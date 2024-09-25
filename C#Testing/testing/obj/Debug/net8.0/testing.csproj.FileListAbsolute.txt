@@ -1,0 +1,14 @@
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\bin\Debug\net8.0\testing.exe
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\bin\Debug\net8.0\testing.deps.json
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\bin\Debug\net8.0\testing.runtimeconfig.json
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\bin\Debug\net8.0\testing.dll
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\bin\Debug\net8.0\testing.pdb
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.AssemblyInfoInputs.cache
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.AssemblyInfo.cs
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.csproj.CoreCompileInputs.cache
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.dll
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\refint\testing.dll
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.pdb
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\testing.genruntimeconfig.cache
+c:\Users\KawleskiNoah\OneDrive - University of Wisconsin-Stout\Uw-Stout\Senior Year\Fall Semester\Capstone\C#Testing\testing\obj\Debug\net8.0\ref\testing.dll

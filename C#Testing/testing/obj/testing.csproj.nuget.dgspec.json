@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj": {}
+    "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\testing.csproj": {}
   },
   "projects": {
-    "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj": {
+    "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\testing.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj",
-        "projectName": "FeatureRecognitionAPI",
-        "projectPath": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj",
+        "projectUniqueName": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\testing.csproj",
+        "projectName": "testing",
+        "projectPath": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\testing.csproj",
         "packagesPath": "C:\\Users\\KawleskiNoah\\.nuget\\packages\\",
-        "outputPath": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\obj\\",
+        "outputPath": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\KawleskiNoah\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -39,12 +39,6 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "dependencies": {
-            "Swashbuckle.AspNetCore": {
-              "target": "Package",
-              "version": "[6.4.0, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -57,9 +51,6 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
