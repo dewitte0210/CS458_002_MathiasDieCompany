@@ -3,4 +3,8 @@
 ################################################################################
 
 /FeatureRecognitionAPI/FeatureRecognitionAPI/obj/Debug/net8.0/FeatureRecognitionAPI.GeneratedMSBuildEditorConfig.editorconfig
-/FeatureRecognitionAPI/.vs/
+/FeatureRecognitionAPI/.vs/**
+*.cache
+*.bin
+*.props
+*.vsidx
