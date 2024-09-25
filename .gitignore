@@ -5,6 +5,8 @@
 /FeatureRecognitionAPI/FeatureRecognitionAPI/obj/Debug/net8.0/FeatureRecognitionAPI.GeneratedMSBuildEditorConfig.editorconfig
 /FeatureRecognitionAPI/.vs/**
 *.cache
+*.AssemblyInfo.cache
+*.AssemblyReference.cache
 *.bin
 *.props
 *.vsidx
