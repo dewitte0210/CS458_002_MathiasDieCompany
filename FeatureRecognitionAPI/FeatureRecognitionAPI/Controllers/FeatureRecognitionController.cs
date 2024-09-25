@@ -9,6 +9,7 @@ namespace FeatureRecognitionAPI.Controllers
         [HttpGet]
         public IActionResult GetFileStructure(string fileName)
         {
+            return null;
             //TODO
         }
     }
