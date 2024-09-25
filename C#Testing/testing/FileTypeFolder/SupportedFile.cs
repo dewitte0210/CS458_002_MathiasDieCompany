@@ -11,6 +11,7 @@ abstract public class SupportedFile
 	protected string path;
 	protected SupportedExtensions fileType;
 	protected FeatureListClass featureList;
+	protected EntityListClass entityList;
 	protected enum SupportedExtensions
 	{
 		pdf,
@@ -51,4 +52,6 @@ abstract public class SupportedFile
 	 * This is where the feature recognition logic will go
 	*/
 	abstract public bool findFeatures();
+	// Method to read the data from a file and fill the entityList with entities
+	public abstract void readEntities();
 }

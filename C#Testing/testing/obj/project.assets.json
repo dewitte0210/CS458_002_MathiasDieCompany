@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\KawleskiNoah\\OneDrive - University of Wisconsin-Stout\\Uw-Stout\\Senior Year\\Fall Semester\\Capstone\\C#Testing\\testing\\testing.csproj",
+      "projectUniqueName": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\testing.csproj",
       "projectName": "testing",
-      "projectPath": "C:\\Users\\KawleskiNoah\\OneDrive - University of Wisconsin-Stout\\Uw-Stout\\Senior Year\\Fall Semester\\Capstone\\C#Testing\\testing\\testing.csproj",
+      "projectPath": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\testing.csproj",
       "packagesPath": "C:\\Users\\KawleskiNoah\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\KawleskiNoah\\OneDrive - University of Wisconsin-Stout\\Uw-Stout\\Senior Year\\Fall Semester\\Capstone\\C#Testing\\testing\\obj\\",
+      "outputPath": "C:\\MDCLocalRepo\\CS458_002_MathiasDieCompany\\C#Testing\\testing\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\KawleskiNoah\\AppData\\Roaming\\NuGet\\NuGet.Config",
