@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/FeatureRecognitionAPI/FeatureRecognitionAPI/obj/Debug/net8.0/FeatureRecognitionAPI.GeneratedMSBuildEditorConfig.editorconfig
+/FeatureRecognitionAPI/.vs/**
+*.cache
+*.bin
+*.props
+*.vsidx

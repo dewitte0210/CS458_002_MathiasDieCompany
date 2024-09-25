@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "XGga995CaaOLsCk08ZO5FcPP9Lnr2d+4Os/LCKZMKYA=",
+  "Source": "FeatureRecognitionAPI",
+  "BasePath": "_content/FeatureRecognitionAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
