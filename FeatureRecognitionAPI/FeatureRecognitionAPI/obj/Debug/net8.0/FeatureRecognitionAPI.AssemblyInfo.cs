@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FeatureRecognitionAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c21401abee7948e02746e2960e1b9039b588c2fb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f9bf0edb14c5b2d5abe2b670c4cf3b84c4d6ac4e")]
 [assembly: System.Reflection.AssemblyProductAttribute("FeatureRecognitionAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FeatureRecognitionAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
