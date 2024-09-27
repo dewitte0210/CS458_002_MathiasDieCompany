@@ -1,16 +1,16 @@
 import * as React from 'react';
+import DragNdrop from './Components/DragNdrop';
+import "./Components/drag-drop.css";
+import { useState } from 'react';
 
-function MyButton({ title }: { title: string }) {
-  return (
-    <button>{title}</button>
-  );
-}
+const App: React.FC = () => {
+  const [files, setFiles] = useState<File[]>([]);
 
-export default function MyApp() {
   return (
     <div>
-      <h1>Welcome to my app</h1>
-      <MyButton title="I'm a button" />
+      <DragNdrop onFilesSelected={setFiles} width={window.innerWidth / 2} height={window.innerHeight} />
     </div>
   );
 }
+
+export default App;

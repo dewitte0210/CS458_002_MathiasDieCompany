@@ -1,0 +1,109 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|c:\\users\\wuestriley\\source\\repos\\practicum\\cs458_002_mathiasdiecompany\\featurerecognitionapi\\featurerecognitionapi\\services\\featurerecognitionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|solutionrelative:featurerecognitionapi\\services\\featurerecognitionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|c:\\users\\wuestriley\\source\\repos\\practicum\\cs458_002_mathiasdiecompany\\featurerecognitionapi\\featurerecognitionapi\\services\\ifeaturerecognitionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|solutionrelative:featurerecognitionapi\\services\\ifeaturerecognitionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|c:\\users\\wuestriley\\source\\repos\\practicum\\cs458_002_mathiasdiecompany\\featurerecognitionapi\\featurerecognitionapi\\models\\filetypes\\supportedfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|solutionrelative:featurerecognitionapi\\models\\filetypes\\supportedfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|c:\\users\\wuestriley\\source\\repos\\practicum\\cs458_002_mathiasdiecompany\\featurerecognitionapi\\featurerecognitionapi\\controllers\\featurerecognitioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|solutionrelative:featurerecognitionapi\\controllers\\featurerecognitioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|c:\\users\\wuestriley\\source\\repos\\practicum\\cs458_002_mathiasdiecompany\\featurerecognitionapi\\featurerecognitionapi\\models\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F34E0D31-FFB7-4244-9A1B-11CE168C7582}|FeatureRecognitionAPI\\FeatureRecognitionAPI.csproj|solutionrelative:featurerecognitionapi\\models\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SupportedFile.cs",
+              "DocumentMoniker": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Models\\FileTypes\\SupportedFile.cs",
+              "RelativeDocumentMoniker": "FeatureRecognitionAPI\\Models\\FileTypes\\SupportedFile.cs",
+              "ToolTip": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Models\\FileTypes\\SupportedFile.cs",
+              "RelativeToolTip": "FeatureRecognitionAPI\\Models\\FileTypes\\SupportedFile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-27T19:48:45.977Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IFeatureRecognitionService.cs",
+              "DocumentMoniker": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Services\\IFeatureRecognitionService.cs",
+              "RelativeDocumentMoniker": "FeatureRecognitionAPI\\Services\\IFeatureRecognitionService.cs",
+              "ToolTip": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Services\\IFeatureRecognitionService.cs*",
+              "RelativeToolTip": "FeatureRecognitionAPI\\Services\\IFeatureRecognitionService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-27T19:42:08.206Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FeatureRecognitionService.cs",
+              "DocumentMoniker": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Services\\FeatureRecognitionService.cs",
+              "RelativeDocumentMoniker": "FeatureRecognitionAPI\\Services\\FeatureRecognitionService.cs",
+              "ToolTip": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Services\\FeatureRecognitionService.cs*",
+              "RelativeToolTip": "FeatureRecognitionAPI\\Services\\FeatureRecognitionService.cs*",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAYwAkAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-27T19:39:32.535Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FeatureRecognitionController.cs",
+              "DocumentMoniker": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Controllers\\FeatureRecognitionController.cs",
+              "RelativeDocumentMoniker": "FeatureRecognitionAPI\\Controllers\\FeatureRecognitionController.cs",
+              "ToolTip": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Controllers\\FeatureRecognitionController.cs*",
+              "RelativeToolTip": "FeatureRecognitionAPI\\Controllers\\FeatureRecognitionController.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-25T20:57:26.148Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Main.cs",
+              "DocumentMoniker": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Models\\Main.cs",
+              "RelativeDocumentMoniker": "FeatureRecognitionAPI\\Models\\Main.cs",
+              "ToolTip": "C:\\Users\\WuestRiley\\source\\repos\\Practicum\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\Models\\Main.cs",
+              "RelativeToolTip": "FeatureRecognitionAPI\\Models\\Main.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAQwB8AAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-25T21:23:12.002Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
