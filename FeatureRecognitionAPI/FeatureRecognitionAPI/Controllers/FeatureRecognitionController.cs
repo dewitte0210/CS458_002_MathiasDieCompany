@@ -11,11 +11,10 @@ namespace FeatureRecognitionAPI.Controllers
         // TODO: Create API endpoint to take a .dwg, .dxf file and return info on its extension
         [HttpGet]
         [Route("getFileStructure")]
-        public SupportedFile GetFileStructure(string fileName)
+        public string GetFileStructure(string fileName)
         {
-            return null;
             //TODO
-            SupportedFile test = FeatureRecognitionService.GetFileStructure(fileName);
+            string test = FeatureRecognitionService.GetFileStructure(fileName);
             return test;
         }
     }
