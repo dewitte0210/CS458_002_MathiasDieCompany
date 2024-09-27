@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using FeatureRecognitionAPI.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FeatureRecognitionAPI.Controllers
@@ -7,13 +8,14 @@ namespace FeatureRecognitionAPI.Controllers
     [Route("FeatureRecognition")]
     public class FeatureRecognitionController
     {
+        // TODO: Create API endpoint to take a .dwg, .dxf file and return info on its extension
         [HttpGet]
         [Route("getFileStructure")]
         public string GetFileStructure(string fileName)
         {
             //TODO
-            //FeatureRecognitionService.GetFileStructure(fileName);
-            return "test";
+            string test = FeatureRecognitionService.GetFileStructure(fileName);
+            return test;
         }
     }
 }
