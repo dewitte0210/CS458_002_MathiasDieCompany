@@ -15,7 +15,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.String",
+        "Type": "SupportedFile",
         "MediaTypes": [
           "text/plain",
           "application/json",

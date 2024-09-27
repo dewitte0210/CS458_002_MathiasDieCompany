@@ -34,4 +34,9 @@ public class DWGFile : SupportedFile
         }
         return false;
     }
+
+    public override void readEntities()
+    {
+        throw new NotImplementedException();
+    }
 }
