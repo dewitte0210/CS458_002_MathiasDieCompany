@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FeatureRecognitionAPI.Controllers
 {
@@ -7,10 +8,13 @@ namespace FeatureRecognitionAPI.Controllers
     public class FeatureRecognitionController
     {
         [HttpGet]
-        public IActionResult GetFileStructure(string fileName)
+        [Route("getFileStructure")]
+        public string GetFileStructure(string fileName)
         {
             return null;
             //TODO
+            //FeatureRecognitionService.GetFileStructure(fileName);
+            return "test";
         }
     }
 }
