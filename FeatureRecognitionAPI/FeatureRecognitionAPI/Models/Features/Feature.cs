@@ -9,6 +9,10 @@ using System.Numerics;
 abstract public class Feature
 {
     PossibleFeatureTypes featureType;
+    Entity[] entityList;
+    bool kissCut;
+    bool multipleRadius;
+    bool perOver20;
     protected enum PossibleFeatureTypes
     {
         rectangle,
@@ -17,6 +21,10 @@ abstract public class Feature
     
     public Feature()
     {
-
+        kissCut = false;
+        multipleRadius = false;
+        perOver20 = false;
     }
+
+    abstract public void calcPerimeter();
 }
