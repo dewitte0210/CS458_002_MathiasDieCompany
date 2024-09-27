@@ -35,4 +35,9 @@ public class PDFFile : SupportedFile
         }
         return false;
     }
+
+    public override void readEntities()
+    {
+        throw new NotImplementedException();
+    }
 }
