@@ -16,4 +16,9 @@ public class DXFFile : SupportedFile
         //TODO
         return false;
     }
+
+    public override void readEntities()
+    {
+        throw new NotImplementedException();
+    }
 }
