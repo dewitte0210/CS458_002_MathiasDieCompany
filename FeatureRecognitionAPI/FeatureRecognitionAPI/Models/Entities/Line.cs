@@ -2,10 +2,13 @@
 using System.IO;
 using System.Numerics;
 
-public class Line : Entity
+namespace FeatureRecognitionAPI.Models
 {
-    Line()
+    public class Line : Entity
     {
-        entityType = PossibleEntityTypes.line;
+        Line()
+        {
+            entityType = PossibleEntityTypes.line;
+        }
     }
 }

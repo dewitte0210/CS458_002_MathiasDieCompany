@@ -6,17 +6,20 @@ using System;
 using System.IO;
 using System.Numerics;
 
-abstract public class Feature
+namespace FeatureRecognitionAPI.Models
 {
-    PossibleFeatureTypes featureType;
-    protected enum PossibleFeatureTypes
+    abstract public class Feature
     {
-        rectangle,
-        circle,
-    }
-    
-    public Feature()
-    {
+        PossibleFeatureTypes featureType;
+        protected enum PossibleFeatureTypes
+        {
+            rectangle,
+            circle,
+        }
 
+        public Feature()
+        {
+
+        }
     }
 }

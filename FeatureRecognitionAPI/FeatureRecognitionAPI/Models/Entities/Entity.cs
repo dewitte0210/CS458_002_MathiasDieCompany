@@ -7,18 +7,21 @@ using System;
 using System.IO;
 using System.Numerics;
 
-abstract public class Entity
+namespace FeatureRecognitionAPI.Models
 {
-    protected PossibleEntityTypes entityType;
-    protected enum PossibleEntityTypes
+    abstract public class Entity
     {
-        line,
-        circle,
-        arc
-    }
-    
-    public Entity()
-    {
+        protected PossibleEntityTypes entityType;
+        protected enum PossibleEntityTypes
+        {
+            line,
+            circle,
+            arc
+        }
 
+        public Entity()
+        {
+
+        }
     }
 }

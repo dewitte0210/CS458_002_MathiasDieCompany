@@ -3,23 +3,26 @@
  */
 using System;
 
-public class EntityListClass
+namespace FeatureRecognitionAPI.Models
 {
-    Entity[] entityList;
-    public EntityListClass()
+    public class EntityListClass
     {
-    }
+        Entity[] entityList;
+        public EntityListClass()
+        {
+        }
 
-    //Convert entityList to a readable array to be printed in a file
-    public string[] toStringArray()
-    {
-        //TODO
-        return new string[0];
-    }
+        //Convert entityList to a readable array to be printed in a file
+        public string[] toStringArray()
+        {
+            //TODO
+            return new string[0];
+        }
 
-    //Convert string array, formatted in the same way as the toStringArray method, to entity list
-    public void setEntityList(string[] stringFeatureList)
-    {
+        //Convert string array, formatted in the same way as the toStringArray method, to entity list
+        public void setEntityList(string[] stringFeatureList)
+        {
 
+        }
     }
 }

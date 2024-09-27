@@ -4,21 +4,24 @@
  */
 using System;
 
-public class DXFFile : SupportedFile
+namespace FeatureRecognitionAPI.Models
 {
-    public DXFFile(string path) : base(path) 
+    public class DXFFile : SupportedFile
     {
-        fileType = SupportedExtensions.dxf;
-    }
+        public DXFFile(string path) : base(path)
+        {
+            fileType = SupportedExtensions.dxf;
+        }
 
-    public override bool findFeatures()
-    {
-        //TODO
-        return false;
-    }
+        public override bool findFeatures()
+        {
+            //TODO
+            return false;
+        }
 
-    public override void readEntities()
-    {
-        throw new NotImplementedException();
+        public override void readEntities()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

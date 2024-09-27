@@ -2,10 +2,12 @@
 using System.IO;
 using System.Numerics;
 
-public class Circle : Entity
-{
-    Circle()
+namespace FeatureRecognitionAPI.Models { 
+    public class Circle : Entity
     {
-        entityType = PossibleEntityTypes.circle;
+        Circle()
+        {
+            entityType = PossibleEntityTypes.circle;
+        }
     }
 }
