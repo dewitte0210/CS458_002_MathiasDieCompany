@@ -38,7 +38,7 @@ bld/
 [Ll]og/
 [Ll]ogs/
 **\Debug\net8.0\
-**/v17/
+**\v17\
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
