@@ -1,7 +1,8 @@
 using System.IO;
 using System;
+using FeatureRecognitionAPI.Models;
 
-namespace MyNamespace
+namespace FeatureRecognitionAPI
 {
     public class MyMainClass
     {
