@@ -12,8 +12,8 @@ namespace FeatureRecognitionAPI.Models
     {
         protected string path;
         protected SupportedExtensions fileType;
-        protected FeatureListClass featureList;
-        protected EntityListClass entityList;
+        protected List<Feature> featureList = [];
+        protected List<Entity> entityList;
         protected enum SupportedExtensions
         {
             pdf,
@@ -38,13 +38,12 @@ namespace FeatureRecognitionAPI.Models
         }
         public void writeFeatures()
         {
-            File.WriteAllLines("features.txt", featureList.toStringArray());
+        
         }
         public void readFeatures()
         {
-            featureList.setFeatureList(File.ReadAllLines("features.txt"));
         }
-        public FeatureListClass getFeatureList()
+        public List<Feature> getFeatureList()
         {
             return featureList;
         }

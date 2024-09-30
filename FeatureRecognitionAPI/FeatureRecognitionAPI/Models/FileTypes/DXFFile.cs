@@ -10,7 +10,7 @@ namespace FeatureRecognitionAPI.Models
     {
         public DXFFile(string path) : base(path)
         {
-            entityList = new EntityListClass();
+            entityList = [];
             this.path = path;
             fileType = SupportedExtensions.dxf;
             if (File.Exists(path))
@@ -21,8 +21,12 @@ namespace FeatureRecognitionAPI.Models
 
             public override bool findFeatures()
             {
-                //TODO
-                return false;
+                while(featureList.Count > 0)
+                {
+                    Entity curEntity = entityList.First();
+
+                } 
+                return true; 
             }
 
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
@@ -101,7 +105,7 @@ namespace FeatureRecognitionAPI.Models
 
                         }
                         Line lineEntity = new Line(xStart, xEnd, yStart, yEnd);
-                        entityList.addEntity(lineEntity);
+                        entityList.Add(lineEntity);
                         break;
 
                     case "ARC":
@@ -153,7 +157,7 @@ namespace FeatureRecognitionAPI.Models
                             index++;
                         }
                         Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
-                        entityList.addEntity(arcEntity);
+                        entityList.Add(arcEntity);
                         break;
 
                     case "CIRCLE":
@@ -190,7 +194,7 @@ namespace FeatureRecognitionAPI.Models
                             index++;
                         }
                         Circle circleEntity = new Circle(xPoint, yPoint, radius);
-                        entityList.addEntity(circleEntity);
+                        entityList.Add(circleEntity);
                         break;
 
                     default:
