@@ -2,11 +2,11 @@
 
 namespace FeatureRecognitionAPI.Services
 {
-    public class FeatureRecognitionService
+    public class FeatureRecognitionService : IFeatureRecognitionService
     {
         public FeatureRecognitionService() { }
 
-        public static string GetFileStructure(string fileName)
+        public string GetFileStructure(string fileName)
         {
             if (fileName != null)
             {

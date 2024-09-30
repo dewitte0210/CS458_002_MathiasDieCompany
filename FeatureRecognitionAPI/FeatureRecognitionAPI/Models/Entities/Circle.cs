@@ -4,8 +4,15 @@ using System.Numerics;
 
 public class Circle : Entity
 {
-    Circle()
+    private decimal xPoint, yPoint, radius;
+    private Circle()
+    { }
+
+    public Circle(decimal xPoint, decimal yPoint, decimal radius)
     {
         entityType = PossibleEntityTypes.circle;
+        this.xPoint=xPoint;
+        this.yPoint=yPoint;
+        this.radius=radius;
     }
 }
