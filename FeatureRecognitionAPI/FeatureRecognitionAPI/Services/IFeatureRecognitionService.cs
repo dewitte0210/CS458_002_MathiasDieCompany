@@ -2,7 +2,7 @@
 {
     public interface IFeatureRecognitionService
     {
-        public SupportedFile GetFileStructure(string fileName);
+        public string GetFileStructure(string fileName);
 
     }
 }
