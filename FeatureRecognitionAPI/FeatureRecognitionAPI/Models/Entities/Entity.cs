@@ -10,6 +10,7 @@ using System.Numerics;
 abstract public class Entity
 {
     protected PossibleEntityTypes entityType;
+    double length;
     protected enum PossibleEntityTypes
     {
         line,
@@ -17,6 +18,11 @@ abstract public class Entity
         arc
     }
     
+    public void setLength(double length)
+    {
+        this.length = length;
+    }
+    public double getLength() { return this.length; }
     public Entity()
     {
 
