@@ -152,6 +152,7 @@ public class DXFFile : SupportedFile
                     }
                     Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
                     entityList.addEntity(arcEntity);
+                    
                     break;
 
                 case "CIRCLE":
