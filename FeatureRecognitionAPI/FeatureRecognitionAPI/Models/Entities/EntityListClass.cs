@@ -31,14 +31,14 @@ public class EntityListClass
     public bool addEntity(Entity entity)
     {
         //If there is room in the array, add the entity
-        if (entityIndex < entityList.Length)
+        if ((entityIndex + 1) < entityList.Length)
         {
             entityIndex++;
             entityList[entityIndex] = entity;
             return true;
         }
         //If there is not room, double entity array size
-        else if (entityIndex >= entityList.Length)
+        else if ((entityIndex + 1) >= entityList.Length)
         {
             Entity[] temp = new Entity[(entityList.Length * 2)];
 
