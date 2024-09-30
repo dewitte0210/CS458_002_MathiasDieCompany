@@ -7,7 +7,7 @@ namespace FeatureRecognitionAPI.Models
 {
     public class FeatureListClass
     {
-        Feature[] featureList;
+        private List<Feature> featureList = [];
         public FeatureListClass()
         {
         }

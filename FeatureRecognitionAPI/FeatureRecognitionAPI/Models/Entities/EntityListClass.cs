@@ -7,9 +7,13 @@ namespace FeatureRecognitionAPI.Models
 {
     public class EntityListClass
     {
-        Entity[] entityList;
+        private List<Entity> entityList = [];
+        //Refers to to the current index at the 'end' of the entityList
+        private int entityIndex;
         public EntityListClass()
         {
+            //set entity index to -1 to indicate empty list
+            entityIndex = -1;
         }
 
         //Convert entityList to a readable array to be printed in a file
@@ -23,6 +27,13 @@ namespace FeatureRecognitionAPI.Models
         public void setEntityList(string[] stringFeatureList)
         {
 
+        }
+
+        public bool addEntity(Entity entity)
+        {
+            entityList.Add(entity);
+            entityIndex++; 
+            return true;
         }
     }
 }
