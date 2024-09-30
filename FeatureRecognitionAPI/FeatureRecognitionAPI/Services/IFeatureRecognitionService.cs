@@ -1,4 +1,7 @@
-﻿namespace FeatureRecognitionAPI.Services
+﻿using FeatureRecognitionAPI.Services;
+using FeatureRecognitionAPI.Models;
+
+namespace FeatureRecognitionAPI
 {
     public interface IFeatureRecognitionService
     {

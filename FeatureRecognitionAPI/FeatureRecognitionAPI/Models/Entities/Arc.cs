@@ -2,38 +2,40 @@
 using System.IO;
 using System.Numerics;
 using System.Reflection.Metadata;
+using DecimalMath;
+
 namespace FeatureRecognitionAPI.Models
 {
 
     public class Arc : Entity
     {
         //Center point of arc - x value
-        public double centerX { get; set; }
+        public decimal centerX { get; set; }
         //Center point of arc - y value
-        public double centerY { get; set; }
+        public decimal centerY { get; set; }
         //Starting point of arc - x value
-        public double startX { get; }
+        public decimal startX { get; }
         //Starting point of arc - y value
-        public double startY { get; }
+        public decimal startY { get; }
         //Ending point of arc - x value
-        public double endX { get; }
+        public decimal endX { get; }
         //Ending point of arc - y value
-        public double endY { get; }
-        public double radius { get; set; }
+        public decimal endY { get; }
+        public decimal radius { get; set; }
         //Start angle for starting coordinate values
-        public double startAngle { get; set; }
+        public decimal startAngle { get; set; }
         //End angle for ending coordinate values
-        public double endAngle { get; set; }
+        public decimal endAngle { get; set; }
         //Actual angle of the arc
-        public double centralAngle { get; }
+        public decimal centralAngle { get; }
         //Length of the arc
-        public double length { get; }
+        public decimal length { get; }
 
         /**
          * Creates an arc and calculates the starting and ending coordinates as well
          * as the length of the arc
          */
-        public Arc(double centerX, double centerY, double radius, double startAngle, double endAngle)
+        public Arc(decimal centerX, decimal centerY, decimal radius, decimal startAngle, decimal endAngle)
         {
             entityType = PossibleEntityTypes.arc;
             this.centerX = centerX;
@@ -52,33 +54,33 @@ namespace FeatureRecognitionAPI.Models
         /**
          * Function for calculating radians for cos and sin calculations.
          */
-        private double degreesToRadians(double degrees)
+        private decimal degreesToRadians(decimal degrees)
         {
-            return (degrees * Math.PI / 180);
+            return (degrees * DecimalEx.Pi / 180);
         }
 
         /**
          * Function to calculate the x coordinate given the center point, radius
          * and an angle.
          */
-        private double calcXCoord(double x, double radius, double angle)
+        private decimal calcXCoord(decimal x, decimal radius, decimal angle)
         {
-            return (radius * Math.Cos(degreesToRadians(angle)) + x);
+            return (radius * DecimalEx.Cos(degreesToRadians(angle)) + x);
         }
 
         /**
          * Function to calculate the y coordinate given the center point, radius
          * and an angle.
          */
-        private double calcYCoord(double y, double radius, double angle)
+        private decimal calcYCoord(decimal y, decimal radius, decimal angle)
         {
-            return (radius * Math.Sin(degreesToRadians(angle)) + y);
+            return (radius * DecimalEx.Sin(degreesToRadians(angle)) + y);
         }
 
         /**
          * Function to calculate the central angle
          */
-        private double calcCentralAngle(double startAngle, double endAngle) 
+        private decimal calcCentralAngle(decimal startAngle, decimal endAngle) 
         {
             //The subtraction result would be negative, need to add 360 to get correct value
             if (endAngle < startAngle)
@@ -89,9 +91,9 @@ namespace FeatureRecognitionAPI.Models
         /**
          * Fucntion to calculate the length of the arc for perimeter length checks
          */
-        private double calcLength(double radius, double centralAngle)
+        private decimal calcLength(decimal radius, decimal centralAngle)
         {
-            return (2 * Math.PI * radius * (centralAngle / 360));
+            return (2 * DecimalEx.Pi * radius * (centralAngle / 360));
         }
     }
 }

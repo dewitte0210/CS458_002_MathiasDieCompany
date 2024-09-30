@@ -8,10 +8,19 @@
     ".NETCoreApp,Version=v8.0": {
       "FeatureRecognitionAPI/1.0.0": {
         "dependencies": {
+          "DecimalMath.DecimalEx": "1.0.2",
           "Swashbuckle.AspNetCore": "6.4.0"
         },
         "runtime": {
           "FeatureRecognitionAPI.dll": {}
+        }
+      },
+      "DecimalMath.DecimalEx/1.0.2": {
+        "runtime": {
+          "lib/netstandard2.0/DecimalEx.dll": {
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.2.0"
+          }
         }
       },
       "Microsoft.Extensions.ApiDescription.Server/6.0.5": {},
@@ -68,6 +77,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "DecimalMath.DecimalEx/1.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BCii/IxT7Tx7BPZ7MtrpqVlEii/iaHi4OOXpgaPi+zrphnkbe251KKI3S+pgnTzobfn0jS/SF7bgidqOMj1oGw==",
+      "path": "decimalmath.decimalex/1.0.2",
+      "hashPath": "decimalmath.decimalex.1.0.2.nupkg.sha512"
     },
     "Microsoft.Extensions.ApiDescription.Server/6.0.5": {
       "type": "package",

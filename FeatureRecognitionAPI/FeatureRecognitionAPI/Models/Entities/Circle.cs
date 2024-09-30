@@ -1,17 +1,18 @@
 ﻿using System;
 using System.IO;
 using System.Numerics;
+using DecimalMath;
 
 namespace FeatureRecognitionAPI.Models { 
     public class Circle : Entity
     {
         //Center point of circle - x value
-        public double centerX {  get; set; }
+        public decimal centerX {  get; set; }
         //Center point of circle - y value
-        public double centerY { get; set; }
-        public double radius { get; set; }
-        public double perimeter { get; }
-        public Circle(double centerX, double centerY, double radius)
+        public decimal centerY { get; set; }
+        public decimal radius { get; set; }
+        public decimal perimeter { get; }
+        public Circle(decimal centerX, decimal centerY, decimal radius)
         {
             entityType = PossibleEntityTypes.circle;
             this.centerX = centerX;
@@ -20,9 +21,9 @@ namespace FeatureRecognitionAPI.Models {
             this.perimeter = calcPerimeter(radius);
         }
 
-        private double calcPerimeter(double radius)
+        private decimal calcPerimeter(decimal radius)
         {
-            return 2 * Math.PI * radius;
+            return 2 * DecimalEx.Pi * radius;
         }
     }
 }
