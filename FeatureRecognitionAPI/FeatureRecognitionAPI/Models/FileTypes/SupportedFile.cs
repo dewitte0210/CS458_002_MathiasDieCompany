@@ -10,8 +10,8 @@ abstract public class SupportedFile
 {
 	protected string path;
 	protected SupportedExtensions fileType;
-	protected FeatureListClass featureList;
-	protected EntityListClass entityList;
+	protected Feature[] featureList;
+	protected Entity[] entityList;
 	protected enum SupportedExtensions
 	{
 		pdf,
@@ -36,15 +36,11 @@ abstract public class SupportedFile
 	}
 	public void writeFeatures()
 	{
-		File.WriteAllLines("features.txt", featureList.toStringArray());
+		//TODO write contents of featureList to features.txt
 	}
 	public void readFeatures()
 	{
-		featureList.setFeatureList(File.ReadAllLines("features.txt"));
-	}
-	public FeatureListClass getFeatureList()
-	{
-		return featureList;
+		//TODO read features.txt into fetureList
 	}
 	
 	/* 
