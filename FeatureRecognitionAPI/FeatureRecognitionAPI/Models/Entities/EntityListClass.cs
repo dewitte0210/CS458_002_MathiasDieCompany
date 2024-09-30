@@ -3,56 +3,37 @@
  */
 using System;
 
-public class EntityListClass
+namespace FeatureRecognitionAPI.Models
 {
-    private Entity[] entityList;
-    //Refers to to the current index at the 'end' of the entityList
-    private int entityIndex;
-    public EntityListClass()
+    public class EntityListClass
     {
-        //set entity index to -1 to indicate empty list
-        entityIndex = -1;
-        entityList = new Entity[100];
-    }
-
-    //Convert entityList to a readable array to be printed in a file
-    public string[] toStringArray()
-    {
-        //TODO
-        return new string[0];
-    }
-
-    //Convert string array, formatted in the same way as the toStringArray method, to entity list
-    public void setEntityList(string[] stringFeatureList)
-    {
-
-    }
-
-    public bool addEntity(Entity entity)
-    {
-        //If there is room in the array, add the entity
-        if ((entityIndex + 1) < entityList.Length)
+        private List<Entity> entityList = [];
+        //Refers to to the current index at the 'end' of the entityList
+        private int entityIndex;
+        public EntityListClass()
         {
-            entityIndex++;
-            entityList[entityIndex] = entity;
+            //set entity index to -1 to indicate empty list
+            entityIndex = -1;
+        }
+
+        //Convert entityList to a readable array to be printed in a file
+        public string[] toStringArray()
+        {
+            //TODO
+            return new string[0];
+        }
+
+        //Convert string array, formatted in the same way as the toStringArray method, to entity list
+        public void setEntityList(string[] stringFeatureList)
+        {
+
+        }
+
+        public bool addEntity(Entity entity)
+        {
+            entityList.Add(entity);
+            entityIndex++; 
             return true;
         }
-        //If there is not room, double entity array size
-        else if ((entityIndex + 1) >= entityList.Length)
-        {
-            Entity[] temp = new Entity[(entityList.Length * 2)];
-
-            for (int i = 0; i < entityList.Length; i++)
-            {
-                temp[i] = entityList[i];
-            }
-            entityList = temp;
-            //Add Entity
-            entityIndex++;
-            entityList[entityIndex] = entity;
-            return true;
-        }
-        return false;
     }
-
 }

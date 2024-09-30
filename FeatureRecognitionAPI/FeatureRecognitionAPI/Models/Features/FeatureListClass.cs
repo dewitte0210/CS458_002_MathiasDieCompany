@@ -3,23 +3,26 @@
  */
 using System;
 
-public class FeatureListClass
+namespace FeatureRecognitionAPI.Models
 {
-    Feature[] featureList;
-    public FeatureListClass()
+    public class FeatureListClass
     {
-    }
+        private List<Feature> featureList = [];
+        public FeatureListClass()
+        {
+        }
 
-    //Convert featureList to a readable array to be printed in a file
-    public string[] toStringArray()
-    {
-        //TODO
-        return new string[0];
-    }
+        //Convert featureList to a readable array to be printed in a file
+        public string[] toStringArray()
+        {
+            //TODO
+            return new string[0];
+        }
 
-    //Convert string array, formatted in the same way as the toStringArray method, to feature list
-    public void setFeatureList(string[] stringFeatureList)
-    {
+        //Convert string array, formatted in the same way as the toStringArray method, to feature list
+        public void setFeatureList(string[] stringFeatureList)
+        {
 
+        }
     }
 }
