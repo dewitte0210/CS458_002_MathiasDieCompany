@@ -1,4 +1,5 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
+﻿using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Enums;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 
