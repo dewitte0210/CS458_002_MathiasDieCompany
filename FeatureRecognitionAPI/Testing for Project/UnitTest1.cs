@@ -51,6 +51,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDXFFileClass()
         {
+            //Example 
             string path = @"C:\Users\Ice-HaskinsStephen\Downloads\Example-003.dxf";
             bool pathTest = File.Exists(path);
 
@@ -85,11 +86,23 @@ namespace Testing_for_Project
             Assert.That(test3.startAngle, Is.EqualTo(149.9999999999999716m));
             Assert.That(test3.endAngle, Is.EqualTo(270.0000000000000000m));
 
+            Assert.That(testList[3].GetEntityType(), Is.EqualTo("circle"));
+            Circle test4 = (Circle)testList[3];
 
-            
+            Assert.That(test4.centerX, Is.EqualTo(3.3752118942999996m));
+            Assert.That(test4.centerY, Is.EqualTo(2.6843885206000002));
+            Assert.That(test4.radius, Is.EqualTo(1.0000000000000000m));
 
+            Assert.That(testList[4].GetEntityType(), Is.EqualTo("arc"));
+            Arc test5 = (Arc)testList[4];
 
+            Assert.That(test5.centerX, Is.EqualTo(6.0004237886999992m));
+            Assert.That(test5.centerY, Is.EqualTo(4.2000000000000011m));
+            Assert.That(test5.radius, Is.EqualTo(0.7499999999999999m));
+            Assert.That(test5.startAngle, Is.EqualTo(329.9990346727777819m));
+            Assert.That(test5.endAngle, Is.EqualTo(90.0000000000000000m));
 
+            Assert.That(testList[5].GetEntityType(), Is.EqualTo("line"));
 
         }
     }
