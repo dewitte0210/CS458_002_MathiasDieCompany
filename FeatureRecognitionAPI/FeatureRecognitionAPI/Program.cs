@@ -1,6 +1,8 @@
 using FeatureRecognitionAPI.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Formatting;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +18,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FeatureRecognitionPolicy", builder =>
     {
-        builder.WithOrigins("http://localhost:7244")
-               .WithMethods("POST", "GET", "PUT", "DELETE")
-               .WithHeaders(HeaderNames.ContentType);
+        builder.WithOrigins("http://localhost:3000")
+               //.WithMethods("POST", "GET", "PUT", "DELETE")
+               //.WithHeaders(HeaderNames.ContentType);
+               .AllowAnyMethod() // Temporarily allow any method
+               .AllowAnyHeader() // Temporarily allow any header
+               .AllowCredentials(); // Allow credentials if needed
     });
 });
 
@@ -32,7 +37,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("FeatureRecognitionPolicy");
-
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
