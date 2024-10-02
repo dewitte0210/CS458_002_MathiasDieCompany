@@ -9,29 +9,21 @@ using System.Numerics;
 
 namespace FeatureRecognitionAPI.Models
 {
-    protected PossibleEntityTypes entityType;
-    double length;
-    protected enum PossibleEntityTypes
-    {
-        line,
-        circle,
-        arc
-    }
-    
-    public void setLength(double length)
-    {
-        this.length = length;
-    }
-    public double getLength() { return this.length; }
-    public Entity()
-    {
+    public abstract class Entity {
         protected PossibleEntityTypes entityType;
+        double length;
         protected enum PossibleEntityTypes
         {
             line,
             circle,
             arc
         }
+
+        public void setLength(double length)
+        {
+            this.length = length;
+        }
+        public double getLength() { return this.length; }
 
         public Entity()
         {
