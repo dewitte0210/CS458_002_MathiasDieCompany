@@ -1,6 +1,7 @@
 using FeatureRecognitionAPI.Models;
 using NuGet.Frameworks;
 using DecimalMath;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Testing_for_Project
 {
@@ -57,7 +58,36 @@ namespace Testing_for_Project
             Assert.That(pathTest, Is.True);
             DXFFile testFile = new DXFFile(path);
 
-            List<Entity> testList = testFile.GetEntities();
+            List<Entity> testList = testFile.GetEntities();            
+            Assert.That(testList[0].GetEntityType(), Is.EqualTo("arc"));
+            Arc test1 = (Arc)testList[0];
+
+            Assert.That(test1.centerX, Is.EqualTo(11.2650987394999991m));
+            Assert.That(test1.centerY, Is.EqualTo(0.7549998982999999m));
+            Assert.That(test1.radius, Is.EqualTo(0.7499999999999999m));
+            Assert.That(test1.startAngle, Is.EqualTo(270.0000000000000000m));
+            Assert.That(test1.endAngle, Is.EqualTo(30.0000000000000036m));
+
+            Assert.That(testList[1].GetEntityType(), Is.EqualTo("line"));
+            Line test2 = (Line)testList[1];
+
+            Assert.That(test2.StartX, Is.EqualTo(11.2650987394999991m));
+            Assert.That(test2.StartY, Is.EqualTo(0.0049998983000000m));
+            Assert.That(test2.EndX, Is.EqualTo(6.0146749507999999m));
+            Assert.That(test2.EndY, Is.EqualTo(0.0049998983000000m));
+
+            Assert.That(testList[2].GetEntityType(), Is.EqualTo("arc"));
+            Arc test3 = (Arc)testList[2];
+
+            Assert.That(test3.centerX, Is.EqualTo(6.0146749507999999m));
+            Assert.That(test3.centerY, Is.EqualTo(0.7549998982999998m));
+            Assert.That(test3.radius, Is.EqualTo(0.7499999999999999m));
+            Assert.That(test3.startAngle, Is.EqualTo(149.9999999999999716m));
+            Assert.That(test3.endAngle, Is.EqualTo(270.0000000000000000m));
+
+
+            
+
 
 
 

@@ -105,7 +105,7 @@ namespace FeatureRecognitionAPI.Models
                             index++;
 
                         }
-                        Line lineEntity = new Line(xStart, xEnd, yStart, yEnd);
+                        Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
                         entityList.Add(lineEntity);
                         break;
 

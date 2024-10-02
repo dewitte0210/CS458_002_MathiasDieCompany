@@ -23,5 +23,10 @@ namespace FeatureRecognitionAPI.Models
         {
 
         }
+
+        public string GetEntityType()
+        {
+            return entityType.ToString();
+        }
     }
 }

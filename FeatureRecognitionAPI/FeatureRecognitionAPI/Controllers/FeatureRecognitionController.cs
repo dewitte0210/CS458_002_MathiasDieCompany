@@ -22,12 +22,12 @@ namespace FeatureRecognitionAPI.Controllers
             return test;
         }
 
-        [HttpPost]
-        [Route("uploadFile")]
-        public string UploadFile()
-        {
-            var file = "";
-            System.Web.
-        }
+        //[HttpPost]
+        //[Route("uploadFile")]
+        //public string UploadFile()
+        //{
+        //    var file = "";
+        //    System.Web.
+        //}
     }
 }
