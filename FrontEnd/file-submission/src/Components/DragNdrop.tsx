@@ -4,6 +4,8 @@ import { MdClear } from "react-icons/md";
 import "./drag-drop.css";
 import { useState } from 'react';
 
+
+
 /*
   Defines the shape of the props that the DragNdrop component accepts.
 */
@@ -24,8 +26,19 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   //state hooks
   const [file, setFile] = useState<File | null>(null); // Only allow one file
   const [submitted, setSubmitted] = useState(false);  // New state to track submission
+  const allowedFileExtensions = ['.pdf', '.dwg', '.dxf'];
   
-  const allowedFileExtensions = ['.pdf', '.dwg', '.dxf']; // Define allowed file extensions
+  const handleFileDrop = (newFile: File) => {
+    const fileExtension = newFile.name.split('.').pop();
+    if (fileExtension && allowedFileExtensions.includes(`.${fileExtension}`)) {
+      setFile(newFile);
+      if (onFilesSelected) {
+        onFilesSelected([newFile]); // Pass the file to the parent component
+      }
+    } else {
+      alert('Invalid file type. Please upload a PDF, DWG, or DXF file.'); // Alert for invalid file type
+    }
+  };
 
   /*
     Event handler for when a file is dropped onto the drop zone.
@@ -77,16 +90,46 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   /*
     Event handler for when the user clicks the submit file button.
   */
-  const handleSubmit = () => {
-    if (file) {
-      // TODO: Perform submission action
-      setSubmitted(true);  // Update the state to indicate successful submission
-      if (onFilesSelected) {
-        onFilesSelected([file]);
-      }
+  // const handleSubmit = () => {
+  //   if (file) {
+  //     uploadFile(file)
+  //     .then(() => {
+  //       setSubmitted(true);  // Update the state to indicate successful submission
+  //       if (onFilesSelected) {
+  //         onFilesSelected([file]);
+  //       }
+  //     })
+  //     .catch((error: any) => {
+  //       console.error(error); // Log the error to the console
+  //       alert('An error occurred while submitting the file. Please try again.'); // Alert the user about the error
+  //     });
+  //   }
+  // };
+  const handleSubmit = async () => {
+    console.log(file);
+    if (!file) {
+      console.error("No file selected");
+      return;
     }
-  };
 
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+        const res = await fetch("https://localhost:44373/api/FeatureRecognition/uploadFile", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status} ${res.statusText}`);
+        }
+    
+        console.log("File uploaded successfully:", res);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        alert('An error occurred while submitting the file. Please try again.');
+      }
+  }
   /*
     Event handler for when the user clicks the back button after submission.
   */
@@ -94,7 +137,6 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     setSubmitted(false);
     setFile(null); // Clear the file after submission
   };
-
   return (
     <section className="drag-drop" style={{ width: width, height: height }}>
       {!submitted ? (  // Conditional rendering based on submission state

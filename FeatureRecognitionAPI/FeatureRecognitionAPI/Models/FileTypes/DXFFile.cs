@@ -20,15 +20,15 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
-            public override bool findFeatures()
+        public override bool findFeatures()
+        {
+            while(featureList.Count > 0)
             {
-                while(featureList.Count > 0)
-                {
-                    Entity curEntity = entityList.First();
+                Entity curEntity = entityList.First();
 
-                } 
-                return true; 
-            }
+            } 
+            return true; 
+        }
 
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
