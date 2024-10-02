@@ -46,5 +46,21 @@ namespace Testing_for_Project
             Assert.That(circle1.radius, Is.EqualTo(0.2577228596164672m));
             Assert.That(circle1.perimeter, Is.EqualTo((2 * DecimalEx.Pi * 0.2577228596164672m)));
         }
+
+        [Test]
+        public void TestDXFFileClass()
+        {
+            string path = @"C:\Users\Ice-HaskinsStephen\Downloads\Example-003.dxf";
+            bool pathTest = File.Exists(path);
+
+            //Make sure the file exists so that DXF can be created
+            Assert.That(pathTest, Is.True);
+            DXFFile testFile = new DXFFile(path);
+
+            List<Entity> testList = testFile.GetEntities();
+
+
+
+        }
     }
 }
