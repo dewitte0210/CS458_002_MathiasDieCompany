@@ -1,18 +1,29 @@
 ﻿using System;
 using System.IO;
 using System.Numerics;
+using DecimalMath;
 
-public class Circle : Entity
-{
-    private decimal xPoint, yPoint, radius;
-    private Circle()
-    { }
-
-    public Circle(decimal xPoint, decimal yPoint, decimal radius)
+namespace FeatureRecognitionAPI.Models { 
+    public class Circle : Entity
     {
-        entityType = PossibleEntityTypes.circle;
-        this.xPoint=xPoint;
-        this.yPoint=yPoint;
-        this.radius=radius;
+        //Center point of circle - x value
+        public decimal centerX {  get; set; }
+        //Center point of circle - y value
+        public decimal centerY { get; set; }
+        public decimal radius { get; set; }
+        public decimal perimeter { get; }
+        public Circle(decimal centerX, decimal centerY, decimal radius)
+        {
+            entityType = PossibleEntityTypes.circle;
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.radius = radius;
+            this.perimeter = calcPerimeter(radius);
+        }
+
+        private decimal calcPerimeter(decimal radius)
+        {
+            return 2 * DecimalEx.Pi * radius;
+        }
     }
 }
