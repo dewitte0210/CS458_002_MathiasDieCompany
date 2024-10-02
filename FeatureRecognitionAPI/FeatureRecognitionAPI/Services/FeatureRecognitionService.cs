@@ -72,51 +72,6 @@ namespace FeatureRecognitionAPI.Services
 
                     return (OperationStatus.OK, lines);
 
-                    //        int linesLength = lines.Length;
-                    //        int entityIndex = 0;
-
-                    //        //Find the index where entities start
-                    //        for (int i = 0; i < linesLength; i++)
-                    //        {
-                    //            Console.WriteLine(lines[i]);
-
-                    //            if (lines[i] == "ENTITIES")
-                    //            {
-                    //                entityIndex = i;
-                    //                break;
-                    //            }
-                    //        }
-
-                    //        bool detectingEntities = true;
-
-                    //        int index = entityIndex;
-
-                    //        while (detectingEntities)
-                    //        {
-
-                    //            Console.WriteLine(lines[index]);
-
-                    //            switch (lines[index])
-                    //            {
-                    //                case "LINE":
-                    //                    for (int i=index; index < lines.Length; index++, i++)
-                    //                    {
-
-                    //                    }
-                    //                    return;
-                    //                case "ARC":
-
-                    //                case "CIRCLE":
-
-                    //                default:
-                    //                    index++;
-                    //                    return;
-                    //            }
-
-
-
-
-                    //        }
                 }
                 else
                     return (OperationStatus.BadRequest, new List<string> { "File not recognized" });
