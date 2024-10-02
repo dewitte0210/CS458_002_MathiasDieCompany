@@ -1,6 +1,6 @@
-@FeatureRecognitionAPI_HostAddress = http://localhost:5283
+@FeatureRecognitionAPI_HostAddress = http://localhost:44373
 
-GET {{FeatureRecognitionAPI_HostAddress}}/weatherforecast/
-Accept: application/json
+GET {{FeatureRecognitionAPI_HostAddress}}/api/FeatureRecognition/uploadFile
+Accept: form-data
 
 ###
