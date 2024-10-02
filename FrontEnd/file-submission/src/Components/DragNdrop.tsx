@@ -115,7 +115,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     const formData = new FormData();
     formData.append("file", file);
     try {
-        const res = await fetch("http://localhost:44373/api/FeatureRecognition/uploadFile", {
+        const res = await fetch("https://localhost:44373/api/FeatureRecognition/uploadFile", {
             method: "POST",
             body: formData
         });
