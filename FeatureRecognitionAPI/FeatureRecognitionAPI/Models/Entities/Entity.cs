@@ -7,7 +7,7 @@ using System;
 using System.IO;
 using System.Numerics;
 
-abstract public class Entity
+namespace FeatureRecognitionAPI.Models
 {
     protected PossibleEntityTypes entityType;
     double length;
@@ -25,6 +25,17 @@ abstract public class Entity
     public double getLength() { return this.length; }
     public Entity()
     {
+        protected PossibleEntityTypes entityType;
+        protected enum PossibleEntityTypes
+        {
+            line,
+            circle,
+            arc
+        }
 
+        public Entity()
+        {
+
+        }
     }
 }
