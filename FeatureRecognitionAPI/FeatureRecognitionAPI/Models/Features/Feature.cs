@@ -5,11 +5,12 @@
  * for optimization before detecting features ignore all entity groups outside
  * the first border and calculates feautrues only for that one 
  */
+using FeatureRecognitionAPI.Models;
 using System;
 using System.IO;
 using System.Numerics;
 
- public class Feature
+public class Feature
 {
     PossibleFeatureTypes featureType;
     Entity[] entityList; //list of touching entities that make up the feature
@@ -33,6 +34,50 @@ using System.Numerics;
         multipleRadius = false;
         perOver20 = false;
         border = false;
+    }
+
+    public Feature(Entity[] entityList)
+    {
+        this.entityList = entityList;
+
+        int numLines = 0;
+        int numArcs = 0;
+        int numCircles = 0;
+
+        for (int i = 0; i < entityList.Length; i++)
+        {
+            if (entityList[i] is Line)
+            {
+                numLines++;
+            }
+            else if (entityList[i] is Arc)
+            {
+                numArcs++;
+            }
+            else if (entityList[i] is Circle)
+            {
+                numCircles++;
+            }
+            else
+            {
+                Console.WriteLine("Error: Cannot detect entity type.");
+                break;
+            }
+        }
+        //Console.WriteLine(numLines + " " + numArcs + " " + numCircles);
+
+        if (numCircles == 1 || (numLines == 2 && numArcs == 2))
+        {
+            featureType = PossibleFeatureTypes.Group1B;
+        }
+        else if (numLines == 4 && (numArcs == 0 || numArcs ==4))
+        {
+            featureType = PossibleFeatureTypes.Group1A;
+        }
+        else
+        {
+            Console.WriteLine("Error: Cannot assign feature type.");
+        }
     }
 
     //calculates if the perimeter is over 20
