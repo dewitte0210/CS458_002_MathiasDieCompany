@@ -24,7 +24,7 @@ namespace FeatureRecognitionAPI.Models
                 while(featureList.Count > 0)
                 {
                     Entity curEntity = entityList.First();
-
+                        
                 } 
                 return true; 
             }
