@@ -4,8 +4,6 @@ import { MdClear } from "react-icons/md";
 import "./drag-drop.css";
 import { useState } from 'react';
 
-
-
 /*
   Defines the shape of the props that the DragNdrop component accepts.
 */
@@ -23,11 +21,15 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   width,
   height,
 }) => {
-  //state hooks
+  // State hooks
   const [file, setFile] = useState<File | null>(null); // Only allow one file
-  const [submitted, setSubmitted] = useState(false);  // New state to track submission
+  const [submitted, setSubmitted] = useState(false); // New state to track submission
+  const [jsonResponse, setJsonResponse] = useState<any>(null); // New state for JSON response
   const allowedFileExtensions = ['.pdf', '.dwg', '.dxf'];
-  
+
+  /*
+    Handles the dropped file and checks if it's of an allowed file type.
+  */
   const handleFileDrop = (newFile: File) => {
     const fileExtension = newFile.name.split('.').pop();
     if (fileExtension && allowedFileExtensions.includes(`.${fileExtension}`)) {
@@ -59,19 +61,19 @@ const DragNdrop: React.FC<DragNdropProps> = ({
       }
     }
   };
-  
+
   /*
     Event handler for when the user clicks the remove file button.
   */
   const handleRemoveFile = () => {
     setFile(null); // Clear the selected file
   };
-  
+
   /*
     Event handler for when the user selects a file using the file input.
   */
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files; // get the files that were selected
+    const selectedFiles = event.target.files; // Get the files that were selected
     if (selectedFiles && selectedFiles.length > 0) {
       const newFile = selectedFiles[0]; // Only pick the first file
       const fileExtension = newFile.name.split('.').pop()?.toLowerCase(); // Get the file extension
@@ -85,12 +87,12 @@ const DragNdrop: React.FC<DragNdropProps> = ({
       }
     }
   };
-  
 
   /*
     Event handler for when the user clicks the submit file button.
+    Submits the file to the server and captures the JSON response.
   */
-  // const handleSubmit = () => {
+   // const handleSubmit = () => {
   //   if (file) {
   //     uploadFile(file)
   //     .then(() => {
@@ -106,7 +108,6 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   //   }
   // };
   const handleSubmit = async () => {
-    console.log(file);
     if (!file) {
       console.error("No file selected");
       return;
@@ -115,31 +116,37 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     const formData = new FormData();
     formData.append("file", file);
     try {
-        const res = await fetch("https://localhost:44373/api/FeatureRecognition/uploadFile", {
-            method: "POST",
-            body: formData
-        });
+      const res = await fetch("https://localhost:44373/api/FeatureRecognition/uploadFile", {
+        method: "POST",
+        body: formData
+      });
 
-        if (!res.ok) {
-          throw new Error(`Server error: ${res.status} ${res.statusText}`);
-        }
-    
-        console.log("File uploaded successfully:", res);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert('An error occurred while submitting the file. Please try again.');
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
       }
-  }
+
+      const jsonResponse = await res.json(); // Capture JSON response
+      setJsonResponse(jsonResponse); // Store response in state
+      setSubmitted(true); // Update the state to indicate successful submission
+
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert('An error occurred while submitting the file. Please try again.');
+    }
+  };
+
   /*
     Event handler for when the user clicks the back button after submission.
   */
   const backToUpload = () => {
     setSubmitted(false);
     setFile(null); // Clear the file after submission
+    setJsonResponse(null); // Clear the JSON response on going back
   };
+
   return (
     <section className="drag-drop" style={{ width: width, height: height }}>
-      {!submitted ? (  // Conditional rendering based on submission state
+      {!submitted ? ( // Conditional rendering based on submission state
         <>
           <div
             className={`document-uploader ${file ? "upload-box active" : "upload-box"}`}
@@ -184,9 +191,15 @@ const DragNdrop: React.FC<DragNdropProps> = ({
             </button>
           )}
         </>
-      ) : (  // Show success message after submission
+      ) : ( // Show success message after submission
         <div className="success-message">
           <p>File submitted successfully!</p>
+          {jsonResponse && ( // Conditionally render the JSON response
+            <div className="json-response">
+              <h3>Server Response:</h3>
+              <pre>{JSON.stringify(jsonResponse, null, 2)}</pre> {/* Pretty-print the JSON */}
+            </div>
+          )}
           <button className="back-btn" onClick={backToUpload}>
             Go Back
           </button>
