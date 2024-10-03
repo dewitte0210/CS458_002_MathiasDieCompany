@@ -59,7 +59,8 @@ namespace Testing_for_Project
             Assert.That(pathTest, Is.True);
             DXFFile testFile = new DXFFile(path);
 
-            List<Entity> testList = testFile.GetEntities();            
+            //Thirteen known entities in Example-003.dxf that must be verified to have been accurately ingested
+            List<Entity> testList = testFile.GetEntities();
             Assert.That(testList[0].GetEntityType(), Is.EqualTo("arc"));
             Arc test1 = (Arc)testList[0];
 
@@ -90,7 +91,7 @@ namespace Testing_for_Project
             Circle test4 = (Circle)testList[3];
 
             Assert.That(test4.centerX, Is.EqualTo(3.3752118942999996m));
-            Assert.That(test4.centerY, Is.EqualTo(2.6843885206000002));
+            Assert.That(test4.centerY, Is.EqualTo(2.6843885206000002m));
             Assert.That(test4.radius, Is.EqualTo(1.0000000000000000m));
 
             Assert.That(testList[4].GetEntityType(), Is.EqualTo("arc"));
@@ -103,6 +104,78 @@ namespace Testing_for_Project
             Assert.That(test5.endAngle, Is.EqualTo(90.0000000000000000m));
 
             Assert.That(testList[5].GetEntityType(), Is.EqualTo("line"));
+            Line test6 = (Line)testList[5];
+
+            Assert.That(test6.StartX, Is.EqualTo(6.0004237886999992m));
+            Assert.That(test6.StartY, Is.EqualTo(4.9500000000000011m));
+            Assert.That(test6.EndX, Is.EqualTo(0.7500000000000000m));
+            Assert.That(test6.EndY, Is.EqualTo(4.9500000000000011m));
+
+            Assert.That(testList[6].GetEntityType(), Is.EqualTo("arc"));
+            Arc test7 = (Arc)testList[6];
+
+            Assert.That(test7.centerX, Is.EqualTo(0.7499999999999996m));
+            Assert.That(test7.centerY, Is.EqualTo(4.2000000000000011m));
+            Assert.That(test7.radius, Is.EqualTo(0.7499999999999999m));
+            Assert.That(test7.startAngle, Is.EqualTo(89.9999999999999716m));
+            Assert.That(test7.endAngle, Is.EqualTo(210.0009653272222181m));
+
+            Assert.That(testList[7].GetEntityType(), Is.EqualTo("circle"));
+            Circle test8 = (Circle)testList[7];
+
+            Assert.That(test8.centerX, Is.EqualTo(8.6398868451999995m));
+            Assert.That(test8.centerY, Is.EqualTo(2.2706113776999994m));
+            Assert.That(test8.radius, Is.EqualTo(1.0000000000000000m));
+
+            Assert.That(testList[8].GetEntityType(), Is.EqualTo("line"));
+            Line test9 = (Line)testList[8];
+
+            Assert.That(test9.StartX, Is.EqualTo(5.3651558979999994m));
+            Assert.That(test9.StartY, Is.EqualTo(1.1299998982999999m));
+            Assert.That(test9.EndX, Is.EqualTo(7.0403281640286135m));
+            Assert.That(test9.EndY, Is.EqualTo(4.0313704835897957m));
+
+            Assert.That(testList[9].GetEntityType(), Is.EqualTo("arc"));
+            Arc test10 = (Arc)testList[9];
+
+            Assert.That(test10.centerX, Is.EqualTo(8.6398868451999995m));
+            Assert.That(test10.centerY, Is.EqualTo(3.1078289152999994m));
+            Assert.That(test10.radius, Is.EqualTo(1.8470292371454000m));
+            Assert.That(test10.startAngle, Is.EqualTo(30.0009653272222003m));
+            Assert.That(test10.endAngle, Is.EqualTo(149.9990346727777535m));
+
+            Assert.That(testList[10].GetEntityType(), Is.EqualTo("line"));
+            Line test11 = (Line)testList[10];
+
+            Assert.That(test11.StartX, Is.EqualTo(10.2394455263713855m));
+            Assert.That(test11.StartY, Is.EqualTo(4.0313704835897939m));
+            Assert.That(test11.EndX, Is.EqualTo(11.9146177922999996m));
+            Assert.That(test11.EndY, Is.EqualTo(1.1299998982999999));
+
+            Assert.That(testList[11].GetEntityType, Is.EqualTo("line"));
+            Line test12 = (Line)testList[11];
+
+            Assert.That(test12.StartX, Is.EqualTo(6.6499365233942473m));
+            Assert.That(test12.StartY, Is.EqualTo(3.8249890568663383m));
+            Assert.That(test12.EndX, Is.EqualTo(4.9747705754328919m));
+            Assert.That(test12.EndY, Is.EqualTo(0.9236294146435339m));
+
+            Assert.That(testList[12].GetEntityType(), Is.EqualTo("arc"));
+            Arc test13 = (Arc)testList[12];
+
+            Assert.That(test13.centerX, Is.EqualTo(3.3752118942999996m));
+            Assert.That(test13.centerY, Is.EqualTo(1.8471709829999998m));
+            Assert.That(test13.radius, Is.EqualTo(1.8470292371454000m));
+            Assert.That(test13.startAngle, Is.EqualTo(210.0009653296103238m));
+            Assert.That(test13.endAngle, Is.EqualTo(329.9990346703896762m));
+
+            Assert.That(testList[13].GetEntityType(), Is.EqualTo("line"));
+            Line test14 = (Line)testList[13];
+
+            Assert.That(test14.StartX, Is.EqualTo(1.7756532131671074m));
+            Assert.That(test14.StartY, Is.EqualTo(0.9236294146435343m));
+            Assert.That(test14.EndX, Is.EqualTo(0.1004872653057516m));
+            Assert.That(test14.EndY, Is.EqualTo(3.8249890568663383m));
 
         }
     }
