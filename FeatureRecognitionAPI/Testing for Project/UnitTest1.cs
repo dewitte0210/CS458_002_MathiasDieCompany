@@ -51,7 +51,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDXFFileClass()
         {
-            //Example 
+            //Set path to any filepath containing the 3rd example dxf file
             string path = @"C:\Users\Ice-HaskinsStephen\Downloads\Example-003.dxf";
             bool pathTest = File.Exists(path);
 

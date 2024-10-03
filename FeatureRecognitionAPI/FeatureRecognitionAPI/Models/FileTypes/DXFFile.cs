@@ -227,7 +227,7 @@ namespace FeatureRecognitionAPI.Models
             return index;
         }
 
-        //May need to be refactored depending on of c# handles this by copy or by reference
+        //May need to be refactored depending on if c# handles this by copy or by reference
         public List<Entity> GetEntities()
         {
             return entityList;
