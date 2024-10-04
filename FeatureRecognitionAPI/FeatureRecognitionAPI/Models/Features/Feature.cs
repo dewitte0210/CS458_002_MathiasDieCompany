@@ -27,14 +27,8 @@ public class Feature
         Group6,
         Group2A
     }
-    
-    public Feature()
-    {
-        kissCut = false;
-        multipleRadius = false;
-        perOver20 = false;
-        border = false;
-    }
+
+    private Feature() { }//should not use default constructor
 
     public Feature(Entity[] entityList)
     {
