@@ -7,7 +7,7 @@ namespace FeatureRecognitionAPI.Services
     public interface IFeatureRecognitionService
     {
         public Task<(OperationStatus, string)> GetFileExtension(string fileName);
-        public Task<(OperationStatus, List<string>)> UploadFile(IFormFile file);
+        public Task<(OperationStatus, int)> UploadFile(IFormFile file);
 
     }
 }

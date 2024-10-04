@@ -49,7 +49,7 @@ namespace FeatureRecognitionAPI.Services
             return (OperationStatus.OK, null);
         }
 
-        public async Task<(OperationStatus, List<string>)> UploadFile(IFormFile file)
+        public async Task<(OperationStatus, int)> UploadFile(IFormFile file)
         {
             try
             {
@@ -65,28 +65,19 @@ namespace FeatureRecognitionAPI.Services
 
                 if (File.Exists(path))
                 {
-                    //Might be unnecessary, but could map to a DTO object to return to client and display features/entities
                     DXFFile dXFFile = new DXFFile(path);
 
                     string json = JsonConvert.SerializeObject(dXFFile.GetEntities());
-                    
 
-
-
-                    //Line to get an array of the lines in the file
-                    List<string> lines = new List<string>();
-                    lines.Add(json);
-                    //Print the entire file
-
-                    return (OperationStatus.OK, lines);
+                    return (OperationStatus.OK, dXFFile.GetEntities().Count());
 
                 }
                 else
-                    return (OperationStatus.BadRequest, new List<string> { "File not recognized" });
+                    return (OperationStatus.BadRequest, 0);
             }
             catch (Exception ex)
             {
-                return (OperationStatus.ExternalApiFailure, new List<string> { ex.Message });
+                return (OperationStatus.ExternalApiFailure, 0);
             }
 
 

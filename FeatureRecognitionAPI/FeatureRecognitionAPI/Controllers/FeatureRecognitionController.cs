@@ -29,7 +29,7 @@ namespace FeatureRecognitionAPI.Controllers
         }
 
         [HttpPost("uploadFile", Name = nameof(UploadFile))]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
         {
             if (file == null)
@@ -38,7 +38,7 @@ namespace FeatureRecognitionAPI.Controllers
             }
             var (status, output) = await _featureRecognitionService.UploadFile(file);
 
-            // Currently returning each line in the file and file saved in ExampleFiles, could maybe return feature list? Or another endpoint for it
+            
             return Ok(output);
         }
     }

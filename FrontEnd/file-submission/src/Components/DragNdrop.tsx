@@ -198,7 +198,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
           {jsonResponse && ( // Conditionally render the JSON response
             <div className="json-response">
               <h3>Server Response:</h3>
-              <pre>{JSON.stringify(jsonResponse, null, 2)}</pre> {/* Pretty-print the JSON */}
+              <pre>Number of Entities: {JSON.stringify(jsonResponse, null, 2)}</pre> {/* Pretty-print the JSON */}
             </div>
           )}
           <button className="back-btn" onClick={backToUpload}>
