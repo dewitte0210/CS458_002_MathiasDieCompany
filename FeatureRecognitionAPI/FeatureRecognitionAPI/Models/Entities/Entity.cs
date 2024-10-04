@@ -7,6 +7,9 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Line = FeatureRecognitionAPI.Models.Line;
+using Arc = FeatureRecognitionAPI.Models.Arc;
+
 
 namespace FeatureRecognitionAPI.Models
 {
