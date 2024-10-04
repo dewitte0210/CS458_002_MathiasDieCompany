@@ -1,6 +1,8 @@
 ﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
+using Newtonsoft.Json;
 using System.IO;
+using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace FeatureRecognitionAPI.Services
@@ -66,13 +68,8 @@ namespace FeatureRecognitionAPI.Services
                     //Might be unnecessary, but could map to a DTO object to return to client and display features/entities
                     DXFFile dXFFile = new DXFFile(path);
 
-                    Newtonsoft.Json.JsonSerializer jsonSerializer = new Newtonsoft.Json.JsonSerializer();
-                    string json;
-                    using (var writer = new StringWriter())
-                    {
-                        jsonSerializer.Serialize(writer, dXFFile);
-                        json = writer.ToString();
-                    }
+                    string json = JsonConvert.SerializeObject(dXFFile.GetEntities());
+                    
 
 
 
