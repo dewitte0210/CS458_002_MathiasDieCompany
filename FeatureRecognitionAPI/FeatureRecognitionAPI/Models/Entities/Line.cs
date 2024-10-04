@@ -28,5 +28,6 @@ namespace FeatureRecognitionAPI.Models
             // Distance Calculation
             Length = DecimalEx.Sqrt(DecimalEx.Pow(endX - startX, 2) + DecimalEx.Pow(endY - startY, 2));
         }
+
     }
 }
