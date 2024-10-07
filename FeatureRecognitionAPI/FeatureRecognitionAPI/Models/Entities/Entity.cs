@@ -7,8 +7,11 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using DecimalMath;
 using Line = FeatureRecognitionAPI.Models.Line;
 using Arc = FeatureRecognitionAPI.Models.Arc;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -152,11 +155,48 @@ namespace FeatureRecognitionAPI.Models
             // First case, the circles do not intersect as they are too far appart
             // Second case, one circle is entirely inside the other but not intersecting.
             if (between.Length > (arc1.radius + arc2.radius) || 
-                between.Length < (arc1.radius - arc2.radius)) { return false; }
-            
-            // The circles intersect. Do they intersect at the position of the arcs?
+                between.Length < (Math.Abs(arc1.radius - arc2.radius)) ||
+                between.Length == 0) { return false; }
 
-            return false;
+            // The circles intersect. Do they intersect at the position of the arcs?
+            
+            // Find a and h.
+            decimal a = (DecimalEx.Pow(arc1.radius,2) - DecimalEx.Pow(arc2.radius, 2) + DecimalEx.Pow(between.Length, 2)) / 
+                (2 * between.Length);
+            decimal h = DecimalEx.Sqrt(DecimalEx.Pow(arc1.radius, 2) - DecimalEx.Pow(a,2));
+            
+            // Find P2.
+            decimal cx2 = arc1.centerX + a * (arc2.centerX - arc1.centerX) / between.Length;
+            decimal cy2 = arc1.centerY + a * (arc2.centerY - arc1.centerY) / between.Length;
+
+            // Get the points P3.
+            decimal intersect1X = (cx2 + h * (arc2.centerY - arc1.centerY) / between.Length);
+            decimal intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.Length);
+            decimal intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.Length);
+            decimal intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.Length);
+            
+            // Arc angles are expressed in radians
+            
+            return true;
+        }
+
+        public bool IsInArcRange(decimal circleX, decimal circleY, decimal pointX, decimal pointY,
+            decimal startAngle, decimal endAngle)
+        {
+            decimal y = pointY - circleY;
+            decimal x = pointX - circleX;
+            decimal tan = DecimalEx.ATan(y/x);
+            decimal degrees = tan * (180 / DecimalEx.Pi);
+            // rotate start and end angles to start at 0
+            decimal difference = 360 - startAngle;
+            decimal adjustedStart = 0;
+            decimal adjustedEnd = endAngle + difference;
+            decimal adjustedDegrees = degrees + difference;
+            
+            if(adjustedEnd > 360) { adjustedEnd -= 360; }
+            if(adjustedDegrees > 360) { adjustedDegrees -= 360; }
+
+            return adjustedDegrees > adjustedStart && adjustedDegrees < adjustedEnd; 
         }
     }
 }
