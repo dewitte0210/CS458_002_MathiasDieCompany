@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 using Line = FeatureRecognitionAPI.Models.Line;
 using Arc = FeatureRecognitionAPI.Models.Arc;
 
-
 namespace FeatureRecognitionAPI.Models
 {
     public abstract class Entity {
