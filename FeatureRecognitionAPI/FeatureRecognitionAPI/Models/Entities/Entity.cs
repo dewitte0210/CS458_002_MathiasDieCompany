@@ -68,6 +68,50 @@ namespace FeatureRecognitionAPI.Models
         
         private bool IntersectLineWithArc(Line line, Arc arc)
         {
+            //  Get line in the slope-intercept form, then transform it to the
+            //  general form: Ax + By + C = 0
+
+            //  A, B, and C variables in the general form
+            decimal a;
+            decimal b;
+            decimal c;
+            //  Variable used for calculation of intersect points
+            bool negative = false;
+
+            //  This is to check for a vertical line, since it would crash the program
+            //  trying to divide by 0
+            if (line.EndX == line.StartX)
+            {
+                a = 1;
+                b = 0;
+                c = -1 * line.EndX;
+            }
+            else
+            {
+                // The slope of the line ends up being A in the general form
+                a = (line.EndY - line.StartY) / (line.EndX - line.StartX);
+                c = line.EndY - (a * line.EndX);
+                b = 1;
+                //  A cannot be negative in the general form
+                if(a < 0)
+                {
+                    negative = true;
+                    a *= -1;
+                    b *= -1;
+                    c *= -1;
+                }
+            }
+
+            //  Checks if the line passes through or touches the circle the arc represents
+            decimal numerator = a * arc.centerX + b * arc.centerY + c;
+            if (numerator < 0)
+                numerator *= -1;
+            decimal distance = numerator / DecimalEx.Sqrt(DecimalEx.Pow(a, 2) + DecimalEx.Pow(b, 2));
+
+            if (arc.radius >= distance)
+            {
+
+            }
             return false;
         }
 
