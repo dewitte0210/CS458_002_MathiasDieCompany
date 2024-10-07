@@ -8,5 +8,7 @@ namespace Testing_for_Project
 {
     internal class EntityClassTests
     {
+    
+    
     }
 }
