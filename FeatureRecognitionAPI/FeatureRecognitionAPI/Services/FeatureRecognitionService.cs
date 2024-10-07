@@ -49,7 +49,7 @@ namespace FeatureRecognitionAPI.Services
             return (OperationStatus.OK, null);
         }
 
-        public async Task<(OperationStatus, int)> UploadFile(IFormFile file)
+        public async Task<(OperationStatus, string)> UploadFile(IFormFile file)
         {
             try
             {
@@ -63,21 +63,40 @@ namespace FeatureRecognitionAPI.Services
                     file.CopyTo(stream);   
                 }
 
+                string text;
+                string json = "";
+
                 if (File.Exists(path))
                 {
-                    DXFFile dXFFile = new DXFFile(path);
+                    switch (ext)
+                    {
+                        case ".dxf":
+                            DXFFile dXFFile = new DXFFile(path);
+                            json = JsonConvert.SerializeObject(dXFFile);
+                            break;
+                        case ".dwg":
+                            DWGFile dwgFile = new DWGFile(path);
+                            json = JsonConvert.SerializeObject(dwgFile);
+                            break;
+                        case ".pdf":
+                            PDFFile pdfFile = new PDFFile(path);
+                            text = pdfFile.ExtractTextFromPDF();
+                            json = JsonConvert.SerializeObject(text);
+                            break;
+                        default:
+                            Console.WriteLine("ERROR detecting file extension");
+                            return (OperationStatus.BadRequest, json);
+                    }
 
-                    string json = JsonConvert.SerializeObject(dXFFile.GetEntities());
-
-                    return (OperationStatus.OK, dXFFile.GetEntities().Count());
+                    return (OperationStatus.OK, json);
 
                 }
                 else
-                    return (OperationStatus.BadRequest, 0);
+                    return (OperationStatus.BadRequest, json);
             }
             catch (Exception ex)
             {
-                return (OperationStatus.ExternalApiFailure, 0);
+                return (OperationStatus.ExternalApiFailure, string.Empty);
             }
 
 

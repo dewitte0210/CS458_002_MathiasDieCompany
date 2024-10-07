@@ -4,6 +4,15 @@
  * then features will be determined based off the entities
  */
 using System;
+using System.Collections.Generic;
+using System.Text;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf.Canvas.Parser.Data;
+using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using NHibernate.Mapping;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -12,6 +21,33 @@ namespace FeatureRecognitionAPI.Models
         public PDFFile(string path) : base(path)
         {
             fileType = SupportedExtensions.pdf;
+        }
+
+        public string ExtractTextFromPDF()
+        {
+            PdfReader reader = new PdfReader(path);
+            PdfDocument pdfDoc = new PdfDocument(reader);
+            StringBuilder text = new StringBuilder();
+
+            for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+            {
+                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                string currentText = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(i), strategy);
+                text.Append(currentText);
+            }
+
+            return text.ToString();
+        }
+
+        private void AnalyzeShapesInPDF(PdfDocument pdfDoc)
+        {
+            for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
+            {
+                PdfPage page = pdfDoc.GetPage(i);
+                PdfCanvasProcessor processor = new PdfCanvasProcessor(new RenderListener());
+                processor.ProcessPageContent(page);
+
+            }
         }
 
         /*
@@ -41,6 +77,37 @@ namespace FeatureRecognitionAPI.Models
         public override void readEntities()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class RenderListener : IEventListener
+    {
+        public void EventOccurred(IEventData data, EventType type)
+        {
+            if (type == EventType.RENDER_PATH)
+            {
+                PathRenderInfo renderInfo = (PathRenderInfo)data;
+                // Analyze the path to detect lines and arcs
+                foreach (Subpath subpath in renderInfo.GetPath().GetSubpaths())
+                {
+                    foreach (IPathSegment segment in subpath.GetSegments())
+                    {
+                        if (segment is LineSegment)
+                        {
+                            // Handle line segment
+                        }
+                        else if (segment is BezierCurve)
+                        {
+                            // Handle arc segment
+                        }
+                    }
+                }
+            }
+        }
+
+        public ICollection<EventType> GetSupportedEvents()
+        {
+            return new List<EventType> { EventType.RENDER_PATH };
         }
     }
 }
