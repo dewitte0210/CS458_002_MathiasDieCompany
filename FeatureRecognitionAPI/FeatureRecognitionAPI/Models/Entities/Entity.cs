@@ -174,10 +174,14 @@ namespace FeatureRecognitionAPI.Models
             decimal intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.Length);
             decimal intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.Length);
             decimal intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.Length);
+
+            bool intersect1IsValid = IsInArcRange(arc1.centerX, arc1.centerY, intersect1X, intersect1Y, arc1.startAngle, arc1.endAngle) &&
+                   IsInArcRange(arc2.centerX, arc2.centerY, intersect1X, intersect1Y, arc2.startAngle, arc2.endAngle);
+            bool intersect2IsValid = IsInArcRange(arc1.centerX, arc1.centerY, intersect2X, intersect2Y, arc1.startAngle, arc1.endAngle) &&
+                   IsInArcRange(arc2.centerX, arc2.centerY, intersect2X, intersect2Y, arc2.startAngle, arc2.endAngle);
             
-            // Arc angles are expressed in radians
-            
-            return true;
+            return intersect1IsValid || intersect2IsValid; 
+;
         }
 
         public bool IsInArcRange(decimal circleX, decimal circleY, decimal pointX, decimal pointY,
@@ -187,6 +191,7 @@ namespace FeatureRecognitionAPI.Models
             decimal x = pointX - circleX;
             decimal tan = DecimalEx.ATan(y/x);
             decimal degrees = tan * (180 / DecimalEx.Pi);
+
             // rotate start and end angles to start at 0
             decimal difference = 360 - startAngle;
             decimal adjustedStart = 0;
