@@ -113,7 +113,23 @@ namespace FeatureRecognitionAPI.Models
 
             if (arc.radius >= distance)
             {
+                /**
+                 * The general quadratic equation every line intersecting an arc is as follows (using the variables):
+                 * 2x^2 + [(-2) * arc.centerX + 2 * (c - arc.centerY)]x + (arc.centerX)^2 + (c - arc.centerY)^2 - (arc.radius)^2 = 0
+                 *  The return value of DecimalEx.SolveQuadratic() will give an array of decimal numbers that represent
+                 *  the x values of the solution. It will not return any imaginary solutions
+                 */
+                decimal[] solns = DecimalEx.SolveQuadratic(2, ((-2) * arc.centerX) + 2 * (c - arc.centerY), DecimalEx.Pow(arc.centerX, 2) + DecimalEx.Pow(c - arc.centerY, 2) - DecimalEx.Pow(arc.radius, 2));
 
+                //Checks if each solution is on the arc, if one is on it return true
+                for (int i = 0; i < solns.Length; i++)
+                {
+                    //Solution x value
+                    decimal x = solns[i];
+                    //Solution y value
+                    decimal y = 2 * DecimalEx.Pow(solns[i], 2) + ((-2) * arc.centerX + 2 * (c - arc.centerY)) * solns[i] + DecimalEx.Pow(arc.centerX, 2) + DecimalEx.Pow((c - arc.centerY), 2) - DecimalEx.Pow(arc.radius, 2);
+                    if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
+                }
             }
             return false;
         }
