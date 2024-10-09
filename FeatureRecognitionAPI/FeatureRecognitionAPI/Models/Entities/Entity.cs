@@ -206,8 +206,22 @@ namespace FeatureRecognitionAPI.Models
         {
             decimal y = pointY - circleY;
             decimal x = pointX - circleX;
-            decimal tan = DecimalEx.ATan(y/x);
-            decimal degrees = tan * (180 / DecimalEx.Pi);
+            decimal degrees; 
+            
+            // Figure out the angle the point is in. Speciall cases apply at x=0 and y=0
+            if(x == 0)
+            {
+                degrees = y > 0 ? 90 : 270;    
+            }
+            else if(y == 0)
+            {
+                degrees = x > 0 ? 0 : 180;
+            }
+            else
+            {
+                decimal tan = DecimalEx.ATan(y/x);
+                degrees = tan * (180 / DecimalEx.Pi);
+            }
 
             // rotate start and end angles to start at 0
             decimal difference = 360 - startAngle;
@@ -215,10 +229,10 @@ namespace FeatureRecognitionAPI.Models
             decimal adjustedEnd = endAngle + difference;
             decimal adjustedDegrees = degrees + difference;
             
-            if(adjustedEnd > 360) { adjustedEnd -= 360; }
-            if(adjustedDegrees > 360) { adjustedDegrees -= 360; }
+            if(adjustedEnd >= 360) { adjustedEnd -= 360; }
+            if(adjustedDegrees >= 360) { adjustedDegrees -= 360; }
 
-            return adjustedDegrees > adjustedStart && adjustedDegrees < adjustedEnd; 
+            return adjustedDegrees >= adjustedStart && adjustedDegrees <= adjustedEnd; 
         }
     }
 }
