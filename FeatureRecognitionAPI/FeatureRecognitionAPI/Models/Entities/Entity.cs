@@ -12,6 +12,9 @@ using Line = FeatureRecognitionAPI.Models.Line;
 using Arc = FeatureRecognitionAPI.Models.Arc;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Testing_for_Project")]
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -69,7 +72,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
         
-        private bool IntersectLineWithArc(Line line, Arc arc)
+        internal bool IntersectLineWithArc(Line line, Arc arc)
         {
             //  Get line in the slope-intercept form, then transform it to the
             //  general form: Ax + By + C = 0
@@ -134,7 +137,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        private bool IntersectLineWithLine(Line line1, Line line2)
+        internal bool IntersectLineWithLine(Line line1, Line line2)
         {
             // Get lines in the form Ax + By = C
             decimal A1 = line1.EndY - line1.StartY;
@@ -163,7 +166,7 @@ namespace FeatureRecognitionAPI.Models
             return xBounds && yBounds;
         }
 
-        private bool IntersectArcWithArc(Arc arc1, Arc arc2)
+        internal bool IntersectArcWithArc(Arc arc1, Arc arc2)
         {
             // Treat both Arcs circles, get the line between their centers
             Line between = new Line(arc1.centerX, arc1.centerY, arc2.centerX, arc2.centerY);
@@ -200,7 +203,7 @@ namespace FeatureRecognitionAPI.Models
 ;
         }
 
-        public bool IsInArcRange(decimal circleX, decimal circleY, decimal pointX, decimal pointY,
+        internal bool IsInArcRange(decimal circleX, decimal circleY, decimal pointX, decimal pointY,
             decimal startAngle, decimal endAngle)
         {
             decimal y = pointY - circleY;
