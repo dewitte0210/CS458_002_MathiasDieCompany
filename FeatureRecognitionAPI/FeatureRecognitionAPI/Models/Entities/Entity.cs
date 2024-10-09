@@ -109,9 +109,7 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Checks if the line passes through or touches the circle the arc represents
-            decimal numerator = a * arc.centerX + b * arc.centerY + c;
-            if (numerator < 0)
-                numerator *= -1;
+            decimal numerator = Math.Abs(a * arc.centerX + b * arc.centerY + c);
             decimal distance = numerator / DecimalEx.Sqrt(DecimalEx.Pow(a, 2) + DecimalEx.Pow(b, 2));
 
             if (arc.radius >= distance)
