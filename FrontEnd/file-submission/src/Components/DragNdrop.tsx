@@ -23,15 +23,16 @@ const DragNdrop: React.FC<DragNdropProps> = ({
 }) => {
   // State hooks
   const [file, setFile] = useState<File | null>(null); // Only allow one file
-  const [submitted, setSubmitted] = useState(false); // New state to track submission
-  const [jsonResponse, setJsonResponse] = useState<any>(null); // New state for JSON response
+  const [submitted, setSubmitted] = useState(false); // Tracks submission
+  const [jsonResponse, setJsonResponse] = useState<any>(null); // Stores JSON response
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
   const allowedFileExtensions = ['.pdf', '.dwg', '.dxf'];
 
   /*
     Handles the dropped file and checks if it's of an allowed file type.
   */
   const handleFileDrop = (newFile: File) => {
-    const fileExtension = newFile.name.split('.').pop();
+    const fileExtension = newFile.name.split('.').pop()?.toLowerCase();
     if (fileExtension && allowedFileExtensions.includes(`.${fileExtension}`)) {
       setFile(newFile);
       if (onFilesSelected) {
@@ -50,15 +51,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     const droppedFiles = event.dataTransfer.files; // Get the files that were dropped
     if (droppedFiles.length > 0) {
       const newFile = droppedFiles[0]; // Only pick the first file
-      const fileExtension = newFile.name.split('.').pop()?.toLowerCase(); // Get the file extension
-      if (fileExtension && allowedFileExtensions.includes(`.${fileExtension}`)) {
-        setFile(newFile);
-        if (onFilesSelected) {
-          onFilesSelected([newFile]); // Pass the file to the parent component
-        }
-      } else {
-        alert('Invalid file type. Please upload a PDF, DWG, or DXF file.'); // Alert for invalid file type
-      }
+      handleFileDrop(newFile);
     }
   };
 
@@ -76,15 +69,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     const selectedFiles = event.target.files; // Get the files that were selected
     if (selectedFiles && selectedFiles.length > 0) {
       const newFile = selectedFiles[0]; // Only pick the first file
-      const fileExtension = newFile.name.split('.').pop()?.toLowerCase(); // Get the file extension
-      if (fileExtension && allowedFileExtensions.includes(`.${fileExtension}`)) {
-        setFile(newFile);
-        if (onFilesSelected) {
-          onFilesSelected([newFile]); // Pass the file to the parent component
-        }
-      } else {
-        alert('Invalid file type. Please upload a PDF, DWG, or DXF file.'); // Alert for invalid file type
-      }
+      handleFileDrop(newFile);
     }
   };
 
@@ -92,26 +77,13 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     Event handler for when the user clicks the submit file button.
     Submits the file to the server and captures the JSON response.
   */
-   // const handleSubmit = () => {
-  //   if (file) {
-  //     uploadFile(file)
-  //     .then(() => {
-  //       setSubmitted(true);  // Update the state to indicate successful submission
-  //       if (onFilesSelected) {
-  //         onFilesSelected([file]);
-  //       }
-  //     })
-  //     .catch((error: any) => {
-  //       console.error(error); // Log the error to the console
-  //       alert('An error occurred while submitting the file. Please try again.'); // Alert the user about the error
-  //     });
-  //   }
-  // };
   const handleSubmit = async () => {
     if (!file) {
       console.error("No file selected");
       return;
     }
+
+    setIsLoading(true); // Start loading
 
     const formData = new FormData();
     formData.append("file", file);
@@ -133,6 +105,8 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     } catch (error) {
       console.error("Error uploading file:", error);
       alert('An error occurred while submitting the file. Please try again.');
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
@@ -147,7 +121,9 @@ const DragNdrop: React.FC<DragNdropProps> = ({
 
   return (
     <section className="drag-drop" style={{ width: width, height: height }}>
-      {!submitted ? ( // Conditional rendering based on submission state
+      {isLoading ? ( // Display loading screen during file upload
+        <><span className="loader"></span><div className="loading-text">Uploading...</div></>
+      ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
         <>
           <div
             className={`document-uploader ${file ? "upload-box active" : "upload-box"}`}
