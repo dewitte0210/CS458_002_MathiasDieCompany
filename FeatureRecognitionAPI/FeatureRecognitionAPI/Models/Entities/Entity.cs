@@ -69,7 +69,6 @@ namespace FeatureRecognitionAPI.Models
                     return IntersectLineWithArc((Line)this, (Arc)other);
                 }
             }
-            return false;
         }
         
         internal bool IntersectLineWithArc(Line line, Arc arc)
@@ -208,7 +207,7 @@ namespace FeatureRecognitionAPI.Models
             decimal x = pointX - circleX;
             decimal degrees; 
             
-            // Figure out the angle the point is in. Speciall cases apply at x=0 and y=0
+            // Figure out the angle the point is in. Special cases apply at x=0 and y=0
             if(x == 0)
             {
                 degrees = y > 0 ? 90 : 270;    
@@ -221,6 +220,14 @@ namespace FeatureRecognitionAPI.Models
             {
                 decimal tan = DecimalEx.ATan(y/x);
                 degrees = tan * (180 / DecimalEx.Pi);
+                if(x < 0 && y > 0 )
+                {
+                    degrees = Math.Abs(degrees + 90);
+                }
+                else if (x < 0 && y < 0)
+                {
+                    degrees = Math.Abs(degrees + 180);
+                }
             }
 
             // rotate start and end angles to start at 0
