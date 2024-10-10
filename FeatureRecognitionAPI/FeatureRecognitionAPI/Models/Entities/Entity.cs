@@ -80,8 +80,9 @@ namespace FeatureRecognitionAPI.Models
             decimal a;
             decimal b;
             decimal c;
-            //  Variable used for calculation of intersect points
-            bool negative = false;
+            //  Slope and intercept of the line, used in quadratic calc
+            decimal slope = 0;
+            decimal intercept = 0;
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
@@ -93,14 +94,15 @@ namespace FeatureRecognitionAPI.Models
             }
             else
             {
+                slope = (line.EndY - line.StartY) / (line.EndX - line.StartX);
+                intercept = line.EndY - (slope * line.EndX);
                 // The slope of the line ends up being A in the general form
-                a = (line.EndY - line.StartY) / (line.EndX - line.StartX);
-                c = line.EndY - (a * line.EndX);
-                b = 1;
+                a = slope;
+                c = intercept;
+                b = -1;
                 //  A cannot be negative in the general form
                 if(a < 0)
                 {
-                    negative = true;
                     a *= -1;
                     b *= -1;
                     c *= -1;
@@ -113,22 +115,35 @@ namespace FeatureRecognitionAPI.Models
 
             if (arc.radius >= distance)
             {
-                /**
-                 * The general quadratic equation every line intersecting an arc is as follows (using the variables):
-                 * 2x^2 + [(-2) * arc.centerX + 2 * (c - arc.centerY)]x + (arc.centerX)^2 + (c - arc.centerY)^2 - (arc.radius)^2 = 0
-                 *  The return value of DecimalEx.SolveQuadratic() will give an array of decimal numbers that represent
-                 *  the x values of the solution. It will not return any imaginary solutions
-                 */
-                decimal[] solns = DecimalEx.SolveQuadratic(2, ((-2) * arc.centerX) + 2 * (c - arc.centerY), DecimalEx.Pow(arc.centerX, 2) + DecimalEx.Pow(c - arc.centerY, 2) - DecimalEx.Pow(arc.radius, 2));
-
-                //Checks if each solution is on the arc, if one is on it return true
-                for (int i = 0; i < solns.Length; i++)
+                //  Will hold the solution values of the quadratic equation
+                decimal[] solns;
+                //  Special case for vertical line
+                if (line.EndX == line.StartX)
                 {
-                    //Solution x value
-                    decimal x = solns[i];
-                    //Solution y value
-                    decimal y = 2 * DecimalEx.Pow(solns[i], 2) + ((-2) * arc.centerX + 2 * (c - arc.centerY)) * solns[i] + DecimalEx.Pow(arc.centerX, 2) + DecimalEx.Pow((c - arc.centerY), 2) - DecimalEx.Pow(arc.radius, 2);
-                    if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
+                    solns = DecimalEx.SolveQuadratic(1, -2 * arc.centerY, DecimalEx.Pow(arc.centerY, 2) + DecimalEx.Pow((line.EndX - arc.centerX), 2) - DecimalEx.Pow(arc.radius, 2));
+                    //  Checks if each solution is on the arc, if one is on it return true
+                    for (int i = 0; i < solns.Length; i++)
+                    {
+                        //  Solution y value
+                        decimal y = solns[i];
+                        //  Solution x value
+                        decimal x = line.EndX;
+                        if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
+                    }
+                }
+                else
+                {
+                    solns = DecimalEx.SolveQuadratic((DecimalEx.Pow(slope, 2) + 1), (-2 * arc.centerX) + (2 * (intercept * slope)) - (2 * (arc.centerY * slope)), DecimalEx.Pow(arc.centerX, 2) + DecimalEx.Pow(intercept, 2) - (2 * (intercept * arc.centerY)) + DecimalEx.Pow(arc.centerY, 2) - DecimalEx.Pow(arc.radius, 2));
+
+                    //  Checks if each solution is on the arc, if one is on it return true
+                    for (int i = 0; i < solns.Length; i++)
+                    {
+                        //  Solution x value
+                        decimal x = solns[i];
+                        //  Solution y value
+                        decimal y = slope * solns[i] + intercept;
+                        if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
+                    }
                 }
             }
             return false;
@@ -205,7 +220,7 @@ namespace FeatureRecognitionAPI.Models
         {
             decimal y = pointY - circleY;
             decimal x = pointX - circleX;
-            decimal degrees; 
+            decimal degrees;
             
             // Figure out the angle the point is in. Special cases apply at x=0 and y=0
             if(x == 0)
@@ -220,13 +235,15 @@ namespace FeatureRecognitionAPI.Models
             {
                 decimal tan = DecimalEx.ATan(y/x);
                 degrees = tan * (180 / DecimalEx.Pi);
-                if(x < 0 && y > 0 )
-                {
-                    degrees = Math.Abs(degrees + 90);
-                }
-                else if (x < 0 && y < 0)
+                //Q2 and Q3
+                if(x < 0)
                 {
                     degrees = Math.Abs(degrees + 180);
+                }
+                //Q4
+                else if (x > 0 && y < 0)
+                {
+                    degrees = Math.Abs(degrees + 270);
                 }
             }
 
