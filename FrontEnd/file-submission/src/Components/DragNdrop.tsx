@@ -3,6 +3,7 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
 import "./drag-drop.css";
 import { useState } from 'react';
+import testJson from './testData.json';
 
 /*
   Defines the shape of the props that the DragNdrop component accepts.
@@ -95,7 +96,8 @@ const DragNdrop: React.FC<DragNdropProps> = ({
 
       const jsonResponse = await res.json(); // Capture JSON responses
       console.log(jsonResponse);
-      setJsonResponse(jsonResponse); // Store response in state
+      //setJsonResponse(jsonResponse); // Store response in state
+      setJsonResponse(testJson);
       setSubmitted(true); // Update the state to indicate successful submission
 
     } catch (error) {
@@ -114,6 +116,36 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     setFile(null); // Clear the file after submission
     setJsonResponse(null); // Clear the JSON response on going back
   };
+
+  const DisplayData = testJson.map(
+    (info)=>{
+      return(
+      <tr>
+        <td>{info.group}</td>
+        <td> {info.perOver20 ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+        <td> {info.multipleRadius ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+        <td> {info.kissCut ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+        <td> {info.border ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+      </tr>
+      )
+    }
+  )
 
   return (
     <section className="drag-drop">
@@ -169,8 +201,21 @@ const DragNdrop: React.FC<DragNdropProps> = ({
           <p>File submitted successfully!</p>
           {jsonResponse && ( // Conditionally render the JSON response
             <div className="json-response">
-              <h3>Server Response:</h3>
-              <pre>Number of Entities: {JSON.stringify(jsonResponse, null, 2)}</pre> {/* Pretty-print the JSON */}
+              <h3>Features Detected: {jsonResponse.length}</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Group</th>
+                    <th>Perimeter Over 20</th>
+                    <th>Multiple Radius</th>
+                    <th>Kiss Cut</th>
+                    <th>Border</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {DisplayData}
+                </tbody>
+                </table>
             </div>
           )}
           <button className="back-btn" onClick={backToUpload}>
