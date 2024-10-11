@@ -191,8 +191,9 @@ const DragNdrop: React.FC<DragNdropProps> = ({
             )}
           </div>
           {file && (
-            <button className="submit-btn" onClick={handleSubmit}>
-              Submit File
+            <button className="animated-button" onClick={handleSubmit}>
+              <span>Submit File</span>
+              <span></span>
             </button>
           )}
         </>
@@ -218,8 +219,9 @@ const DragNdrop: React.FC<DragNdropProps> = ({
                 </table>
             </div>
           )}
-          <button className="back-btn" onClick={backToUpload}>
-            Go Back
+          <button className="animated-button" onClick={backToUpload}>
+          <span>Go Back</span>
+          <span></span>
           </button>
         </div>
       )}
