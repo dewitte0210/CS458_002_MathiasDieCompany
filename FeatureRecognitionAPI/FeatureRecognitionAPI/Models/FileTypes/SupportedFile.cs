@@ -52,16 +52,17 @@ namespace FeatureRecognitionAPI.Models
         public List<List<Entity>> makeTouchingEntitiesList(List<Entity> myEntityList)
         {
             List<List<Entity>> touchingEntityList = new List<List<Entity>>();
-            for (int i = 0; i < myEntityList.Count; i++)
+            /*for (int i = 0; i < myEntityList.Count; i++)
             {
                 for (int j = i; j < myEntityList.Count;j++)
                 {
 
                 }
-            }
+            }*/
+
             return touchingEntityList;
         }
-        public List<Entity> makeTouchingEntitiesListHelper(List<Entity> myEntityList)
+        private List<Entity> makeTouchingEntitiesListHelper(List<Entity> myEntityList)
         {
 
         }
