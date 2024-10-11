@@ -9,8 +9,6 @@ import { useState } from 'react';
 */
 interface DragNdropProps {
   onFilesSelected?: (files: File[]) => void;
-  width: number;
-  height: number;
 }
 
 /*
@@ -18,8 +16,6 @@ interface DragNdropProps {
 */
 const DragNdrop: React.FC<DragNdropProps> = ({
   onFilesSelected,
-  width,
-  height,
 }) => {
   // State hooks
   const [file, setFile] = useState<File | null>(null); // Only allow one file
@@ -120,7 +116,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   };
 
   return (
-    <section className="drag-drop" style={{ width: width, height: height }}>
+    <section className="drag-drop">
       {isLoading ? ( // Display loading screen during file upload
         <><span className="loader"></span><div className="loading-text">Uploading...</div></>
       ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
