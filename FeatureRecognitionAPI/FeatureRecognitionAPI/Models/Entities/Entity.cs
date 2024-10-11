@@ -158,22 +158,22 @@ namespace FeatureRecognitionAPI.Models
 
             decimal A2 = line2.EndY - line2.StartY;
             decimal B2 = line2.EndX - line2.StartX;
-            decimal C2 = A2 * line2.StartX + B2 * line2.EndX;
+            decimal C2 = A2 * line2.StartX + B2 * line2.StartY;
 
-            decimal det = A1 * B2 - A2 * B1;
+            decimal delta = A1 * B2 - A2 * B1;
             
             // Lines are parralell and thus cannot intersect
-            if (det == 0) { return false; }
+            if (delta == 0) { return false; }
             
             // Intersection point
-            decimal xIntersect = (B2 * C1 - B1 * C2) / det;
-            decimal yIntersect = (B2 * C1 - B1 * C2) / det;
-           
+            decimal xIntersect = (B1 * C2 - B2 * C1) / delta;
+            decimal yIntersect = (A1 * C2 - A2 * C1) / delta;
+
             // Check if the intersect lies on each of our line segments.
-            bool xBounds = (xIntersect > line1.StartX && xIntersect < line1.EndX
-                && xIntersect > line2.StartX && xIntersect < line2.EndX);
-            bool yBounds = (yIntersect > line1.StartY && yIntersect < line1.EndY
-                && yIntersect > line2.StartY && yIntersect < line2.EndY);
+            bool xBounds = (xIntersect > Math.Min(line1.StartX, line1.EndX) && xIntersect < Math.Max(line1.StartX, line1.EndX)) &&
+                (xIntersect > Math.Min(line2.StartX, line2.EndX) && xIntersect < Math.Max(line2.StartX, line2.EndX));
+            bool yBounds = (yIntersect > Math.Min(line1.StartY, line1.EndY) && yIntersect < Math.Max(line1.StartY, line1.EndY)) &&
+                (yIntersect > Math.Min(line2.StartY, line2.EndY) && yIntersect < Math.Max(line2.StartY, line2.EndY));
 
             return xBounds && yBounds;
         }
