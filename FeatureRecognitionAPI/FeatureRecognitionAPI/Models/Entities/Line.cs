@@ -7,18 +7,18 @@ namespace FeatureRecognitionAPI.Models
 {
     public class Line : Entity
     {
-        public decimal StartX { get; set; }
-        public decimal StartY { get; set; }
-        public decimal EndX { get; set; }
-        public decimal EndY { get; set; }
+        public  double StartX { get; set; }
+        public  double StartY { get; set; }
+        public  double EndX { get; set; }
+        public  double EndY { get; set; }
 
-        public decimal Length { get; } 
+        public  double Length { get; } 
         private Line()
         {
             entityType = PossibleEntityTypes.line;
         }
 
-        public Line(decimal startX, decimal startY, decimal endX, decimal endY)
+        public Line( double startX,  double startY,  double endX,  double endY)
         {
             StartX = startX;
             StartY = startY;
@@ -26,8 +26,7 @@ namespace FeatureRecognitionAPI.Models
             EndY = endY;
 
             // Distance Calculation
-            Length = DecimalEx.Sqrt(DecimalEx.Pow(endX - startX, 2) + DecimalEx.Pow(endY - startY, 2));
+            Length = Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2));
         }
-
     }
 }
