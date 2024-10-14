@@ -71,7 +71,8 @@ namespace FeatureRecognitionAPI.Services
                     switch (ext)
                     {
                         case ".dxf":
-                            DXFFile dXFFile = new DXFFile(path);
+                            DXFFile dXFFile = new DXFFile(path); // future TODO? make readEntities asynchronous,
+                                                                 //might be slow for large files with mutliple users hitting endpoint at once
                             json = JsonConvert.SerializeObject(dXFFile);
                             break;
                         case ".dwg":
