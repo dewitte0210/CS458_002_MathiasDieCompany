@@ -8,7 +8,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <DragNdrop onFilesSelected={setFiles} width={window.innerWidth / 2} height={window.innerHeight} />
+      <DragNdrop onFilesSelected={setFiles}/>
     </div>
   );
 }

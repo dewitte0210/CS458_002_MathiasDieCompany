@@ -3,14 +3,13 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { MdClear } from "react-icons/md";
 import "./drag-drop.css";
 import { useState } from 'react';
+import testJson from './testData.json';
 
 /*
   Defines the shape of the props that the DragNdrop component accepts.
 */
 interface DragNdropProps {
   onFilesSelected?: (files: File[]) => void;
-  width: number;
-  height: number;
 }
 
 /*
@@ -18,8 +17,6 @@ interface DragNdropProps {
 */
 const DragNdrop: React.FC<DragNdropProps> = ({
   onFilesSelected,
-  width,
-  height,
 }) => {
   // State hooks
   const [file, setFile] = useState<File | null>(null); // Only allow one file
@@ -99,7 +96,8 @@ const DragNdrop: React.FC<DragNdropProps> = ({
 
       const jsonResponse = await res.json(); // Capture JSON responses
       console.log(jsonResponse);
-      setJsonResponse(jsonResponse); // Store response in state
+      //setJsonResponse(jsonResponse); // Store response in state
+      setJsonResponse(testJson);
       setSubmitted(true); // Update the state to indicate successful submission
 
     } catch (error) {
@@ -119,8 +117,47 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     setJsonResponse(null); // Clear the JSON response on going back
   };
 
+  /*
+    Calculate the total number of features detected.
+  */
+  const numFeatures = testJson.reduce((acc, curr) => acc + curr.numFeatures, 0);
+
+  /*
+    Display the JSON data in a table
+  */
+  const DisplayData = testJson.map(
+    (info)=>{
+      return(
+      <tr>
+        <td>{info.numFeatures}</td>
+        <td>{info.group}</td>
+        <td> {info.perOver20 ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+        <td> {info.multipleRadius ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+        <td> {info.kissCut ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+        <td> {info.border ? (
+          <span className="checkmark">&#10003;</span>
+        ) : (
+          <span className="crossmark">&#10005;</span>
+        )} </td>
+      </tr>
+      )
+    }
+  )
+
   return (
-    <section className="drag-drop" style={{ width: width, height: height }}>
+    <section className="drag-drop">
       {isLoading ? ( // Display loading screen during file upload
         <><span className="loader"></span><div className="loading-text">Uploading...</div></>
       ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
@@ -163,22 +200,37 @@ const DragNdrop: React.FC<DragNdropProps> = ({
             )}
           </div>
           {file && (
-            <button className="submit-btn" onClick={handleSubmit}>
-              Submit File
+            <button className="animated-button" onClick={handleSubmit}>
+              <span>Submit File</span>
+              <span></span>
             </button>
           )}
         </>
       ) : ( // Show success message after submission
         <div className="success-message">
-          <p>File submitted successfully!</p>
           {jsonResponse && ( // Conditionally render the JSON response
             <div className="json-response">
-              <h3>Server Response:</h3>
-              <pre>Number of Entities: {JSON.stringify(jsonResponse, null, 2)}</pre> {/* Pretty-print the JSON */}
+              <h3>Features Detected: {numFeatures}</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Number</th>
+                    <th>Group</th>
+                    <th>Perimeter Over 20</th>
+                    <th>Multiple Radius</th>
+                    <th>Kiss Cut</th>
+                    <th>Border</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {DisplayData}
+                </tbody>
+                </table>
             </div>
           )}
-          <button className="back-btn" onClick={backToUpload}>
-            Go Back
+          <button className="animated-button" onClick={backToUpload}>
+          <span>Go Back</span>
+          <span></span>
           </button>
         </div>
       )}

@@ -1,12 +1,11 @@
 .drag-drop {
-  background: #fff;
+  background-color: transparent;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   position: fixed; 
   top: 50%; 
   left: 50%; 
-  transform: translate(-50%, -50%); 
-  padding: 20px; 
+  transform: translate(-50%, -50%);
   max-width: 90vw; 
   max-height: 90vh; 
   box-sizing: border-box;
@@ -18,7 +17,6 @@
 
 .document-uploader {
   border: 2px dashed #4282fe;
-  background-color: #f4fbff;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -57,8 +55,8 @@
   .file-list {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center the file items horizontally */
-    justify-content: center; /* Center file items vertically */
+    align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     width: 100%;
     height: 5vh;
@@ -66,7 +64,7 @@
     &__container {
       display: flex;
       flex-direction: column;
-      align-items: center; /* Center the file items in the container */
+      align-items: center;
       justify-content: center;
       width: 100%;
       height: 100%;
@@ -79,8 +77,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem;
-    width: 90%; /* Adjust the width to center properly */
-    max-width: 1000px; /* Set a max width for consistent alignment */
+    width: 90%;
+    max-width: 1000px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
 
@@ -144,28 +142,56 @@
   }
 }
 
-.submit-btn, .back-btn {
+.animated-button {
+  position: relative;
   display: inline-block;
-  padding: 15px 25px;
-  font-size: 24px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  outline: none;
-  color: #fff;
-  background-color: #04AA6D;
+  padding: 12px 48px;
   border: none;
-  border-radius: 15px;
-  box-shadow: 0 9px #999;
-  margin-top: 12px;
+  font-size: 16px;
+  background: rgb(84,114,210);
+  background: linear-gradient(circle, rgba(84,114,210,1) 0%, rgba(0,95,255,1) 100%);
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  border: 3px solid #5472d2;
+  margin-top: 40px;
 }
 
-.submit-btn:hover, .back-btn:hover {background-color: #3e8e41}
+.animated-button span:first-child {
+  position: relative;
+  z-index: 1;
+}
 
-.submit-btn:active, .back-btn:active {
-  background-color: #3e8e41;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
+.animated-button span:last-child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0px;
+  height: 0px;
+  background-color: #ffffff;
+  opacity: 1;
+  transition: all 0.2s ease-in;
+}
+
+.animated-button:hover {
+  box-shadow: 0 0 0 5px #ffffff;
+  color: #000000;
+  border: 3px solid #5472d2;
+  animation: .2s ease-in;
+}
+
+.animated-button:active {
+  scale: 0.95;
+}
+
+.animated-button:hover span:last-child {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
 }
 
 .success-message {
@@ -219,4 +245,38 @@
 .loading-text {
   margin-top: 100px;
   position: fixed;
+}
+
+table {
+	border-collapse: collapse;
+    font-family: Tahoma, Geneva, sans-serif;
+}
+table td {
+	padding: 15px;
+}
+table th {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+table thead td {
+	background-color: #54585d;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 13px;
+	border: 1px solid #54585d;
+}
+table tbody td {
+	color: #636363;
+	border: 1px solid #dddfe1;
+}
+table tbody tr {
+	background-color: #f9fafb;
+}
+table tbody tr:nth-child(odd) {
+	background-color: #ffffff;
+}
+
+h3 {
+  text-align: center;
 }
