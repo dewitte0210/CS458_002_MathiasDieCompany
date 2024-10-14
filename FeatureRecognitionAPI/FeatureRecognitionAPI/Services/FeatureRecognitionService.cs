@@ -49,7 +49,7 @@ namespace FeatureRecognitionAPI.Services
             return (OperationStatus.OK, null);
         }
 
-        public async Task<(OperationStatus, int)> UploadFile(IFormFile file)
+        public async Task<(OperationStatus, string)> UploadFile(IFormFile file)
         {
             try
             {
@@ -67,17 +67,17 @@ namespace FeatureRecognitionAPI.Services
                 {
                     DXFFile dXFFile = new DXFFile(path);
 
-                    string json = JsonConvert.SerializeObject(dXFFile.GetEntities());
+                    string json = JsonConvert.SerializeObject(dXFFile.getFeatureList());
 
-                    return (OperationStatus.OK, dXFFile.GetEntities().Count());
+                    return (OperationStatus.OK, json);
 
                 }
                 else
-                    return (OperationStatus.BadRequest, 0);
+                    return (OperationStatus.BadRequest, null);
             }
             catch (Exception ex)
             {
-                return (OperationStatus.ExternalApiFailure, 0);
+                return (OperationStatus.ExternalApiFailure, null);
             }
 
 
