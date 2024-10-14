@@ -1,6 +1,6 @@
 [
   {
-    "numFeatures": 1,
+    "numFeatures": 2,
     "group": "1A",
     "perOver20": true,
     "kissCut": false,
@@ -8,7 +8,7 @@
     "border": true
   },
   {
-    "numFeatures": 2,
+    "numFeatures": 4,
     "group": "1B",
     "perOver20": false,
     "kissCut": false,
@@ -16,7 +16,7 @@
     "border": false
   },
   {
-    "numFeatures": 3,
+    "numFeatures": 1,
     "group": "1C",
     "perOver20": false,
     "kissCut": false,
@@ -24,7 +24,7 @@
     "border": false
   },
   {
-    "numFeatures": 4,
+    "numFeatures": 6,
     "group": "2A",
     "perOver20": false,
     "kissCut": false,

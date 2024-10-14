@@ -117,6 +117,14 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     setJsonResponse(null); // Clear the JSON response on going back
   };
 
+  /*
+    Calculate the total number of features detected.
+  */
+  const numFeatures = testJson.reduce((acc, curr) => acc + curr.numFeatures, 0);
+
+  /*
+    Display the JSON data in a table
+  */
   const DisplayData = testJson.map(
     (info)=>{
       return(
@@ -202,7 +210,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
         <div className="success-message">
           {jsonResponse && ( // Conditionally render the JSON response
             <div className="json-response">
-              <h3>Features Detected: {jsonResponse.length}</h3>
+              <h3>Features Detected: {numFeatures}</h3>
               <table>
                 <thead>
                   <tr>
