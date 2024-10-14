@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "numFeatures": 1,
     "group": "1A",
     "perOver20": true,
     "kissCut": false,
@@ -8,7 +8,7 @@
     "border": true
   },
   {
-    "id": 2,
+    "numFeatures": 2,
     "group": "1B",
     "perOver20": false,
     "kissCut": false,
@@ -16,7 +16,7 @@
     "border": false
   },
   {
-    "id": 3,
+    "numFeatures": 3,
     "group": "1C",
     "perOver20": false,
     "kissCut": false,
@@ -24,11 +24,11 @@
     "border": false
   },
   {
-    "id": 4,
+    "numFeatures": 4,
     "group": "2A",
     "perOver20": false,
     "kissCut": false,
-    "multipleRadius": false,
-    "border": true
+    "multipleRadius": true,
+    "border": false
   }
 ]

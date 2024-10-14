@@ -121,6 +121,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     (info)=>{
       return(
       <tr>
+        <td>{info.numFeatures}</td>
         <td>{info.group}</td>
         <td> {info.perOver20 ? (
           <span className="checkmark">&#10003;</span>
@@ -199,13 +200,13 @@ const DragNdrop: React.FC<DragNdropProps> = ({
         </>
       ) : ( // Show success message after submission
         <div className="success-message">
-          <p>File submitted successfully!</p>
           {jsonResponse && ( // Conditionally render the JSON response
             <div className="json-response">
               <h3>Features Detected: {jsonResponse.length}</h3>
               <table>
                 <thead>
                   <tr>
+                    <th>Number</th>
                     <th>Group</th>
                     <th>Perimeter Over 20</th>
                     <th>Multiple Radius</th>

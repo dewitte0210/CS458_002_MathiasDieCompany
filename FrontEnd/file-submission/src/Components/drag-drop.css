@@ -254,6 +254,11 @@ table {
 table td {
 	padding: 15px;
 }
+table th {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
 table thead td {
 	background-color: #54585d;
 	color: #ffffff;
