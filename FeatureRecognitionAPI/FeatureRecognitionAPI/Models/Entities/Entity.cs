@@ -77,12 +77,12 @@ namespace FeatureRecognitionAPI.Models
             //  general form: Ax + By + C = 0
 
             //  A, B, and C variables in the general form
-            decimal a;
-            decimal b;
-            decimal c;
+             double a;
+             double b;
+             double c;
             //  Slope and intercept of the line, used in quadratic calc
-            decimal slope = 0;
-            decimal intercept = 0;
+             double slope = 0;
+             double intercept = 0;
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
@@ -110,38 +110,47 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Checks if the line passes through or touches the circle the arc represents
-            decimal numerator = Math.Abs(a * arc.centerX + b * arc.centerY + c);
-            decimal distance = numerator / DecimalEx.Sqrt(DecimalEx.Pow(a, 2) + DecimalEx.Pow(b, 2));
-
+             double numerator = Math.Abs(a * arc.centerX + b * arc.centerY + c);
+             double distance = numerator / Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
             if (arc.radius >= distance)
             {
                 //  Will hold the solution values of the quadratic equation
-                decimal[] solns;
+                List<double> solns = new();
+
                 //  Special case for vertical line
                 if (line.EndX == line.StartX)
                 {
-                    solns = DecimalEx.SolveQuadratic(1, -2 * arc.centerY, DecimalEx.Pow(arc.centerY, 2) + DecimalEx.Pow((line.EndX - arc.centerX), 2) - DecimalEx.Pow(arc.radius, 2));
+                    decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.centerY), (decimal)(Math.Pow(arc.centerY, 2) + Math.Pow((line.EndX - arc.centerX), 2) - Math.Pow(arc.radius, 2)));
+
+                    foreach(decimal number in tempSolns)
+                    {
+                        solns.Add((double)number);
+                    }
                     //  Checks if each solution is on the arc, if one is on it return true
-                    for (int i = 0; i < solns.Length; i++)
+                    for (int i = 0; i < solns.Count(); i++)
                     {
                         //  Solution y value
-                        decimal y = solns[i];
+                         double y = solns[i];
                         //  Solution x value
-                        decimal x = line.EndX;
+                         double x = line.EndX;
                         if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
                     }
                 }
                 else
                 {
-                    solns = DecimalEx.SolveQuadratic((DecimalEx.Pow(slope, 2) + 1), (-2 * arc.centerX) + (2 * (intercept * slope)) - (2 * (arc.centerY * slope)), DecimalEx.Pow(arc.centerX, 2) + DecimalEx.Pow(intercept, 2) - (2 * (intercept * arc.centerY)) + DecimalEx.Pow(arc.centerY, 2) - DecimalEx.Pow(arc.radius, 2));
-
+                    decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1), (decimal)(-2.0 * arc.centerX) + (decimal)(2 * (intercept * slope)) - (decimal)(2 * (arc.centerY * slope)), (decimal)Math.Pow(arc.centerX, 2) + (decimal)Math.Pow(intercept, 2) - (decimal)(2 * (intercept * arc.centerY)) + (decimal)Math.Pow(arc.centerY, 2) - (decimal)Math.Pow(arc.radius, 2));
+                    foreach(decimal number in tempSolns)
+                    {
+                        solns.Add((double)number);
+                    }
+                    
                     //  Checks if each solution is on the arc, if one is on it return true
-                    for (int i = 0; i < solns.Length; i++)
+                    for (int i = 0; i < solns.Count; i++)
                     {
                         //  Solution x value
-                        decimal x = solns[i];
+                         double x = solns[i];
                         //  Solution y value
-                        decimal y = slope * solns[i] + intercept;
+                         double y = slope * solns[i] + intercept;
                         if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
                     }
                 }
@@ -152,22 +161,22 @@ namespace FeatureRecognitionAPI.Models
         internal bool IntersectLineWithLine(Line line1, Line line2)
         {
             // Get lines in the form Ax + By = C
-            decimal A1 = line1.EndY - line1.StartY;
-            decimal B1 = line1.EndX - line1.StartX;
-            decimal C1 = A1 * line1.StartX + B1 * line1.StartY;
+             double A1 = line1.EndY - line1.StartY;
+             double B1 = line1.EndX - line1.StartX;
+             double C1 = A1 * line1.StartX + B1 * line1.StartY;
 
-            decimal A2 = line2.EndY - line2.StartY;
-            decimal B2 = line2.EndX - line2.StartX;
-            decimal C2 = A2 * line2.StartX + B2 * line2.StartY;
+             double A2 = line2.EndY - line2.StartY;
+             double B2 = line2.EndX - line2.StartX;
+             double C2 = A2 * line2.StartX + B2 * line2.StartY;
 
-            decimal delta = A1 * B2 - A2 * B1;
+             double delta = A1 * B2 - A2 * B1;
             
             // Lines are parralell and thus cannot intersect
             if (delta == 0) { return false; }
             
             // Intersection point
-            decimal xIntersect = (B1 * C2 - B2 * C1) / delta;
-            decimal yIntersect = (A1 * C2 - A2 * C1) / delta;
+             double xIntersect = (B1 * C2 - B2 * C1) / delta;
+             double yIntersect = (A1 * C2 - A2 * C1) / delta;
 
             // Check if the intersect lies on each of our line segments.
             bool xBounds = (xIntersect > Math.Min(line1.StartX, line1.EndX) && xIntersect < Math.Max(line1.StartX, line1.EndX)) &&
@@ -192,19 +201,19 @@ namespace FeatureRecognitionAPI.Models
             // The circles intersect. Do they intersect at the position of the arcs?
             
             // Find a and h.
-            decimal a = (DecimalEx.Pow(arc1.radius,2) - DecimalEx.Pow(arc2.radius, 2) + DecimalEx.Pow(between.Length, 2)) / 
+             double a = (Math.Pow(arc1.radius,2) - Math.Pow(arc2.radius, 2) + Math.Pow(between.Length, 2)) / 
                 (2 * between.Length);
-            decimal h = DecimalEx.Sqrt(DecimalEx.Pow(arc1.radius, 2) - DecimalEx.Pow(a,2));
+             double h = Math.Sqrt(Math.Pow(arc1.radius, 2) - Math.Pow(a,2));
             
             // Find P2.
-            decimal cx2 = arc1.centerX + a * (arc2.centerX - arc1.centerX) / between.Length;
-            decimal cy2 = arc1.centerY + a * (arc2.centerY - arc1.centerY) / between.Length;
+             double cx2 = arc1.centerX + a * (arc2.centerX - arc1.centerX) / between.Length;
+             double cy2 = arc1.centerY + a * (arc2.centerY - arc1.centerY) / between.Length;
 
             // Get the points P3.
-            decimal intersect1X = (cx2 + h * (arc2.centerY - arc1.centerY) / between.Length);
-            decimal intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.Length);
-            decimal intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.Length);
-            decimal intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.Length);
+             double intersect1X = (cx2 + h * (arc2.centerY - arc1.centerY) / between.Length);
+             double intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.Length);
+             double intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.Length);
+             double intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.Length);
 
             bool intersect1IsValid = IsInArcRange(arc1.centerX, arc1.centerY, intersect1X, intersect1Y, arc1.startAngle, arc1.endAngle) &&
                    IsInArcRange(arc2.centerX, arc2.centerY, intersect1X, intersect1Y, arc2.startAngle, arc2.endAngle);
@@ -215,12 +224,12 @@ namespace FeatureRecognitionAPI.Models
 ;
         }
 
-        internal bool IsInArcRange(decimal circleX, decimal circleY, decimal pointX, decimal pointY,
-            decimal startAngle, decimal endAngle)
+        internal bool IsInArcRange( double circleX,  double circleY,  double pointX,  double pointY,
+             double startAngle,  double endAngle)
         {
-            decimal y = pointY - circleY;
-            decimal x = pointX - circleX;
-            decimal degrees;
+             double y = pointY - circleY;
+             double x = pointX - circleX;
+             double degrees;
             
             // Figure out the angle the point is in. Special cases apply at x=0 and y=0
             if(x == 0)
@@ -233,25 +242,26 @@ namespace FeatureRecognitionAPI.Models
             }
             else
             {
-                decimal tan = DecimalEx.ATan(y/x);
-                degrees = tan * (180 / DecimalEx.Pi);
+                 double tan = Math.Atan2(y,x);
+                degrees = tan * (180 / Math.PI);
                 //Q2 and Q3
                 if(x < 0)
                 {
-                    degrees = Math.Abs(degrees + 180);
+                    // y < 0? Q3 else Q2
+                    degrees =  y < 0 ? degrees += 360 : Math.Abs(degrees + 180);
                 }
                 //Q4
                 else if (x > 0 && y < 0)
                 {
-                    degrees = Math.Abs(degrees + 270);
+                    degrees = 360 + degrees;
                 }
             }
 
             // rotate start and end angles to start at 0
-            decimal difference = 360 - startAngle;
-            decimal adjustedStart = 0;
-            decimal adjustedEnd = endAngle + difference;
-            decimal adjustedDegrees = degrees + difference;
+             double difference = 360 - startAngle;
+             double adjustedStart = 0;
+             double adjustedEnd = endAngle + difference;
+             double adjustedDegrees = degrees + difference;
             
             if(adjustedEnd >= 360) { adjustedEnd -= 360; }
             if(adjustedDegrees >= 360) { adjustedDegrees -= 360; }

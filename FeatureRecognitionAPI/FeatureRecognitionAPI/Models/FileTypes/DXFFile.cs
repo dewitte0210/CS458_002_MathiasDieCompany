@@ -87,10 +87,10 @@ namespace FeatureRecognitionAPI.Models
         private int ParseLine(string[] lines, int index)
         {
             //Variables used to create entity of type Line
-            decimal xStart = 0;
-            decimal yStart = 0;
-            decimal xEnd = 0;
-            decimal yEnd = 0;
+             double xStart = 0;
+             double yStart = 0;
+             double xEnd = 0;
+             double yEnd = 0;
             //Index must be incremented along with i in order to keep maintain accurate indexing
             while (lines[index] != "  0")
             {
@@ -100,25 +100,25 @@ namespace FeatureRecognitionAPI.Models
 
                     case " 10":
                         index++;
-                        xStart = decimal.Parse(lines[index]);
+                        xStart = double.Parse(lines[index]);
                         //Console.WriteLine(xStart + " xStart");
                         break;
 
                     case " 11":
                         index++;
-                        xEnd = decimal.Parse(lines[index]);
+                        xEnd = double.Parse(lines[index]);
                         //Console.WriteLine(xEnd + " xEnd");
                         break;
 
                     case " 20":
                         index++;
-                        yStart = decimal.Parse(lines[index]);
+                        yStart = double.Parse(lines[index]);
                         //Console.WriteLine(yStart +" yStart");
                         break;
 
                     case " 21":
                         index++;
-                        yEnd = decimal.Parse(lines[index]);
+                        yEnd = double.Parse(lines[index]);
                         //Console.WriteLine(yEnd + " yEnd");
                         break;
 
@@ -136,11 +136,11 @@ namespace FeatureRecognitionAPI.Models
 
         private int ParseArc(string[] lines, int index)
         {
-            decimal xPoint = 0;
-            decimal yPoint = 0;
-            decimal radius = 0;
-            decimal startAngle = 0;
-            decimal endAngle = 0;
+             double xPoint = 0;
+             double yPoint = 0;
+             double radius = 0;
+             double startAngle = 0;
+             double endAngle = 0;
 
             while (lines[index] != "  0")
             {
@@ -149,31 +149,31 @@ namespace FeatureRecognitionAPI.Models
 
                     case " 10":
                         index++;
-                        xPoint = decimal.Parse(lines[index]);
+                        xPoint = double.Parse(lines[index]);
                         //Console.WriteLine(xPoint + " xPoint");
                         break;
 
                     case " 20":
                         index++;
-                        yPoint = decimal.Parse(lines[index]);
+                        yPoint = double.Parse(lines[index]);
                         //Console.WriteLine(yPoint + " yPoint");
                         break;
 
                     case " 40":
                         index++;
-                        radius = decimal.Parse(lines[index]);
+                        radius = double.Parse(lines[index]);
                         //Console.WriteLine(radius +" yStart");
                         break;
 
                     case " 50":
                         index++;
-                        startAngle = decimal.Parse(lines[index]);
+                        startAngle = double.Parse(lines[index]);
                         //Console.WriteLine(startAngle + " startAngle");
                         break;
 
                     case " 51":
                         index++;
-                        endAngle = decimal.Parse(lines[index]);
+                        endAngle = double.Parse(lines[index]);
                         //Console.WriteLine(endAngle + " endAngle");
                         break;
 
@@ -190,9 +190,9 @@ namespace FeatureRecognitionAPI.Models
 
         private int ParseCircle(string[] lines, int index)
         {
-            decimal xPoint = 0;
-            decimal yPoint = 0;
-            decimal radius = 0;
+             double xPoint = 0;
+             double yPoint = 0;
+             double radius = 0;
             while (lines[index] != "  0")
             {
                 switch (lines[index])
@@ -200,19 +200,19 @@ namespace FeatureRecognitionAPI.Models
 
                     case " 10":
                         index++;
-                        xPoint = decimal.Parse(lines[index]);
+                        xPoint = double.Parse(lines[index]);
                         //Console.WriteLine(xPoint + " xPoint");
                         break;
 
                     case " 20":
                         index++;
-                        yPoint = decimal.Parse(lines[index]);
+                        yPoint = double.Parse(lines[index]);
                         //Console.WriteLine(yPoint + " yPoint");
                         break;
 
                     case " 40":
                         index++;
-                        radius = decimal.Parse(lines[index]);
+                        radius = double.Parse(lines[index]);
                         //Console.WriteLine(radius +" yStart");
                         break;
 
