@@ -62,9 +62,19 @@ namespace FeatureRecognitionAPI.Models
 
             return touchingEntityList;
         }
+        public void extendEntities(List<Entity> myEntityList)
+        {
+            for (int i = 0; i < myEntityList.Count; i++)
+            {
+                for (int j = 0;j <myEntityList.Count; j++)
+                {
+                    if (myEntityList[i])
+                }
+            }
+        }
         private List<Entity> makeTouchingEntitiesListHelper(List<Entity> myEntityList)
         {
-
+            return myEntityList;
         }
 
         /* 
