@@ -34,7 +34,7 @@ namespace FeatureRecognitionAPI.Models
             Length = Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2));
         }
 
-        public override bool isParallel(Entity other)
+        public bool isParallel(Entity other)
         {
             if (other is Line)
             {
@@ -49,7 +49,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        public override bool isPerpendicular(Entity other)
+        public bool isPerpendicular(Entity other)
         {
             if (other is Line)
             {
