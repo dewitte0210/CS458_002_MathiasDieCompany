@@ -18,5 +18,8 @@
   <ItemGroup>
     <Folder Include="ExampleFiles\" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <InternalsVisibleTo Include="Testing_for_Project" />
+  </ItemGroup>
 </Project>
