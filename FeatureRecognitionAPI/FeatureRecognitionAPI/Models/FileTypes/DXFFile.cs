@@ -2,6 +2,7 @@
  * SupportedFile child that implements a DXF instance
  * I believe this will not require the use of Entities and can instead just read the data straight into features
  */
+using FeatureRecognitionAPI.Models.Enums;
 using System;
 using System.Reflection;
 
@@ -9,15 +10,56 @@ namespace FeatureRecognitionAPI.Models
 {
     public class DXFFile : SupportedFile
     {
+        private FileVersion _fileVersion;
+        private string[] _lines;
         public DXFFile(string path) : base(path)
         {
             entityList = [];
             this.path = path;
             fileType = SupportedExtensions.dxf;
+            _fileVersion = GetFileVersion();
+            
             if (File.Exists(path))
             {
                 readEntities();
             }
+        }
+
+        public FileVersion GetFileVersion()
+        {
+            for (int i = 0; i < _lines.Length; i++)
+            {
+                if (_lines[i] == "$ACADVER")
+                {
+                    string version = _lines[i + 1];
+                    switch (version)
+                    {
+                        case "AC1006":
+                            return FileVersion.AutoCad10;
+                        case "AC1009":
+                            return FileVersion.AutoCad12;
+                        case "AC1012":
+                            return FileVersion.AutoCad13;
+                        case "AC1014":
+                            return FileVersion.AutoCad14;
+                        case "AC1015":
+                            return FileVersion.AutoCad2000;
+                        case "AC1018":
+                            return FileVersion.AutoCad2004;
+                        case "AC1021":
+                            return FileVersion.AutoCad2007;
+                        case "AC1024":
+                            return FileVersion.AutoCad2010;
+                        case "AC1027":
+                            return FileVersion.AutoCad2013;
+                        case "AC1032":
+                            return FileVersion.AutoCad2018;
+                        default:
+                            return FileVersion.Unknown;
+                    }
+                }
+            }
+            return FileVersion.Unknown;
         }
 
         public override bool findFeatures()
@@ -33,38 +75,54 @@ namespace FeatureRecognitionAPI.Models
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
+        { 
+        }
+
+        public async Task<List<Entity>> ReadEntities()
         {
-            string[] lines = File.ReadAllLines(path);
-
-            //find and track index where entities begin in file (where parsing into entities starts)
-            int index = GetStartIndex(lines);
-
-            //While we haven't reached the end of the entities section, loop and grab entities
-            while ((lines[index] != "ENDSEC") && (lines.Length > index))
+            try
             {
+                List<Entity> entityList = new List<Entity>();
 
-                index++;
-                //Console.WriteLine("In while loop: " + lines[index]);
+                _lines = await File.ReadAllLinesAsync(path);
 
-                switch (lines[index])
+                //find and track index where entities begin in file (where parsing into entities starts)
+                int index = GetStartIndex(_lines);
+
+                //While we haven't reached the end of the entities section, loop and grab entities
+                while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
                 {
-                    case "LINE":
 
-                        index = ParseLine(lines, index);
-                        break;
+                    index++;
+                    //Console.WriteLine("In while loop: " + lines[index]);
 
-                    case "ARC":
-                        index = ParseArc(lines, index);
-                        break;
+                    switch (_lines[index])
+                    {
+                        case "LINE":
 
-                    case "CIRCLE":
-                        index = ParseCircle(lines, index);
-                        break;
+                            index = ParseLine(_lines, index);
+                            break;
 
-                    default:
-                        break;
+                        case "ARC":
+                            index = ParseArc(_lines, index);
+                            break;
+
+                        case "CIRCLE":
+                            index = ParseCircle(_lines, index);
+                            break;
+
+                        default:
+                            break;
+                    }
+
                 }
 
+                return entityList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return entityList;
             }
         }
 
@@ -84,6 +142,7 @@ namespace FeatureRecognitionAPI.Models
             return startIndex;
         }
 
+        #region Parse Entities
         private int ParseLine(string[] lines, int index)
         {
             //Variables used to create entity of type Line
@@ -225,12 +284,18 @@ namespace FeatureRecognitionAPI.Models
             Circle circleEntity = new Circle(xPoint, yPoint, radius);
             entityList.Add(circleEntity);
             return index;
-        }
+        } 
+        #endregion
 
         //May need to be refactored depending on if c# handles this by copy or by reference
         public List<Entity> GetEntities()
         {
             return entityList;
+        }
+
+        public void SetEntities(List<Entity> entities)
+        {
+            entityList = entities;
         }
 
 

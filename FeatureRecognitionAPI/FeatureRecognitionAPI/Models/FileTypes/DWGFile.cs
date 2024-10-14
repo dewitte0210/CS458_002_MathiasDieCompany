@@ -1,6 +1,7 @@
 ﻿/*
  * Child class from SupportedFiles that handles DWG files.
  */
+using FeatureRecognitionAPI.Models.Enums;
 using System;
 
 namespace FeatureRecognitionAPI.Models
