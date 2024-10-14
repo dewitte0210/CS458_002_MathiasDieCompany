@@ -11,7 +11,7 @@ namespace FeatureRecognitionAPI.Models
     public class DXFFile : SupportedFile
     {
         private FileVersion _fileVersion;
-        private readonly string[] _lines;
+        private string[] _lines;
         public DXFFile(string path) : base(path)
         {
             entityList = [];
@@ -21,7 +21,6 @@ namespace FeatureRecognitionAPI.Models
             
             if (File.Exists(path))
             {
-                _lines = File.ReadAllLines(path); // Save runtime by setting this once
                 readEntities();
             }
         }
@@ -76,36 +75,54 @@ namespace FeatureRecognitionAPI.Models
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
+        { 
+        }
+
+        public async Task<List<Entity>> ReadEntities()
         {
-            //find and track index where entities begin in file (where parsing into entities starts)
-            int index = GetStartIndex(_lines);
-
-            //While we haven't reached the end of the entities section, loop and grab entities
-            while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
+            try
             {
+                List<Entity> entityList = new List<Entity>();
 
-                index++;
-                //Console.WriteLine("In while loop: " + lines[index]);
+                _lines = await File.ReadAllLinesAsync(path);
 
-                switch (_lines[index])
+                //find and track index where entities begin in file (where parsing into entities starts)
+                int index = GetStartIndex(_lines);
+
+                //While we haven't reached the end of the entities section, loop and grab entities
+                while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
                 {
-                    case "LINE":
 
-                        index = ParseLine(_lines, index);
-                        break;
+                    index++;
+                    //Console.WriteLine("In while loop: " + lines[index]);
 
-                    case "ARC":
-                        index = ParseArc(_lines, index);
-                        break;
+                    switch (_lines[index])
+                    {
+                        case "LINE":
 
-                    case "CIRCLE":
-                        index = ParseCircle(_lines, index);
-                        break;
+                            index = ParseLine(_lines, index);
+                            break;
 
-                    default:
-                        break;
+                        case "ARC":
+                            index = ParseArc(_lines, index);
+                            break;
+
+                        case "CIRCLE":
+                            index = ParseCircle(_lines, index);
+                            break;
+
+                        default:
+                            break;
+                    }
+
                 }
 
+                return entityList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return entityList;
             }
         }
 
@@ -274,6 +291,11 @@ namespace FeatureRecognitionAPI.Models
         public List<Entity> GetEntities()
         {
             return entityList;
+        }
+
+        public void SetEntities(List<Entity> entities)
+        {
+            entityList = entities;
         }
 
 

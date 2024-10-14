@@ -15,6 +15,7 @@ namespace FeatureRecognitionAPI.Models
         double length;
         protected enum PossibleEntityTypes
         {
+            //MAP TO ObjectName inside CadObjectCollection from .Entities._entries
             line,
             circle,
             arc
