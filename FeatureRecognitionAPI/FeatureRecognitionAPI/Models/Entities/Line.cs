@@ -10,7 +10,7 @@ namespace FeatureRecognitionAPI.Models
         public double StartX { get; set; }
         public double StartY { get; set; }
         public double EndX { get; set; }
-        public decimal EndY { get; set; }
+        public double EndY { get; set; }
         public double SlopeY { get; }
         public double SlopeX { get; }
 
