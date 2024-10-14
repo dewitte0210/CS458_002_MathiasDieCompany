@@ -14,13 +14,13 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeY { get; }
         public double SlopeX { get; }
 
-        public decimal Length { get; } 
+        public  double Length { get; } 
         private Line()
         {
             entityType = PossibleEntityTypes.line;
         }
 
-        public Line(decimal startX, decimal startY, decimal endX, decimal endY)
+        public Line( double startX,  double startY,  double endX,  double endY)
         {
             StartX = startX;
             StartY = startY;
@@ -31,7 +31,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeX = EndX - StartX;
 
             // Distance Calculation
-            Length = DecimalEx.Sqrt(DecimalEx.Pow(endX - startX, 2) + DecimalEx.Pow(endY - startY, 2));
+            Length = Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2));
         }
 
         public override bool isParallel(Entity other)
