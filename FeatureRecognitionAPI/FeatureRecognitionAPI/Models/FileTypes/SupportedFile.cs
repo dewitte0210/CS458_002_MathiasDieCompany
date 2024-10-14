@@ -68,7 +68,7 @@ namespace FeatureRecognitionAPI.Models
             {
                 for (int j = 0;j <myEntityList.Count; j++)
                 {
-                    if (myEntityList[i])
+                    if (myEntityList[i].GetEntityType())
                 }
             }
         }
