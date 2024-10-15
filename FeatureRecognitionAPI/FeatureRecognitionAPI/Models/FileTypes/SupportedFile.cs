@@ -2,8 +2,9 @@
  * Abstract class to be inherrited by every File child class
  * - DWG, DXF, PDF
  */
+using FeatureRecognitionAPI.Models.Enums;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 
@@ -15,12 +16,8 @@ namespace FeatureRecognitionAPI.Models
         protected SupportedExtensions fileType;
         protected List<Feature> featureList = [];
         protected List<Entity> entityList;
-        protected enum SupportedExtensions
-        {
-            pdf,
-            dwg,
-            dxf,
-        }
+
+        //protected keyword for nested enum is about granting 
         public SupportedFile(string path)
         {
             this.path = path;

@@ -63,11 +63,35 @@ namespace FeatureRecognitionAPI.Services
                     file.CopyTo(stream);   
                 }
 
+                string text;
+                string json = "";
+
                 if (File.Exists(path))
                 {
-                    DXFFile dXFFile = new DXFFile(path);
+                    switch (ext)
+                    {
+                        case ".dxf":
+                            DXFFile dXFFile = new DXFFile(path); // future TODO? make readEntities asynchronous,
+                                                                 //might be slow for large files with mutliple users hitting endpoint at once
+                            List<Entity> entities = new List<Entity>();
+                            entities = await dXFFile.ReadEntities();
+                            dXFFile.SetEntities(entities);
 
-                    string json = JsonConvert.SerializeObject(dXFFile.getFeatureList());
+                            json = JsonConvert.SerializeObject(entities);
+                            break;
+                        case ".dwg":
+                            DWGFile dwgFile = new DWGFile(path);
+                            json = JsonConvert.SerializeObject(dwgFile);
+                            break;
+                        case ".pdf":
+                            PDFFile pdfFile = new PDFFile(path); //TODO: need more info to extract entities from pdf
+                            text = pdfFile.ExtractTextFromPDF();
+                            json = JsonConvert.SerializeObject(text);
+                            break;
+                        default:
+                            Console.WriteLine("ERROR detecting file extension");
+                            return (OperationStatus.BadRequest, json);
+                    }
 
                     return (OperationStatus.OK, json);
 
