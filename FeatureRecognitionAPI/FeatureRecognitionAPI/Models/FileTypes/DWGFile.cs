@@ -2,16 +2,22 @@
  * Child class from SupportedFiles that handles DWG files.
  */
 using FeatureRecognitionAPI.Models.Enums;
+using ACadSharp;
 using System;
+using ACadSharp.IO;
+using CSMath;
+using iText.Barcodes.Qrcode;
 
 namespace FeatureRecognitionAPI.Models
 {
     public class DWGFile : SupportedFile
     {
-        Entity[] entityList;
+        private FileVersion _fileVersion;
+        private string _path;
         public DWGFile(string path) : base(path)
         {
             fileType = SupportedExtensions.dwg;
+            _path = path;
         }
 
         /*
@@ -38,9 +44,45 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        public override void readEntities()
+        public async Task<List<Entity>> ReadEntities()
         {
+            DwgReader reader = new DwgReader(_path);
+            
+            CadDocument doc = reader.Read();
+
+            CadObjectCollection<ACadSharp.Entities.Entity> entities = doc.Entities;
+
+            for (int i = 0; i < entities.Count(); i++)
+            {
+                switch (entities[i].ObjectName)
+                {
+                    case "LINE":
+                        {
+                           // double xStart, yStart, xEnd, yEnd;
+                            
+
+                           // Line lineEntity = new Line(((ACadSharp.Entities.Line)entities[i]).StartPoint.X, yStart, xEnd, yEnd);
+                            break;
+                        }
+                    case "ARC":
+                        {
+                            break; 
+                        }
+                    case "CIRCLE":
+                        {
+                            break;
+                        }
+
+                } 
+            }
+
             throw new NotImplementedException();
         }
+
+        public override void readEntities()
+        {
+
+        }
+        
     }
 }
