@@ -63,9 +63,15 @@ namespace FeatureRecognitionAPI.Models
         {
             for (int i = 0; i < myEntityList.Count; i++)
             {
-                for (int j = 0;j <myEntityList.Count; j++)
+                if (myEntityList[i].GetEntityType() == PossibleEntityTypes.line)
                 {
-                    if (myEntityList[i].GetEntityType())
+                    for (int j = 0; j < myEntityList.Count; j++)
+                    {
+                        if (((Line)myEntityList[i]).extend(myEntityList[j]))
+                        {
+
+                        }
+                    }
                 }
             }
         }

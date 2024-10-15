@@ -3,6 +3,7 @@
  * The info from a PDF and DWG will be parsed into Entities
  *  - Line, Circle, Arc
  */
+using FeatureRecognitionAPI.Models.Enums;
 using System;
 using System.IO;
 using System.Numerics;
@@ -21,13 +22,6 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity {
         protected PossibleEntityTypes entityType;
         double length;
-        protected enum PossibleEntityTypes
-        {
-            //MAP TO ObjectName inside CadObjectCollection from .Entities._entries
-            line,
-            circle,
-            arc
-        }
 
         public void setLength(double length)
         {
@@ -40,9 +34,9 @@ namespace FeatureRecognitionAPI.Models
 
         }
 
-        public string GetEntityType()
+        public PossibleEntityTypes GetEntityType()
         {
-            return entityType.ToString();
+            return entityType;
         }
         public bool DoesIntersect(Entity other)
         {

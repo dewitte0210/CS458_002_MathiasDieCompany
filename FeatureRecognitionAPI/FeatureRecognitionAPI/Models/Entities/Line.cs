@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FeatureRecognitionAPI.Models.Enums;
+using System;
 using System.IO;
 using System.Numerics;
 using DecimalMath;
@@ -62,5 +63,20 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        public bool extend(Entity other)
+        {
+            if (other is Line)
+            {
+                if (isPerpendicular(other))
+                {
+                    
+                }
+                else if (isParallel(other))
+                {
+                     
+                }
+            }
+            return false;
+        }
     }
 }
