@@ -29,7 +29,7 @@ namespace FeatureRecognitionAPI.Controllers
         }
 
         [HttpPost("uploadFile", Name = nameof(UploadFile))]
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
         {
             if (file == null)

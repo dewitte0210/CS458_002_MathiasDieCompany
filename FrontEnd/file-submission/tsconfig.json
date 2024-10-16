@@ -2,7 +2,7 @@
   "compilerOptions": {
     "jsx": "react",
     "resolveJsonModule": true,
-    "esModuleInterop": true,
+    "noImplicitAny": false,
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
