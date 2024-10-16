@@ -18,6 +18,9 @@ namespace FeatureRecognitionAPI.Models
         {
             fileType = SupportedExtensions.dwg;
             _path = path;
+            entityList = new List<Entity>();
+            if(File.Exists(path)) 
+                readEntities();
         }
 
         /*
@@ -44,7 +47,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        public async Task<List<Entity>> ReadEntities()
+        public override void readEntities()
         {
             DwgReader reader = new DwgReader(_path);
             
@@ -58,18 +61,32 @@ namespace FeatureRecognitionAPI.Models
                 {
                     case "LINE":
                         {
-                           // double xStart, yStart, xEnd, yEnd;
-                            
-
-                           // Line lineEntity = new Line(((ACadSharp.Entities.Line)entities[i]).StartPoint.X, yStart, xEnd, yEnd);
+                            Line lineEntity = 
+                                new Line(((ACadSharp.Entities.Line)entities[i]).StartPoint.X,
+                                ((ACadSharp.Entities.Line)entities[i]).StartPoint.Y,
+                                ((ACadSharp.Entities.Line)entities[i]).EndPoint.X,
+                                ((ACadSharp.Entities.Line)entities[i]).EndPoint.Y);
+                            entityList.Add(lineEntity);
                             break;
                         }
                     case "ARC":
                         {
+                            Arc arcEntity =
+                                new Arc(((ACadSharp.Entities.Arc)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Arc)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Arc)entities[i]).Radius,
+                                ((ACadSharp.Entities.Arc)entities[i]).StartAngle,
+                                ((ACadSharp.Entities.Arc)entities[i]).EndAngle);
+                            entityList.Add(arcEntity);
                             break; 
                         }
                     case "CIRCLE":
                         {
+                            Circle circleEntity =
+                                new Circle(((ACadSharp.Entities.Circle)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Arc)entities[i]).Radius);
+                            entityList.Add(circleEntity);
                             break;
                         }
 
@@ -79,10 +96,6 @@ namespace FeatureRecognitionAPI.Models
             throw new NotImplementedException();
         }
 
-        public override void readEntities()
-        {
-
-        }
         
     }
 }
