@@ -14,13 +14,15 @@ namespace FeatureRecognitionAPI.Models
         private string[] _lines;
         public DXFFile(string path) : base(path)
         {
-            entityList = [];
+            entityList = new List<Entity>();
             this.path = path;
             fileType = SupportedExtensions.dxf;
-            _fileVersion = GetFileVersion();
+            //_fileVersion = GetFileVersion();
             
             if (File.Exists(path))
             {
+                _lines = File.ReadAllLines(path);
+                _fileVersion = GetFileVersion();
                 readEntities();
             }
         }
@@ -75,16 +77,10 @@ namespace FeatureRecognitionAPI.Models
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
-        { 
-        }
-
-        public async Task<List<Entity>> ReadEntities()
         {
             try
             {
                 List<Entity> entityList = new List<Entity>();
-
-                _lines = await File.ReadAllLinesAsync(path);
 
                 //find and track index where entities begin in file (where parsing into entities starts)
                 int index = GetStartIndex(_lines);
@@ -116,13 +112,10 @@ namespace FeatureRecognitionAPI.Models
                     }
 
                 }
-
-                return entityList;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return entityList;
             }
         }
 
