@@ -43,6 +43,11 @@ namespace FeatureRecognitionAPI.Models
         }
         public List<Feature> getFeatureList()
         {
+            featureList.Add(new Feature("Group1B", false, false, true, false));
+            featureList.Add(new Feature("Group1A", false, true, false, true));
+            featureList.Add(new Feature("Group1C", false, false, true, false));
+            featureList.Add(new Feature("Group2A", true, false, false, false));
+
             return featureList;
         }
 

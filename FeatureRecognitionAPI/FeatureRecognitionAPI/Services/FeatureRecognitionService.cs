@@ -72,12 +72,11 @@ namespace FeatureRecognitionAPI.Services
                     {
                         case ".dxf":
                             DXFFile dXFFile = new DXFFile(path); // future TODO? make readEntities asynchronous,
-                                                                 //might be slow for large files with mutliple users hitting endpoint at once
-                            List<Entity> entities = new List<Entity>();
-                            entities = await dXFFile.ReadEntities();
-                            dXFFile.SetEntities(entities);
+                            //might be slow for large files with mutliple users hitting endpoint at once
 
-                            json = JsonConvert.SerializeObject(entities);
+                            List<Feature> features = dXFFile.getFeatureList();
+
+                            json = JsonConvert.SerializeObject(features);
                             break;
                         case ".dwg":
                             DWGFile dwgFile = new DWGFile(path);
