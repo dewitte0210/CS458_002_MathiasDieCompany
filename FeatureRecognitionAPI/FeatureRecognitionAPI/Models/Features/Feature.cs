@@ -6,6 +6,7 @@
  * the first border and calculates feautrues only for that one 
  */
 using FeatureRecognitionAPI.Models;
+using iText.StyledXmlParser.Node;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
@@ -26,6 +27,7 @@ public class Feature
     bool perOver20;
     [JsonProperty]
     bool border;
+    public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     protected enum PossibleFeatureTypes
     {
@@ -42,6 +44,7 @@ public class Feature
 
     public Feature(string featureType, bool kissCut, bool multipleRadius, bool perOver20, bool border)
     {
+        this.count = 1;
         PossibleFeatureTypes inputAsEnum = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), featureType);
         this.featureType = inputAsEnum;
         this.kissCut = kissCut;
@@ -52,6 +55,7 @@ public class Feature
 
     public Feature(Entity[] entityList)
     {
+        this.count = 1;
         this.entityList = entityList;
 
         int numLines = 0;
@@ -112,5 +116,34 @@ public class Feature
         }
     }
 
+    public override bool Equals(object obj)
+    {
+        var item = obj as Feature;
+        /*
+            TO BE IMPLEMENTED LATER
+        */
+        //if (featureType == PossibleFeatureTypes.Group1B && entityList.Length == 1)
+        //{
+        //    //add check, could be arc
+
+        //    var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+        //    Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+        //    serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+        //    Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+
+        //    if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+        //        perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
+        //    {
+        //        return true;
+        //    }
+        //}
+        //else
+        if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+                perOver20 == item.perOver20 && border == item.border)
+        {
+            return true;
+        }
+        return false;
+    }
 
 }

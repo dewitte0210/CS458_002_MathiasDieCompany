@@ -118,7 +118,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   /*
     Calculate the total number of features detected.
   */
-  const numFeatures = jsonResponse?.length;
+  const numFeatures = jsonResponse?.reduce((acc: number, info: any) => acc + info.count, 0);
 
   /*
     Display the JSON data in a table
@@ -128,6 +128,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
       console.log(info.featureType);
       return(
       <tr>
+        <td>{info.count}</td>
         <td>{info.featureType}</td>
         <td> {info.perOver20 ? (
           <span className="checkmark">&#10003;</span>
@@ -212,6 +213,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
               <table>
                 <thead>
                   <tr>
+                    <th>Count</th>
                     <th>Group</th>
                     <th>Perimeter Over 20</th>
                     <th>Multiple Radius</th>

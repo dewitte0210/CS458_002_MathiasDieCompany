@@ -45,8 +45,26 @@ namespace FeatureRecognitionAPI.Models
         {
             featureList.Add(new Feature("Group1B", false, false, true, false));
             featureList.Add(new Feature("Group1A", false, true, false, true));
-            featureList.Add(new Feature("Group1C", false, false, true, false));
-            featureList.Add(new Feature("Group2A", true, false, false, false));
+            featureList.Add(new Feature("Group1A", false, true, false, true));
+            featureList.Add(new Feature("Group1A", false, false, false, true));
+            featureList.Add(new Feature("Group1A", false, false, false, true));
+            featureList.Add(new Feature("Group1A", false, false, false, true));
+            featureList.Add(new Feature("Group1A", false, false, false, true));
+            featureList.Add(new Feature("Group1C", false, false, false, true));
+            featureList.Add(new Feature("Group1C", false, false, false, true));
+            featureList.Add(new Feature("Group1C", true, false, false, true));
+
+            for (int i = 0; i < featureList.Count(); i++)
+            {
+                for (int j = 0; j < featureList.Count(); j++)
+                {
+                    if (featureList[i].Equals(featureList[j]) && i != j)
+                    {
+                        featureList[i].count += featureList[j].count;
+                        featureList.RemoveAt(j);
+                    }
+                }
+            }
 
             return featureList;
         }
