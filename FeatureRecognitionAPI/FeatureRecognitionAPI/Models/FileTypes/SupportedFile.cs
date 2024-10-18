@@ -43,6 +43,7 @@ namespace FeatureRecognitionAPI.Models
         }
         public List<Feature> getFeatureList()
         {
+            // This is a temporary list of features that will be replaced by the actual feature recognition logic
             featureList.Add(new Feature("Group1B", false, false, true, false));
             featureList.Add(new Feature("Group1A", false, true, false, true));
             featureList.Add(new Feature("Group1A", false, true, false, true));
@@ -54,6 +55,8 @@ namespace FeatureRecognitionAPI.Models
             featureList.Add(new Feature("Group1C", false, false, false, true));
             featureList.Add(new Feature("Group1C", true, false, false, true));
 
+
+            // Group identical features together
             for (int i = 0; i < featureList.Count(); i++)
             {
                 for (int j = 0; j < featureList.Count(); j++)

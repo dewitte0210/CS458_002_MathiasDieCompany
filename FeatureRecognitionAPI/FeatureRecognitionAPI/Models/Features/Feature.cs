@@ -116,9 +116,13 @@ public class Feature
         }
     }
 
+    /*
+     * Overriding the Equals method to compare two Feature objects
+    */
     public override bool Equals(object obj)
     {
         var item = obj as Feature;
+
         /*
             TO BE IMPLEMENTED LATER
         */
@@ -138,6 +142,8 @@ public class Feature
         //    }
         //}
         //else
+
+        // Checking equality
         if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
                 perOver20 == item.perOver20 && border == item.border)
         {
