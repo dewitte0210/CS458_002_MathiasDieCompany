@@ -95,9 +95,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
       }
 
       const jsonResponse = await res.json(); // Capture JSON responses
-      console.log(jsonResponse);
-      //setJsonResponse(jsonResponse); // Store response in state
-      setJsonResponse(testJson);
+      setJsonResponse(jsonResponse); // Store response in state
       setSubmitted(true); // Update the state to indicate successful submission
 
     } catch (error) {
@@ -120,17 +118,17 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   /*
     Calculate the total number of features detected.
   */
-  const numFeatures = testJson.reduce((acc, curr) => acc + curr.numFeatures, 0);
+  const numFeatures = jsonResponse?.length;
 
   /*
     Display the JSON data in a table
   */
-  const DisplayData = testJson.map(
+  const DisplayData = jsonResponse?.map(
     (info)=>{
+      console.log(info.featureType);
       return(
       <tr>
-        <td>{info.numFeatures}</td>
-        <td>{info.group}</td>
+        <td>{info.featureType}</td>
         <td> {info.perOver20 ? (
           <span className="checkmark">&#10003;</span>
         ) : (
@@ -214,7 +212,6 @@ const DragNdrop: React.FC<DragNdropProps> = ({
               <table>
                 <thead>
                   <tr>
-                    <th>Number</th>
                     <th>Group</th>
                     <th>Perimeter Over 20</th>
                     <th>Multiple Radius</th>

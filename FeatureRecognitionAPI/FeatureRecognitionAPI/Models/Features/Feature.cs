@@ -6,20 +6,30 @@
  * the first border and calculates feautrues only for that one 
  */
 using FeatureRecognitionAPI.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.IO;
 using System.Numerics;
 
 public class Feature
 {
+    [JsonProperty]
     PossibleFeatureTypes featureType;
+    [JsonProperty]
     Entity[] entityList; //list of touching entities that make up the feature
+    [JsonProperty]
     bool kissCut;
+    [JsonProperty]
     bool multipleRadius;
+    [JsonProperty]
     bool perOver20;
+    [JsonProperty]
     bool border;
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     protected enum PossibleFeatureTypes
     {
+        [JsonProperty]
         Group1A,
         Group1B,
         Group3,
@@ -29,6 +39,16 @@ public class Feature
     }
 
     private Feature() { }//should not use default constructor
+
+    public Feature(string featureType, bool kissCut, bool multipleRadius, bool perOver20, bool border)
+    {
+        PossibleFeatureTypes inputAsEnum = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), featureType);
+        this.featureType = inputAsEnum;
+        this.kissCut = kissCut;
+        this.multipleRadius = multipleRadius;
+        this.perOver20 = perOver20;
+        this.border = border;
+    }
 
     public Feature(Entity[] entityList)
     {

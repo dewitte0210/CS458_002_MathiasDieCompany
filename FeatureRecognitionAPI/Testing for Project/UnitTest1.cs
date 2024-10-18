@@ -2,6 +2,10 @@ using FeatureRecognitionAPI.Models;
 using NuGet.Frameworks;
 using DecimalMath;
 using Microsoft.AspNetCore.Rewrite;
+using System.Security.Policy;
+using ACadSharp.IO;
+using ACadSharp;
+using NHibernate.Criterion;
 
 namespace Testing_for_Project
 {
@@ -52,7 +56,7 @@ namespace Testing_for_Project
         public void TestDXFFileClass()
         {
             //Set path to any filepath containing the 3rd example dxf file
-            string path = @"C:\Users\Ice-HaskinsStephen\Downloads\Example-003.dxf";
+            string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
             bool pathTest = File.Exists(path);
 
             //Make sure the file exists so that DXF can be created
@@ -177,6 +181,19 @@ namespace Testing_for_Project
             Assert.That(test14.EndX, Is.EqualTo(0.1004872653057516));
             Assert.That(test14.EndY, Is.EqualTo(3.8249890568663383));
 
+        }
+        [Test]
+        //Test to verify we are getting the correct number of entities back from the library
+       public void testingACadSharpLibrary()
+        {
+            string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
+            DwgReader dwgReader = new DwgReader(path);
+
+            CadDocument test = dwgReader.Read();
+
+            CadObjectCollection<ACadSharp.Entities.Entity> testList = test.Entities;
+
+            Assert.That(testList.Count(), Is.EqualTo(42));
         }
     }
 }
