@@ -46,7 +46,7 @@ namespace FeatureRecognitionAPI.Models
         }
         public bool DoesIntersect(Entity other)
         {
-            if (this.entityType == PossibleEntityTypes.circle) { return false; }
+            if (this is Circle || other is Circle) { return false; }
 
             if (this.entityType == PossibleEntityTypes.arc)
             {
@@ -161,31 +161,155 @@ namespace FeatureRecognitionAPI.Models
 
         internal bool IntersectLineWithLine(Line line1, Line line2)
         {
-            // Get lines in the form Ax + By = C
-             double A1 = line1.EndY - line1.StartY;
-             double B1 = line1.EndX - line1.StartX;
-             double C1 = A1 * line1.StartX + B1 * line1.StartY;
+            //  Get lines in the form Ax + By + C = 0
+            double A1;
+            double B1;
+            double C1;
+            double slope1 = 0;
+            double intercept1 = 0;
+            bool vertical1 = false;
 
-             double A2 = line2.EndY - line2.StartY;
-             double B2 = line2.EndX - line2.StartX;
-             double C2 = A2 * line2.StartX + B2 * line2.StartY;
+            //  This is to check for a vertical line, since it would crash the program
+            //  trying to divide by 0
+            if (line1.EndX == line1.StartX)
+            {
+                A1 = 1;
+                B1 = 0;
+                C1 = -1 * line1.EndX;
+                vertical1 = true;
+            }
+            else
+            {
+                slope1 = (line1.EndY - line1.StartY) / (line1.EndX - line1.StartX);
+                intercept1 = line1.EndY - (slope1 * line1.EndX);
+                // The slope of the line ends up being A in the general form
+                A1 = slope1;
+                C1 = intercept1;
+                B1 = -1;
+                //  A cannot be negative in the general form
+                if (A1 < 0)
+                {
+                    A1 *= -1;
+                    B1 *= -1;
+                    C1 *= -1;
+                }
+            }
 
-             double delta = A1 * B2 - A2 * B1;
-            
-            // Lines are parralell and thus cannot intersect
-            if (delta == 0) { return false; }
-            
-            // Intersection point
-             double xIntersect = (B1 * C2 - B2 * C1) / delta;
-             double yIntersect = (A1 * C2 - A2 * C1) / delta;
+            double A2;
+            double B2;
+            double C2;
+            double slope2 = 0;
+            double intercept2 = 0;
+            bool vertical2 = false;
 
-            // Check if the intersect lies on each of our line segments.
-            bool xBounds = (xIntersect > Math.Min(line1.StartX, line1.EndX) && xIntersect < Math.Max(line1.StartX, line1.EndX)) &&
-                (xIntersect > Math.Min(line2.StartX, line2.EndX) && xIntersect < Math.Max(line2.StartX, line2.EndX));
-            bool yBounds = (yIntersect > Math.Min(line1.StartY, line1.EndY) && yIntersect < Math.Max(line1.StartY, line1.EndY)) &&
-                (yIntersect > Math.Min(line2.StartY, line2.EndY) && yIntersect < Math.Max(line2.StartY, line2.EndY));
+            //  This is to check for a vertical line, since it would crash the program
+            //  trying to divide by 0
+            if (line2.EndX == line2.StartX)
+            {
+                A2 = 1;
+                B2 = 0;
+                C2 = -1 * line2.EndX;
+                vertical2 = true;
+            }
+            else
+            {
+                slope2 = (line2.EndY - line2.StartY) / (line2.EndX - line2.StartX);
+                intercept2 = line2.EndY - (slope2 * line2.EndX);
+                // The slope of the line ends up being A in the general form
+                A2 = slope2;
+                C2 = intercept2;
+                B2 = -1;
+                //  A cannot be negative in the general form
+                if (A2 < 0)
+                {
+                    A2 *= -1;
+                    B2 *= -1;
+                    C2 *= -1;
+                }
+            }
 
-            return xBounds && yBounds;
+            //  Lines are parallel -> non zero
+            if (slope1 == slope2 && slope1 != 0) { return false; }
+            //  Lines are parallel -> vertical
+            else if (vertical1 && vertical2) { return false; }
+            //  Lines are parallel -> horizontal
+            else if (slope1 == slope2 && (!vertical1 && !vertical2)) { return false; }
+
+            //  Calc intersection between lines
+            double intersectX;
+            double intersectY;
+            //  line1 is vertical
+            if (B1 == 0)
+            {
+                intersectX = line1.EndX;
+                intersectY = ((-1 * A2 * intersectX) - C2) / B2;
+            }
+            //  line2 is vertical
+            else if (B2 == 0)
+            {
+                intersectX = line2.EndX;
+                intersectY = ((-1 * A1 * intersectX) - C1) / B1;
+            }
+            //  line1 is horizontal
+            else if (slope1 == 0)
+            {
+                intersectY = line1.EndY;
+                intersectX = ((-1 * B2 * intersectY) - C2) / A2;
+            }
+            //  line2 is horizontal
+            else if (slope2 == 0)
+            {
+                intersectY = line2.EndY;
+                intersectX = ((-1 * B1 * intersectY) - C1) / A1;
+            }
+            else
+            {
+                intersectX = ((-1 * C1) - ((B2 * -1 * C1) / B1)) / (A2 + ((B2 * -1 * A1) / B1));
+                intersectY = ((-1 * A1) / B1 * intersectX) - (C1 / B1);
+            }
+
+            //  Check if the intersection is in bounds of both line segments
+            bool line1InBoundsX;
+            if (line1.StartX > line1.EndX)
+            {
+                line1InBoundsX = (intersectX <= line1.StartX && intersectX >= line1.EndX);
+            }
+            else
+            {
+                line1InBoundsX = (intersectX >= line1.StartX && intersectX <= line1.EndX);
+            }
+
+            bool line1InBoundsY;
+            if (line1.StartY > line1.EndY)
+            {
+                line1InBoundsY = (intersectY <= line1.StartY && intersectY >= line1.EndY);
+            }
+            else
+            {
+                line1InBoundsY = (intersectY >= line1.StartY && intersectY <= line1.EndY);
+            }
+
+            bool line2InBoundsX;
+            if (line2.StartX > line2.EndX)
+            {
+                line2InBoundsX = (intersectX <= line2.StartX && intersectX >= line2.EndX);
+            }
+            else
+            {
+                line2InBoundsX = (intersectX >= line2.StartX && intersectX <= line2.EndX);
+            }
+
+            bool line2InBoundsY;
+            if (line2.StartY > line2.EndY)
+            {
+                line2InBoundsY = (intersectY <= line2.StartY && intersectY >= line2.EndY);
+            }
+            else
+            {
+                line2InBoundsY = (intersectY >= line2.StartY && intersectY <= line2.EndY);
+            }
+
+            return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
 
         internal bool IntersectArcWithArc(Arc arc1, Arc arc2)

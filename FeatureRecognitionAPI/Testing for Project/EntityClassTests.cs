@@ -154,6 +154,42 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void IntersectLineWithLine_IntersectingWithVerticalLine1_ReturnTrue()
+        {
+            Line line2 = new(0.0, 0.0, 5.0, 5.0);
+            Line line1 = new(2.0, -1.0, 2.0, 6.0);
+            bool result = line1.IntersectLineWithLine(line1, line2);
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IntersectLineWithLine_IntersectingWithVerticalLine2_ReturnTrue()
+        {
+            Line line1 = new(0.0, 0.0, 5.0, 5.0);
+            Line line2 = new(2.0, -1.0, 2.0, 6.0);
+            bool result = line1.IntersectLineWithLine(line1, line2);
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IntersectLineWithLine_IntersectingWithHorizontalLine1_ReturnTrue()
+        {
+            Line line2 = new(0.0, 0.0, 5.0, 5.0);
+            Line line1 = new(-1.0, 3.0, 6.0, 3.0);
+            bool result = line1.IntersectLineWithLine(line1, line2);
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void IntersectLineWithLine_IntersectingWithHorizontalLine2_ReturnTrue()
+        {
+            Line line1 = new(0.0, 0.0, 5.0, 5.0);
+            Line line2 = new(-1.0, 3.0, 6.0, 3.0);
+            bool result = line1.IntersectLineWithLine(line1, line2);
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
         public void IntersectLineWithLine_NotIntersecting_ReturnFalse()
         {
             Line line1 = new(0.0, 0.0, 5.0, 1.0);
@@ -169,6 +205,15 @@ namespace Testing_for_Project
             Line line2 = new(0.0, 5.0, 5.0, 5.0);
             bool result = line1.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void IntersectLineWithLine_VerticalAndHorizontal_ReturnTrue()
+        {
+            Line line1 = new(2, 2, 12, 2);
+            Line line2 = new(2, 2, 2, 8);
+            bool result = line1.IntersectLineWithLine(line1, line2);
+            Assert.That(result, Is.True);
         }
         #endregion
     }
