@@ -41,19 +41,15 @@ namespace FeatureRecognitionAPI.Models
         public void readFeatures()
         {
         }
-        public List<Feature> getFeatureList()
+        public List<Feature> getFeatureList(List<List<Entity>> entities)
         {
-            // This is a temporary list of features that will be replaced by the actual feature recognition logic
-            featureList.Add(new Feature("Group1B", false, false, true, false));
-            featureList.Add(new Feature("Group1A", false, true, false, true));
-            featureList.Add(new Feature("Group1A", false, true, false, true));
-            featureList.Add(new Feature("Group1A", false, false, false, true));
-            featureList.Add(new Feature("Group1A", false, false, false, true));
-            featureList.Add(new Feature("Group1A", false, false, false, true));
-            featureList.Add(new Feature("Group1A", false, false, false, true));
-            featureList.Add(new Feature("Group1C", false, false, false, true));
-            featureList.Add(new Feature("Group1C", false, false, false, true));
-            featureList.Add(new Feature("Group1C", true, false, false, true));
+            List<Feature> featureList = new List<Feature>();
+
+            for (int i = 0; i < entities.Count(); i++)
+            {
+                Feature feature = new Feature(entities[i]);
+                featureList.Add(feature);
+            }
 
 
             // Group identical features together

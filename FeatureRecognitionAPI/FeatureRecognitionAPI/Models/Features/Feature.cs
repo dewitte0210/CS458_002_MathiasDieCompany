@@ -18,7 +18,7 @@ public class Feature
     [JsonProperty]
     PossibleFeatureTypes featureType;
     [JsonProperty]
-    Entity[] entityList; //list of touching entities that make up the feature
+    List<Entity> entityList; //list of touching entities that make up the feature
     [JsonProperty]
     bool kissCut;
     [JsonProperty]
@@ -53,7 +53,7 @@ public class Feature
         this.border = border;
     }
 
-    public Feature(Entity[] entityList)
+    public Feature(List<Entity> entityList)
     {
         this.count = 1;
         this.entityList = entityList;
@@ -62,7 +62,7 @@ public class Feature
         int numArcs = 0;
         int numCircles = 0;
 
-        for (int i = 0; i < entityList.Length; i++)
+        for (int i = 0; i < entityList.Count; i++)
         {
             if (entityList[i] is Line)
             {
@@ -102,7 +102,7 @@ public class Feature
     public void calcPerimeter()
     {
         double sum = 0;
-        for (int i = 0; i < entityList.Length; i++)
+        for (int i = 0; i < entityList.Count; i++)
         {
             sum += entityList[i].getLength();
         }
