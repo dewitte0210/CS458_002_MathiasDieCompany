@@ -2,6 +2,8 @@
  * SupportedFile child that implements a DXF instance
  * I believe this will not require the use of Entities and can instead just read the data straight into features
  */
+using ACadSharp.IO;
+using ACadSharp;
 using FeatureRecognitionAPI.Models.Enums;
 using System;
 using System.Reflection;
@@ -23,7 +25,15 @@ namespace FeatureRecognitionAPI.Models
             {
                 _lines = File.ReadAllLines(path);
                 _fileVersion = GetFileVersion();
-                readEntities();
+                if (_fileVersion == FileVersion.AutoCad10 || _fileVersion == FileVersion.AutoCad12)
+                {
+                    readEntitiesOld();
+                }
+                else
+                {
+                    readEntities();
+                }
+               
             }
         }
 
@@ -73,49 +83,89 @@ namespace FeatureRecognitionAPI.Models
             } 
             return true; 
         }
+        public void readEntitiesOld()
+        {
+            List<Entity> entityList = new List<Entity>();
+
+            //find and track index where entities begin in file (where parsing into entities starts)
+            int index = GetStartIndex(_lines);
+
+            //While we haven't reached the end of the entities section, loop and grab entities
+            while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
+            {
+
+                index++;
+                //Console.WriteLine("In while loop: " + lines[index]);
+
+                switch (_lines[index])
+                {
+                    case "LINE":
+
+                        index = ParseLine(_lines, index);
+                        break;
+
+                    case "ARC":
+                        index = ParseArc(_lines, index);
+                        break;
+
+                    case "CIRCLE":
+                        index = ParseCircle(_lines, index);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+        }
 
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
         {
-            try
+            DxfReader reader = new DxfReader(path);
+
+            CadDocument doc = reader.Read();
+
+            CadObjectCollection<ACadSharp.Entities.Entity> entities = doc.Entities;
+
+            for (int i = 0; i < entities.Count(); i++)
             {
-                List<Entity> entityList = new List<Entity>();
-
-                //find and track index where entities begin in file (where parsing into entities starts)
-                int index = GetStartIndex(_lines);
-
-                //While we haven't reached the end of the entities section, loop and grab entities
-                while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
+                switch (entities[i].ObjectName)
                 {
-
-                    index++;
-                    //Console.WriteLine("In while loop: " + lines[index]);
-
-                    switch (_lines[index])
-                    {
-                        case "LINE":
-
-                            index = ParseLine(_lines, index);
+                    case "LINE":
+                        {
+                            Line lineEntity =
+                                new Line(((ACadSharp.Entities.Line)entities[i]).StartPoint.X,
+                                ((ACadSharp.Entities.Line)entities[i]).StartPoint.Y,
+                                ((ACadSharp.Entities.Line)entities[i]).EndPoint.X,
+                                ((ACadSharp.Entities.Line)entities[i]).EndPoint.Y);
+                            entityList.Add(lineEntity);
                             break;
-
-                        case "ARC":
-                            index = ParseArc(_lines, index);
+                        }
+                    case "ARC":
+                        {
+                            Arc arcEntity =
+                                new Arc(((ACadSharp.Entities.Arc)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Arc)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Arc)entities[i]).Radius,
+                                //Start and end angle return radians, and must be converted to degrees
+                                (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180 / Math.PI)),
+                                (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180 / Math.PI)));
+                            entityList.Add(arcEntity);
                             break;
-
-                        case "CIRCLE":
-                            index = ParseCircle(_lines, index);
+                        }
+                    case "CIRCLE":
+                        {
+                            Circle circleEntity =
+                                new Circle(((ACadSharp.Entities.Circle)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Circle)entities[i]).Radius);
+                            entityList.Add(circleEntity);
                             break;
-
-                        default:
-                            break;
-                    }
-
+                        }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
             }
         }
 
