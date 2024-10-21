@@ -96,7 +96,7 @@ namespace FeatureRecognitionAPI.Models
             else
             {
                 slope = (line.EndY - line.StartY) / (line.EndX - line.StartX);
-                if (slope > (double)Decimal.MaxValue || slope < (double)Decimal.MinValue)
+                if (slope > 1000000 || slope < -1000000)
                 {
                     slope = 0;
                 }

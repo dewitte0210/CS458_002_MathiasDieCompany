@@ -52,18 +52,18 @@ namespace FeatureRecognitionAPI.Models
             }
 
 
-            // Group identical features together
-            for (int i = 0; i < featureList.Count(); i++)
-            {
-                for (int j = 0; j < featureList.Count(); j++)
-                {
-                    if (featureList[i].Equals(featureList[j]) && i != j)
-                    {
-                        featureList[i].count += featureList[j].count;
-                        featureList.RemoveAt(j);
-                    }
-                }
-            }
+            //// Group identical features together
+            //for (int i = 0; i < featureList.Count(); i++)
+            //{
+            //    for (int j = 0; j < featureList.Count(); j++)
+            //    {
+            //        if (featureList[i].Equals(featureList[j]) && i != j)
+            //        {
+            //            featureList[i].count += featureList[j].count;
+            //            featureList.RemoveAt(j);
+            //        }
+            //    }
+            //}
 
             return featureList;
         }
