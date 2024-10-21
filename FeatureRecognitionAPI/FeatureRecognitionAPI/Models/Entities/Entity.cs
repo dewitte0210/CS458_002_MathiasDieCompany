@@ -96,6 +96,10 @@ namespace FeatureRecognitionAPI.Models
             else
             {
                 slope = (line.EndY - line.StartY) / (line.EndX - line.StartX);
+                if (slope > (double)Decimal.MaxValue || slope < (double)Decimal.MinValue)
+                {
+                    slope = 0;
+                }
                 intercept = line.EndY - (slope * line.EndX);
                 // The slope of the line ends up being A in the general form
                 a = slope;
