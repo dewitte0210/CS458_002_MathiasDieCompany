@@ -249,7 +249,6 @@ namespace FeatureRecognitionAPI.Models
             {
                 switch (lines[index])
                 {
-
                     case " 10":
                         index++;
                         xPoint = double.Parse(lines[index]);

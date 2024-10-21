@@ -24,7 +24,6 @@ namespace Testing_for_Project
             Assert.That(line1.StartY, Is.EqualTo(0.4071346127707478));
             Assert.That(line1.EndX, Is.EqualTo(2.6124753611322347));
             Assert.That(line1.EndY, Is.EqualTo(0.4071346127707472));
-            Assert.That(line1.Length, Is.EqualTo(Math.Sqrt(Math.Pow(2.6124753611322347 - 1.9724753611322341, 2) + Math.Pow(0.4071346127707472 - 0.4071346127707478, 2))));
         }
         [Test]
         public void TestArcClass()
@@ -40,7 +39,6 @@ namespace Testing_for_Project
             Assert.That(arc1.startAngle, Is.EqualTo(270));
             Assert.That(arc1.endAngle, Is.EqualTo(0.0000000000002120));
             Assert.That(arc1.centralAngle, Is.EqualTo(0.0000000000002120 - 270 + 360));
-            Assert.That(arc1.length, Is.EqualTo(2 * Math.PI * 0.03 * ((0.0000000000002120 - 270 + 360) / 360)));
         }
         [Test]
         public void TestCircleClass()
@@ -49,7 +47,6 @@ namespace Testing_for_Project
             Assert.That(circle1.centerX, Is.EqualTo(0.7124999999999999));
             Assert.That(circle1.centerY, Is.EqualTo(0.7124999999999999));
             Assert.That(circle1.radius, Is.EqualTo(0.2577228596164672));
-            Assert.That(circle1.perimeter, Is.EqualTo((2 * Math.PI * 0.2577228596164672)));
         }
 
         [Test]

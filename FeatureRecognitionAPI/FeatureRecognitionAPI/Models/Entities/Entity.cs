@@ -264,50 +264,22 @@ namespace FeatureRecognitionAPI.Models
             }
             else
             {
-                intersectX = ((-1 * C1) - ((B2 * -1 * C1) / B1)) / (A2 + ((B2 * -1 * A1) / B1));
+                intersectX = ((-1 * C2) - ((B2 * -1 * C1) / B1)) / (A2 + ((B2 * -1 * A1) / B1));
                 intersectY = ((-1 * A1) / B1 * intersectX) - (C1 / B1);
             }
 
             //  Check if the intersection is in bounds of both line segments
-            bool line1InBoundsX;
-            if (line1.StartX > line1.EndX)
-            {
-                line1InBoundsX = (intersectX <= line1.StartX && intersectX >= line1.EndX);
-            }
-            else
-            {
-                line1InBoundsX = (intersectX >= line1.StartX && intersectX <= line1.EndX);
-            }
+            bool line1InBoundsX = intersectX >= Math.Min(line1.StartX, line1.EndX) &&
+                    intersectX <= Math.Max(line1.StartX, line1.EndX);
 
-            bool line1InBoundsY;
-            if (line1.StartY > line1.EndY)
-            {
-                line1InBoundsY = (intersectY <= line1.StartY && intersectY >= line1.EndY);
-            }
-            else
-            {
-                line1InBoundsY = (intersectY >= line1.StartY && intersectY <= line1.EndY);
-            }
+            bool line1InBoundsY = intersectY >= Math.Min(line1.StartY, line1.EndY) &&
+                    intersectY <= Math.Max(line1.StartY, line1.EndY);
 
-            bool line2InBoundsX;
-            if (line2.StartX > line2.EndX)
-            {
-                line2InBoundsX = (intersectX <= line2.StartX && intersectX >= line2.EndX);
-            }
-            else
-            {
-                line2InBoundsX = (intersectX >= line2.StartX && intersectX <= line2.EndX);
-            }
+            bool line2InBoundsX = intersectX >= Math.Min(line2.StartX, line2.EndX) &&
+                    intersectX <= Math.Max(line2.StartX, line2.EndX);
 
-            bool line2InBoundsY;
-            if (line2.StartY > line2.EndY)
-            {
-                line2InBoundsY = (intersectY <= line2.StartY && intersectY >= line2.EndY);
-            }
-            else
-            {
-                line2InBoundsY = (intersectY >= line2.StartY && intersectY <= line2.EndY);
-            }
+            bool line2InBoundsY = intersectY >= Math.Min(line2.StartY, line2.EndY) &&
+                    intersectY <= Math.Max(line2.StartY, line2.EndY);
 
             return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
