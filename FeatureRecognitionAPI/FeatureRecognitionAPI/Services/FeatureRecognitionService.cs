@@ -72,10 +72,10 @@ namespace FeatureRecognitionAPI.Services
                     {
                         case ".dxf":
                             DXFFile dXFFile = new DXFFile(path); // future TODO? make readEntities asynchronous,
-                            json = JsonConvert.SerializeObject(dXFFile.GetEntities());
+                            List<List<Entity>> touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
                             //might be slow for large files with mutliple users hitting endpoint at once
 
-                            List<Feature> features = dXFFile.getFeatureList();
+                            List<Feature> features = dXFFile.getFeatureList(touchingEntityList);
 
                             json = JsonConvert.SerializeObject(features);
                             break;
@@ -101,11 +101,13 @@ namespace FeatureRecognitionAPI.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "Unsupported DWG File")
+                    return (OperationStatus.UnsupportedFileType, ex.Message);
+                if (ex.Message == "Error: Issue with DXF File")
+                    return (OperationStatus.CorruptFile, ex.Message);
+
                 return (OperationStatus.ExternalApiFailure, null);
             }
-
-
-            
         }
     }
 }

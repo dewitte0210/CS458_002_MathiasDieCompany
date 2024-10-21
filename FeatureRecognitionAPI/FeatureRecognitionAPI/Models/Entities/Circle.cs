@@ -11,14 +11,13 @@ namespace FeatureRecognitionAPI.Models {
         //Center point of circle - y value
         public  double centerY { get; set; }
         public  double radius { get; set; }
-        public  double perimeter { get; }
         public Circle( double centerX,  double centerY,  double radius)
         {
             entityType = PossibleEntityTypes.circle;
             this.centerX = centerX;
             this.centerY = centerY;
             this.radius = radius;
-            this.perimeter = calcPerimeter(radius);
+            this.setLength(calcPerimeter(radius));
         }
 
         private  double calcPerimeter( double radius)

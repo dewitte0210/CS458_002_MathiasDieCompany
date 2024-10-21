@@ -28,8 +28,6 @@ namespace FeatureRecognitionAPI.Models
         public  double endAngle { get; set; }
         //Actual angle of the arc
         public  double centralAngle { get; }
-        //Length of the arc
-        public  double length { get; }
 
         /**
          * Creates an arc and calculates the starting and ending coordinates as well
@@ -48,7 +46,7 @@ namespace FeatureRecognitionAPI.Models
             this.endX = calcXCoord(centerX, radius, endAngle);
             this.endY = calcYCoord(centerY, radius, endAngle);
             this.centralAngle = calcCentralAngle(startAngle, endAngle);
-            this.length = calcLength(radius, centralAngle);
+            this.setLength(calcLength(radius, centralAngle));
         }
 
         /**

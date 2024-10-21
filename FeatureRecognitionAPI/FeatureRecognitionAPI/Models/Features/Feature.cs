@@ -18,7 +18,7 @@ public class Feature
     [JsonProperty]
     PossibleFeatureTypes featureType;
     [JsonProperty]
-    Entity[] entityList; //list of touching entities that make up the feature
+    List<Entity> entityList; //list of touching entities that make up the feature
     [JsonProperty]
     bool kissCut;
     [JsonProperty]
@@ -53,7 +53,7 @@ public class Feature
         this.border = border;
     }
 
-    public Feature(Entity[] entityList)
+    public Feature(List<Entity> entityList)
     {
         this.count = 1;
         this.entityList = entityList;
@@ -62,7 +62,7 @@ public class Feature
         int numArcs = 0;
         int numCircles = 0;
 
-        for (int i = 0; i < entityList.Length; i++)
+        for (int i = 0; i < entityList.Count; i++)
         {
             if (entityList[i] is Line)
             {
@@ -102,7 +102,7 @@ public class Feature
     public void calcPerimeter()
     {
         double sum = 0;
-        for (int i = 0; i < entityList.Length; i++)
+        for (int i = 0; i < entityList.Count; i++)
         {
             sum += entityList[i].getLength();
         }
@@ -119,37 +119,37 @@ public class Feature
     /*
      * Overriding the Equals method to compare two Feature objects
     */
-    public override bool Equals(object obj)
-    {
-        var item = obj as Feature;
+    //public override bool Equals(object obj)
+    //{
+    //    var item = obj as Feature;
 
-        /*
-            TO BE IMPLEMENTED LATER
-        */
-        //if (featureType == PossibleFeatureTypes.Group1B && entityList.Length == 1)
-        //{
-        //    //add check, could be arc
+    //    /*
+    //        TO BE IMPLEMENTED LATER
+    //    */
+    //    //if (featureType == PossibleFeatureTypes.Group1B && entityList.Length == 1)
+    //    //{
+    //    //    //add check, could be arc
 
-        //    var serializedParent = JsonConvert.SerializeObject(entityList[0]);
-        //    Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-        //    serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
-        //    Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+    //    //    var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+    //    //    Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+    //    //    serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+    //    //    Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
 
-        //    if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-        //        perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else
+    //    //    if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+    //    //        perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
+    //    //    {
+    //    //        return true;
+    //    //    }
+    //    //}
+    //    //else
 
-        // Checking equality
-        if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                perOver20 == item.perOver20 && border == item.border)
-        {
-            return true;
-        }
-        return false;
-    }
+    //    // Checking equality
+    //    if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+    //            perOver20 == item.perOver20 && border == item.border)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
 }

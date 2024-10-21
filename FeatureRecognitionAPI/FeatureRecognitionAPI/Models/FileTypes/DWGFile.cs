@@ -7,6 +7,8 @@ using System;
 using ACadSharp.IO;
 using CSMath;
 using iText.Barcodes.Qrcode;
+using ACadSharp.Header;
+using System.Security.Permissions;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -18,9 +20,19 @@ namespace FeatureRecognitionAPI.Models
         {
             fileType = SupportedExtensions.dwg;
             _path = path;
+            _fileVersion = GetFileVersion();
+
             entityList = new List<Entity>();
-            if(File.Exists(path)) 
-                readEntities();
+            if (_fileVersion >= FileVersion.AutoCad14)
+            {
+                if (File.Exists(path))
+                    readEntities();
+            }
+            else
+            {
+                throw new Exception("Unsupported DWG File");
+            }
+            
         }
 
         /*
@@ -75,8 +87,9 @@ namespace FeatureRecognitionAPI.Models
                                 new Arc(((ACadSharp.Entities.Arc)entities[i]).Center.X,
                                 ((ACadSharp.Entities.Arc)entities[i]).Center.Y,
                                 ((ACadSharp.Entities.Arc)entities[i]).Radius,
-                                ((ACadSharp.Entities.Arc)entities[i]).StartAngle,
-                                ((ACadSharp.Entities.Arc)entities[i]).EndAngle);
+                                //Start and end angle return radians, and must be converted to degrees
+                                (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180/Math.PI)),
+                                (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180/ Math.PI)));
                             entityList.Add(arcEntity);
                             break; 
                         }
@@ -85,17 +98,55 @@ namespace FeatureRecognitionAPI.Models
                             Circle circleEntity =
                                 new Circle(((ACadSharp.Entities.Circle)entities[i]).Center.X,
                                 ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
-                                ((ACadSharp.Entities.Arc)entities[i]).Radius);
+                                ((ACadSharp.Entities.Circle)entities[i]).Radius);
                             entityList.Add(circleEntity);
                             break;
                         }
-
                 } 
             }
-
-            throw new NotImplementedException();
         }
 
-        
+        public FileVersion GetFileVersion()
+        {
+            DwgReader reader = new DwgReader(_path);
+            CadHeader header = reader.ReadHeader();
+
+            String version = header.VersionString;
+
+            switch (version)
+            {
+                case "AC1006":
+                    return FileVersion.AutoCad10;
+                case "AC1009":
+                    return FileVersion.AutoCad12;
+                case "AC1012":
+                    return FileVersion.AutoCad13;
+                case "AC1014":
+                    return FileVersion.AutoCad14;
+                case "AC1015":
+                    return FileVersion.AutoCad2000;
+                case "AC1018":
+                    return FileVersion.AutoCad2004;
+                case "AC1021":
+                    return FileVersion.AutoCad2007;
+                case "AC1024":
+                    return FileVersion.AutoCad2010;
+                case "AC1027":
+                    return FileVersion.AutoCad2013;
+                case "AC1032":
+                    return FileVersion.AutoCad2018;
+                default:
+                    return FileVersion.Unknown;
+            }
+
+
+        }
+
+        public List<Entity> GetEntities()
+        {
+            return  entityList;
+        }
+
+
     }
 }

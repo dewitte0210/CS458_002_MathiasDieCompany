@@ -29,7 +29,7 @@ namespace FeatureRecognitionAPI.Models
             arc
         }
 
-        public void setLength(double length)
+        protected void setLength(double length)
         {
             this.length = length;
         }
@@ -96,6 +96,10 @@ namespace FeatureRecognitionAPI.Models
             else
             {
                 slope = (line.EndY - line.StartY) / (line.EndX - line.StartX);
+                if (slope > 1000000 || slope < -1000000)
+                {
+                    slope = 0;
+                }
                 intercept = line.EndY - (slope * line.EndX);
                 // The slope of the line ends up being A in the general form
                 a = slope;
@@ -291,26 +295,26 @@ namespace FeatureRecognitionAPI.Models
              
             // First case, the circles do not intersect as they are too far appart
             // Second case, one circle is entirely inside the other but not intersecting.
-            if (between.Length > (arc1.radius + arc2.radius) || 
-                between.Length < (Math.Abs(arc1.radius - arc2.radius)) ||
-                between.Length == 0) { return false; }
+            if (between.length > (arc1.radius + arc2.radius) || 
+                between.length < (Math.Abs(arc1.radius - arc2.radius)) ||
+                between.length == 0) { return false; }
 
             // The circles intersect. Do they intersect at the position of the arcs?
             
             // Find a and h.
-             double a = (Math.Pow(arc1.radius,2) - Math.Pow(arc2.radius, 2) + Math.Pow(between.Length, 2)) / 
-                (2 * between.Length);
+             double a = (Math.Pow(arc1.radius,2) - Math.Pow(arc2.radius, 2) + Math.Pow(between.length, 2)) / 
+                (2 * between.length);
              double h = Math.Sqrt(Math.Pow(arc1.radius, 2) - Math.Pow(a,2));
             
             // Find P2.
-             double cx2 = arc1.centerX + a * (arc2.centerX - arc1.centerX) / between.Length;
-             double cy2 = arc1.centerY + a * (arc2.centerY - arc1.centerY) / between.Length;
+             double cx2 = arc1.centerX + a * (arc2.centerX - arc1.centerX) / between.length;
+             double cy2 = arc1.centerY + a * (arc2.centerY - arc1.centerY) / between.length;
 
             // Get the points P3.
-             double intersect1X = (cx2 + h * (arc2.centerY - arc1.centerY) / between.Length);
-             double intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.Length);
-             double intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.Length);
-             double intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.Length);
+             double intersect1X = (cx2 + h * (arc2.centerY - arc1.centerY) / between.length);
+             double intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.length);
+             double intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.length);
+             double intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.length);
 
             bool intersect1IsValid = IsInArcRange(arc1.centerX, arc1.centerY, intersect1X, intersect1Y, arc1.startAngle, arc1.endAngle) &&
                    IsInArcRange(arc2.centerX, arc2.centerY, intersect1X, intersect1Y, arc2.startAngle, arc2.endAngle);
