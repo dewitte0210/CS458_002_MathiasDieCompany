@@ -2,6 +2,8 @@
  * SupportedFile child that implements a DXF instance
  * I believe this will not require the use of Entities and can instead just read the data straight into features
  */
+using ACadSharp.IO;
+using ACadSharp;
 using FeatureRecognitionAPI.Models.Enums;
 using System;
 using System.Reflection;
@@ -23,7 +25,15 @@ namespace FeatureRecognitionAPI.Models
             {
                 _lines = File.ReadAllLines(path);
                 _fileVersion = GetFileVersion();
-                readEntities();
+                if (_fileVersion == FileVersion.AutoCad10 || _fileVersion == FileVersion.AutoCad12)
+                {
+                    readEntitiesOld();
+                }
+                else
+                {
+                    readEntities();
+                }
+               
             }
         }
 
@@ -73,49 +83,89 @@ namespace FeatureRecognitionAPI.Models
             } 
             return true; 
         }
+        public void readEntitiesOld()
+        {
+            List<Entity> entityList = new List<Entity>();
+
+            //find and track index where entities begin in file (where parsing into entities starts)
+            int index = GetStartIndex(_lines);
+
+            //While we haven't reached the end of the entities section, loop and grab entities
+            while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
+            {
+
+                index++;
+                //Console.WriteLine("In while loop: " + lines[index]);
+
+                switch (_lines[index])
+                {
+                    case "LINE":
+
+                        index = ParseLine(_lines, index);
+                        break;
+
+                    case "ARC":
+                        index = ParseArc(_lines, index);
+                        break;
+
+                    case "CIRCLE":
+                        index = ParseCircle(_lines, index);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+        }
 
         //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
         {
-            try
+            DxfReader reader = new DxfReader(path);
+
+            CadDocument doc = reader.Read();
+
+            CadObjectCollection<ACadSharp.Entities.Entity> entities = doc.Entities;
+
+            for (int i = 0; i < entities.Count(); i++)
             {
-                List<Entity> entityList = new List<Entity>();
-
-                //find and track index where entities begin in file (where parsing into entities starts)
-                int index = GetStartIndex(_lines);
-
-                //While we haven't reached the end of the entities section, loop and grab entities
-                while ((_lines[index] != "ENDSEC") && (_lines.Length > index))
+                switch (entities[i].ObjectName)
                 {
-
-                    index++;
-                    //Console.WriteLine("In while loop: " + lines[index]);
-
-                    switch (_lines[index])
-                    {
-                        case "LINE":
-
-                            index = ParseLine(_lines, index);
+                    case "LINE":
+                        {
+                            Line lineEntity =
+                                new Line(((ACadSharp.Entities.Line)entities[i]).StartPoint.X,
+                                ((ACadSharp.Entities.Line)entities[i]).StartPoint.Y,
+                                ((ACadSharp.Entities.Line)entities[i]).EndPoint.X,
+                                ((ACadSharp.Entities.Line)entities[i]).EndPoint.Y);
+                            entityList.Add(lineEntity);
                             break;
-
-                        case "ARC":
-                            index = ParseArc(_lines, index);
+                        }
+                    case "ARC":
+                        {
+                            Arc arcEntity =
+                                new Arc(((ACadSharp.Entities.Arc)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Arc)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Arc)entities[i]).Radius,
+                                //Start and end angle return radians, and must be converted to degrees
+                                (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180 / Math.PI)),
+                                (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180 / Math.PI)));
+                            entityList.Add(arcEntity);
                             break;
-
-                        case "CIRCLE":
-                            index = ParseCircle(_lines, index);
+                        }
+                    case "CIRCLE":
+                        {
+                            Circle circleEntity =
+                                new Circle(((ACadSharp.Entities.Circle)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Circle)entities[i]).Radius);
+                            entityList.Add(circleEntity);
                             break;
-
-                        default:
-                            break;
-                    }
-
+                        }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
             }
         }
 
@@ -143,6 +193,9 @@ namespace FeatureRecognitionAPI.Models
              double yStart = 0;
              double xEnd = 0;
              double yEnd = 0;
+
+            bool startXFlag, startYFlag, endXFlag, endYFlag ;
+            startXFlag = startYFlag = endXFlag = endYFlag = false;
             //Index must be incremented along with i in order to keep maintain accurate indexing
             while (lines[index] != "  0")
             {
@@ -153,25 +206,25 @@ namespace FeatureRecognitionAPI.Models
                     case " 10":
                         index++;
                         xStart = double.Parse(lines[index]);
-                        //Console.WriteLine(xStart + " xStart");
+                        startXFlag = true;
                         break;
 
                     case " 11":
                         index++;
                         xEnd = double.Parse(lines[index]);
-                        //Console.WriteLine(xEnd + " xEnd");
+                        endXFlag = true;
                         break;
 
                     case " 20":
                         index++;
                         yStart = double.Parse(lines[index]);
-                        //Console.WriteLine(yStart +" yStart");
+                        startYFlag = true;
                         break;
 
                     case " 21":
                         index++;
                         yEnd = double.Parse(lines[index]);
-                        //Console.WriteLine(yEnd + " yEnd");
+                        endYFlag = true;
                         break;
 
                     default:
@@ -181,9 +234,16 @@ namespace FeatureRecognitionAPI.Models
                 index++;
 
             }
-            Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
-            entityList.Add(lineEntity);
-            return index;
+            if (startYFlag && startXFlag && endXFlag && endYFlag)
+            {
+                Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
+                entityList.Add(lineEntity);
+                return index;
+            }
+            else
+            {
+                throw new Exception("Error: Issue with DXF File");
+            }
         }
 
         private int ParseArc(string[] lines, int index)
@@ -193,6 +253,8 @@ namespace FeatureRecognitionAPI.Models
              double radius = 0;
              double startAngle = 0;
              double endAngle = 0;
+            bool xFlag, yFlag, rFlag, startFlag, endFlag;
+            xFlag = yFlag = rFlag = startFlag = endFlag = false;
 
             while (lines[index] != "  0")
             {
@@ -202,31 +264,31 @@ namespace FeatureRecognitionAPI.Models
                     case " 10":
                         index++;
                         xPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(xPoint + " xPoint");
+                        xFlag = true;
                         break;
 
                     case " 20":
                         index++;
                         yPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(yPoint + " yPoint");
+                        yFlag = true;
                         break;
 
                     case " 40":
                         index++;
                         radius = double.Parse(lines[index]);
-                        //Console.WriteLine(radius +" yStart");
+                        rFlag = true;
                         break;
 
                     case " 50":
                         index++;
                         startAngle = double.Parse(lines[index]);
-                        //Console.WriteLine(startAngle + " startAngle");
+                        startFlag = true;
                         break;
 
                     case " 51":
                         index++;
                         endAngle = double.Parse(lines[index]);
-                        //Console.WriteLine(endAngle + " endAngle");
+                        endFlag = true;
                         break;
 
                     default:
@@ -235,9 +297,16 @@ namespace FeatureRecognitionAPI.Models
                 }
                 index++;
             }
-            Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
-            entityList.Add(arcEntity);
-            return index;
+            if (xFlag && yFlag && rFlag && startFlag && endFlag)
+            {
+                Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
+                entityList.Add(arcEntity);
+                return index;
+            }
+            else
+            {
+                throw new Exception("Error: Issue with DXF File");
+            }
         }
 
         private int ParseCircle(string[] lines, int index)
@@ -245,6 +314,8 @@ namespace FeatureRecognitionAPI.Models
              double xPoint = 0;
              double yPoint = 0;
              double radius = 0;
+            bool xFlag, yFlag, rFlag;
+            xFlag = yFlag = rFlag = false;
             while (lines[index] != "  0")
             {
                 switch (lines[index])
@@ -253,19 +324,19 @@ namespace FeatureRecognitionAPI.Models
                     case " 10":
                         index++;
                         xPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(xPoint + " xPoint");
+                        xFlag = true;
                         break;
 
                     case " 20":
                         index++;
                         yPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(yPoint + " yPoint");
+                        yFlag = true;
                         break;
 
                     case " 40":
                         index++;
                         radius = double.Parse(lines[index]);
-                        //Console.WriteLine(radius +" yStart");
+                        rFlag = true;
                         break;
 
                     default:
@@ -274,9 +345,16 @@ namespace FeatureRecognitionAPI.Models
                 }
                 index++;
             }
-            Circle circleEntity = new Circle(xPoint, yPoint, radius);
-            entityList.Add(circleEntity);
-            return index;
+            if (xFlag && yFlag && rFlag)
+            {
+                Circle circleEntity = new Circle(xPoint, yPoint, radius);
+                entityList.Add(circleEntity);
+                return index;
+            }
+            else
+            {
+                throw new Exception("Error: Issue with DXF File");
+            }
         } 
         #endregion
 
