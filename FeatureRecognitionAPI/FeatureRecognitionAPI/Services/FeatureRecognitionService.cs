@@ -108,9 +108,6 @@ namespace FeatureRecognitionAPI.Services
 
                 return (OperationStatus.ExternalApiFailure, null);
             }
-
-
-            
         }
     }
 }
