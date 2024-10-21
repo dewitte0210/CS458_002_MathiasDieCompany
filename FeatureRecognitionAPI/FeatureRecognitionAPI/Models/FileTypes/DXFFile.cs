@@ -193,6 +193,9 @@ namespace FeatureRecognitionAPI.Models
              double yStart = 0;
              double xEnd = 0;
              double yEnd = 0;
+
+            bool startXFlag, startYFlag, endXFlag, endYFlag ;
+            startXFlag = startYFlag = endXFlag = endYFlag = false;
             //Index must be incremented along with i in order to keep maintain accurate indexing
             while (lines[index] != "  0")
             {
@@ -203,25 +206,25 @@ namespace FeatureRecognitionAPI.Models
                     case " 10":
                         index++;
                         xStart = double.Parse(lines[index]);
-                        //Console.WriteLine(xStart + " xStart");
+                        startXFlag = true;
                         break;
 
                     case " 11":
                         index++;
                         xEnd = double.Parse(lines[index]);
-                        //Console.WriteLine(xEnd + " xEnd");
+                        endXFlag = true;
                         break;
 
                     case " 20":
                         index++;
                         yStart = double.Parse(lines[index]);
-                        //Console.WriteLine(yStart +" yStart");
+                        startYFlag = true;
                         break;
 
                     case " 21":
                         index++;
                         yEnd = double.Parse(lines[index]);
-                        //Console.WriteLine(yEnd + " yEnd");
+                        endYFlag = true;
                         break;
 
                     default:
@@ -231,9 +234,16 @@ namespace FeatureRecognitionAPI.Models
                 index++;
 
             }
-            Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
-            entityList.Add(lineEntity);
-            return index;
+            if (startYFlag && startXFlag && endXFlag && endYFlag)
+            {
+                Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
+                entityList.Add(lineEntity);
+                return index;
+            }
+            else
+            {
+                throw new Exception("Error: Issue with DXF File");
+            }
         }
 
         private int ParseArc(string[] lines, int index)
@@ -243,6 +253,8 @@ namespace FeatureRecognitionAPI.Models
              double radius = 0;
              double startAngle = 0;
              double endAngle = 0;
+            bool xFlag, yFlag, rFlag, startFlag, endFlag;
+            xFlag = yFlag = rFlag = startFlag = endFlag = false;
 
             while (lines[index] != "  0")
             {
@@ -252,31 +264,31 @@ namespace FeatureRecognitionAPI.Models
                     case " 10":
                         index++;
                         xPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(xPoint + " xPoint");
+                        xFlag = true;
                         break;
 
                     case " 20":
                         index++;
                         yPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(yPoint + " yPoint");
+                        yFlag = true;
                         break;
 
                     case " 40":
                         index++;
                         radius = double.Parse(lines[index]);
-                        //Console.WriteLine(radius +" yStart");
+                        rFlag = true;
                         break;
 
                     case " 50":
                         index++;
                         startAngle = double.Parse(lines[index]);
-                        //Console.WriteLine(startAngle + " startAngle");
+                        startFlag = true;
                         break;
 
                     case " 51":
                         index++;
                         endAngle = double.Parse(lines[index]);
-                        //Console.WriteLine(endAngle + " endAngle");
+                        endFlag = true;
                         break;
 
                     default:
@@ -285,9 +297,16 @@ namespace FeatureRecognitionAPI.Models
                 }
                 index++;
             }
-            Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
-            entityList.Add(arcEntity);
-            return index;
+            if (xFlag && yFlag && rFlag && startFlag && endFlag)
+            {
+                Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
+                entityList.Add(arcEntity);
+                return index;
+            }
+            else
+            {
+                throw new Exception("Error: Issue with DXF File");
+            }
         }
 
         private int ParseCircle(string[] lines, int index)
@@ -295,6 +314,8 @@ namespace FeatureRecognitionAPI.Models
              double xPoint = 0;
              double yPoint = 0;
              double radius = 0;
+            bool xFlag, yFlag, rFlag;
+            xFlag = yFlag = rFlag = false;
             while (lines[index] != "  0")
             {
                 switch (lines[index])
@@ -303,19 +324,19 @@ namespace FeatureRecognitionAPI.Models
                     case " 10":
                         index++;
                         xPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(xPoint + " xPoint");
+                        xFlag = true;
                         break;
 
                     case " 20":
                         index++;
                         yPoint = double.Parse(lines[index]);
-                        //Console.WriteLine(yPoint + " yPoint");
+                        yFlag = true;
                         break;
 
                     case " 40":
                         index++;
                         radius = double.Parse(lines[index]);
-                        //Console.WriteLine(radius +" yStart");
+                        rFlag = true;
                         break;
 
                     default:
@@ -324,9 +345,16 @@ namespace FeatureRecognitionAPI.Models
                 }
                 index++;
             }
-            Circle circleEntity = new Circle(xPoint, yPoint, radius);
-            entityList.Add(circleEntity);
-            return index;
+            if (xFlag && yFlag && rFlag)
+            {
+                Circle circleEntity = new Circle(xPoint, yPoint, radius);
+                entityList.Add(circleEntity);
+                return index;
+            }
+            else
+            {
+                throw new Exception("Error: Issue with DXF File");
+            }
         } 
         #endregion
 

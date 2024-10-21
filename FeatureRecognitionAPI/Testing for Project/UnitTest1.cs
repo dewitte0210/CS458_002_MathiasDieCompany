@@ -15,7 +15,7 @@ namespace Testing_for_Project
         public void Setup()
         {
         }
-
+        #region EntityClassTests
         [Test]
         public void TestLineClass()
         {
@@ -51,7 +51,9 @@ namespace Testing_for_Project
             Assert.That(circle1.radius, Is.EqualTo(0.2577228596164672));
             Assert.That(circle1.perimeter, Is.EqualTo((2 * Math.PI * 0.2577228596164672)));
         }
+        #endregion
 
+        #region TestingDXF&DWG
         [Test]
         public void TestDXFFileClass()
         {
@@ -182,6 +184,7 @@ namespace Testing_for_Project
             Assert.That(test14.EndY, Is.EqualTo(3.8249890568663383));
 
         }
+
         [Test]
         public void TestDWGFileClass()
         {
@@ -309,10 +312,10 @@ namespace Testing_for_Project
             Assert.That(test14.radius, Is.EqualTo(0.1562012667054717));
 
         }
-
+        #endregion
 
         [Test]
-        //Test to verify we are getting the correct number of entities back from the library
+        //Test to verify that library returns the expected entity count
        public void testingACadSharpLibrary()
         {
             string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
