@@ -30,7 +30,7 @@ namespace FeatureRecognitionAPI.Models
             }
             else
             {
-                throw new Exception("Unsuported DWG File");
+                throw new Exception("Unsupported DWG File");
             }
             
         }

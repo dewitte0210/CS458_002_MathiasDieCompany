@@ -5,6 +5,7 @@
         Unknown,
         OK,
         ExternalApiFailure,
+        UnsupportedFileType,
         BadRequest
     }
 }

@@ -101,6 +101,9 @@ namespace FeatureRecognitionAPI.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "Unsupported DWG File")
+                    return (OperationStatus.UnsupportedFileType, ex.Message);
+
                 return (OperationStatus.ExternalApiFailure, null);
             }
 
