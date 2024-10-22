@@ -68,20 +68,26 @@ namespace FeatureRecognitionAPI.Services
 
                 if (File.Exists(path))
                 {
+                    List<List<Entity>> touchingEntityList;
+                    List<Feature> features;
                     switch (ext)
                     {
                         case ".dxf":
                             DXFFile dXFFile = new DXFFile(path); // future TODO? make readEntities asynchronous,
-                            List<List<Entity>> touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                            touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
                             //might be slow for large files with mutliple users hitting endpoint at once
 
-                            List<Feature> features = dXFFile.getFeatureList(touchingEntityList);
+                            features = dXFFile.getFeatureList(touchingEntityList);
 
                             json = JsonConvert.SerializeObject(features);
                             break;
                         case ".dwg":
                             DWGFile dwgFile = new DWGFile(path);
-                            json = JsonConvert.SerializeObject(dwgFile);
+                            touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
+                            //might be slow for large files with mutliple users hitting endpoint at once
+
+                            features = dwgFile.getFeatureList(touchingEntityList);
+                            json = JsonConvert.SerializeObject(features);
                             break;
                         case ".pdf":
                             PDFFile pdfFile = new PDFFile(path); //TODO: need more info to extract entities from pdf
