@@ -20,19 +20,26 @@ namespace FeatureRecognitionAPI.Models
         {
             fileType = SupportedExtensions.dwg;
             _path = path;
-            _fileVersion = GetFileVersion();
 
             entityList = new List<Entity>();
-            if (_fileVersion >= FileVersion.AutoCad14)
+            if (File.Exists(path))
             {
-                if (File.Exists(path))
+                try
+                {
+                    //Also sets file version
                     readEntities();
+                }
+                catch (Exception ex)
+                {
+                    //If there is an error reading entities there is a problem w/ dwg file
+                    if (ex.Message == "Attempted to read past the end of the stream.")
+                        //Corrupt / broken file
+                        throw new Exception("Error: Issue with DWG File");
+                    else
+                        //Unsuported file type
+                        throw new Exception("Error with DWG File");
+                }
             }
-            else
-            {
-                throw new Exception("Unsupported DWG File");
-            }
-            
         }
 
         /*
@@ -59,11 +66,15 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        /*If there is an error with the ACadSharp library reader it throws an exception with 
+            message "Attempted to read past the end of the stream." */
         public override void readEntities()
         {
             DwgReader reader = new DwgReader(_path);
             
             CadDocument doc = reader.Read();
+
+            _fileVersion = GetFileVersion(doc.Header.VersionString);
 
             CadObjectCollection<ACadSharp.Entities.Entity> entities = doc.Entities;
 
@@ -105,13 +116,10 @@ namespace FeatureRecognitionAPI.Models
                 } 
             }
         }
-
-        public FileVersion GetFileVersion()
+        //Throws exeption if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
+         
+        public FileVersion GetFileVersion(string version)
         {
-            DwgReader reader = new DwgReader(_path);
-            CadHeader header = reader.ReadHeader();
-
-            String version = header.VersionString;
 
             switch (version)
             {
