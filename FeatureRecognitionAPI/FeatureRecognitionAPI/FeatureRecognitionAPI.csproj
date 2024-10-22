@@ -15,10 +15,6 @@
     <PackageReference Include="NHibernate" Version="5.5.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ExampleFiles\" />
-  </ItemGroup>
   
   <ItemGroup>
     <InternalsVisibleTo Include="Testing_for_Project" />

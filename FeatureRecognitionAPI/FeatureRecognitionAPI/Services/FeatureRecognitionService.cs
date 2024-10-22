@@ -105,6 +105,8 @@ namespace FeatureRecognitionAPI.Services
                     return (OperationStatus.UnsupportedFileType, ex.Message);
                 if (ex.Message == "Error: Issue with DXF File")
                     return (OperationStatus.CorruptFile, ex.Message);
+                if (ex.Message == "Error: Issue with DWG File")
+                    return (OperationStatus.CorruptFile, ex.Message);
 
                 return (OperationStatus.ExternalApiFailure, null);
             }

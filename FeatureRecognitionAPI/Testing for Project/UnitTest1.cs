@@ -6,6 +6,7 @@ using System.Security.Policy;
 using ACadSharp.IO;
 using ACadSharp;
 using NHibernate.Criterion;
+using FeatureRecognitionAPI.Models.Enums;
 
 namespace Testing_for_Project
 {
@@ -52,7 +53,7 @@ namespace Testing_for_Project
 
         #region TestingDXF&DWG
         [Test]
-        public void TestDXFFileClass()
+        public void TestDXFFileClassGoodInput()
         {
             //Set path to any filepath containing the 3rd example dxf file
             string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
@@ -183,7 +184,7 @@ namespace Testing_for_Project
         }
 
         [Test]
-        public void TestDWGFileClass()
+        public void TestDWGFileClassGoodInput()
         {
             //Set path to any filepath containing the 3rd example dxf file
             string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
@@ -309,6 +310,55 @@ namespace Testing_for_Project
             Assert.That(test14.radius, Is.EqualTo(0.1562012667054717));
 
         }
+        [Test]
+
+        //Feed it a DXF file containing missing data internally
+        public void TestDXFCorrupt()
+        {
+            string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dxf";
+
+            try
+            {
+                DXFFile test = new DXFFile(path);
+            }
+            catch (Exception ex)
+            {
+                Assert.That(ex.Message, Is.EqualTo("Error: Issue with DXF File"));
+            }
+
+        }
+
+
+        [Test]
+        public void TestDWGCorrupt()
+        {
+            string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
+
+            try
+            {
+                DWGFile test = new DWGFile(path);
+            }
+            catch (Exception ex)
+            {
+                Assert.That(ex.Message, Is.EqualTo("Error: Issue with DWG File"));
+            }
+        }
+        [Test]
+        public void TestDWGUnsupportedVersion()
+        {
+            string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\WrongVersion.dwg";
+            try
+            {
+                DWGFile test = new DWGFile(path);
+            }
+            catch(Exception ex)
+            {
+                Assert.That(ex.Message, Is.EqualTo("Error with DWG File"));
+            }
+
+        
+        }
+
         #endregion
 
         [Test]
