@@ -3,6 +3,7 @@
  * The info from a PDF and DWG will be parsed into Entities
  *  - Line, Circle, Arc
  */
+using FeatureRecognitionAPI.Models.Enums;
 using System;
 using System.IO;
 using System.Numerics;
@@ -18,16 +19,10 @@ using System.Runtime.CompilerServices;
 
 namespace FeatureRecognitionAPI.Models
 {
+
     public abstract class Entity {
         protected PossibleEntityTypes entityType;
         double length;
-        protected enum PossibleEntityTypes
-        {
-            //MAP TO ObjectName inside CadObjectCollection from .Entities._entries
-            line,
-            circle,
-            arc
-        }
 
         protected void setLength(double length)
         {
@@ -40,9 +35,9 @@ namespace FeatureRecognitionAPI.Models
 
         }
 
-        public string GetEntityType()
+        public PossibleEntityTypes GetEntityType()
         {
-            return entityType.ToString();
+            return entityType;
         }
         public bool DoesIntersect(Entity other)
         {
@@ -161,6 +156,27 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
             return false;
+        }
+
+        public Point getIntersectPoint(Line line1, Line line2)
+        {
+            Point intersectPoint = new Point();
+            double A1 = line1.EndY - line1.StartY;
+            double B1 = line1.EndX - line1.StartX;
+            double C1 = A1 * line1.StartX + B1 * line1.StartY;
+
+            double A2 = line2.EndY - line2.StartY;
+            double B2 = line2.EndX - line2.StartX;
+            double C2 = A2 * line2.StartX + B2 * line2.StartY;
+
+            double delta = A1 * B2 - A2 * B1;
+
+            // Lines are parralell and thus cannot intersect
+            intersectPoint.intersect = (delta == 0);
+
+            // Intersection point
+            intersectPoint.setPoint((B1 * C2 - B2 * C1) / delta, (A1 * C2 - A2 * C1) / delta);
+            return intersectPoint;
         }
 
         internal bool IntersectLineWithLine(Line line1, Line line2)

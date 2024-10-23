@@ -1,9 +1,9 @@
 ﻿namespace FeatureRecognitionAPI.Models.Enums
 {
-    public enum SupportedExtensions
+    public enum PossibleEntityTypes
     {
-        pdf,
-        dwg,
-        dxf,
+        line,
+        circle,
+        arc
     }
 }
