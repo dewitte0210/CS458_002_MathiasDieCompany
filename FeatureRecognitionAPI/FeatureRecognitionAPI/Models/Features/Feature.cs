@@ -127,30 +127,40 @@ public class Feature
             return false;
         }
 
-        /*
-            TO BE IMPLEMENTED LATER
-        */
-        //if (featureType == PossibleFeatureTypes.Group1B && entityList.Count == 1)
-        //{
-        //    //add check, could be arc
-
-        //    var serializedParent = JsonConvert.SerializeObject(entityList[0]);
-        //    Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-        //    serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
-        //    Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-
-        //    if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-        //        perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else
-
-        // Checking equality
-        if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+        if (featureType == item.featureType && featureType == PossibleFeatureTypes.Group1B && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
                 perOver20 == item.perOver20 && border == item.border)
         {
+            if (entityList.Count != item.entityList.Count)
+            {
+                return false;
+            }
+            if (entityList.Count == 4 && item.entityList.Count == 4)
+            {
+                return true;
+            }
+            else if (entityList.Count == 1 && item.entityList.Count == 1)
+            {
+                var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+                Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+                serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+                Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+
+                if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+                    perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
+                {
+                    return true;
+                }
+            }
+        }
+
+        // Checking equality
+        else if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+                perOver20 == item.perOver20 && border == item.border)
+        {
+            if (featureType == PossibleFeatureTypes.Group1B)
+            {
+                return true;
+            }
             return true;
         }
         return false;
