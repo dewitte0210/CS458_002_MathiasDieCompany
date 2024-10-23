@@ -12,8 +12,6 @@ namespace FeatureRecognitionAPI.Models
         public  double EndX { get; set; }
         public  double EndY { get; set; }
 
-
-        public  double Length { get; } 
         private Line()
         {
             entityType = PossibleEntityTypes.line;
@@ -23,11 +21,11 @@ namespace FeatureRecognitionAPI.Models
         {
             StartX = startX;
             StartY = startY;
+            EndX = endX;
+            EndY = endY;
 
-            SlopeX = EndX - StartX;
+            // Distance Calculation
             this.setLength(Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
-            }
-            else return endPoint;
         }
     }
 }
