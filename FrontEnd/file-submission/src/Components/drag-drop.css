@@ -247,14 +247,9 @@
   position: fixed;
 }
 
-.json-response {
-  margin-top: 50px;
-  height: 400px;
-  overflow-y: scroll;
-}
 table {
 	border-collapse: collapse;
-  font-family: Tahoma, Geneva, sans-serif;
+    font-family: Tahoma, Geneva, sans-serif;
 }
 table td {
 	padding: 15px;

@@ -88,7 +88,7 @@ public class Feature
         {
             featureType = PossibleFeatureTypes.Group1B;
         }
-        else if (numLines == 4 && (numArcs == 0 || numArcs == 4))
+        else if (numLines == 4 && (numArcs == 0 || numArcs ==4))
         {
             featureType = PossibleFeatureTypes.Group1A;
         }
@@ -119,41 +119,37 @@ public class Feature
     /*
      * Overriding the Equals method to compare two Feature objects
     */
-    public override bool Equals(object obj)
-    {
-        var item = obj as Feature;
-        if (item == null)
-        {
-            return false;
-        }
+    //public override bool Equals(object obj)
+    //{
+    //    var item = obj as Feature;
 
-        /*
-            TO BE IMPLEMENTED LATER
-        */
-        //if (featureType == PossibleFeatureTypes.Group1B && entityList.Count == 1)
-        //{
-        //    //add check, could be arc
+    //    /*
+    //        TO BE IMPLEMENTED LATER
+    //    */
+    //    //if (featureType == PossibleFeatureTypes.Group1B && entityList.Length == 1)
+    //    //{
+    //    //    //add check, could be arc
 
-        //    var serializedParent = JsonConvert.SerializeObject(entityList[0]);
-        //    Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-        //    serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
-        //    Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+    //    //    var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+    //    //    Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+    //    //    serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+    //    //    Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
 
-        //    if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-        //        perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
-        //    {
-        //        return true;
-        //    }
-        //}
-        //else
+    //    //    if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+    //    //        perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
+    //    //    {
+    //    //        return true;
+    //    //    }
+    //    //}
+    //    //else
 
-        // Checking equality
-        if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                perOver20 == item.perOver20 && border == item.border)
-        {
-            return true;
-        }
-        return false;
-    }
+    //    // Checking equality
+    //    if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+    //            perOver20 == item.perOver20 && border == item.border)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
 }
