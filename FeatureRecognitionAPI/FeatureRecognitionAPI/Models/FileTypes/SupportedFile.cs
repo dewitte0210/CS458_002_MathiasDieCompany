@@ -127,8 +127,6 @@ namespace FeatureRecognitionAPI.Models
                     scanThroughEntityList(temp, myEntityList, features);
                 }
             }
-       
-        }
         public void extendAllEntities(List<Entity> myEntityList)
         {
             for (int i = 0; i < myEntityList.Count; i++)
@@ -139,8 +137,7 @@ namespace FeatureRecognitionAPI.Models
                     {
                         if (myEntityList[i] is Line && myEntityList[j] is Line)
                         {
-                            if (!extendTwoLines((Line)myEntityList[i], (Line)myEntityList[j]))
-                            {
+                            if (!extendTwoLines((Line)myEntityList[i], (Line)myEntityList[j])) {
                                 if (!extendedEntityList.Contains(myEntityList[i]))
                                 {
                                     extendedEntityList.Add(myEntityList[i]);
@@ -151,10 +148,15 @@ namespace FeatureRecognitionAPI.Models
                                 }
                             }
                         }
+                        if (((Line)myEntityList[i]).extend(myEntityList[j]))
+                        {
+
+                        }
                     }
                 }
             }
         }
+
         //Method that takes two lines and extends them to touch if they are:
         // 1. not already touching
         // 2. are parallel or perpendicular
