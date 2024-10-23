@@ -54,7 +54,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeX = EndX - StartX;
 
             // Distance Calculation
-            Length = Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2));
+            this.setLength( Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
         }
 
         public bool isParallel(Entity other)
