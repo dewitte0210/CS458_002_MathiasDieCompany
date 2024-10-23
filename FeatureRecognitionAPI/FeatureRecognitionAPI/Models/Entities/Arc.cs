@@ -1,5 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-using System;
+﻿using System;
 using System.IO;
 using System.Numerics;
 using System.Reflection.Metadata;
