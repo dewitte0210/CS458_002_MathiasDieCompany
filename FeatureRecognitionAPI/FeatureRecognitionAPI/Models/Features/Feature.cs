@@ -24,7 +24,7 @@ public class Feature
     [JsonProperty]
     bool multipleRadius;
     [JsonProperty]
-    bool perOver20;
+    double perimeter;
     [JsonProperty]
     bool border;
     public int count;
@@ -42,15 +42,17 @@ public class Feature
 
     private Feature() { }//should not use default constructor
 
-    public Feature(string featureType, bool kissCut, bool multipleRadius, bool perOver20, bool border)
+    public Feature(string featureType, bool kissCut, bool multipleRadius, bool border)
     {
         this.count = 1;
+        //change string input to enum value
         PossibleFeatureTypes inputAsEnum = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), featureType);
         this.featureType = inputAsEnum;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
-        this.perOver20 = perOver20;
         this.border = border;
+
+        calcPerimeter();
     }
 
     public Feature(List<Entity> entityList)
@@ -62,6 +64,7 @@ public class Feature
         int numArcs = 0;
         int numCircles = 0;
 
+        //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)
         {
             if (entityList[i] is Line)
@@ -82,12 +85,13 @@ public class Feature
                 break;
             }
         }
-        //Console.WriteLine(numLines + " " + numArcs + " " + numCircles);
 
+        //check two conditions possible to make Group1B (with no perimeter features)
         if (numCircles == 1 || (numLines == 2 && numArcs == 2))
         {
             featureType = PossibleFeatureTypes.Group1B;
         }
+        //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4 && (numArcs == 0 || numArcs == 4))
         {
             featureType = PossibleFeatureTypes.Group1A;
@@ -96,23 +100,17 @@ public class Feature
         {
             Console.WriteLine("Error: Cannot assign feature type.");
         }
+
+        //calculate and set the perimeter of the feature
+        calcPerimeter();
     }
 
-    //calculates if the perimeter is over 20
+    //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        double sum = 0;
         for (int i = 0; i < entityList.Count; i++)
         {
-            sum += entityList[i].getLength();
-        }
-        if (sum > 20)
-        {
-            perOver20 = true;
-        }
-        else
-        {
-            perOver20 = false;
+            perimeter += entityList[i].getLength();
         }
     }
 
@@ -127,42 +125,47 @@ public class Feature
             return false;
         }
 
+        //calculate difference in order to use tolerence
+        double perDiff = perimeter - item.perimeter;
+
+        //if the features are identical Group1B features
         if (featureType == item.featureType && featureType == PossibleFeatureTypes.Group1B && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                perOver20 == item.perOver20 && border == item.border)
+                Math.Abs(perDiff) < 0.0005 && border == item.border)
         {
+            //may need to change in the case where a circle is made of two arcs seperated by perimeter features
             if (entityList.Count != item.entityList.Count)
             {
                 return false;
             }
+            //return true if they are identical non-circular Group1B features
             if (entityList.Count == 4 && item.entityList.Count == 4)
             {
                 return true;
             }
+            //if they are circular
             else if (entityList.Count == 1 && item.entityList.Count == 1)
             {
+                //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
+                //TODO: create added check if they are arcs instead of circles
                 var serializedParent = JsonConvert.SerializeObject(entityList[0]);
                 Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
                 serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
                 Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
 
-                if (kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                    perOver20 == item.perOver20 && border == item.border && c1.radius == c2.radius)
+                if (c1.radius == c2.radius)
                 {
                     return true;
                 }
             }
         }
 
-        // Checking equality
+        // Checking equality of all other feature types
         else if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                perOver20 == item.perOver20 && border == item.border)
+                Math.Abs(perDiff) < 0.0005 && border == item.border)
         {
-            if (featureType == PossibleFeatureTypes.Group1B)
-            {
-                return true;
-            }
             return true;
         }
+        //not equal
         return false;
     }
 

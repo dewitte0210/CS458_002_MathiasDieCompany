@@ -125,16 +125,13 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   */
   const DisplayData = jsonResponse?.map(
     (info)=>{
-      console.log(info.featureType);
+      // Check if the feature is a circle and calculate the diameter if it is
+      const perimeterOrDiameter = (info.featureType === "Group1B" && info.entityList.length === 1) ? info.perimeter / Math.PI : info.perimeter;
       return(
       <tr>
         <td>{info.count}</td>
         <td>{info.featureType}</td>
-        <td> {info.perOver20 ? (
-          <span className="checkmark">&#10003;</span>
-        ) : (
-          <span className="crossmark">&#10005;</span>
-        )} </td>
+        <td>{perimeterOrDiameter.toFixed(3)}</td>
         <td> {info.multipleRadius ? (
           <span className="checkmark">&#10003;</span>
         ) : (
@@ -215,7 +212,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
                   <tr>
                     <th>Count</th>
                     <th>Group</th>
-                    <th>Perimeter Over 20</th>
+                    <th>Perimeter/Diameter</th>
                     <th>Multiple Radius</th>
                     <th>Kiss Cut</th>
                     <th>Border</th>
