@@ -71,9 +71,27 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
-        
+
+        internal bool PointsAreTouching(Point p1, Point p2)
+        {
+            double xDiff = Math.Abs(p1.X - p2.X); 
+            double yDiff = Math.Abs(p1.Y - p2.Y);
+            if (xDiff < 0.0000009 && yDiff < 0.0000009)
+            {
+                return true;
+            }
+            return false; 
+        }
         internal bool IntersectLineWithArc(Line line, Arc arc)
         {
+            //Check if the enpoints are touching first to avoid the intersect calculations
+            Point lStart = new(line.StartX, line.StartY);
+            Point lEnd = new(line.EndX, line.EndY);
+            Point aStart = new(arc.startX, arc.startY);
+            Point aEnd = new(arc.endX, arc.endY);
+            bool touching = PointsAreTouching(lStart, aStart) || PointsAreTouching(lStart, aEnd) || PointsAreTouching(lEnd, aStart) || PointsAreTouching(lEnd, aEnd);
+            if (touching) { return true; }
+
             //  Get line in the slope-intercept form, then transform it to the
             //  general form: Ax + By + C = 0
 
@@ -165,6 +183,14 @@ namespace FeatureRecognitionAPI.Models
 
         internal bool IntersectLineWithLine(Line line1, Line line2)
         {
+            // If the endpoints are touching we can avoid the intersect math 
+            Point l1Start = new(line1.StartX, line1.StartY);
+            Point l1End = new(line1.EndX, line1.EndY);
+            Point l2Start = new(line2.StartX, line2.StartY);
+            Point l2End = new(line2.EndX, line2.EndY);
+            bool touching = PointsAreTouching(l1Start, l2Start) || PointsAreTouching(l1Start, l2End) || PointsAreTouching(l1End, l2Start) || PointsAreTouching(l1End, l2End);
+            if (touching) { return true; }
+            
             //  Get lines in the form Ax + By + C = 0
             double A1;
             double B1;
@@ -290,6 +316,15 @@ namespace FeatureRecognitionAPI.Models
 
         internal bool IntersectArcWithArc(Arc arc1, Arc arc2)
         {
+            
+            // If the endpoints are touching we can avoid the intersect math 
+            Point a1Start = new(arc1.startX, arc1.startY);
+            Point a1End = new(arc1.endX, arc1.endY);
+            Point a2Start = new(arc2.startX, arc2.startY);
+            Point a2End = new(arc2.endX, arc2.endY);
+            bool touching = PointsAreTouching(a1Start, a2Start) || PointsAreTouching(a1Start, a2End) || PointsAreTouching(a1End, a2Start) || PointsAreTouching(a1End, a2End);
+            if (touching) { return true; }
+            
             // Treat both Arcs circles, get the line between their centers
             Line between = new Line(arc1.centerX, arc1.centerY, arc2.centerX, arc2.centerY);
              
