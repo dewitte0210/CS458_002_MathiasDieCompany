@@ -3,6 +3,7 @@ using System.IO;
 using System.Numerics;
 using System.Reflection.Metadata;
 using DecimalMath;
+using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Models
 {

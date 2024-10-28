@@ -3,7 +3,8 @@ namespace FeatureRecognitionAPI.Models
     public class Point
     {
         public double X;
-        public double Y; 
+        public double Y;
+        public bool intersect;
 
         public Point()
         {
@@ -15,7 +16,7 @@ namespace FeatureRecognitionAPI.Models
             Y = y;
         }
 
-        public void SetPoint(double x, double y) {
+        public void setPoint(double x, double y) {
             X = x;
             Y = y; 
         }
