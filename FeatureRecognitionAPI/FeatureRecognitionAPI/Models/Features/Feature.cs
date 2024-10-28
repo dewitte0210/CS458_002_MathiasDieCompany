@@ -180,23 +180,25 @@ public class Feature
 
     public void extendAllEntities(List<Entity> myEntityList)
     {
-        for (int i = 0; i < myEntityList.Count; i++)
+        foreach (var entity in myEntityList)
         {
-            if (myEntityList[i] is Line)
+            if (entity is Line)
             {
-                for (int j = 0; j < myEntityList.Count; j++)
+                foreach(var otherEntity in myEntityList)
                 {
-                    if (myEntityList[j] is Line)
+                    if (otherEntity is Line)
                     {
-                        if (!extendTwoLines((Line)myEntityList[i], (Line)myEntityList[j]))
+                        // for each entity it checks if it can extend with every other entity and does so
+                        // adds extended entity to extendedEntityList
+                        if (!extendTwoLines((Line)entity, (Line)otherEntity))
                         {
-                            if (!extendedEntityList.Contains(myEntityList[i]))
+                            if (!extendedEntityList.Contains(entity))
                             {
-                                extendedEntityList.Add(myEntityList[i]);
+                                extendedEntityList.Add(entity);
                             }
-                            if (!extendedEntityList.Contains(myEntityList[j]))
+                            if (!extendedEntityList.Contains(otherEntity))
                             {
-                                extendedEntityList.Add(myEntityList[j]);
+                                extendedEntityList.Add(otherEntity);
                             }
                         }
                     }
