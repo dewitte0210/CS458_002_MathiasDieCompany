@@ -178,32 +178,51 @@ public class Feature
         return false;
     }
 
+    /*
+     * Recursive function that calls extendAllEntitiesHelper
+     * @Param myEntityList parameter that extendedEntityList is set equal to
+    */
     public void extendAllEntities(List<Entity> myEntityList)
     {
-        foreach (var entity in myEntityList)
+        extendedEntityList = myEntityList;
+        extendAllEntitiesHelper();
+    }
+
+    /*
+     * This is a recursive helper function to extend every line in extendedEntityList
+    */
+    private void extendAllEntitiesHelper()
+    {
+        bool extendedALine = false; // repeats recursivly if this is true
+        //this block extends every line in extendedEntityList
+        foreach (var entity in extendedEntityList)
         {
             if (entity is Line)
             {
-                foreach(var otherEntity in myEntityList)
+                foreach (var otherEntity in extendedEntityList)
                 {
-                    if (otherEntity is Line)
+                    if (otherEntity is Line && entity != otherEntity)
                     {
                         // for each entity it checks if it can extend with every other entity and does so
-                        // adds extended entity to extendedEntityList
-                        if (!extendTwoLines((Line)entity, (Line)otherEntity))
+                        // removes the two previous entities
+                        // new extended lines are added in the extendTwoLines method
+                        if (extendTwoLines((Line)entity, (Line)otherEntity))
                         {
-                            if (!extendedEntityList.Contains(entity))
-                            {
-                                extendedEntityList.Add(entity);
-                            }
-                            if (!extendedEntityList.Contains(otherEntity))
-                            {
-                                extendedEntityList.Add(otherEntity);
-                            }
+                            extendedEntityList.Remove(entity);
+                            extendedEntityList.Remove(otherEntity);
+                            extendedALine = true;
                         }
                     }
                 }
             }
+        }
+        if (extendedALine)
+        {
+            extendAllEntitiesHelper();
+        }
+        else
+        {
+            return;
         }
     }
 
