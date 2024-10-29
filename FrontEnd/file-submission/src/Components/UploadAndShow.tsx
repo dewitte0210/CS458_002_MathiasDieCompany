@@ -5,16 +5,16 @@ import JsonTable from './JsonTable';
 import LoadingIndicator from './LoadingIndicator';
 
 /*
-  Defines the shape of the props that the UploadAndShow component accepts.
+  Defines the shape of the props that the DragNdrop component accepts.
 */
-interface UploadAndShowProps {
+interface DragNdropProps {
   onFilesSelected?: (files: File[]) => void;
 }
 
 /*
   Main component that handles drag-and-drop and file submission.
 */
-const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
+const DragNdrop: React.FC<DragNdropProps> = ({ onFilesSelected }) => {
   const [file, setFile] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [jsonResponse, setJsonResponse] = useState<any>(null);
@@ -60,20 +60,28 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
       {isLoading ? (
         <LoadingIndicator />
       ) : !submitted ? (
-        <DragDropZone
-          file={file}
-          allowedFileExtensions={allowedFileExtensions}
-          setFile={setFile}
-          onFilesSelected={onFilesSelected}
-          onSubmit={handleSubmit}
-        />
+        <>
+          <DragDropZone
+            file={file}
+            allowedFileExtensions={allowedFileExtensions}
+            setFile={setFile}
+            onFilesSelected={onFilesSelected}
+          />
+          {file && (
+            <button className="animated-button" onClick={handleSubmit}>
+              <span>Submit File</span>
+              <span></span>
+            </button>
+          )}
+        </>
       ) : (
         <div className="success-message">
           {jsonResponse && (
             <JsonTable jsonResponse={jsonResponse} />
           )}
           <button className="animated-button" onClick={backToUpload}>
-            Go Back
+          <span>Go Back</span>
+            <span></span>
           </button>
         </div>
       )}
@@ -81,4 +89,4 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
   );
 };
 
-export default UploadAndShow;
+export default DragNdrop;

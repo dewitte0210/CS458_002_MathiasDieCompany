@@ -10,11 +10,10 @@ interface DragDropZoneProps {
   allowedFileExtensions: string[];
   setFile: (file: File | null) => void;
   onFilesSelected?: (files: File[]) => void;
-  onSubmit: () => void;
 }
 
 const DragDropZone: React.FC<DragDropZoneProps> = ({
-  file, allowedFileExtensions, setFile, onFilesSelected, onSubmit
+  file, allowedFileExtensions, setFile, onFilesSelected
 }) => {
   const handleFileDrop = (newFile: File) => {
     const fileExtension = newFile.name.split('.').pop()?.toLowerCase();
@@ -54,11 +53,6 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
       <label htmlFor="browse" className="browse-btn">Browse file</label>
       {file && (
         <FileDisplay file={file} onRemoveFile={() => setFile(null)} />
-      )}
-      {file && (
-        <button className="animated-button" onClick={onSubmit}>
-          Submit File
-        </button>
       )}
     </div>
   );
