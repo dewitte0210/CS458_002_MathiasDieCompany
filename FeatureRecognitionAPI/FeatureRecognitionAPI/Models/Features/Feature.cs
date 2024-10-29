@@ -18,7 +18,7 @@ public class Feature
     [JsonProperty]
     PossibleFeatureTypes featureType;
     [JsonProperty]
-    List<Entity> entityList; //list of touching entities that make up the feature
+    public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty]
     bool kissCut;
     [JsonProperty]
@@ -67,8 +67,14 @@ public class Feature
     public Feature(List<Entity> entityList)
     {
         this.count = 1;
-        this.entityList = entityList;
+        this.EntityList = entityList;
+        psuedoFeatureDetection(entityList);
+        //calculate and set the perimeter of the feature
+        calcPerimeter();
+    }
 
+    public void psuedoFeatureDetection(List<Entity> entityList)
+    {
         int numLines = 0;
         int numArcs = 0;
         int numCircles = 0;
@@ -109,17 +115,13 @@ public class Feature
         {
             Console.WriteLine("Error: Cannot assign feature type.");
         }
-
-        //calculate and set the perimeter of the feature
-        calcPerimeter();
     }
-
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        for (int i = 0; i < entityList.Count; i++)
+        for (int i = 0; i < EntityList.Count; i++)
         {
-            perimeter += entityList[i].getLength();
+            perimeter += EntityList[i].Length;
         }
     }
 
@@ -142,23 +144,23 @@ public class Feature
                 Math.Abs(perDiff) < 0.0005 && border == item.border)
         {
             //may need to change in the case where a circle is made of two arcs seperated by perimeter features
-            if (entityList.Count != item.entityList.Count)
+            if (EntityList.Count != item.EntityList.Count)
             {
                 return false;
             }
             //return true if they are identical non-circular Group1B features
-            if (entityList.Count == 4 && item.entityList.Count == 4)
+            if (EntityList.Count == 4 && item.EntityList.Count == 4)
             {
                 return true;
             }
             //if they are circular
-            else if (entityList.Count == 1 && item.entityList.Count == 1)
+            else if (EntityList.Count == 1 && item.EntityList.Count == 1)
             {
                 //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
                 //TODO: create added check if they are arcs instead of circles
-                var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+                var serializedParent = JsonConvert.SerializeObject(EntityList[0]);
                 Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-                serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+                serializedParent = JsonConvert.SerializeObject(item.EntityList[0]);
                 Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
 
                 if (c1.radius == c2.radius)
@@ -185,6 +187,16 @@ public class Feature
     public void extendAllEntities(List<Entity> myEntityList)
     {
         extendedEntityList = myEntityList;
+        extendAllEntitiesHelper();
+    }
+
+    /*
+     *  Recursive function that calls extendAllEntitiesHelper
+     *  sets extendedEntityList to entityList
+    */
+    public void extendAllEntities()
+    {
+        extendedEntityList = EntityList;
         extendAllEntitiesHelper();
     }
 

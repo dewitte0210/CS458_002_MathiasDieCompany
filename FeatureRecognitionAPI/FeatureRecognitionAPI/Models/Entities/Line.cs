@@ -36,7 +36,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeX = EndX - StartX;
 
             // Distance Calculation
-            this.setLength(Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
+            this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
         }
 
         //constructor with extendedline parameter
@@ -52,7 +52,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeX = EndX - StartX;
 
             // Distance Calculation
-            this.setLength(Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
+            this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
         }
 
         public bool isParallel(Entity other)
