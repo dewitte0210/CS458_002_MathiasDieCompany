@@ -8,9 +8,11 @@ interface JsonTableProps {
 }
 
 const JsonTable: React.FC<JsonTableProps> = ({ jsonResponse }) => {
+  // Calculate the total number of features detected
   const numFeatures = jsonResponse?.reduce((acc: number, info: any) => acc + info.count, 0);
 
   return (
+    // Display JSON data in a table
     <div className="json-response">
       <h3>Features Detected: {numFeatures}</h3>
       <table>
@@ -26,6 +28,7 @@ const JsonTable: React.FC<JsonTableProps> = ({ jsonResponse }) => {
         </thead>
         <tbody>
           {jsonResponse.map((info) => {
+            // Check if the feature is a circle and calculate the diameter if it is
             const perimeterOrDiameter = (info.featureType === "Group1B" && info.entityList.length === 1)
               ? info.perimeter / Math.PI
               : info.perimeter;

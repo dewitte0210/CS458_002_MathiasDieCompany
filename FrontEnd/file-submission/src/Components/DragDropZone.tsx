@@ -19,18 +19,24 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
     const fileExtension = newFile.name.split('.').pop()?.toLowerCase();
     if (fileExtension && allowedFileExtensions.includes(`.${fileExtension}`)) {
       setFile(newFile);
-      onFilesSelected && onFilesSelected([newFile]);
+      onFilesSelected && onFilesSelected([newFile]); // Pass the file to the parent component
     } else {
-      alert('Invalid file type. Please upload a PDF, DWG, or DXF file.');
+      alert('Invalid file type. Please upload a PDF, DWG, or DXF file.'); // Alert for invalid file type
     }
   };
 
+  /*
+    Event handler for when a file is dropped onto the drop zone.
+  */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const droppedFiles = event.dataTransfer.files;
-    if (droppedFiles.length > 0) handleFileDrop(droppedFiles[0]);
+    event.preventDefault(); // Prevent the default behavior of opening the file in the browser
+    const droppedFiles = event.dataTransfer.files; // Get the files that were dropped
+    if (droppedFiles.length > 0) handleFileDrop(droppedFiles[0]); // Only pick the first file
   };
 
+  /*
+    Event handler for when the user selects a file using the file input.
+  */
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
     if (selectedFiles && selectedFiles.length > 0) handleFileDrop(selectedFiles[0]);
