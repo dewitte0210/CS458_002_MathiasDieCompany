@@ -42,6 +42,17 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
     if (selectedFiles && selectedFiles.length > 0) handleFileDrop(selectedFiles[0]);
   };
 
+  /*
+    Event handler for when the user clicks the remove file button.
+  */
+  const handleRemoveFile = () => {
+    setFile(null); // Clear the selected file
+    const fileInput = document.getElementById("browse") as HTMLInputElement; // Get the file input element
+    if (fileInput) {
+      fileInput.value = ""; // Reset the input value to allow re-upload
+    }
+  };
+
   return (
     <div
       className={`document-uploader ${file ? "upload-box active" : "upload-box"}`}
@@ -58,7 +69,7 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
       <input type="file" hidden id="browse" onChange={handleFileChange} accept=".dxf,.dwg,.pdf" />
       <label htmlFor="browse" className="browse-btn">Browse file</label>
       {file && (
-        <FileDisplay file={file} onRemoveFile={() => setFile(null)} />
+        <FileDisplay file={file} onRemoveFile={handleRemoveFile} />
       )}
     </div>
   );
