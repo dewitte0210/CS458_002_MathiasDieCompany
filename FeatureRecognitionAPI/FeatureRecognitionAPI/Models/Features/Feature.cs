@@ -148,14 +148,14 @@ public class Feature
     {
         if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
         {
-            perimeter = entityList[0].getLength() / Math.PI;
+            perimeter = EntityList[0].Length / Math.PI;
         }
 
         else
         {
-            for (int i = 0; i < entityList.Count; i++)
+            for (int i = 0; i < EntityList.Count; i++)
             {
-                perimeter += entityList[i].getLength();
+                perimeter += EntityList[i].Length;
             }
         }
     }
@@ -243,8 +243,6 @@ public class Feature
                         // new extended lines are added in the extendTwoLines method
                         if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
-                            ExtendedEntityList.Remove(ExtendedEntityList[i]);
-                            ExtendedEntityList.Remove(ExtendedEntityList[j]);
                             extendedALine = true;
                         }
                     }
@@ -346,8 +344,10 @@ public class Feature
                     tempLine.EndX = line2.EndX;
                     tempLine.EndY = line2.EndY;
                 }
+                ExtendedEntityList.Remove(line1);
+                ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
-                return true;//extended a parallel lines into 1
+                return true;//extended two parallel lines into 1
             }
         }
         return false;
