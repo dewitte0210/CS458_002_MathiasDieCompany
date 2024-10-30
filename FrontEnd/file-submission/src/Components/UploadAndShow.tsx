@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import DragDropZone from './DragDropZone';
-import JsonTable from './JsonTable';
 import LoadingIndicator from './LoadingIndicator';
+import QuoteSubmission from './QuoteSubmission'; // Import your QuoteSubmission component
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -85,12 +85,18 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
       ) : ( // Show success message after submission
         <div className="success-message">
           {jsonResponse && ( // Conditionally render the JSON response
-            <JsonTable jsonResponse={jsonResponse} />
+            <QuoteSubmission jsonResponse={jsonResponse} />
           )}
-          <button className="animated-button" onClick={backToUpload}>
-          <span>Go Back</span>
-            <span></span>
-          </button>
+          <div className="button-container">
+            <button className="animated-button" onClick={backToUpload}>
+              <span>Confirm</span>
+              <span></span>
+            </button>
+            <button className="animated-button" onClick={backToUpload}>
+              <span>Go Back</span>
+              <span></span>
+            </button>
+          </div>
         </div>
       )}
     </section>
