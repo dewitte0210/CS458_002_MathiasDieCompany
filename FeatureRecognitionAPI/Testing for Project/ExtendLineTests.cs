@@ -14,7 +14,7 @@ namespace Testing_for_Project
             Line line1 = new(7,4,7,6);
             Line line2 = new(7, 8, 7, 10);
             List<Entity> testEntities = [line1, line2];
-            Feature testFeature = new(testEntities);
+            Feature testFeature = new(testEntities, false, false);
             testFeature.extendAllEntities();
             Line finalTestLine = new(7, 4, 7, 10);
             Assert.IsTrue(testFeature.EntityList.Count == 1);

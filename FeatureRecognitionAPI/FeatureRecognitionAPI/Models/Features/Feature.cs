@@ -30,7 +30,7 @@ public class Feature
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
-    protected List<Entity> extendedEntityList; // list of entities after extending them all
+    public List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
     protected List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
                                            // contain entities that make up the base shape and possibly corner features
     protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
@@ -60,6 +60,15 @@ public class Feature
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
         this.border = border;
+
+        calcPerimeter();
+    }
+
+    public Feature (List<Entity> entityList, bool kissCut, bool multipleRadius)
+    {
+        EntityList = entityList;
+        this.kissCut = kissCut;
+        this.multipleRadius = multipleRadius;
 
         calcPerimeter();
     }
@@ -207,21 +216,23 @@ public class Feature
     {
         bool extendedALine = false; // repeats recursivly if this is true
         //this block extends every line in extendedEntityList
-        foreach (var entity in extendedEntityList)
+        //foreach (var entity in extendedEntityList)
+        for (int i = 0; i < extendedEntityList.Count; i++)
         {
-            if (entity is Line)
+            if (extendedEntityList[i] is Line)
             {
-                foreach (var otherEntity in extendedEntityList)
+                //foreach (var otherEntity in extendedEntityList)
+                for (int j = 0; j < extendedEntityList.Count; j++)
                 {
-                    if (otherEntity is Line && entity != otherEntity)
+                    if (extendedEntityList[j] is Line && extendedEntityList[i] != extendedEntityList[j])
                     {
                         // for each entity it checks if it can extend with every other entity and does so
                         // removes the two previous entities
                         // new extended lines are added in the extendTwoLines method
-                        if (extendTwoLines((Line)entity, (Line)otherEntity))
+                        if (extendTwoLines((Line)extendedEntityList[i], (Line)extendedEntityList[j]))
                         {
-                            extendedEntityList.Remove(entity);
-                            extendedEntityList.Remove(otherEntity);
+                            extendedEntityList.Remove(extendedEntityList[i]);
+                            extendedEntityList.Remove(extendedEntityList[j]);
                             extendedALine = true;
                         }
                     }
