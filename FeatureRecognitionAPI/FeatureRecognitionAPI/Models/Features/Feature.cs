@@ -87,9 +87,9 @@ public class Feature
         }
 
         //check two conditions possible to make Group1B (with no perimeter features)
-        if (numCircles == 1 || (numLines == 2 && numArcs == 2))
+        if (CheckGroup1B(numCircles, numLines, numArcs))
         {
-            featureType = PossibleFeatureTypes.Group1B;
+            featureType = PossibleFeatureTypes.Group1B; 
         }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4 && (numArcs == 0 || numArcs == 4))
@@ -103,6 +103,25 @@ public class Feature
 
         //calculate and set the perimeter of the feature
         calcPerimeter();
+    }
+    
+    // Checks the feature to see if there is 
+    private bool CheckGroup1B(int numCircles, int numLines, int numArcs)
+    {
+        if (numCircles == 1 && numLines == 0 && numArcs == 0) { return true; }
+        if (numArcs == 2 && numLines == 2)
+        {
+            double totalDegrees = 0;
+            entityList.ForEach(entity =>
+            {
+                if (entity is Arc)
+                {
+                    totalDegrees += (entity as Arc).centralAngle;
+                }
+            });
+            if (totalDegrees > 359.999 && totalDegrees < 360.0009) { return true; }
+        }
+        return false;
     }
 
     //calculates the perimeter of the feature
