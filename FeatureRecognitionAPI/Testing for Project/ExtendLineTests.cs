@@ -17,9 +17,9 @@ namespace Testing_for_Project
             Feature testFeature = new(testEntities, false, false);
             testFeature.extendAllEntities();
             Line finalTestLine = new(7, 4, 7, 10);
-            Assert.IsTrue(testFeature.EntityList.Count == 1);
-            Assert.IsTrue(testFeature.EntityList[0] is Line);
-            Assert.IsTrue(((Line)testFeature.EntityList[0]) == finalTestLine);
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
+            Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
+            Assert.IsTrue(((Line)testFeature.ExtendedEntityList[0]) == finalTestLine);
         }
     }
 }

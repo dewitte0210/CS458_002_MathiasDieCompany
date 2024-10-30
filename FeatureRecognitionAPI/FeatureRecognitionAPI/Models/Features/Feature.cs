@@ -195,7 +195,7 @@ public class Feature
     */
     public void extendAllEntities(List<Entity> myEntityList)
     {
-        extendedEntityList = myEntityList;
+        ExtendedEntityList = myEntityList;
         extendAllEntitiesHelper();
     }
 
@@ -205,7 +205,7 @@ public class Feature
     */
     public void extendAllEntities()
     {
-        extendedEntityList = EntityList;
+        ExtendedEntityList = EntityList;
         extendAllEntitiesHelper();
     }
 
@@ -217,22 +217,22 @@ public class Feature
         bool extendedALine = false; // repeats recursivly if this is true
         //this block extends every line in extendedEntityList
         //foreach (var entity in extendedEntityList)
-        for (int i = 0; i < extendedEntityList.Count; i++)
+        for (int i = 0; i < ExtendedEntityList.Count; i++)
         {
-            if (extendedEntityList[i] is Line)
+            if (ExtendedEntityList[i] is Line)
             {
                 //foreach (var otherEntity in extendedEntityList)
-                for (int j = 0; j < extendedEntityList.Count; j++)
-                {
-                    if (extendedEntityList[j] is Line && extendedEntityList[i] != extendedEntityList[j])
+                for (int j = 0; j < ExtendedEntityList.Count; j++)
+                {   
+                    if (ExtendedEntityList[j] is Line && ExtendedEntityList[i] != ExtendedEntityList[j])
                     {
                         // for each entity it checks if it can extend with every other entity and does so
                         // removes the two previous entities
                         // new extended lines are added in the extendTwoLines method
-                        if (extendTwoLines((Line)extendedEntityList[i], (Line)extendedEntityList[j]))
+                        if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
-                            extendedEntityList.Remove(extendedEntityList[i]);
-                            extendedEntityList.Remove(extendedEntityList[j]);
+                            ExtendedEntityList.Remove(ExtendedEntityList[i]);
+                            ExtendedEntityList.Remove(ExtendedEntityList[j]);
                             extendedALine = true;
                         }
                     }
@@ -271,12 +271,12 @@ public class Feature
                     if (PointToExtendLine1.X == line1.StartX && PointToExtendLine1.Y == line1.StartY)
                     {
                         //make new line1 line with extended start point
-                        extendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.EndX, line1.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.EndX, line1.EndY, true));
                     }
                     else
                     {
                         //make new line1 line with extended end point
-                        extendedEntityList.Add(new Line(line1.StartX, line1.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line1.StartX, line1.StartY, intersectPoint.X, intersectPoint.Y, true));
                     }
 
 
@@ -284,12 +284,12 @@ public class Feature
                     if (PointToExtendLine2.X == line2.StartX && PointToExtendLine2.Y == line2.StartY)
                     {
                         //make new line2 line with extended start point
-                        extendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.EndX, line2.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.EndX, line2.EndY, true));
                     }
                     else
                     {
                         //make new line2 line with extended end point
-                        extendedEntityList.Add(new Line(line2.StartX, line2.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line2.StartX, line2.StartY, intersectPoint.X, intersectPoint.Y, true));
                     }
                     return true;
                 }
@@ -334,7 +334,7 @@ public class Feature
                     tempLine.EndX = line2.EndX;
                     tempLine.EndY = line2.EndY;
                 }
-                extendedEntityList.Add(tempLine);
+                ExtendedEntityList.Add(tempLine);
                 return true;//extended a parallel lines into 1
             }
         }
