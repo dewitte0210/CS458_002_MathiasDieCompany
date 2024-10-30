@@ -74,5 +74,21 @@ namespace Testing_for_Project
             Assert.IsTrue(finalTestLine1 == line1);
             Assert.IsTrue(finalTestLine2 == line2);
         }
+
+        [Test]
+        public void InvalidEntities()
+        {
+            Arc arc1 = new Arc(1, 2, Math.Sqrt(8), 315, 45);
+            Circle circle1 = new(0, 0, 2);
+            List<Entity> testEntities = [arc1, circle1];
+            Feature testFeature = new(testEntities, false, false);
+            testFeature.extendAllEntities();
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 2);
+            Assert.IsTrue(testFeature.ExtendedEntityList[0] is Arc && testFeature.ExtendedEntityList[1] is Circle);
+            Arc finalTestLine1 = (Arc)testFeature.ExtendedEntityList[0];
+            Circle finalTestLine2 = (Circle)testFeature.ExtendedEntityList[1];
+            Assert.IsTrue(finalTestLine1 == arc1);
+            Assert.IsTrue(finalTestLine2 == circle1);
+        }
     }
 }
