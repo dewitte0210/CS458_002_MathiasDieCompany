@@ -1,6 +1,6 @@
 import * as React from 'react';
-import DragNdrop from './Components/DragNdrop';
-import "./Components/drag-drop.css";
+import UploadAndShow from './Components/UploadAndShow';
+import "./Components/UploadAndShow.css";
 import { useState } from 'react';
 
 const App: React.FC = () => {
@@ -8,7 +8,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <DragNdrop onFilesSelected={setFiles}/>
+      <UploadAndShow onFilesSelected={setFiles} />
     </div>
   );
 }
