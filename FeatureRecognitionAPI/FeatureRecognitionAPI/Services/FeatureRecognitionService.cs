@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json.Converters;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -70,6 +71,8 @@ namespace FeatureRecognitionAPI.Services
                 {
                     List<List<Entity>> touchingEntityList;
                     List<Feature> features;
+                    var settings = new JsonSerializerSettings();
+                    settings.Converters.Add(new StringEnumConverter());
                     switch (ext)
                     {
                         case ".dxf":
@@ -79,7 +82,7 @@ namespace FeatureRecognitionAPI.Services
 
                             features = dXFFile.getFeatureList(touchingEntityList);
 
-                            json = JsonConvert.SerializeObject(features);
+                            json = JsonConvert.SerializeObject(features, settings);
                             break;
                         case ".dwg":
                             DWGFile dwgFile = new DWGFile(path);
@@ -87,7 +90,7 @@ namespace FeatureRecognitionAPI.Services
                             //might be slow for large files with mutliple users hitting endpoint at once
 
                             features = dwgFile.getFeatureList(touchingEntityList);
-                            json = JsonConvert.SerializeObject(features);
+                            json = JsonConvert.SerializeObject(features, settings);
                             break;
                         case ".pdf":
                             PDFFile pdfFile = new PDFFile(path); //TODO: need more info to extract entities from pdf

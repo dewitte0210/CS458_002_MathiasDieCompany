@@ -6,6 +6,7 @@
  * the first border and calculates feautrues only for that one 
  */
 using FeatureRecognitionAPI.Models;
+using iText.Layout.Splitting;
 using iText.StyledXmlParser.Node;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -41,8 +42,11 @@ public class Feature
     protected enum PossibleFeatureTypes
     {
         [JsonProperty]
-        Group1A,
-        Group1B,
+        Punch,
+        Group1A1,
+        Group1A2,
+        Group1B1,
+        Group1B2,
         Group3,
         Group1C,
         Group6,
@@ -113,24 +117,46 @@ public class Feature
         //check two conditions possible to make Group1B (with no perimeter features)
         if (numCircles == 1 || (numLines == 2 && numArcs == 2))
         {
-            featureType = PossibleFeatureTypes.Group1B;
+            if (numCircles == 1 && numLines == 0 && numArcs == 0)
+            {
+                Circle c = entityList[0] as Circle;
+                if (c.radius <= 1.625)
+                {
+                    featureType = PossibleFeatureTypes.Punch;
+                }
+                else featureType = PossibleFeatureTypes.Group1B1;
+            }
+            else featureType = PossibleFeatureTypes.Group1B2;
         }
         //check two conditions possible to make Group1A (with no perimeter features)
-        else if (numLines == 4 && (numArcs == 0 || numArcs == 4))
+        else if (numLines == 4)
         {
-            featureType = PossibleFeatureTypes.Group1A;
+            if (numArcs == 0)
+            {
+                featureType = PossibleFeatureTypes.Group1A1;
+            }
+            else featureType = PossibleFeatureTypes.Group1A2;
         }
         else
         {
             Console.WriteLine("Error: Cannot assign feature type.");
         }
     }
-    //calculates the perimeter of the feature
+
+    //calculates the perimeter or diameter of the feature
     public void calcPerimeter()
     {
-        for (int i = 0; i < EntityList.Count; i++)
+        if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
         {
-            perimeter += EntityList[i].Length;
+            perimeter = entityList[0].getLength() / Math.PI;
+        }
+
+        else
+        {
+            for (int i = 0; i < entityList.Count; i++)
+            {
+                perimeter += entityList[i].getLength();
+            }
         }
     }
 
@@ -149,22 +175,9 @@ public class Feature
         double perDiff = perimeter - item.perimeter;
 
         //if the features are identical Group1B features
-        if (featureType == item.featureType && featureType == PossibleFeatureTypes.Group1B && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
+        if (featureType == item.featureType && featureType == PossibleFeatureTypes.Group1B1 && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
                 Math.Abs(perDiff) < 0.0005 && border == item.border)
         {
-            //may need to change in the case where a circle is made of two arcs seperated by perimeter features
-            if (EntityList.Count != item.EntityList.Count)
-            {
-                return false;
-            }
-            //return true if they are identical non-circular Group1B features
-            if (EntityList.Count == 4 && item.EntityList.Count == 4)
-            {
-                return true;
-            }
-            //if they are circular
-            else if (EntityList.Count == 1 && item.EntityList.Count == 1)
-            {
                 //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
                 //TODO: create added check if they are arcs instead of circles
                 var serializedParent = JsonConvert.SerializeObject(EntityList[0]);
@@ -176,7 +189,6 @@ public class Feature
                 {
                     return true;
                 }
-            }
         }
 
         // Checking equality of all other feature types

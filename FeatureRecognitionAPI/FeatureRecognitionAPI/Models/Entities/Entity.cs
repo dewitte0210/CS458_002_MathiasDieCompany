@@ -210,7 +210,7 @@ namespace FeatureRecognitionAPI.Models
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if (line1.EndX == line1.StartX)
+            if (PointsAreTouching(new(line1.StartX,0), new(line1.EndX,0)))
             {
                 A1 = 1;
                 B1 = 0;
@@ -243,7 +243,7 @@ namespace FeatureRecognitionAPI.Models
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if (line2.EndX == line2.StartX)
+            if (PointsAreTouching(new(line2.StartX,0), new(line2.EndX,0)))
             {
                 A2 = 1;
                 B2 = 0;
