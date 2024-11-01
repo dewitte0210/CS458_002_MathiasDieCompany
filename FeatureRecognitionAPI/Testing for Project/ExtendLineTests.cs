@@ -19,10 +19,10 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartX == 7);
-            Assert.IsTrue(finalTestLine.EndX == 7);
-            Assert.IsTrue(finalTestLine.StartY == 4);
-            Assert.IsTrue(finalTestLine.EndY == 10);
+            Assert.IsTrue(finalTestLine.StartPoint.X == 7);
+            Assert.IsTrue(finalTestLine.EndPoint.X == 7);
+            Assert.IsTrue(finalTestLine.StartPoint.Y == 4);
+            Assert.IsTrue(finalTestLine.EndPoint.Y == 10);
         }
 
         [Test]
@@ -36,10 +36,10 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartX == 4);
-            Assert.IsTrue(finalTestLine.EndX == 10);
-            Assert.IsTrue(finalTestLine.StartY == 7);
-            Assert.IsTrue(finalTestLine.EndY == 7);
+            Assert.IsTrue(finalTestLine.StartPoint.X == 4);
+            Assert.IsTrue(finalTestLine.EndPoint.X == 10);
+            Assert.IsTrue(finalTestLine.StartPoint.Y == 7);
+            Assert.IsTrue(finalTestLine.EndPoint.Y == 7);
         }
 
         [Test]
@@ -53,10 +53,10 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartX == 0);
-            Assert.IsTrue(finalTestLine.EndX == 9);
-            Assert.IsTrue(finalTestLine.StartY == 0);
-            Assert.IsTrue(finalTestLine.EndY == 9);
+            Assert.IsTrue(finalTestLine.StartPoint.X == 0);
+            Assert.IsTrue(finalTestLine.EndPoint.X == 9);
+            Assert.IsTrue(finalTestLine.StartPoint.Y == 0);
+            Assert.IsTrue(finalTestLine.EndPoint.Y == 9);
         }
 
         [Test]

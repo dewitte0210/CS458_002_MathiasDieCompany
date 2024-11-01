@@ -269,8 +269,9 @@ public class Feature
         if (!line1.DoesIntersect(line2))
         //makes sure youre not extending lines that already touch
         {
+            //Does not need to detect if lines are perpendicular since they might not be perfectly perpendicular
             //check if the lines are parallel or perpendicular
-            if (line1.isPerpendicular(line2))
+            /*if (line1.isPerpendicular(line2))
             {
                 Point intersectPoint = line1.getIntersectPoint(line1, line2);
                 Point PointToExtendLine1 = line1.findPointToExtend(line1, intersectPoint);
@@ -303,46 +304,46 @@ public class Feature
                     }
                     return true;
                 }
-            }
-            else if (line1.isParallel(line2))
+            }*/
+            if (line1.isParallel(line2))
             {
                 Point pointToExtend;
                 Line tempLine = new Line(true);//makes a new line object with extendedLine boolean to true
                 if (line1.findDistance(
-                    new Point(line1.StartX, line1.StartY),
-                    new Point(line2.StartX, line2.StartY))
+                    line1.StartPoint,
+                    line2.StartPoint)
                     < line1.findDistance(
-                    new Point(line1.EndX, line1.EndY),
-                    new Point(line2.StartX, line2.StartY)))
+                    line1.EndPoint,
+                    line2.StartPoint))
                 //This looks like a lot but all this is doing is finding the closest point on line1 to line2
                 {
                     //At this point we know the point to be extended on line1 is the start point, meaning the end point can stay the same
                     //  Hence why tempLine end point is set to line1's
-                    pointToExtend = new Point(line1.StartX, line1.StartY);
-                    tempLine.StartX = line1.EndX;
-                    tempLine.StartY = line1.EndY;
+                    pointToExtend = line1.StartPoint;
+                    tempLine.StartPoint.X = line1.EndPoint.X;
+                    tempLine.StartPoint.Y = line1.EndPoint.Y;
                 }
                 else
                 {
-                    pointToExtend = new Point(line1.EndX, line1.EndY);
-                    tempLine.StartX = line1.StartX;
-                    tempLine.StartY = line1.StartY;
+                    pointToExtend = line1.EndPoint;
+                    tempLine.StartPoint.X = line1.StartPoint.X;
+                    tempLine.StartPoint.Y = line1.StartPoint.Y;
                 }
                 if (line2.findDistance(
                     pointToExtend,
-                    new Point(line2.StartX, line2.StartY))
+                    line2.StartPoint)
                     > line2.findDistance(
                     pointToExtend,
-                    new Point(line2.EndX, line2.EndY)))
+                    line2.EndPoint))
                 //Similar to the one above but finds what point on line2 is farthest from line1's point to extend
                 {
-                    tempLine.EndX = line2.StartX;
-                    tempLine.EndY = line2.StartY;
+                    tempLine.EndPoint.X = line2.StartPoint.X;
+                    tempLine.EndPoint.Y = line2.StartPoint.Y;
                 }
                 else
                 {
-                    tempLine.EndX = line2.EndX;
-                    tempLine.EndY = line2.EndY;
+                    tempLine.EndPoint.X = line2.EndPoint.X;
+                    tempLine.EndPoint.Y = line2.EndPoint.Y;
                 }
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
@@ -352,4 +353,26 @@ public class Feature
         }
         return false;
     }
+
+    public bool sortExtendedLines()
+    {
+        Stack<Entity> path = new Stack<Entity>();
+        sortExtendedLinesHelper(path, 0);
+        return false;
+    }
+    public bool sortExtendedLinesHelper(Stack<Entity> curPath, int index)
+    {
+        curPath.Push(ExtendedEntityList[index]);
+        List<Entity> connectedEntities = new List<Entity>();
+        foreach (Entity entity in ExtendedEntityList)
+        {
+            if (ExtendedEntityList[index] != entity)
+            {
+              
+            }
+        }
+        return false;
+    }
+
+    
 }
