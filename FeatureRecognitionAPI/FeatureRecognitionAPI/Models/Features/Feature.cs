@@ -32,7 +32,7 @@ public class Feature
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
-    protected List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
+    internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
     internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
                                            // contain entities that make up the base shape and possibly corner features
     protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
