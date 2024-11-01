@@ -13,11 +13,12 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.IO;
 using System.Numerics;
+using FeatureRecognitionAPI.Models.Enums;
 
 public class Feature
 {
     [JsonProperty]
-    PossibleFeatureTypes featureType;
+    public PossibleFeatureTypes featureType { get; set; }
     [JsonProperty]
     public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty]
@@ -31,28 +32,19 @@ public class Feature
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
-    public List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
-    protected List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
+    protected List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
+    internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
                                            // contain entities that make up the base shape and possibly corner features
     protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
                                                       // touching entities that make up a single perimeter feature for
                                                       // the original feature
     //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
-    protected enum PossibleFeatureTypes
-    {
-        [JsonProperty]
-        Punch,
-        Group1A1,
-        Group1A2,
-        Group1B1,
-        Group1B2,
-        Group3,
-        Group1C,
-        Group6,
-        Group2A
-    }
-
+   
+    private int numLines = 0;
+    private int numArcs = 0;
+    private int numCircles = 0;
+    
     private Feature() { }//should not use default constructor
 
     public Feature(string featureType, bool kissCut, bool multipleRadius, bool border)
@@ -114,19 +106,17 @@ public class Feature
             }
         }
 
+
+        //calculate and set the perimeter of the feature
+        calcPerimeter();
+    }
+    
+    internal void DetectFeatures()
+    {
         //check two conditions possible to make Group1B (with no perimeter features)
-        if (numCircles == 1 || (numLines == 2 && numArcs == 2))
+        if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
         {
-            if (numCircles == 1 && numLines == 0 && numArcs == 0)
-            {
-                Circle c = entityList[0] as Circle;
-                if (c.radius <= 1.625)
-                {
-                    featureType = PossibleFeatureTypes.Punch;
-                }
-                else featureType = PossibleFeatureTypes.Group1B1;
-            }
-            else featureType = PossibleFeatureTypes.Group1B2;
+            featureType = type; 
         }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4)
@@ -142,8 +132,40 @@ public class Feature
             Console.WriteLine("Error: Cannot assign feature type.");
         }
     }
+    // Checks the feature to see if it is one of the Group 1B features
+    internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
+    {
+        // Entity is just a circle
+        if (numCircles == 1 && numLines == 0 && numArcs == 0) 
+        {
+            type = PossibleFeatureTypes.Group1B1;
+            return true; 
+        }
+        //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
+        //of the arcs and make sure they are 360
+        else if(numArcs == 2 && numLines == 2)
+        {
+            double totalDegrees = 0;
+            baseEntityList.ForEach(entity =>
+            {
+                if (entity is Arc)
+                {
+                    totalDegrees += (entity as Arc).centralAngle;
+                }
+            });
+            if (totalDegrees > 359.999 && totalDegrees < 360.0009) 
+            {
+                type = PossibleFeatureTypes.Group1B2;
+                return true; 
+            }
+        }
 
-    //calculates the perimeter or diameter of the feature
+        // set a dummy type and return false.
+        type = PossibleFeatureTypes.Punch;
+        return false;
+    }
+
+    //calculates the perimeter of the feature
     public void calcPerimeter()
     {
         if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
