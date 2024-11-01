@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import DragDropZone from './DragDropZone';
 import QuoteSubmission from './QuoteSubmission';
-import Spinner from 'react-bootstrap/Spinner';
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -88,8 +87,8 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
           )}
         </div>
         </>
-      ) : ( // Show success message after submission
-        <div className="success-message">
+      ) : ( // Show retrieved data
+        <div className="response-container">
           {jsonResponse && ( // Conditionally render the JSON response
             <QuoteSubmission jsonResponse={jsonResponse} />
           )}

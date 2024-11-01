@@ -22,8 +22,9 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
   };
 
   return (
-    <div className="json-response">
+    <div className="quote-container">
       <form onSubmit={handleSubmit} className="quote-form">
+      <div className="quote-form-fields">
         <label htmlFor="ruleType">Rule Type:</label>
         <select id="ruleType" name="ruleType">
           <option value="2ptCB937">2pt CB Center Bevel .937/.918</option>
@@ -44,7 +45,8 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
           <option value="StandardHandPlug">Standard Hand Plug</option>
           <option value="EjectorPlates">Ejector Plates</option>
         </select>
-
+      </div>
+        <div className="features-table">
         <table>
           <thead>
             <tr>
@@ -88,6 +90,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
             })}
           </tbody>
         </table>
+        </div>
       </form>
     </div>
   );

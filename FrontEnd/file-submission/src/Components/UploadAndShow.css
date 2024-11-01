@@ -4,6 +4,7 @@
   justify-content: center;
   position: relative;
   height: 100vh;
+  max-height: 100%;
 }
 
 .upload-container {
@@ -233,16 +234,28 @@
 
 .button-container {
   display: flex;
-  gap: 30px;
+  flex-direction: row;
   justify-content: center;
-  width: 100%;
+  gap: 4%;
+  margin-top: 7%;
 }
 
-.json-response {
-  margin-top: 50px;
-  height: 500px;
+.quote-container {
+
   overflow-y: auto;
-  margin-bottom: 50px;
+  position: relative;
+}
+
+.quote-form-fields {
+  margin-bottom: 5%;
+  display: flex;
+  flex-direction: row;
+  gap: 3%;
+}
+
+.features-table {
+  max-height: 55vh;
+  overflow-y: auto;
 }
 
 table {
