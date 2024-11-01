@@ -39,7 +39,7 @@ public class Feature
                                                       // the original feature
     //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
-    protected enum PossibleFeatureTypes
+    internal enum PossibleFeatureTypes
     {
         [JsonProperty]
         Punch,
@@ -305,6 +305,36 @@ public class Feature
                 return true;//extended a parallel lines into 1
             }
         }
+        return false;
+    }
+
+    internal bool checkGroup2A(int numLines, int numArcs, int numCircles, out PossibleFeatureTypes type)
+    {
+        if (numArcs >= 6 && numCircles == 0)
+        {
+            //  Possible ellipse
+            if (numLines == 0)
+            {
+
+            }
+            //  Possible bowtie
+            else if (numLines == 2)
+            {
+
+            }
+        }
+        type = PossibleFeatureTypes.Punch;
+        return false;
+    }
+
+    internal bool isEllipse()
+    {
+
+        return false;
+    }
+
+    internal bool isBowtie()
+    {
         return false;
     }
 }

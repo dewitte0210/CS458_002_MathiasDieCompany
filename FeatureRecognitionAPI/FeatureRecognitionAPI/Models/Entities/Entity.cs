@@ -22,6 +22,7 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity {
         protected PossibleEntityTypes entityType;
         double length;
+        
 
         protected void setLength(double length)
         {
