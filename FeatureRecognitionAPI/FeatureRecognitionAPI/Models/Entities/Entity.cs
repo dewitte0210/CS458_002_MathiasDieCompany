@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
         {
             double xDiff = Math.Abs(p1.X - p2.X); 
             double yDiff = Math.Abs(p1.Y - p2.Y);
-            if (xDiff < 0.0000009 && yDiff < 0.0000009)
+            if (xDiff < 0.0009 && yDiff < 0.0009)
             {
                 return true;
             }
