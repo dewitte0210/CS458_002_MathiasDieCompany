@@ -18,7 +18,7 @@ namespace FeatureRecognitionAPI.Models {
             this.centerX = centerX;
             this.centerY = centerY;
             this.radius = radius;
-            this.setLength(calcPerimeter(radius));
+            this.Length = (calcPerimeter(radius));
         }
 
         private  double calcPerimeter( double radius)

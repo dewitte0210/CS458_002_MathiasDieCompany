@@ -20,7 +20,7 @@ public class Feature
     [JsonProperty]
     public PossibleFeatureTypes featureType { get; set; }
     [JsonProperty]
-    List<Entity> entityList; //list of touching entities that make up the feature
+    public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty]
     bool kissCut;
     [JsonProperty]
@@ -32,7 +32,7 @@ public class Feature
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
-    protected List<Entity> extendedEntityList; // list of entities after extending them all
+    internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
     internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
                                            // contain entities that make up the base shape and possibly corner features
     protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
@@ -60,11 +60,29 @@ public class Feature
         calcPerimeter();
     }
 
+    public Feature (List<Entity> entityList, bool kissCut, bool multipleRadius)
+    {
+        EntityList = entityList;
+        this.kissCut = kissCut;
+        this.multipleRadius = multipleRadius;
+
+        calcPerimeter();
+    }
+
     public Feature(List<Entity> entityList)
     {
         this.count = 1;
-        this.entityList = entityList;
+        this.EntityList = entityList;
+        psuedoFeatureDetection(entityList);
+        //calculate and set the perimeter of the feature
+        calcPerimeter();
+    }
 
+    public void psuedoFeatureDetection(List<Entity> entityList)
+    {
+        int numLines = 0;
+        int numArcs = 0;
+        int numCircles = 0;
 
         //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)
@@ -152,14 +170,14 @@ public class Feature
     {
         if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
         {
-            perimeter = entityList[0].getLength() / Math.PI;
+            perimeter = EntityList[0].Length / Math.PI;
         }
 
         else
         {
-            for (int i = 0; i < entityList.Count; i++)
+            for (int i = 0; i < EntityList.Count; i++)
             {
-                perimeter += entityList[i].getLength();
+                perimeter += EntityList[i].Length;
             }
         }
     }
@@ -184,9 +202,9 @@ public class Feature
         {
                 //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
                 //TODO: create added check if they are arcs instead of circles
-                var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+                var serializedParent = JsonConvert.SerializeObject(EntityList[0]);
                 Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-                serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+                serializedParent = JsonConvert.SerializeObject(item.EntityList[0]);
                 Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
 
                 if (c1.radius == c2.radius)
@@ -205,30 +223,61 @@ public class Feature
         return false;
     }
 
+    /*
+     * Recursive function that calls extendAllEntitiesHelper
+     * @Param myEntityList parameter that extendedEntityList is set equal to
+    */
     public void extendAllEntities(List<Entity> myEntityList)
     {
-        for (int i = 0; i < myEntityList.Count; i++)
+        ExtendedEntityList = myEntityList;
+        extendAllEntitiesHelper();
+    }
+
+    /*
+     *  Recursive function that calls extendAllEntitiesHelper
+     *  sets extendedEntityList to entityList
+    */
+    public void extendAllEntities()
+    {
+        ExtendedEntityList = EntityList;
+        extendAllEntitiesHelper();
+    }
+
+    /*
+     * This is a recursive helper function to extend every line in extendedEntityList
+    */
+    private void extendAllEntitiesHelper()
+    {
+        bool extendedALine = false; // repeats recursivly if this is true
+        //this block extends every line in extendedEntityList
+        //foreach (var entity in extendedEntityList)
+        for (int i = 0; i < ExtendedEntityList.Count; i++)
         {
-            if (myEntityList[i] is Line)
+            if (ExtendedEntityList[i] is Line)
             {
-                for (int j = 0; j < myEntityList.Count; j++)
-                {
-                    if (myEntityList[j] is Line)
+                //foreach (var otherEntity in extendedEntityList)
+                for (int j = 0; j < ExtendedEntityList.Count; j++)
+                {   
+                    if (ExtendedEntityList[j] is Line && ExtendedEntityList[i] != ExtendedEntityList[j])
                     {
-                        if (!extendTwoLines((Line)myEntityList[i], (Line)myEntityList[j]))
+                        // for each entity it checks if it can extend with every other entity and does so
+                        // removes the two previous entities
+                        // new extended lines are added in the extendTwoLines method
+                        if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
-                            if (!extendedEntityList.Contains(myEntityList[i]))
-                            {
-                                extendedEntityList.Add(myEntityList[i]);
-                            }
-                            if (!extendedEntityList.Contains(myEntityList[j]))
-                            {
-                                extendedEntityList.Add(myEntityList[j]);
-                            }
+                            extendedALine = true;
                         }
                     }
                 }
             }
+        }
+        if (extendedALine)
+        {
+            extendAllEntitiesHelper();
+        }
+        else
+        {
+            return;
         }
     }
 
@@ -242,8 +291,9 @@ public class Feature
         if (!line1.DoesIntersect(line2))
         //makes sure youre not extending lines that already touch
         {
+            //Does not need to detect if lines are perpendicular since they might not be perfectly perpendicular
             //check if the lines are parallel or perpendicular
-            if (line1.isPerpendicular(line2))
+            /*if (line1.isPerpendicular(line2))
             {
                 Point intersectPoint = line1.getIntersectPoint(line1, line2);
                 Point PointToExtendLine1 = line1.findPointToExtend(line1, intersectPoint);
@@ -254,12 +304,12 @@ public class Feature
                     if (PointToExtendLine1.X == line1.StartX && PointToExtendLine1.Y == line1.StartY)
                     {
                         //make new line1 line with extended start point
-                        extendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.EndX, line1.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.EndX, line1.EndY, true));
                     }
                     else
                     {
                         //make new line1 line with extended end point
-                        extendedEntityList.Add(new Line(line1.StartX, line1.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line1.StartX, line1.StartY, intersectPoint.X, intersectPoint.Y, true));
                     }
 
 
@@ -267,60 +317,84 @@ public class Feature
                     if (PointToExtendLine2.X == line2.StartX && PointToExtendLine2.Y == line2.StartY)
                     {
                         //make new line2 line with extended start point
-                        extendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.EndX, line2.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.EndX, line2.EndY, true));
                     }
                     else
                     {
                         //make new line2 line with extended end point
-                        extendedEntityList.Add(new Line(line2.StartX, line2.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line2.StartX, line2.StartY, intersectPoint.X, intersectPoint.Y, true));
                     }
                     return true;
                 }
-            }
-            else if (line1.isParallel(line2))
+            }*/
+            if (line1.isParallel(line2))
             {
                 Point pointToExtend;
                 Line tempLine = new Line(true);//makes a new line object with extendedLine boolean to true
                 if (line1.findDistance(
-                    new Point(line1.StartX, line1.StartY),
-                    new Point(line2.StartX, line2.StartY))
+                    line1.StartPoint,
+                    line2.StartPoint)
                     < line1.findDistance(
-                    new Point(line1.EndX, line1.EndY),
-                    new Point(line2.StartX, line2.StartY)))
+                    line1.EndPoint,
+                    line2.StartPoint))
                 //This looks like a lot but all this is doing is finding the closest point on line1 to line2
                 {
                     //At this point we know the point to be extended on line1 is the start point, meaning the end point can stay the same
                     //  Hence why tempLine end point is set to line1's
-                    pointToExtend = new Point(line1.StartX, line1.StartY);
-                    tempLine.StartX = line1.EndX;
-                    tempLine.StartY = line1.EndY;
+                    pointToExtend = line1.StartPoint;
+                    tempLine.StartPoint.X = line1.EndPoint.X;
+                    tempLine.StartPoint.Y = line1.EndPoint.Y;
                 }
                 else
                 {
-                    pointToExtend = new Point(line1.EndX, line1.EndY);
-                    tempLine.StartX = line1.StartX;
-                    tempLine.StartY = line1.StartY;
+                    pointToExtend = line1.EndPoint;
+                    tempLine.StartPoint.X = line1.StartPoint.X;
+                    tempLine.StartPoint.Y = line1.StartPoint.Y;
                 }
                 if (line2.findDistance(
                     pointToExtend,
-                    new Point(line2.StartX, line2.StartY))
+                    line2.StartPoint)
                     > line2.findDistance(
                     pointToExtend,
-                    new Point(line2.EndX, line2.EndY)))
+                    line2.EndPoint))
                 //Similar to the one above but finds what point on line2 is farthest from line1's point to extend
                 {
-                    tempLine.EndX = line2.StartX;
-                    tempLine.EndY = line2.StartY;
+                    tempLine.EndPoint.X = line2.StartPoint.X;
+                    tempLine.EndPoint.Y = line2.StartPoint.Y;
                 }
                 else
                 {
-                    tempLine.EndX = line2.EndX;
-                    tempLine.EndY = line2.EndY;
+                    tempLine.EndPoint.X = line2.EndPoint.X;
+                    tempLine.EndPoint.Y = line2.EndPoint.Y;
                 }
-                extendedEntityList.Add(tempLine);
-                return true;//extended a parallel lines into 1
+                ExtendedEntityList.Remove(line1);
+                ExtendedEntityList.Remove(line2);
+                ExtendedEntityList.Add(tempLine);
+                return true;//extended two parallel lines into 1
             }
         }
         return false;
     }
+
+    public bool sortExtendedLines()
+    {
+        Stack<Entity> path = new Stack<Entity>();
+        sortExtendedLinesHelper(path, 0);
+        return false;
+    }
+    public bool sortExtendedLinesHelper(Stack<Entity> curPath, int index)
+    {
+        curPath.Push(ExtendedEntityList[index]);
+        List<Entity> connectedEntities = new List<Entity>();
+        foreach (Entity entity in ExtendedEntityList)
+        {
+            if (ExtendedEntityList[index] != entity)
+            {
+              
+            }
+        }
+        return false;
+    }
+
+    
 }

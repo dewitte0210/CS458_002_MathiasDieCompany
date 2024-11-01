@@ -21,10 +21,10 @@ namespace Testing_for_Project
         public void TestLineClass()
         {
             Line line1 = new Line(1.9724753611322341, 0.4071346127707478, 2.6124753611322347, 0.4071346127707472);
-            Assert.That(line1.StartX, Is.EqualTo(1.9724753611322341));
-            Assert.That(line1.StartY, Is.EqualTo(0.4071346127707478));
-            Assert.That(line1.EndX, Is.EqualTo(2.6124753611322347));
-            Assert.That(line1.EndY, Is.EqualTo(0.4071346127707472));
+            Assert.That(line1.StartPoint.X, Is.EqualTo(1.9724753611322341));
+            Assert.That(line1.StartPoint.Y, Is.EqualTo(0.4071346127707478));
+            Assert.That(line1.EndPoint.X, Is.EqualTo(2.6124753611322347));
+            Assert.That(line1.EndPoint.Y, Is.EqualTo(0.4071346127707472));
         }
         [Test]
         public void TestArcClass()
@@ -80,10 +80,10 @@ namespace Testing_for_Project
             Assert.That(testList[1].GetEntityType(), Is.EqualTo("line"));
             Line test2 = (Line)testList[1];
 
-            Assert.That(test2.StartX, Is.EqualTo(11.2650987394999991));
-            Assert.That(test2.StartY, Is.EqualTo(0.0049998983000000));
-            Assert.That(test2.EndX, Is.EqualTo(6.0146749507999999));
-            Assert.That(test2.EndY, Is.EqualTo(0.0049998983000000));
+            Assert.That(test2.StartPoint.X, Is.EqualTo(11.2650987394999991));
+            Assert.That(test2.StartPoint.Y, Is.EqualTo(0.0049998983000000));
+            Assert.That(test2.EndPoint.X, Is.EqualTo(6.0146749507999999));
+            Assert.That(test2.EndPoint.Y, Is.EqualTo(0.0049998983000000));
 
             Assert.That(testList[2].GetEntityType(), Is.EqualTo("arc"));
             Arc test3 = (Arc)testList[2];
@@ -113,10 +113,10 @@ namespace Testing_for_Project
             Assert.That(testList[5].GetEntityType(), Is.EqualTo("line"));
             Line test6 = (Line)testList[5];
 
-            Assert.That(test6.StartX, Is.EqualTo(6.0004237886999992));
-            Assert.That(test6.StartY, Is.EqualTo(4.9500000000000011));
-            Assert.That(test6.EndX, Is.EqualTo(0.7500000000000000));
-            Assert.That(test6.EndY, Is.EqualTo(4.9500000000000011));
+            Assert.That(test6.StartPoint.X, Is.EqualTo(6.0004237886999992));
+            Assert.That(test6.StartPoint.Y, Is.EqualTo(4.9500000000000011));
+            Assert.That(test6.EndPoint.X, Is.EqualTo(0.7500000000000000));
+            Assert.That(test6.EndPoint.Y, Is.EqualTo(4.9500000000000011));
 
             Assert.That(testList[6].GetEntityType(), Is.EqualTo("arc"));
             Arc test7 = (Arc)testList[6];
@@ -137,10 +137,10 @@ namespace Testing_for_Project
             Assert.That(testList[8].GetEntityType(), Is.EqualTo("line"));
             Line test9 = (Line)testList[8];
 
-            Assert.That(test9.StartX, Is.EqualTo(5.3651558979999994));
-            Assert.That(test9.StartY, Is.EqualTo(1.1299998982999999));
-            Assert.That(test9.EndX, Is.EqualTo(7.0403281640286135));
-            Assert.That(test9.EndY, Is.EqualTo(4.0313704835897957));
+            Assert.That(test9.StartPoint.X, Is.EqualTo(5.3651558979999994));
+            Assert.That(test9.StartPoint.Y, Is.EqualTo(1.1299998982999999));
+            Assert.That(test9.EndPoint.X, Is.EqualTo(7.0403281640286135));
+            Assert.That(test9.EndPoint.Y, Is.EqualTo(4.0313704835897957));
 
             Assert.That(testList[9].GetEntityType(), Is.EqualTo("arc"));
             Arc test10 = (Arc)testList[9];
@@ -154,18 +154,18 @@ namespace Testing_for_Project
             Assert.That(testList[10].GetEntityType(), Is.EqualTo("line"));
             Line test11 = (Line)testList[10];
 
-            Assert.That(test11.StartX, Is.EqualTo(10.2394455263713855));
-            Assert.That(test11.StartY, Is.EqualTo(4.0313704835897939));
-            Assert.That(test11.EndX, Is.EqualTo(11.9146177922999996));
-            Assert.That(test11.EndY, Is.EqualTo(1.1299998982999999));
+            Assert.That(test11.StartPoint.X, Is.EqualTo(10.2394455263713855));
+            Assert.That(test11.StartPoint.Y, Is.EqualTo(4.0313704835897939));
+            Assert.That(test11.EndPoint.X, Is.EqualTo(11.9146177922999996));
+            Assert.That(test11.EndPoint.Y, Is.EqualTo(1.1299998982999999));
 
             Assert.That(testList[11].GetEntityType, Is.EqualTo("line"));
             Line test12 = (Line)testList[11];
 
-            Assert.That(test12.StartX, Is.EqualTo(6.6499365233942473));
-            Assert.That(test12.StartY, Is.EqualTo(3.8249890568663383));
-            Assert.That(test12.EndX, Is.EqualTo(4.9747705754328919));
-            Assert.That(test12.EndY, Is.EqualTo(0.9236294146435339));
+            Assert.That(test12.StartPoint.X, Is.EqualTo(6.6499365233942473));
+            Assert.That(test12.StartPoint.Y, Is.EqualTo(3.8249890568663383));
+            Assert.That(test12.EndPoint.X, Is.EqualTo(4.9747705754328919));
+            Assert.That(test12.EndPoint.Y, Is.EqualTo(0.9236294146435339));
 
             Assert.That(testList[12].GetEntityType(), Is.EqualTo("arc"));
             Arc test13 = (Arc)testList[12];
@@ -179,10 +179,10 @@ namespace Testing_for_Project
             Assert.That(testList[13].GetEntityType(), Is.EqualTo("line"));
             Line test14 = (Line)testList[13];
 
-            Assert.That(test14.StartX, Is.EqualTo(1.7756532131671074));
-            Assert.That(test14.StartY, Is.EqualTo(0.9236294146435343));
-            Assert.That(test14.EndX, Is.EqualTo(0.1004872653057516));
-            Assert.That(test14.EndY, Is.EqualTo(3.8249890568663383));
+            Assert.That(test14.StartPoint.X, Is.EqualTo(1.7756532131671074));
+            Assert.That(test14.StartPoint.Y, Is.EqualTo(0.9236294146435343));
+            Assert.That(test14.EndPoint.X, Is.EqualTo(0.1004872653057516));
+            Assert.That(test14.EndPoint.Y, Is.EqualTo(3.8249890568663383));
 
         }
 
@@ -207,10 +207,10 @@ namespace Testing_for_Project
             Assert.That(testList[0].GetEntityType(), Is.EqualTo("line"));
             Line test1 = (Line)testList[0];
 
-            Assert.That(test1.StartX, Is.EqualTo(1.9724753611322341));
-            Assert.That(test1.StartY, Is.EqualTo(0.4071346127707478));
-            Assert.That(test1.EndX, Is.EqualTo(2.6124753611322347));
-            Assert.That(test1.EndY, Is.EqualTo(0.4071346127707472));
+            Assert.That(test1.StartPoint.X, Is.EqualTo(1.9724753611322341));
+            Assert.That(test1.StartPoint.Y, Is.EqualTo(0.4071346127707478));
+            Assert.That(test1.EndPoint.X, Is.EqualTo(2.6124753611322347));
+            Assert.That(test1.EndPoint.Y, Is.EqualTo(0.4071346127707472));
 
             Assert.That(testList[1].GetEntityType(), Is.EqualTo("arc"));
             Arc test2 = (Arc)testList[1];
@@ -224,10 +224,10 @@ namespace Testing_for_Project
             Assert.That(testList[2].GetEntityType(), Is.EqualTo("line"));
             Line test3 = (Line)testList[2];
 
-            Assert.That(test3.StartX, Is.EqualTo(2.6424753611322358));
-            Assert.That(test3.StartY, Is.EqualTo(0.4371346127707473));
-            Assert.That(test3.EndX, Is.EqualTo(2.6424753611322340));
-            Assert.That(test3.EndY, Is.EqualTo(0.9771346127707479));
+            Assert.That(test3.StartPoint.X, Is.EqualTo(2.6424753611322358));
+            Assert.That(test3.StartPoint.Y, Is.EqualTo(0.4371346127707473));
+            Assert.That(test3.EndPoint.X, Is.EqualTo(2.6424753611322340));
+            Assert.That(test3.EndPoint.Y, Is.EqualTo(0.9771346127707479));
 
             Assert.That(testList[3].GetEntityType(), Is.EqualTo("arc"));
             Arc test4 = (Arc)testList[3];
@@ -241,10 +241,10 @@ namespace Testing_for_Project
             Assert.That(testList[4].GetEntityType(), Is.EqualTo("line"));
             Line test5 = (Line)testList[4];
 
-            Assert.That(test5.StartX, Is.EqualTo(2.6124753611322347));
-            Assert.That(test5.StartY, Is.EqualTo(1.0071346127707477));
-            Assert.That(test5.EndX, Is.EqualTo(1.9724753611322341));
-            Assert.That(test5.EndY, Is.EqualTo(1.0071346127707477));
+            Assert.That(test5.StartPoint.X, Is.EqualTo(2.6124753611322347));
+            Assert.That(test5.StartPoint.Y, Is.EqualTo(1.0071346127707477));
+            Assert.That(test5.EndPoint.X, Is.EqualTo(1.9724753611322341));
+            Assert.That(test5.EndPoint.Y, Is.EqualTo(1.0071346127707477));
             
 
             Assert.That(testList[5].GetEntityType(), Is.EqualTo("arc"));
@@ -259,10 +259,10 @@ namespace Testing_for_Project
             Assert.That(testList[6].GetEntityType(), Is.EqualTo("line"));
             Line test7 = (Line)testList[6];
 
-            Assert.That(test7.StartX, Is.EqualTo(1.9424753611322347));
-            Assert.That(test7.StartY, Is.EqualTo(0.9771346127707479));
-            Assert.That(test7.EndX, Is.EqualTo(1.9424753611322347));
-            Assert.That(test7.EndY, Is.EqualTo(0.4371346127707478));
+            Assert.That(test7.StartPoint.X, Is.EqualTo(1.9424753611322347));
+            Assert.That(test7.StartPoint.Y, Is.EqualTo(0.9771346127707479));
+            Assert.That(test7.EndPoint.X, Is.EqualTo(1.9424753611322347));
+            Assert.That(test7.EndPoint.Y, Is.EqualTo(0.4371346127707478));
 
             Assert.That(testList[7].GetEntityType(), Is.EqualTo("arc"));
             Arc test8 = (Arc)testList[7];
@@ -283,18 +283,18 @@ namespace Testing_for_Project
             Assert.That(testList[9].GetEntityType(), Is.EqualTo("line"));
             Line test10 = (Line)testList[9];
 
-            Assert.That(test10.StartX, Is.EqualTo(1.5688878087292752));
-            Assert.That(test10.StartY, Is.EqualTo(0.6554637349171067));
-            Assert.That(test10.EndX, Is.EqualTo(1.5688878087292759));
-            Assert.That(test10.EndY, Is.EqualTo(0.7854637349171074));
+            Assert.That(test10.StartPoint.X, Is.EqualTo(1.5688878087292752));
+            Assert.That(test10.StartPoint.Y, Is.EqualTo(0.6554637349171067));
+            Assert.That(test10.EndPoint.X, Is.EqualTo(1.5688878087292759));
+            Assert.That(test10.EndPoint.Y, Is.EqualTo(0.7854637349171074));
 
             Assert.That(testList[10].GetEntityType(), Is.EqualTo("line"));
             Line test11 = (Line)testList[10];
 
-            Assert.That(test11.StartX, Is.EqualTo(1.3488878087292762));
-            Assert.That(test11.StartY, Is.EqualTo(0.7854637349171074));
-            Assert.That(test11.EndX, Is.EqualTo(1.3488878087292764));
-            Assert.That(test11.EndY, Is.EqualTo(0.6554637349171064));
+            Assert.That(test11.StartPoint.X, Is.EqualTo(1.3488878087292762));
+            Assert.That(test11.StartPoint.Y, Is.EqualTo(0.7854637349171074));
+            Assert.That(test11.EndPoint.X, Is.EqualTo(1.3488878087292764));
+            Assert.That(test11.EndPoint.Y, Is.EqualTo(0.6554637349171064));
 
             Assert.That(testList[11].GetEntityType, Is.EqualTo("circle"));
             Circle test12 = (Circle)testList[11];
