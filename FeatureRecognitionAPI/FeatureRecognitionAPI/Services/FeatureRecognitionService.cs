@@ -12,7 +12,7 @@ namespace FeatureRecognitionAPI.Services
     {
         public FeatureRecognitionService() { }
 
-        public async Task<(OperationStatus, string)> GetFileExtension(string fileName)
+        public async Task<(OperationStatus, string?)> GetFileExtension(string fileName)
         {
             if (fileName != null)
             {
@@ -50,7 +50,7 @@ namespace FeatureRecognitionAPI.Services
             return (OperationStatus.OK, null);
         }
 
-        public async Task<(OperationStatus, string)> UploadFile(IFormFile file)
+        public async Task<(OperationStatus, string?)> UploadFile(IFormFile file)
         {
             try
             {
