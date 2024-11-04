@@ -66,7 +66,7 @@ public class Feature
 
     public Feature (List<Entity> EntityList, bool kissCut, bool multipleRadius)
     {
-        EntityList = EntityList;
+        this.EntityList = EntityList;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
 
