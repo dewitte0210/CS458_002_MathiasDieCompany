@@ -400,7 +400,7 @@ public class Feature
 
 
 
-    public double FindMaxPoint()
+    public Point FindMaxPoint()
     {
         double maxX = 0;
         //Find the starting max 
@@ -462,14 +462,9 @@ public class Feature
             }
             
         }
-        return maxX;
-    }
 
-
-    public double FindMaxY()
-    {
         double maxY = 0;
-        //Find the starting max 
+        //Find the starting max Y
         if (EntityList[0] is Line)
         {
             if (((Line)EntityList[0]).StartPoint.Y > ((Line)EntityList[0]).EndPoint.Y)
@@ -528,10 +523,10 @@ public class Feature
             }
 
         }
-        return maxY;
+        return new Point( maxX, maxY );
     }
 
-    public double FindMinX()
+    public Point FindMinPoint()
     {
         double minX = 0;
         //Find the starting min 
@@ -593,11 +588,7 @@ public class Feature
             }
 
         }
-        return minX;
-    }
 
-    public double FindMinY()
-    {
         double minY = 0;
         //Find the starting minumum 
         if (EntityList[0] is Line)
@@ -658,9 +649,9 @@ public class Feature
             }
 
         }
-        return minY;
-    }
+        return new Point(minX, minY);
 
+    }
 
 } 
 

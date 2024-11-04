@@ -44,5 +44,27 @@ namespace Testing_for_Project
             testFeature.DetectFeatures();
             Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Punch));
         }
+
+        [Test]
+
+        public void VerifyMaxPoint()
+        {
+            Line line1 = new(10.6, 12.0, 10.0, 5.0);
+            Line line2 = new(0.0, -5.0, 13.8, -5.0);
+            Line line3 = new(0.0, -5.0, 10.0, -6.0);
+            Line line4 = new(-10.0, -5.0, 4, -5.0);
+            List<Entity> entities = new List<Entity> { line1, line2, line3, line4 };
+            Feature testFeature = new Feature(entities);
+
+            Point maxPoint = testFeature.FindMaxPoint();
+            Point minPoint = testFeature.FindMinPoint();
+
+            Assert.That(maxPoint.X, Is.EqualTo(13.8));
+            Assert.That(maxPoint.Y, Is.EqualTo(12));
+
+            Assert.That(minPoint.X, Is.EqualTo(-10));
+            Assert.That(minPoint.Y, Is.EqualTo(-6));
+
+        }
     }
 }
