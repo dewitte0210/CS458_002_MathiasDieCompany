@@ -80,9 +80,9 @@ public class Feature
 
     public void psuedoFeatureDetection(List<Entity> entityList)
     {
-        int numLines = 0;
-        int numArcs = 0;
-        int numCircles = 0;
+        numLines = 0;
+        numArcs = 0;
+        numCircles = 0;
 
         //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)

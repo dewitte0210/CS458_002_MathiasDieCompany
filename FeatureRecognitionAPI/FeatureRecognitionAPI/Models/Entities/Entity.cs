@@ -73,8 +73,8 @@ namespace FeatureRecognitionAPI.Models
         internal bool IntersectLineWithArc(Line line, Arc arc)
         {
             //Check if the enpoints are touching first to avoid the intersect calculations
-            Point aStart = new(arc.startX, arc.startY);
-            Point aEnd = new(arc.endX, arc.endY);
+            Point aStart = new(arc.Start.X, arc.Start.Y);
+            Point aEnd = new(arc.End.X, arc.End.Y);
             bool touching = PointsAreTouching(line.StartPoint, aStart) || PointsAreTouching(line.StartPoint, aEnd) || PointsAreTouching(line.EndPoint, aStart) || PointsAreTouching(line.EndPoint, aEnd);
             if (touching) { return true; }
 
@@ -119,7 +119,7 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Checks if the line passes through or touches the circle the arc represents
-             double numerator = Math.Abs(a * arc.centerX + b * arc.centerY + c);
+             double numerator = Math.Abs(a * arc.Center.X + b * arc.Center.Y + c);
              double distance = numerator / Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
             if (arc.radius >= distance)
             {
@@ -129,7 +129,7 @@ namespace FeatureRecognitionAPI.Models
                 //  Special case for vertical line
                 if (line.EndPoint.X == line.StartPoint.X)
                 {
-                    decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.centerY), (decimal)(Math.Pow(arc.centerY, 2) + Math.Pow((line.EndPoint.X - arc.centerX), 2) - Math.Pow(arc.radius, 2)));
+                    decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.Center.Y), (decimal)(Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) - Math.Pow(arc.radius, 2)));
 
                     foreach(decimal number in tempSolns)
                     {
@@ -142,12 +142,12 @@ namespace FeatureRecognitionAPI.Models
                          double y = solns[i];
                         //  Solution x value
                          double x = line.EndPoint.X;
-                        if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
+                        if (IsInArcRange(arc.Center.X, arc.Center.Y, x, y, arc.startAngle, arc.endAngle)) { return true; }
                     }
                 }
                 else
                 {
-                    decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1), (decimal)(-2.0 * arc.centerX) + (decimal)(2 * (intercept * slope)) - (decimal)(2 * (arc.centerY * slope)), (decimal)Math.Pow(arc.centerX, 2) + (decimal)Math.Pow(intercept, 2) - (decimal)(2 * (intercept * arc.centerY)) + (decimal)Math.Pow(arc.centerY, 2) - (decimal)Math.Pow(arc.radius, 2));
+                    decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1), (decimal)(-2.0 * arc.Center.X) + (decimal)(2 * (intercept * slope)) - (decimal)(2 * (arc.Center.Y * slope)), (decimal)Math.Pow(arc.Center.X, 2) + (decimal)Math.Pow(intercept, 2) - (decimal)(2 * (intercept * arc.Center.Y)) + (decimal)Math.Pow(arc.Center.Y, 2) - (decimal)Math.Pow(arc.radius, 2));
                     foreach(decimal number in tempSolns)
                     {
                         solns.Add((double)number);
@@ -160,7 +160,7 @@ namespace FeatureRecognitionAPI.Models
                          double x = solns[i];
                         //  Solution y value
                          double y = slope * solns[i] + intercept;
-                        if (IsInArcRange(arc.centerX, arc.centerY, x, y, arc.startAngle, arc.endAngle)) { return true; }
+                        if (IsInArcRange(arc.Center.X, arc.Center.Y, x, y, arc.startAngle, arc.endAngle)) { return true; }
                     }
                 }
             }
@@ -321,15 +321,15 @@ namespace FeatureRecognitionAPI.Models
         {
             
             // If the endpoints are touching we can avoid the intersect math 
-            Point a1Start = new(arc1.startX, arc1.startY);
-            Point a1End = new(arc1.endX, arc1.endY);
-            Point a2Start = new(arc2.startX, arc2.startY);
-            Point a2End = new(arc2.endX, arc2.endY);
+            Point a1Start = new(arc1.Start.X, arc1.Start.Y);
+            Point a1End = new(arc1.End.X, arc1.End.Y);
+            Point a2Start = new(arc2.Start.X, arc2.Start.Y);
+            Point a2End = new(arc2.End.X, arc2.End.Y);
             bool touching = PointsAreTouching(a1Start, a2Start) || PointsAreTouching(a1Start, a2End) || PointsAreTouching(a1End, a2Start) || PointsAreTouching(a1End, a2End);
             if (touching) { return true; }
             
             // Treat both Arcs circles, get the line between their centers
-            Line between = new Line(arc1.centerX, arc1.centerY, arc2.centerX, arc2.centerY);
+            Line between = new Line(arc1.Center.X, arc1.Center.Y, arc2.Center.X, arc2.Center.Y);
              
             // First case, the circles do not intersect as they are too far appart
             // Second case, one circle is entirely inside the other but not intersecting.
@@ -345,19 +345,19 @@ namespace FeatureRecognitionAPI.Models
              double h = Math.Sqrt(Math.Pow(arc1.radius, 2) - Math.Pow(a,2));
             
             // Find P2.
-             double cx2 = arc1.centerX + a * (arc2.centerX - arc1.centerX) / between.Length;
-             double cy2 = arc1.centerY + a * (arc2.centerY - arc1.centerY) / between.Length;
+             double cx2 = arc1.Center.X + a * (arc2.Center.X - arc1.Center.X) / between.Length;
+             double cy2 = arc1.Center.Y + a * (arc2.Center.Y - arc1.Center.Y) / between.Length;
 
             // Get the points P3.
-             double intersect1X = (cx2 + h * (arc2.centerY - arc1.centerY) / between.Length);
-             double intersect1Y = (cy2 - h * (arc2.centerX - arc1.centerX) / between.Length);
-             double intersect2X = (cx2 - h * (arc2.centerY - arc1.centerY) / between.Length);
-             double intersect2Y = (cy2 + h * (arc2.centerX - arc1.centerX) / between.Length);
+             double intersect1X = (cx2 + h * (arc2.Center.Y - arc1.Center.Y) / between.Length);
+             double intersect1Y = (cy2 - h * (arc2.Center.X - arc1.Center.X) / between.Length);
+             double intersect2X = (cx2 - h * (arc2.Center.Y - arc1.Center.Y) / between.Length);
+             double intersect2Y = (cy2 + h * (arc2.Center.X - arc1.Center.X) / between.Length);
 
-            bool intersect1IsValid = IsInArcRange(arc1.centerX, arc1.centerY, intersect1X, intersect1Y, arc1.startAngle, arc1.endAngle) &&
-                   IsInArcRange(arc2.centerX, arc2.centerY, intersect1X, intersect1Y, arc2.startAngle, arc2.endAngle);
-            bool intersect2IsValid = IsInArcRange(arc1.centerX, arc1.centerY, intersect2X, intersect2Y, arc1.startAngle, arc1.endAngle) &&
-                   IsInArcRange(arc2.centerX, arc2.centerY, intersect2X, intersect2Y, arc2.startAngle, arc2.endAngle);
+            bool intersect1IsValid = IsInArcRange(arc1.Center.X, arc1.Center.Y, intersect1X, intersect1Y, arc1.startAngle, arc1.endAngle) &&
+                   IsInArcRange(arc2.Center.X, arc2.Center.Y, intersect1X, intersect1Y, arc2.startAngle, arc2.endAngle);
+            bool intersect2IsValid = IsInArcRange(arc1.Center.X, arc1.Center.Y, intersect2X, intersect2Y, arc1.startAngle, arc1.endAngle) &&
+                   IsInArcRange(arc2.Center.X, arc2.Center.Y, intersect2X, intersect2Y, arc2.startAngle, arc2.endAngle);
             
             return intersect1IsValid || intersect2IsValid; 
 ;
