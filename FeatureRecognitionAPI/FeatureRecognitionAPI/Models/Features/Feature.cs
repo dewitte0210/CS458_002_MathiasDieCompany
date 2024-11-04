@@ -303,28 +303,28 @@ public class Feature
                 if (PointToExtendLine1 != null && PointToExtendLine2 != null)
                 {
                     // Logic for extending line1: determines what point to extend for line1
-                    if (PointToExtendLine1.X == line1.StartX && PointToExtendLine1.Y == line1.StartY)
+                    if (PointToExtendLine1.X == line1.Start.X && PointToExtendLine1.Y == line1.Start.Y)
                     {
                         //make new line1 line with extended start point
-                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.EndX, line1.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.End.X, line1.End.Y, true));
                     }
                     else
                     {
                         //make new line1 line with extended end point
-                        ExtendedEntityList.Add(new Line(line1.StartX, line1.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line1.Start.X, line1.Start.Y, intersectPoint.X, intersectPoint.Y, true));
                     }
 
 
                     // Logic for extending line2: determines what point to extend for line2
-                    if (PointToExtendLine2.X == line2.StartX && PointToExtendLine2.Y == line2.StartY)
+                    if (PointToExtendLine2.X == line2.Start.X && PointToExtendLine2.Y == line2.Start.Y)
                     {
                         //make new line2 line with extended start point
-                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.EndX, line2.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.End.X, line2.End.Y, true));
                     }
                     else
                     {
                         //make new line2 line with extended end point
-                        ExtendedEntityList.Add(new Line(line2.StartX, line2.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line2.Start.X, line2.Start.Y, intersectPoint.X, intersectPoint.Y, true));
                     }
                     return true;
                 }
@@ -417,18 +417,18 @@ public class Feature
         }
         else if (EntityList[0] is Arc)
         {
-            if (((Arc)EntityList[0]).startX > ((Arc)EntityList[0]).endX)
+            if (((Arc)EntityList[0]).Start.X > ((Arc)EntityList[0]).End.X)
             {
-                maxX = ((Arc)EntityList[0]).startX;
+                maxX = ((Arc)EntityList[0]).Start.X;
             }
             else
             {
-                maxX = ((Arc)EntityList[0]).endX;
+                maxX = ((Arc)EntityList[0]).End.X;
             }
         }
         else if (EntityList[0] is Circle)
         {
-            maxX = ( ((Circle)EntityList[0]).centerX + ((Circle)EntityList[0]).radius );
+            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius );
         }
 
         //Loop through list and see if there is a bigger X
@@ -447,18 +447,18 @@ public class Feature
             }
             else if (EntityList[i] is Arc)
             {
-                if (((Arc)EntityList[i]).startX > maxX)
+                if (((Arc)EntityList[i]).Start.X > maxX)
                 {
-                    maxX = ((Arc)EntityList[i]).startX;
+                    maxX = ((Arc)EntityList[i]).Start.X;
                 }
-                if (((Arc)EntityList[i]).endX > maxX)
+                if (((Arc)EntityList[i]).End.X > maxX)
                 {
-                    maxX = ((Arc)EntityList[i]).endX;
+                    maxX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).centerX + ((Circle)EntityList[0]).radius) > maxX ) 
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius) > maxX ) 
             {
-                    maxX = (((Circle)EntityList[0]).centerX + ((Circle)EntityList[0]).radius);
+                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius);
             }
             
         }
@@ -478,18 +478,18 @@ public class Feature
         }
         else if (EntityList[0] is Arc)
         {
-            if (((Arc)EntityList[0]).startY > ((Arc)EntityList[0]).endY)
+            if (((Arc)EntityList[0]).Start.Y > ((Arc)EntityList[0]).End.Y)
             {
-                maxY = ((Arc)EntityList[0]).startY;
+                maxY = ((Arc)EntityList[0]).Start.Y;
             }
             else
             {
-                maxY = ((Arc)EntityList[0]).endY;
+                maxY = ((Arc)EntityList[0]).End.Y;
             }
         }
         else if (EntityList[0] is Circle)
         {
-            maxY = (((Circle)EntityList[0]).centerY + ((Circle)EntityList[0]).radius);
+            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
         }
 
         //Loop through list and see if there is a bigger Y 
@@ -508,18 +508,18 @@ public class Feature
             }
             else if (EntityList[i] is Arc)
             {
-                if (((Arc)EntityList[i]).startY > maxY)
+                if (((Arc)EntityList[i]).Start.Y > maxY)
                 {
-                    maxY = ((Arc)EntityList[i]).startY;
+                    maxY = ((Arc)EntityList[i]).Start.Y;
                 }
-                if (((Arc)EntityList[i]).endY > maxY)
+                if (((Arc)EntityList[i]).End.Y > maxY)
                 {
-                    maxY = ((Arc)EntityList[i]).endY;
+                    maxY = ((Arc)EntityList[i]).End.Y;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).centerY + ((Circle)EntityList[0]).radius) > maxY)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius) > maxY)
             {
-                maxY = (((Circle)EntityList[0]).centerY + ((Circle)EntityList[0]).radius);
+                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
             }
 
         }
@@ -543,18 +543,18 @@ public class Feature
         }
         else if (EntityList[0] is Arc)
         {
-            if (((Arc)EntityList[0]).startX < ((Arc)EntityList[0]).endX)
+            if (((Arc)EntityList[0]).Start.X < ((Arc)EntityList[0]).End.X)
             {
-                minX = ((Arc)EntityList[0]).startX;
+                minX = ((Arc)EntityList[0]).Start.X;
             }
             else
             {
-                minX = ((Arc)EntityList[0]).endX;
+                minX = ((Arc)EntityList[0]).End.X;
             }
         }
         else if (EntityList[0] is Circle)
         {
-            minX = (((Circle)EntityList[0]).centerX - ((Circle)EntityList[0]).radius);
+            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
         }
 
         //Loop through list and see if there is a smaller Y
@@ -573,18 +573,18 @@ public class Feature
             }
             else if (EntityList[i] is Arc)
             {
-                if (((Arc)EntityList[i]).startX < minX)
+                if (((Arc)EntityList[i]).Start.X < minX)
                 {
-                    minX = ((Arc)EntityList[i]).startX;
+                    minX = ((Arc)EntityList[i]).Start.X;
                 }
-                if (((Arc)EntityList[i]).endX < minX)
+                if (((Arc)EntityList[i]).End.X < minX)
                 {
-                    minX = ((Arc)EntityList[i]).endX;
+                    minX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).centerX - ((Circle)EntityList[0]).radius) > minX)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius) > minX)
             {
-                minX = (((Circle)EntityList[0]).centerX - ((Circle)EntityList[0]).radius);
+                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
             }
 
         }
@@ -604,18 +604,18 @@ public class Feature
         }
         else if (EntityList[0] is Arc)
         {
-            if (((Arc)EntityList[0]).startY < ((Arc)EntityList[0]).endY)
+            if (((Arc)EntityList[0]).Start.Y < ((Arc)EntityList[0]).End.Y)
             {
-                minY = ((Arc)EntityList[0]).startY;
+                minY = ((Arc)EntityList[0]).Start.Y;
             }
             else
             {
-                minY = ((Arc)EntityList[0]).endY;
+                minY = ((Arc)EntityList[0]).End.Y;
             }
         }
         else if (EntityList[0] is Circle)
         {
-            minY = (((Circle)EntityList[0]).centerY - ((Circle)EntityList[0]).radius);
+            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
         }
 
         //Loop through list and see if there is a smaller Y
@@ -634,18 +634,18 @@ public class Feature
             }
             else if (EntityList[i] is Arc)
             {
-                if (((Arc)EntityList[i]).startY < minY)
+                if (((Arc)EntityList[i]).Start.Y < minY)
                 {
-                    minY = ((Arc)EntityList[i]).startY;
+                    minY = ((Arc)EntityList[i]).Start.Y;
                 }
-                if (((Arc)EntityList[i]).endY < minY)
+                if (((Arc)EntityList[i]).End.Y < minY)
                 {
-                    minY = ((Arc)EntityList[i]).endY;
+                    minY = ((Arc)EntityList[i]).End.Y;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).centerY - ((Circle)EntityList[0]).radius) > minY)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius) > minY)
             {
-                minY = (((Circle)EntityList[0]).centerY - ((Circle)EntityList[0]).radius);
+                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
             }
 
         }
