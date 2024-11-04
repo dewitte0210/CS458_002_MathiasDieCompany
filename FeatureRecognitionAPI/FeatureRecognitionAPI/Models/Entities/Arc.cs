@@ -47,7 +47,7 @@ namespace FeatureRecognitionAPI.Models
             this.endX = calcXCoord(centerX, radius, endAngle);
             this.endY = calcYCoord(centerY, radius, endAngle);
             this.centralAngle = calcCentralAngle(startAngle, endAngle);
-            this.setLength(calcLength(radius, centralAngle));
+            this.Length = (calcLength(radius, centralAngle));
         }
 
         /**
