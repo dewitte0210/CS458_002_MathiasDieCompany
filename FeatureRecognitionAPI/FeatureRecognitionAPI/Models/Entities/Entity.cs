@@ -70,6 +70,100 @@ namespace FeatureRecognitionAPI.Models
             }
             return false; 
         }
+        internal bool EntityPointsAreTouching(Entity e2)
+        {
+            if (this is Circle || e2 is Circle)
+            {
+                return false;
+            }
+            if (this is Line)
+            {
+                if (this is Line)
+                {
+                    if (PointsAreTouching(((Line)this).StartPoint, ((Line)e2).StartPoint))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Line)this).StartPoint, ((Line)e2).EndPoint))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Line)this).EndPoint, ((Line)e2).StartPoint))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Line)this).EndPoint, ((Line)e2).EndPoint))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (e2 is Arc)
+                {
+                    if (PointsAreTouching(((Line)this).StartPoint, ((Arc)e2).Start))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Line)this).StartPoint, ((Arc)e2).End))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Line)this).EndPoint, ((Arc)e2).Start))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Line)this).EndPoint, ((Arc)e2).End))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            else if (e1 is Arc)
+            {
+                if (e2 is Line)
+                {
+                    if (PointsAreTouching(((Arc)this).Start, ((Line)e2).StartPoint))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Arc)this).Start, ((Line)e2).EndPoint))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Arc)this).End, ((Line)e2).StartPoint))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Arc)this).End, ((Line)e2).EndPoint))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (e2 is Arc)
+                {
+                    if (PointsAreTouching(((Arc)this).Start, ((Arc)e2).Start))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Arc)this).Start, ((Arc)e2).End))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Arc)this).End, ((Arc)e2).Start))
+                    {
+                        return true;
+                    }
+                    if (PointsAreTouching(((Arc)this).End, ((Arc)e2).End))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            return false;
+        }
         internal bool IntersectLineWithArc(Line line, Arc arc)
         {
             //Check if the enpoints are touching first to avoid the intersect calculations

@@ -378,23 +378,54 @@ public class Feature
 
     public bool sortExtendedLines()
     {
-        Stack<Entity> path = new Stack<Entity>();
-        sortExtendedLinesHelper(path, 0);
-        return false;
-    }
-    public bool sortExtendedLinesHelper(Stack<Entity> curPath, int index)
-    {
-        curPath.Push(ExtendedEntityList[index]);
-        List<Entity> connectedEntities = new List<Entity>();
-        foreach (Entity entity in ExtendedEntityList)
+        Stack<Entity> curPath = new Stack<Entity>();
+        List<Entity> testedEntities = new List<Entity>();
+
+        Entity head = ExtendedEntityList[0];
+        foreach(Entity entity in ExtendedEntityList)
         {
-            if (ExtendedEntityList[index] != entity)
+            if (entity.Length > head.Length)
             {
-              
+                head = entity;
             }
         }
+
+        curPath.Push(head);
+        sortExtendedLinesHelper(curPath, testedEntities, head);
+        return false;
+    }
+    /*recursive helper function to find a closed shape with extended lines
+     */
+    public bool sortExtendedLinesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
+    {
+            //base case where the current entity touches the head (means its a closed shape)
+            //checks if contained in testedEntities to avoid the second entity from triggering this
+            //checks if current entity is the same as head to avoid a false true
+            if ( curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
+            {
+                return true;
+            }
+
+            testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+
+            foreach (Entity entity in ExtendedEntityList)
+            {
+                if (entity != curPath.Peek())
+                { // checks if entity in loop is not the curent entity being checked
+                    if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                    // checks that the entitiy has not already been tested and is touching the entity
+                    {
+                        curPath.Push(entity);//adds to stack
+                        if (sortExtendedLinesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            //means nothing is touching current entity
         return false;
     }
 
-    
+
 }
