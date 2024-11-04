@@ -8,6 +8,7 @@ interface QuoteSubmissionProps {
 const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
   // Initialize state with the JSON response
   const [data, setData] = useState(jsonResponse);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle input change
   const handleChange = (index: number, key: string, value: any) => {
@@ -17,13 +18,36 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    setIsLoading(true); // Start loading
     event.preventDefault();
+
+    const formData = new FormData();
+    const form = event.currentTarget as HTMLFormElement;
+    formData.append("ruleType", form.ruleType.value);
+    formData.append("ejecMethod", form.ejecMethod.value);
+    formData.append("features", JSON.stringify(data));
+
+    try {
+      const res = await fetch("", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
+
+      const priceJSON = await res.json(); // Capture JSON responses
+
+    } catch (error) {
+      alert('An error occurred while submitting your quote. Please try again.');
+    } finally {
+      setIsLoading(false); // End loading
+    }
   };
 
   return (
     <div className="quote-container">
-      <form onSubmit={handleSubmit} className="quote-form">
+      <form id="quote-form" onSubmit={handleSubmit} className="quote-form">
       <div className="quote-form-fields">
         <label htmlFor="ruleType">Rule Type:</label>
         <select id="ruleType" name="ruleType">

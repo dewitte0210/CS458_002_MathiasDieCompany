@@ -266,8 +266,11 @@ table td {
 	padding: 15px;
 }
 table th {
+  position: sticky;
+  top: 0;
   padding-left: 15px;
   padding-right: 15px;
+  background-color: #dddfe1;
 }
 
 table thead td {

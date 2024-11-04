@@ -93,7 +93,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
             <QuoteSubmission jsonResponse={jsonResponse} />
           )}
           <div className="button-container">
-            <button className="animated-button" onClick={backToUpload}>
+            <button form="quote-form" type="submit" className="animated-button">
               <span>Confirm</span>
               <span></span>
             </button>
