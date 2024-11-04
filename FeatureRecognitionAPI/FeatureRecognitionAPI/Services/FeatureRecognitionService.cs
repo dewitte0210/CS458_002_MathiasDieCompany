@@ -54,14 +54,20 @@ namespace FeatureRecognitionAPI.Services
         {
             try
             {
-                string ext = GetFileExtension(file.FileName).Result.Item2;
+                var (status, ext) = await GetFileExtension(file.FileName);
+
+                if (status != OperationStatus.OK || ext == null)
+                {
+                    Console.WriteLine("ERROR detecting file extension");
+                    return (OperationStatus.BadRequest, null);
+                }
 
                 // maybe change ExampleFiles directory
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
 
                 using (Stream stream = new FileStream(path, FileMode.Create))
                 {
-                    file.CopyTo(stream);   
+                    await file.CopyToAsync(stream);
                 }
 
                 string text;
@@ -76,30 +82,34 @@ namespace FeatureRecognitionAPI.Services
                     switch (ext)
                     {
                         case ".dxf":
-                            DXFFile dXFFile = new DXFFile(path); // future TODO? make readEntities asynchronous,
-                            touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            //might be slow for large files with mutliple users hitting endpoint at once
-
-                            features = dXFFile.getFeatureList(touchingEntityList);
-
-                            json = JsonConvert.SerializeObject(features, settings);
+                            using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                DXFFile dXFFile = new DXFFile(dxfStream.Name);
+                                touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                                features = dXFFile.getFeatureList(touchingEntityList);
+                                json = JsonConvert.SerializeObject(features, settings);
+                            }
                             break;
                         case ".dwg":
-                            DWGFile dwgFile = new DWGFile(path);
-                            touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
-                            //might be slow for large files with mutliple users hitting endpoint at once
-
-                            features = dwgFile.getFeatureList(touchingEntityList);
-                            json = JsonConvert.SerializeObject(features, settings);
+                            using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                DWGFile dwgFile = new DWGFile(dwgStream.Name);
+                                touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
+                                features = dwgFile.getFeatureList(touchingEntityList);
+                                json = JsonConvert.SerializeObject(features, settings);
+                            }
                             break;
                         case ".pdf":
-                            PDFFile pdfFile = new PDFFile(path); //TODO: need more info to extract entities from pdf
-                            text = pdfFile.ExtractTextFromPDF();
-                            json = JsonConvert.SerializeObject(text);
+                            using (var pdfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            {
+                                PDFFile pdfFile = new PDFFile(pdfStream.Name);
+                                text = pdfFile.ExtractTextFromPDF();
+                                json = JsonConvert.SerializeObject(text);
+                            }
                             break;
                         default:
                             Console.WriteLine("ERROR detecting file extension");
-                            return (OperationStatus.BadRequest, json);
+                            return (OperationStatus.BadRequest, null);
                     }
 
                     return (OperationStatus.OK, json);
@@ -107,6 +117,7 @@ namespace FeatureRecognitionAPI.Services
                 }
                 else
                     return (OperationStatus.BadRequest, null);
+                
             }
             catch (Exception ex)
             {

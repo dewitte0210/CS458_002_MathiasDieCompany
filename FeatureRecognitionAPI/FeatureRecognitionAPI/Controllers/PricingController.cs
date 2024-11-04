@@ -20,7 +20,7 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EstimatePrice([FromBody] string param) //TODO: create and replace as param object
+        public async Task<IActionResult> EstimatePrice([FromBody] string param) //TODO: create and replace as param object, should be everything on the front end table 
         {
             //TODO: checks for correct input
             
