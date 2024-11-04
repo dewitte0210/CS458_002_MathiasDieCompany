@@ -10,6 +10,7 @@ using iText.Layout.Splitting;
 using iText.StyledXmlParser.Node;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NHibernate.Hql.Ast;
 using System;
 using System.IO;
 using System.Numerics;
@@ -37,8 +38,19 @@ public class Feature
     protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
                                                       // touching entities that make up a single perimeter feature for
                                                       // the original feature
-    //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
-    // You will have to run detection for perimeter features for each index of this list
+                                                      //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
+                                                      // You will have to run detection for perimeter features for each index of this list
+    //Number of lines in feature
+    protected int numLines = 0;
+    public int getNumLines() { return numLines; }
+    //Number of arcs in feature
+    protected int numArcs = 0;
+    public int getNumArcs() {  return numArcs; }
+    //Number of circles in feature
+    protected int numCircles = 0;
+    public int getNumCircles() { return numCircles; }
+
+    
     protected enum PossibleFeatureTypes
     {
         [JsonProperty]
@@ -73,9 +85,7 @@ public class Feature
         this.count = 1;
         this.entityList = entityList;
 
-        int numLines = 0;
-        int numArcs = 0;
-        int numCircles = 0;
+        
 
         //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)
@@ -166,17 +176,17 @@ public class Feature
         if (featureType == item.featureType && featureType == PossibleFeatureTypes.Group1B1 && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
                 Math.Abs(perDiff) < 0.0005 && border == item.border)
         {
-                //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
-                //TODO: create added check if they are arcs instead of circles
-                var serializedParent = JsonConvert.SerializeObject(entityList[0]);
-                Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-                serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
-                Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+            //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
+            //TODO: create added check if they are arcs instead of circles
+            var serializedParent = JsonConvert.SerializeObject(entityList[0]);
+            Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+            serializedParent = JsonConvert.SerializeObject(item.entityList[0]);
+            Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
 
-                if (c1.radius == c2.radius)
-                {
-                    return true;
-                }
+            if (c1.radius == c2.radius)
+            {
+                return true;
+            }
         }
 
         // Checking equality of all other feature types
@@ -221,6 +231,7 @@ public class Feature
     // 2. are parallel or perpendicular
     //adds extended line(parallel) or lines(perpendicular) to extendedEntityList
     //returns true if lines were extended, otherwise false
+
     public bool extendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2))
@@ -307,4 +318,271 @@ public class Feature
         }
         return false;
     }
-}
+
+
+
+    public double FindMaxX()
+    {
+        double maxX = 0;
+        //Find the starting max 
+        if (entityList[0] is Line)
+        {
+            if (((Line)entityList[0]).StartX > ((Line)entityList[0]).EndX)
+            {
+                maxX = ((Line)entityList[0]).StartX;
+            }
+            else
+            {
+                maxX = ((Line)entityList[0]).EndX;
+            }
+        }
+        else if (entityList[0] is Arc)
+        {
+            if (((Arc)entityList[0]).startX > ((Arc)entityList[0]).endX)
+            {
+                maxX = ((Arc)entityList[0]).startX;
+            }
+            else
+            {
+                maxX = ((Arc)entityList[0]).endX;
+            }
+        }
+        else if (entityList[0] is Circle)
+        {
+            maxX = ( ((Circle)entityList[0]).centerX + ((Circle)entityList[0]).radius );
+        }
+
+        //Loop through list and see if there is a bigger X
+        for (int i = 1; i < entityList.Count; i++)
+        {
+            if (entityList[i] is Line)
+            {
+                if (((Line)entityList[i]).StartX > maxX)
+                {
+                    maxX = ((Line)entityList[i]).StartX;
+                }
+                if (((Line)entityList[i]).EndX > maxX)
+                {
+                    maxX = ((Line)entityList[i]).EndX;
+                }
+            }
+            else if (entityList[i] is Arc)
+            {
+                if (((Arc)entityList[i]).startX > maxX)
+                {
+                    maxX = ((Arc)entityList[i]).startX;
+                }
+                if (((Arc)entityList[i]).endX > maxX)
+                {
+                    maxX = ((Arc)entityList[i]).endX;
+                }
+            }
+            else if (entityList[i] is Circle && (((Circle)entityList[0]).centerX + ((Circle)entityList[0]).radius) > maxX ) 
+            {
+                    maxX = (((Circle)entityList[0]).centerX + ((Circle)entityList[0]).radius);
+            }
+            
+        }
+        return maxX;
+    }
+
+
+    public double FindMaxY()
+    {
+        double maxY = 0;
+        //Find the starting max 
+        if (entityList[0] is Line)
+        {
+            if (((Line)entityList[0]).StartY > ((Line)entityList[0]).EndY)
+            {
+                maxY = ((Line)entityList[0]).StartY;
+            }
+            else
+            {
+                maxY = ((Line)entityList[0]).EndY;
+            }
+        }
+        else if (entityList[0] is Arc)
+        {
+            if (((Arc)entityList[0]).startY > ((Arc)entityList[0]).endY)
+            {
+                maxY = ((Arc)entityList[0]).startY;
+            }
+            else
+            {
+                maxY = ((Arc)entityList[0]).endY;
+            }
+        }
+        else if (entityList[0] is Circle)
+        {
+            maxY = (((Circle)entityList[0]).centerY + ((Circle)entityList[0]).radius);
+        }
+
+        //Loop through list and see if there is a bigger Y 
+        for (int i = 1; i < entityList.Count; i++)
+        {
+            if (entityList[i] is Line)
+            {
+                if (((Line)entityList[i]).StartY > maxY)
+                {
+                    maxY = ((Line)entityList[i]).StartY;
+                }
+                if (((Line)entityList[i]).EndY > maxY)
+                {
+                    maxY = ((Line)entityList[i]).EndY;
+                }
+            }
+            else if (entityList[i] is Arc)
+            {
+                if (((Arc)entityList[i]).startY > maxY)
+                {
+                    maxY = ((Arc)entityList[i]).startY;
+                }
+                if (((Arc)entityList[i]).endY > maxY)
+                {
+                    maxY = ((Arc)entityList[i]).endY;
+                }
+            }
+            else if (entityList[i] is Circle && (((Circle)entityList[0]).centerY + ((Circle)entityList[0]).radius) > maxY)
+            {
+                maxY = (((Circle)entityList[0]).centerY + ((Circle)entityList[0]).radius);
+            }
+
+        }
+        return maxY;
+    }
+
+    public double FindMinX()
+    {
+        double minX = 0;
+        //Find the starting min 
+        if (entityList[0] is Line)
+        {
+            if (((Line)entityList[0]).StartX < ((Line)entityList[0]).EndX)
+            {
+                minX = ((Line)entityList[0]).StartX;
+            }
+            else
+            {
+                minX = ((Line)entityList[0]).EndX;
+            }
+        }
+        else if (entityList[0] is Arc)
+        {
+            if (((Arc)entityList[0]).startX < ((Arc)entityList[0]).endX)
+            {
+                minX = ((Arc)entityList[0]).startX;
+            }
+            else
+            {
+                minX = ((Arc)entityList[0]).endX;
+            }
+        }
+        else if (entityList[0] is Circle)
+        {
+            minX = (((Circle)entityList[0]).centerX - ((Circle)entityList[0]).radius);
+        }
+
+        //Loop through list and see if there is a smaller Y
+        for (int i = 1; i < entityList.Count; i++)
+        {
+            if (entityList[i] is Line)
+            {
+                if (((Line)entityList[i]).StartX < minX)
+                {
+                    minX = ((Line)entityList[i]).StartX;
+                }
+                if (((Line)entityList[i]).EndX < minX)
+                {
+                    minX = ((Line)entityList[i]).EndX;
+                }
+            }
+            else if (entityList[i] is Arc)
+            {
+                if (((Arc)entityList[i]).startX < minX)
+                {
+                    minX = ((Arc)entityList[i]).startX;
+                }
+                if (((Arc)entityList[i]).endX < minX)
+                {
+                    minX = ((Arc)entityList[i]).endX;
+                }
+            }
+            else if (entityList[i] is Circle && (((Circle)entityList[0]).centerX - ((Circle)entityList[0]).radius) > minX)
+            {
+                minX = (((Circle)entityList[0]).centerX - ((Circle)entityList[0]).radius);
+            }
+
+        }
+        return minX;
+    }
+
+    public double FindMinY()
+    {
+        double minY = 0;
+        //Find the starting minumum 
+        if (entityList[0] is Line)
+        {
+            if (((Line)entityList[0]).StartY < ((Line)entityList[0]).EndY)
+            {
+                minY = ((Line)entityList[0]).StartY;
+            }
+            else
+            {
+                minY = ((Line)entityList[0]).EndY;
+            }
+        }
+        else if (entityList[0] is Arc)
+        {
+            if (((Arc)entityList[0]).startY < ((Arc)entityList[0]).endY)
+            {
+                minY = ((Arc)entityList[0]).startY;
+            }
+            else
+            {
+                minY = ((Arc)entityList[0]).endY;
+            }
+        }
+        else if (entityList[0] is Circle)
+        {
+            minY = (((Circle)entityList[0]).centerY - ((Circle)entityList[0]).radius);
+        }
+
+        //Loop through list and see if there is a smaller Y
+        for (int i = 1; i < entityList.Count; i++)
+        {
+            if (entityList[i] is Line)
+            {
+                if (((Line)entityList[i]).StartY < minY)
+                {
+                    minY = ((Line)entityList[i]).StartY;
+                }
+                if (((Line)entityList[i]).EndY < minY)
+                {
+                    minY = ((Line)entityList[i]).EndY;
+                }
+            }
+            else if (entityList[i] is Arc)
+            {
+                if (((Arc)entityList[i]).startY < minY)
+                {
+                    minY = ((Arc)entityList[i]).startY;
+                }
+                if (((Arc)entityList[i]).endY < minY)
+                {
+                    minY = ((Arc)entityList[i]).endY;
+                }
+            }
+            else if (entityList[i] is Circle && (((Circle)entityList[0]).centerY - ((Circle)entityList[0]).radius) > minY)
+            {
+                minY = (((Circle)entityList[0]).centerY - ((Circle)entityList[0]).radius);
+            }
+
+        }
+        return minY;
+    }
+
+
+} 
+
+
