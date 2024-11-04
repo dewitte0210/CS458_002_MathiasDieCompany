@@ -8,15 +8,12 @@ namespace FeatureRecognitionAPI.Models {
     public class Circle : Entity
     {
         //Center point of circle - x value
-        public  double centerX {  get; set; }
-        //Center point of circle - y value
-        public  double centerY { get; set; }
+        public Point Center { get; set; }
         public  double radius { get; set; }
         public Circle( double centerX,  double centerY,  double radius)
         {
             entityType = PossibleEntityTypes.circle;
-            this.centerX = centerX;
-            this.centerY = centerY;
+            Center = new Point(centerX, centerY);
             this.radius = radius;
             this.Length = (calcPerimeter(radius));
         }
