@@ -382,7 +382,6 @@ public class Feature
         List<Entity> testedEntities = new List<Entity>();
 
         Entity head = ExtendedEntityList[0];
-
         foreach(Entity entity in ExtendedEntityList)
             //this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
@@ -404,12 +403,16 @@ public class Feature
      */
     public bool sortExtendedLinesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
-        //base case where the current entity touches the head (means its a closed shape)
-        //checks if contained in testedEntities to avoid the second entity from triggering this
-        //checks if current entity is the same as head to avoid a false true
-        if ( curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
+        if (curPath.Count > 2)
         {
-            return true;//path found
+            Entity tempCur = curPath.Pop();
+            //base case where the current entity touches the head (means its a closed shape)
+            //checks if contained in testedEntities to avoid the second entity from triggering this
+            //checks if current entity is the same as head to avoid a false true
+            if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
+            {
+                return true;//path found
+            }
         }
 
         testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
@@ -438,7 +441,7 @@ public class Feature
             {
                 if (!testedEntities.Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {
-                    curPath = new Stack<Entity>();//clears curPath and adds the new head to it
+                    curPath.Clear();//clears curPath and adds the new head to it
                     curPath.Push(entity);
                     return sortExtendedLinesHelper(curPath, testedEntities, entity);
                 }
