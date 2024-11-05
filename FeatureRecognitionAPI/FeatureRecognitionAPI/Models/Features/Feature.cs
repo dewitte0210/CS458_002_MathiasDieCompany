@@ -382,7 +382,9 @@ public class Feature
         List<Entity> testedEntities = new List<Entity>();
 
         Entity head = ExtendedEntityList[0];
+
         foreach(Entity entity in ExtendedEntityList)
+            //this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
             if (entity.Length > head.Length)
             {
@@ -391,40 +393,60 @@ public class Feature
         }
 
         curPath.Push(head);
-        sortExtendedLinesHelper(curPath, testedEntities, head);
+        if (sortExtendedLinesHelper(curPath, testedEntities, head))
+        {
+            baseEntityList = curPath.ToList();
+            return true;
+        }
         return false;
     }
     /*recursive helper function to find a closed shape with extended lines
      */
     public bool sortExtendedLinesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
-            //base case where the current entity touches the head (means its a closed shape)
-            //checks if contained in testedEntities to avoid the second entity from triggering this
-            //checks if current entity is the same as head to avoid a false true
-            if ( curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
-            {
-                return true;
-            }
+        //base case where the current entity touches the head (means its a closed shape)
+        //checks if contained in testedEntities to avoid the second entity from triggering this
+        //checks if current entity is the same as head to avoid a false true
+        if ( curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
+        {
+            return true;//path found
+        }
 
-            testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
 
-            foreach (Entity entity in ExtendedEntityList)
-            {
-                if (entity != curPath.Peek())
-                { // checks if entity in loop is not the curent entity being checked
-                    if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
-                    // checks that the entitiy has not already been tested and is touching the entity
+        foreach (Entity entity in ExtendedEntityList)
+        {
+            if (entity != curPath.Peek())
+            { // checks if entity in loop is not the curent entity being checked
+                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                // checks that the entitiy has not already been tested and is touching the entity
+                {
+                    curPath.Push(entity);//adds to stack
+                    if (sortExtendedLinesHelper(curPath, testedEntities, head))//recursive call with updated curPath
                     {
-                        curPath.Push(entity);//adds to stack
-                        if (sortExtendedLinesHelper(curPath, testedEntities, head))//recursive call with updated curPath
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
-            //means nothing is touching current entity
-        return false;
+        }
+        //this point in the function means nothing is touching current entity
+
+        if (curPath.Peek() == head)
+            //if the function of the head reaches this point it means it has not found a path back to the head
+        {
+            foreach (Entity entity in ExtendedEntityList)
+            {
+                if (!testedEntities.Contains(entity)) // finds the first entity that has not been tested and selects it as the head
+                {
+                    curPath = new Stack<Entity>();//clears curPath and adds the new head to it
+                    curPath.Push(entity);
+                    return sortExtendedLinesHelper(curPath, testedEntities, entity);
+                }
+            }
+        }
+
+        curPath.Pop();
+        return false;//nothing is touching this entity so it is popped off of curPath
     }
 
 

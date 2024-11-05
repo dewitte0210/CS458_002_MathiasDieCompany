@@ -119,7 +119,7 @@ namespace FeatureRecognitionAPI.Models
                     return false;
                 }
             }
-            else if (e1 is Arc)
+            else if (this is Arc)
             {
                 if (e2 is Line)
                 {
