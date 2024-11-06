@@ -49,6 +49,12 @@ namespace Testing_for_Project
             Assert.That(circle1.centerY, Is.EqualTo(0.7124999999999999));
             Assert.That(circle1.radius, Is.EqualTo(0.2577228596164672));
         }
+        [Test]
+        public void TestEllipseClass()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 0, 0, 2.0 / 3.0, 0, 2 * Math.PI);
+            Assert.That(ellipse1.getLength(), Is.EqualTo(15.865439589290595));
+        }
         #endregion
 
         #region TestingDXF&DWG
