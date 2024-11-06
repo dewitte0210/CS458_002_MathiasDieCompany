@@ -8,22 +8,35 @@ namespace FeatureRecognitionAPI.Models {
     public class Circle : Entity
     {
         //Center point of circle - x value
-        public  double centerX {  get; set; }
-        //Center point of circle - y value
-        public  double centerY { get; set; }
+        public Point Center { get; set; }
         public  double radius { get; set; }
         public Circle( double centerX,  double centerY,  double radius)
         {
             entityType = PossibleEntityTypes.circle;
-            this.centerX = centerX;
-            this.centerY = centerY;
+            Center = new Point(centerX, centerY);
             this.radius = radius;
-            this.setLength(calcPerimeter(radius));
+            this.Length = (calcPerimeter(radius));
         }
 
         private  double calcPerimeter( double radius)
         {
             return 2 * Math.PI * radius;
         }
+
+        public override bool Equals(object? obj)
+        {
+            //If the object is a cricle, and the circles have even radius then the circles are equal
+
+            if (obj is Circle)
+            {
+                if (((Circle)obj).radius == this.radius)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
     }
 }
