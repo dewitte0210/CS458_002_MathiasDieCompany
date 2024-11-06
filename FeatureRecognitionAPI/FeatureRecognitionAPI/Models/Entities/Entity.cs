@@ -78,7 +78,7 @@ namespace FeatureRecognitionAPI.Models
             }
             if (this is Line)
             {
-                if (this is Line)
+                if (e2 is Line)
                 {
                     if (PointsAreTouching(((Line)this).StartPoint, ((Line)e2).StartPoint))
                     {

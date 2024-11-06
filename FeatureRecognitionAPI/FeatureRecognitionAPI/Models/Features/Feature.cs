@@ -101,14 +101,9 @@ public class Feature
             }
             else
             {
-                Console.WriteLine("Error: Cannot detect entity type.");
                 break;
             }
         }
-
-
-        //calculate and set the perimeter of the feature
-        calcPerimeter();
     }
     
     internal void DetectFeatures()

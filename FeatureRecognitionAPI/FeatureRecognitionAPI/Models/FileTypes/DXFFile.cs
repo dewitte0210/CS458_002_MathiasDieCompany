@@ -14,13 +14,14 @@ namespace FeatureRecognitionAPI.Models
     {
         private FileVersion _fileVersion;
         private string[] _lines;
+        public DXFFile() { }
         public DXFFile(string path) : base(path)
         {
             entityList = new List<Entity>();
             this.path = path;
             fileType = SupportedExtensions.dxf;
             //_fileVersion = GetFileVersion();
-            
+
             if (File.Exists(path))
             {
                 _lines = File.ReadAllLines(path);
@@ -33,8 +34,10 @@ namespace FeatureRecognitionAPI.Models
                 {
                     readEntities();
                 }
-               
+
             }
+            else
+                throw new FileNotFoundException();
         }
 
         public FileVersion GetFileVersion()
@@ -74,15 +77,6 @@ namespace FeatureRecognitionAPI.Models
             return FileVersion.Unknown;
         }
 
-        public override bool findFeatures()
-        {
-            while(featureList.Count > 0)
-            {
-                Entity curEntity = entityList.First();
-
-            } 
-            return true; 
-        }
         public void readEntitiesOld()
         {
             List<Entity> entityList = new List<Entity>();

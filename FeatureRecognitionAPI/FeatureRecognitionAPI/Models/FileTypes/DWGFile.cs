@@ -40,6 +40,8 @@ namespace FeatureRecognitionAPI.Models
                         throw new Exception("Error with DWG File");
                 }
             }
+            else
+                throw new FileNotFoundException();
         }
 
         /*
@@ -49,20 +51,6 @@ namespace FeatureRecognitionAPI.Models
         public bool findEntities()
         {
             //TODO
-            return false;
-        }
-
-        /*
-         * Finds all features in the file based of the entities within the file
-         * calls findEntities to garuantee an updated entity list
-         * returns false if fails, otherwise returns true
-         */
-        public override bool findFeatures()
-        {
-            if (findEntities())
-            {
-                //TODO
-            }
             return false;
         }
 
