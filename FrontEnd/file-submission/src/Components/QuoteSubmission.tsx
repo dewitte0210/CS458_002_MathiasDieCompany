@@ -28,15 +28,24 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
     formData.append("ejecMethod", form.ejecMethod.value);
     formData.append("features", JSON.stringify(data));
 
+    var object = {};
+    formData.forEach((value, key) => object[key] = value);
+    var formJSON = JSON.stringify(object);
+
+    //display the form data
+    console.log(formJSON);
+
     try {
-      const res = await fetch("", {
+      const res = await fetch("https://localhost:44373/api/Pricing/estimatePrice", {
         method: "POST",
-        body: formData
+        body: formJSON,
+        headers: new Headers({'content-type': 'application/json'})
       });
 
       if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
 
       const priceJSON = await res.json(); // Capture JSON responses
+      alert(`Your quote is: ${priceJSON.price}`); // Display
 
     } catch (error) {
       alert('An error occurred while submitting your quote. Please try again.');
