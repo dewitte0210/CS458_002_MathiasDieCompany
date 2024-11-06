@@ -4,7 +4,7 @@ namespace FeatureRecognitionAPI.Models
     {
         public double X;
         public double Y;
-        public bool intersect;
+        public bool intersect; //boolean value that is true if this point is an intersect point between two lines
 
         public Point()
         {
@@ -14,6 +14,7 @@ namespace FeatureRecognitionAPI.Models
         {
             X = x;
             Y = y;
+            intersect = false;
         }
 
         public void setPoint(double x, double y) {
