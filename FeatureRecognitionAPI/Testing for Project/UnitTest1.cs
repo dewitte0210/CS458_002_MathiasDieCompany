@@ -53,7 +53,7 @@ namespace Testing_for_Project
         public void TestEllipseClass()
         {
             Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 0, 0, 2.0 / 3.0, 0, 2 * Math.PI);
-            Assert.That(ellipse1.getLength(), Is.EqualTo(15.865439589290595));
+            Assert.That(ellipse1.Length, Is.EqualTo(15.865439589290595));
         }
         #endregion
 

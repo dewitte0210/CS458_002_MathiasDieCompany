@@ -35,13 +35,13 @@ namespace FeatureRecognitionAPI.Models
             if (startParameter == 0 && endParameter == 2 * Math.PI)
             {
                 this.isFullEllipse = true;
-                this.setLength(fullPerimeterCalc());
+                Length = fullPerimeterCalc();
             }
             //TODO Partial ellipse length :(
             else
             {
                 this.isFullEllipse = false;
-                this.setLength(partialPerimterCalc());
+                Length = partialPerimterCalc();
             }
         }
 
