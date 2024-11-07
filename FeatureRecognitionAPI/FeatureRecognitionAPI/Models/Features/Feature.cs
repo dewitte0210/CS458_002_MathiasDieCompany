@@ -136,7 +136,7 @@ public class Feature
         }
         else
         {
-            Console.WriteLine("Error: Cannot assign feature type.");
+            //Console.WriteLine("Error: Cannot assign feature type.");
         }
     }
     // Checks the feature to see if it is one of the Group 1B features
