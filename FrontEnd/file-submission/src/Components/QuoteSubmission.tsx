@@ -23,14 +23,28 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
     event.preventDefault();
 
     const formData = new FormData();
-    const form = event.currentTarget as HTMLFormElement;
-    formData.append("ruleType", form.ruleType.value);
-    formData.append("ejecMethod", form.ejecMethod.value);
-    formData.append("features", JSON.stringify(data));
+  const form = event.currentTarget as HTMLFormElement;
+  formData.append("ruleType", form.ruleType.value);
+  formData.append("ejecMethod", form.ejecMethod.value);
+  formData.append("features", new Blob([JSON.stringify(data)], { type: 'application/json' }));
 
-    var object = {};
-    formData.forEach((value, key) => object[key] = value);
-    var formJSON = JSON.stringify(object);
+  var object: any = {};
+  formData.forEach((value, key) => {
+    if (value instanceof Blob && value.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        object[key] = JSON.parse(reader.result as string);
+      };
+      reader.readAsText(value);
+    } else {
+      object[key] = value;
+    }
+  });
+
+  // Wait for all FileReader operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  var formJSON = JSON.stringify(object);
 
     //display the form data
     console.log(formJSON);

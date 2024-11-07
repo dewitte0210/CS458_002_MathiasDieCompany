@@ -1,7 +1,10 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
+﻿using FeatureRecognitionAPI.Models.Dtos;
+using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace FeatureRecognitionAPI.Controllers
 {
@@ -20,16 +23,27 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EstimatePrice([FromBody] string param) //TODO: create and replace as param object, should be everything on the front end table 
+        public async Task<IActionResult> EstimatePrice([FromBody] JsonElement param)
         {
-            //TODO: checks for correct input
-            
-            var (status, msg, output) = await _pricingService.EstimatePrice(param);
+            try
+            {
+                var quoteSubmissionDto = JsonConvert.DeserializeObject<QuoteSubmissionDto>(param.GetRawText());
+                if (quoteSubmissionDto == null)
+                {
+                    return BadRequest("Invalid payload.");
+                }
 
-            if (status != OperationStatus.OK || output == null)
-                return BadRequest(msg);
+                var (status, msg, output) = await _pricingService.EstimatePrice(quoteSubmissionDto);
 
-            return Ok(output);
+                if (status != OperationStatus.OK || output == null)
+                    return BadRequest(msg);
+
+                return Ok(output);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Invalid JSON format: {ex.Message}");
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
+﻿using FeatureRecognitionAPI.Models.Dtos;
+using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -6,7 +7,7 @@ namespace FeatureRecognitionAPI.Services
     {
         public PricingService() { }
 
-        public async Task<(OperationStatus, string, string?)> EstimatePrice(string param)
+        public async Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param)
         {
             try
             {

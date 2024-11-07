@@ -1,9 +1,10 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
+﻿using FeatureRecognitionAPI.Models.Dtos;
+using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Services
 {
     public interface IPricingService
     {
-        Task<(OperationStatus, string, string?)> EstimatePrice(string param);
+        Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param);
     }
 }
