@@ -19,6 +19,11 @@ namespace FeatureRecognitionAPI.Models
         protected List<Entity> entityList;
         protected List<FeatureGroup> featureGroups;
         //protected keyword for nested enum is about granting 
+        protected SupportedFile()
+        {
+            entityList = new List<Entity>();
+            featureList = new List<Feature>();
+        }
         public SupportedFile(string path)
         {
             this.path = path;
