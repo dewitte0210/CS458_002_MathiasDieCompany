@@ -56,6 +56,10 @@ public class Feature
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
         this.border = border;
+        EntityList = new List<Entity>();
+        baseEntityList = new List<Entity>();
+        ExtendedEntityList = new List<Entity>();
+        PerimeterEntityList = new List<List<Entity>>();
 
         calcPerimeter();
     }
@@ -65,6 +69,9 @@ public class Feature
         EntityList = entityList;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
+        baseEntityList = new List<Entity>();
+        ExtendedEntityList = new List<Entity>();
+        PerimeterEntityList = new List<List<Entity>>();
 
         calcPerimeter();
     }
@@ -73,6 +80,9 @@ public class Feature
     {
         this.count = 1;
         this.EntityList = entityList;
+        baseEntityList = new List<Entity>();
+        ExtendedEntityList = new List<Entity>();
+        PerimeterEntityList = new List<List<Entity>>();
         psuedoFeatureDetection(entityList);
         //calculate and set the perimeter of the feature
         calcPerimeter();
@@ -163,11 +173,14 @@ public class Feature
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
+        /*if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
+        {
+            perimeter = EntityList[0].Length / Math.PI;
+        }*/
+        if (EntityList[0] is Circle)
         {
             perimeter = EntityList[0].Length / Math.PI;
         }
-
         else
         {
             for (int i = 0; i < EntityList.Count; i++)
@@ -373,6 +386,11 @@ public class Feature
 
     public bool sortExtendedLines()
     {
+        if (ExtendedEntityList.Count == 1 && ExtendedEntityList[0] is Circle && baseEntityList.Count ==0)
+        {
+            baseEntityList.Add((Circle)ExtendedEntityList[0]);
+            return true;
+        }
         Stack<Entity> curPath = new Stack<Entity>();
         List<Entity> testedEntities = new List<Entity>();
 
@@ -390,6 +408,7 @@ public class Feature
         if (sortExtendedLinesHelper(curPath, testedEntities, head))
         {
             baseEntityList = curPath.ToList();
+            baseEntityList.Reverse();
             return true;
         }
         return false;
@@ -400,7 +419,6 @@ public class Feature
     {
         if (curPath.Count > 2)
         {
-            Entity tempCur = curPath.Pop();
             //base case where the current entity touches the head (means its a closed shape)
             //checks if contained in testedEntities to avoid the second entity from triggering this
             //checks if current entity is the same as head to avoid a false true

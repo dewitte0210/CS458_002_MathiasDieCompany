@@ -80,6 +80,7 @@ namespace FeatureRecognitionAPI.Models
 
             return featureList;
         }
+        public List<Feature> getFeatureList() { return featureList; }
 
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
@@ -138,31 +139,24 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
-        public void findFeatureTypes(List<Feature> myFeatureList)
-        {
-            foreach (Feature feature in myFeatureList)
-            {
-                feature.extendAllEntities();
-                feature.sortExtendedLines();
-            }
-        }
-        public void findFeatureTypes()
-        {
-            findFeatureTypes(featureList);
-        }
 
         /* 
          * method that goes from the path to detected features
         */
-        public void findFeatures()
+        public void detectAllFeatures()
         {
-            findFeatures(entityList);
+            detectAllFeatures(entityList);
         }
-        public void findFeatures(List<Entity> myEntityList)
+        public void detectAllFeatures(List<Entity> myEntityList)
         {
             List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
             featureList = getFeatureList(touchingEntities);
-            findFeatureTypes();
+            foreach (Feature feature in featureList)
+            {
+                    feature.DetectFeatures();
+                    feature.extendAllEntities();
+                    feature.sortExtendedLines();
+            }
         }
         // Method to read the data from a file and fill the entityList with entities
         public abstract void readEntities();

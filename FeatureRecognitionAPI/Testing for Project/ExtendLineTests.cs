@@ -103,7 +103,28 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
             DXFFile exampleOne = new DXFFile(path);
 
-            exampleOne.findFeatures();
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+            foreach (Feature feature in featureList)
+            {
+                bool equalLists = false;
+                if (feature.EntityList.Count == feature.baseEntityList.Count)
+                {
+                    for (int i = 0; i < feature.EntityList.Count; i++)
+                    {
+                        if (feature.baseEntityList.Contains(feature.EntityList[i]))
+                        {
+                            equalLists = true;
+                        }
+                    }
+                }
+            
+                Assert.IsTrue(equalLists);
+                Feature testFeature = new Feature(feature.baseEntityList);
+                testFeature.DetectFeatures();
+                Assert.IsTrue(feature.Equals(testFeature));
+            }
         }
         #endregion
     }
