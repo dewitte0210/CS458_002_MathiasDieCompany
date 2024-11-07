@@ -3,6 +3,7 @@
  * - DWG, DXF, PDF
  */
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Features;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -16,12 +17,7 @@ namespace FeatureRecognitionAPI.Models
         protected SupportedExtensions fileType;
         protected List<Feature> featureList;
         protected List<Entity> entityList;
-
-        protected SupportedFile() 
-        {
-            entityList = new List<Entity>();
-            featureList = new List<Feature>();
-        }
+        protected List<FeatureGroup> featureGroups;
         //protected keyword for nested enum is about granting 
         public SupportedFile(string path)
         {
@@ -139,6 +135,22 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
+
+
+
+        /*
+         * Groups features together and stores how many of each feature group are present in the file
+         * Initliazes class variable featuresList
+         */
+        void SetFeatureGroups()
+        {
+            List<Feature> features = getFeatureList(makeTouchingEntitiesList(entityList));
+
+            for (int i = 0; i < features.Count; i++)
+            {
+                
+            }
+        }
 
         /* 
          * method that goes from the path to detected features

@@ -22,5 +22,21 @@ namespace FeatureRecognitionAPI.Models {
         {
             return 2 * Math.PI * radius;
         }
+
+        public override bool Equals(object? obj)
+        {
+            //If the object is a cricle, and the circles have even radius then the circles are equal
+
+            if (obj is Circle)
+            {
+                if (((Circle)obj).radius == this.radius)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
     }
 }
