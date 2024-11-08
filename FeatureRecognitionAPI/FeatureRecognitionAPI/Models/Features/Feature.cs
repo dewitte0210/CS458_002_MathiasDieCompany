@@ -157,7 +157,7 @@ public class Feature
             {
                 if (entity is Arc)
                 {
-                    totalDegrees += (entity as Arc).centralAngle;
+                    totalDegrees += (entity as Arc).CentralAngle;
                 }
             });
             if (totalDegrees > 359.999 && totalDegrees < 360.0009)
@@ -516,7 +516,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius );
+            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius );
         }
 
         //Loop through list and see if there is a bigger X
@@ -544,9 +544,9 @@ public class Feature
                     maxX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius) > maxX ) 
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius) > maxX ) 
             {
-                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius);
+                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
             }
             
         }
@@ -577,7 +577,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
+            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a bigger Y 
@@ -605,9 +605,9 @@ public class Feature
                     maxY = ((Arc)EntityList[i]).End.Y;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius) > maxY)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius) > maxY)
             {
-                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
+                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius);
             }
 
         }
@@ -642,7 +642,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
+            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a smaller Y
@@ -670,9 +670,9 @@ public class Feature
                     minX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius) > minX)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius) > minX)
             {
-                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
+                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius);
             }
 
         }
@@ -703,7 +703,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
+            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a smaller Y
@@ -731,9 +731,9 @@ public class Feature
                     minY = ((Arc)EntityList[i]).End.Y;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius) > minY)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius) > minY)
             {
-                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
+                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius);
             }
 
         }

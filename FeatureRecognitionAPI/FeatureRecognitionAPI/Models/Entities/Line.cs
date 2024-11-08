@@ -16,10 +16,7 @@ namespace FeatureRecognitionAPI.Models
 
 
 
-        private Line()
-        {
-            entityType = PossibleEntityTypes.line;
-        }
+        private Line() { }
         public Line(bool ExtendedLine)
         {
             this.ExtendedLine = ExtendedLine;

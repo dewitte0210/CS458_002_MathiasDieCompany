@@ -1,64 +1,64 @@
 ﻿using FeatureRecognitionAPI.Models.Enums;
-using NHibernate.Type;
 
 namespace FeatureRecognitionAPI.Models
 {
+    /**
+     * Class that represents a Ellipse object that extends Entity
+     * Inherits entityType and Length fields
+     */
     public class Ellipse : Entity
     {
-        public double centerX { get; set; }
-        public double centerY { get; set; }
-        public double majorAxisXValue { get; set; }
-        public double majorAxisYValue { get; set; }
-        public double extrusionDirectionX {  get; set; }
-        public double extrusionDirectionY { get; set; }
-        public double minorToMajorAxisRatio { get; set; }
-        public double startParameter { get; set; }
-        public double endParameter { get; set; }
-        public bool isFullEllipse { get; set; }
-        private Ellipse()
-        {
-            entityType = PossibleEntityTypes.ellipse;
-        }
+        public double CenterX { get; set; }
+        public double CenterY { get; set; }
+        public double MajorAxisXValue { get; set; }
+        public double MajorAxisYValue { get; set; }
+        public double ExtrusionDirectionX {  get; set; }
+        public double ExtrusionDirectionY { get; set; }
+        public double MinorToMajorAxisRatio { get; set; }
+        public double StartParameter { get; set; }
+        public double EndParameter { get; set; }
+        public bool IsFullEllipse { get; set; }
+        private Ellipse() { }
         public Ellipse(double centerX, double centerY, double majorAxisXValue, 
             double majorAxisYValue, double extrusionDirectionX, double extrusionDirectionY,
             double minorToMajorAxisRatio, double startParameter, double endParameter)
         {
-            this.centerX = centerX;
-            this.centerY = centerY;
-            this.majorAxisXValue = majorAxisXValue;
-            this.majorAxisYValue = majorAxisYValue;
-            this.extrusionDirectionX = extrusionDirectionX;
-            this.extrusionDirectionY = extrusionDirectionY;
-            this.minorToMajorAxisRatio = minorToMajorAxisRatio;
-            this.startParameter = startParameter;
-            this.endParameter = endParameter;
+            this.CenterX = centerX;
+            this.CenterY = centerY;
+            this.MajorAxisXValue = majorAxisXValue;
+            this.MajorAxisYValue = majorAxisYValue;
+            this.ExtrusionDirectionX = extrusionDirectionX;
+            this.ExtrusionDirectionY = extrusionDirectionY;
+            this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
+            this.StartParameter = startParameter;
+            this.EndParameter = endParameter;
             if (startParameter == 0 && endParameter == 2 * Math.PI)
             {
-                this.isFullEllipse = true;
+                this.IsFullEllipse = true;
                 Length = fullPerimeterCalc();
             }
             //TODO Partial ellipse length :(
             else
             {
-                this.isFullEllipse = false;
+                this.IsFullEllipse = false;
                 Length = partialPerimterCalc();
             }
         }
 
         private double fullPerimeterCalc()
         {
-            //Major axis radius
+            //Major axis Radius
             double majorAxis;
-            if (centerX == majorAxisXValue)
+            if (CenterX == MajorAxisXValue)
             {
-                majorAxis = majorAxisYValue - centerY;
+                majorAxis = MajorAxisYValue - CenterY;
             }
             else
             {
-                majorAxis = majorAxisXValue - centerX;
+                majorAxis = MajorAxisXValue - CenterX;
             }
             double a = 1;
-            double g = minorToMajorAxisRatio;
+            double g = MinorToMajorAxisRatio;
             double total = (Math.Pow(a, 2) - Math.Pow(g, 2)) / 2;
             for (int i = 0; i < 5; i++)
             {

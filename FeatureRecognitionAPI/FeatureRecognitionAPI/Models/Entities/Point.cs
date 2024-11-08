@@ -20,6 +20,6 @@ namespace FeatureRecognitionAPI.Models
         public void setPoint(double x, double y) {
             X = x;
             Y = y; 
-        }
+        }        
     }
 }
