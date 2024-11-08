@@ -65,58 +65,54 @@ namespace FeatureRecognitionAPI.Services
                 // maybe change ExampleFiles directory
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
 
-                using (Stream stream = new FileStream(path, FileMode.Create))
+                if (!File.Exists(path))
                 {
-                    await file.CopyToAsync(stream);
-                }
-
-                string text;
-                string json = "";
-
-                if (File.Exists(path))
-                {
-                    List<List<Entity>> touchingEntityList;
-                    List<Feature> features;
-                    var settings = new JsonSerializerSettings();
-                    settings.Converters.Add(new StringEnumConverter());
-                    switch (ext)
+                    using (Stream stream = new FileStream(path, FileMode.Create))
                     {
-                        case ".dxf":
-                            using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                DXFFile dXFFile = new DXFFile(dxfStream.Name);
-                                touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                                features = dXFFile.getFeatureList(touchingEntityList);
-                                json = JsonConvert.SerializeObject(features, settings);
-                            }
-                            break;
-                        case ".dwg":
-                            using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                DWGFile dwgFile = new DWGFile(dwgStream.Name);
-                                touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
-                                features = dwgFile.getFeatureList(touchingEntityList);
-                                json = JsonConvert.SerializeObject(features, settings);
-                            }
-                            break;
-                        case ".pdf":
-                            using (var pdfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                PDFFile pdfFile = new PDFFile(pdfStream.Name);
-                                text = pdfFile.ExtractTextFromPDF();
-                                json = JsonConvert.SerializeObject(text);
-                            }
-                            break;
-                        default:
-                            Console.WriteLine("ERROR detecting file extension");
-                            return (OperationStatus.BadRequest, null);
+                        await file.CopyToAsync(stream);
                     }
-
-                    return (OperationStatus.OK, json);
-
                 }
-                else
-                    return (OperationStatus.BadRequest, null);
+                
+                string json = "";
+                
+                List<List<Entity>> touchingEntityList;
+                List<Feature> features;
+                var settings = new JsonSerializerSettings();
+                settings.Converters.Add(new StringEnumConverter());
+                switch (ext)
+                {
+                    case ".dxf":
+                        using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            DXFFile dXFFile = new DXFFile(dxfStream.Name);
+                            touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                            features = dXFFile.getFeatureList(touchingEntityList);
+                            json = JsonConvert.SerializeObject(features, settings);
+                        }
+                        break;
+                    case ".dwg":
+                        using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            DWGFile dwgFile = new DWGFile(dwgStream.Name);
+                            touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
+                            features = dwgFile.getFeatureList(touchingEntityList);
+                            json = JsonConvert.SerializeObject(features, settings);
+                        }
+                        break;
+                    case ".pdf":
+                        using (var pdfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            PDFFile pdfFile = new PDFFile(pdfStream.Name);
+                            var text = pdfFile.ExtractTextFromPDF();
+                            json = JsonConvert.SerializeObject(text);
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("ERROR detecting file extension");
+                        return (OperationStatus.BadRequest, null);
+                }
+
+                return (OperationStatus.OK, json);
                 
             }
             catch (Exception ex)

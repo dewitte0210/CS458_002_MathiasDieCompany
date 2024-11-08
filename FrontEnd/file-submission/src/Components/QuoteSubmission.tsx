@@ -8,6 +8,7 @@ interface QuoteSubmissionProps {
 const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
   // Initialize state with the JSON response
   const [data, setData] = useState(jsonResponse);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle input change
   const handleChange = (index: number, key: string, value: any) => {
@@ -17,13 +18,60 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    setIsLoading(true); // Start loading
     event.preventDefault();
+
+    const formData = new FormData();
+  const form = event.currentTarget as HTMLFormElement;
+  formData.append("ruleType", form.ruleType.value);
+  formData.append("ejecMethod", form.ejecMethod.value);
+  formData.append("features", new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+  var object: any = {};
+  formData.forEach((value, key) => {
+    if (value instanceof Blob && value.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        object[key] = JSON.parse(reader.result as string);
+      };
+      reader.readAsText(value);
+    } else {
+      object[key] = value;
+    }
+  });
+
+  // Wait for all FileReader operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  var formJSON = JSON.stringify(object);
+
+    //display the form data
+    console.log(formJSON);
+
+    try {
+      const res = await fetch("https://localhost:44373/api/Pricing/estimatePrice", {
+        method: "POST",
+        body: formJSON,
+        headers: new Headers({'content-type': 'application/json'})
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
+
+      const priceJSON = await res.json(); // Capture JSON responses
+      alert(`Your quote is: ${priceJSON.price}`); // Display
+
+    } catch (error) {
+      alert('An error occurred while submitting your quote. Please try again.');
+    } finally {
+      setIsLoading(false); // End loading
+    }
   };
 
   return (
-    <div className="json-response">
-      <form onSubmit={handleSubmit} className="quote-form">
+    <div className="quote-container">
+      <form id="quote-form" onSubmit={handleSubmit} className="quote-form">
+      <div className="quote-form-fields">
         <label htmlFor="ruleType">Rule Type:</label>
         <select id="ruleType" name="ruleType">
           <option value="2ptCB937">2pt CB Center Bevel .937/.918</option>
@@ -44,7 +92,8 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
           <option value="StandardHandPlug">Standard Hand Plug</option>
           <option value="EjectorPlates">Ejector Plates</option>
         </select>
-
+      </div>
+        <div className="features-table">
         <table>
           <thead>
             <tr>
@@ -88,6 +137,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse }) => {
             })}
           </tbody>
         </table>
+        </div>
       </form>
     </div>
   );

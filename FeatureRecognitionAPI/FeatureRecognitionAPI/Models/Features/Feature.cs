@@ -30,13 +30,13 @@ public class Feature
     [JsonProperty]
     public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty]
-    bool kissCut;
+    public bool kissCut;
     [JsonProperty]
-    bool multipleRadius;
+    public bool multipleRadius;
     [JsonProperty]
-    double perimeter;
+    public double perimeter;
     [JsonProperty]
-    bool border;
+    public bool border;
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -71,7 +71,7 @@ public class Feature
         calcPerimeter();
     }
 
-    public Feature(List<Entity> EntityList, bool kissCut, bool multipleRadius)
+    public Feature(List<Entity> entityList, bool kissCut, bool multipleRadius)
     {
         this.EntityList = EntityList;
         this.kissCut = kissCut;
