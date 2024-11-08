@@ -13,6 +13,9 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeY { get; }
         public double SlopeX { get; }
         public bool ExtendedLine { get; set; }
+
+
+
         private Line()
         {
             entityType = PossibleEntityTypes.line;
@@ -91,6 +94,28 @@ namespace FeatureRecognitionAPI.Models
                 return line.StartPoint;
             }
             else return line.EndPoint;
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            //If both lines have the same length, and the slopes are within a tight tollerance, they are equal
+            if (obj is Line)
+            {
+                double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
+                double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
+
+                if (((Line)obj).Length == Length
+                    && slopeDifY < 0.000009
+                    && slopeDifX < 0.000009)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+
+
         }
     }
 }
