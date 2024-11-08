@@ -82,5 +82,20 @@ namespace FeatureRecognitionAPI.Models
         {
             return (2 * Math.PI * radius * (centralAngle / 360));
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Arc)
+            {
+                if (((Arc)obj).radius == this.radius
+                    && ((Arc)obj).startAngle == startAngle
+                    && ((Arc)obj).endAngle == endAngle)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
     }
 }
