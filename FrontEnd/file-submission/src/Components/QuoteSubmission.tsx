@@ -31,11 +31,21 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse, backToU
   setIsLoading(true); // Start loading
   event.preventDefault();
 
+  const updatedData = data.map((item) => {
+    if (item.featureType === "Punch") {
+      return {
+        ...item,
+        featureType: item.punchType, // Set featureType to punchType value
+      };
+    }
+    return item;
+  });
+
   const formData = new FormData();
   const form = event.currentTarget as HTMLFormElement;
   formData.append("ruleType", form.ruleType.value);
   formData.append("ejecMethod", form.ejecMethod.value);
-  formData.append("features", new Blob([JSON.stringify(data)], { type: 'application/json' }));
+  formData.append("features", new Blob([JSON.stringify(updatedData)], { type: 'application/json' }));
 
   console.log(formData);
 
