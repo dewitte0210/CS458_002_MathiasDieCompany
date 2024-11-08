@@ -10,15 +10,23 @@ using iText.Layout.Splitting;
 using iText.StyledXmlParser.Node;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NHibernate.Hql.Ast;
 using System;
 using System.IO;
 using System.Numerics;
 using FeatureRecognitionAPI.Models.Enums;
+using System.Security.Cryptography.Xml;
+using NHibernate.Action;
 
 public class Feature
 {
     [JsonProperty]
     public PossibleFeatureTypes featureType { get; set; }
+    
+    // A list of all the perimeter features attached to this features.
+    [JsonProperty]
+    public List<PerimeterFeatureTypes> perimeterFeatures { get; set; }
+
     [JsonProperty]
     public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty]
@@ -35,16 +43,19 @@ public class Feature
     internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
     internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
                                            // contain entities that make up the base shape and possibly corner features
-    protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
+    internal List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
                                                       // touching entities that make up a single perimeter feature for
                                                       // the original feature
-    //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
-    // You will have to run detection for perimeter features for each index of this list
-   
+                                                      //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
+                                                      // You will have to run detection for perimeter features for each index of this list
+
     private int numLines = 0;
+    public int getNumLines() { return numLines; }
     private int numArcs = 0;
+    public int getNumArcs() { return numArcs; }
     private int numCircles = 0;
-    
+    public int getNumCircles() { return numCircles; }
+
     private Feature() { }//should not use default constructor
 
     public Feature(string featureType, bool kissCut, bool multipleRadius, bool border)
@@ -56,46 +67,51 @@ public class Feature
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
         this.border = border;
-
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
         calcPerimeter();
     }
 
-    public Feature(List<Entity> entityList, bool kissCut, bool multipleRadius)
+    public Feature(List<Entity> EntityList, bool kissCut, bool multipleRadius)
     {
-        EntityList = entityList;
+        this.EntityList = EntityList;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
-
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        
         calcPerimeter();
     }
 
-    public Feature(List<Entity> entityList)
+    public Feature(List<Entity> EntityList)
     {
         this.count = 1;
-        this.EntityList = entityList;
-        psuedoFeatureDetection(entityList);
+        this.EntityList = EntityList;
+        this.baseEntityList = EntityList;
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        
+        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
+        
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
 
-    public void psuedoFeatureDetection(List<Entity> entityList)
+    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
     {
-        int numLines = 0;
-        int numArcs = 0;
-        int numCircles = 0;
+        numLines = 0;
+        numArcs = 0;
+        numCircles = 0;
 
         //count the number of each entity type
-        for (int i = 0; i < entityList.Count; i++)
+        for (int i = 0; i < EntityList.Count; i++)
         {
-            if (entityList[i] is Line)
+            if (EntityList[i] is Line)
             {
                 numLines++;
             }
-            else if (entityList[i] is Arc)
+            else if (EntityList[i] is Arc)
             {
                 numArcs++;
             }
-            else if (entityList[i] is Circle)
+            else if (EntityList[i] is Circle)
             {
                 numCircles++;
             }
@@ -105,18 +121,14 @@ public class Feature
                 break;
             }
         }
-
-
-        //calculate and set the perimeter of the feature
-        calcPerimeter();
     }
-    
+
     internal void DetectFeatures()
     {
         //check two conditions possible to make Group1B (with no perimeter features)
         if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
         {
-            featureType = type; 
+            featureType = type;
         }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4)
@@ -131,19 +143,25 @@ public class Feature
         {
             Console.WriteLine("Error: Cannot assign feature type.");
         }
+
+        //Finally Add the perimeter features
+        CheckGroup5();
+        //calculate and set the perimeter of the feature
+        calcPerimeter();
     }
+
     // Checks the feature to see if it is one of the Group 1B features
     internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
     {
         // Entity is just a circle
-        if (numCircles == 1 && numLines == 0 && numArcs == 0) 
+        if (numCircles == 1 && numLines == 0 && numArcs == 0)
         {
             type = PossibleFeatureTypes.Group1B1;
-            return true; 
+            return true;
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if(numArcs == 2 && numLines == 2)
+        else if (numArcs == 2 && numLines == 2)
         {
             double totalDegrees = 0;
             baseEntityList.ForEach(entity =>
@@ -153,16 +171,64 @@ public class Feature
                     totalDegrees += (entity as Arc).centralAngle;
                 }
             });
-            if (totalDegrees > 359.999 && totalDegrees < 360.0009) 
+            if (totalDegrees > 359.999 && totalDegrees < 360.0009)
             {
                 type = PossibleFeatureTypes.Group1B2;
-                return true; 
+                return true;
             }
         }
 
         // set a dummy type and return false.
         type = PossibleFeatureTypes.Punch;
         return false;
+    }
+    
+    //Checks the perimiter features attached to this feature and adds to the perimiterFeature list for every one we find
+    public void CheckGroup5()
+    {
+        if(PerimeterEntityList == null) { return; }
+
+        foreach (List<Entity> perimeterFeatures in PerimeterEntityList)
+        {
+            CountEntities(perimeterFeatures, out int lineCount, out int arcCount, out int circCount);
+            if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
+            foreach (Entity entity in perimeterFeatures)
+            {
+                if(entity is Arc && ((entity as Arc).centralAngle != 90 || (entity as Arc).centralAngle != 180)) { break; }
+            }
+            
+            // If the feature is group5, add it to the list! 
+            if(HasTwoParalellLine(perimeterFeatures))
+            {
+                this.perimeterFeatures.Add(PerimeterFeatureTypes.Group5);
+            }
+        }
+    }
+    
+    // Checks if an entity list has atleast one set of parralell lines
+    private bool HasTwoParalellLine(List<Entity> entities)
+    {
+        for(int i = 0; i < entities.Count(); i++)
+        {
+            if (entities[i] is Line)
+            {
+                for(int j = 0; j < entities.Count(); j++)
+                {
+                    if(j == i || entities[j] is not Line) { continue; }
+                   
+                    Line entityI = (entities[i] as Line);
+                    Line entityJ = (entities[j] as Line);
+                    double slopeI = Math.Abs(entityI.SlopeY / entityI.SlopeX);
+                    double slopeJ = Math.Abs(entityJ.SlopeY / entityJ.SlopeX);
+                   
+                    if (slopeI == slopeJ) 
+                    {
+                        return true; 
+                    }
+                }
+            }
+        }
+        return false; 
     }
 
     //calculates the perimeter of the feature
@@ -187,39 +253,58 @@ public class Feature
     */
     public override bool Equals(object obj)
     {
-        var item = obj as Feature;
-        if (item == null)
+
+        if ( !(obj is Feature) || (obj == null) )
         {
             return false;
         }
 
-        //calculate difference in order to use tolerence
-        double perDiff = perimeter - item.perimeter;
+       /*
+       * Way to quickly determin that it's likely that the features are equal.
+       * There are edge cases where two features that aren't the same could be set as equal,
+       * for instance, 2 arcs and 2 lines could have an equal perimeter, but be different feature types
+       */
 
-        //if the features are identical Group1B features
-        if (featureType == item.featureType && featureType == PossibleFeatureTypes.Group1B1 && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                Math.Abs(perDiff) < 0.0005 && border == item.border)
+        //if(this.perimeter == ((Feature)obj).perimeter
+        //    && this.numLines == ((Feature)obj).numLines
+        //    && this.numArcs == ((Feature)obj).numArcs
+        //    && this.numCircles == ((Feature)obj).numCircles)
+        //{
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+        //} 
+
+
+        /*
+         * If there are the same number of arcs lines and circles, and permiters match, 
+         * then check to see if all entities have a corresponding entity with matching values
+         */
+        if (((Feature)obj).numLines == numLines
+            && ((Feature)obj).numCircles == numCircles
+            && ((Feature)obj).numArcs == numArcs
+            && ((Feature)obj).perimeter == perimeter)
         {
-                //serialize and deserialize in order to set them to circle objects, should look into different way of doing this
-                //TODO: create added check if they are arcs instead of circles
-                var serializedParent = JsonConvert.SerializeObject(EntityList[0]);
-                Circle c1 = JsonConvert.DeserializeObject<Circle>(serializedParent);
-                serializedParent = JsonConvert.SerializeObject(item.EntityList[0]);
-                Circle c2 = JsonConvert.DeserializeObject<Circle>(serializedParent);
+            List<Entity> tmpList = new List<Entity>(((Feature)obj).EntityList);
 
-                if (c1.radius == c2.radius)
-                {
-                    return true;
-                }
-        }
+            //Creat an array of booleans for every entity in this EntityList
+            bool[] validArray = new bool[EntityList.Count];
+            for(int i = 0; i < validArray.Length; i++)
+            {
+                validArray[i] = false;
+            }
 
-        // Checking equality of all other feature types
-        else if (featureType == item.featureType && kissCut == item.kissCut && multipleRadius == item.multipleRadius &&
-                Math.Abs(perDiff) < 0.0005 && border == item.border)
-        {
-            return true;
+        
         }
-        //not equal
+        else return false;
+
+       
+
+
+
+        //If all paths fail to return true, default to false
         return false;
     }
 
@@ -235,7 +320,7 @@ public class Feature
 
     /*
      *  Recursive function that calls extendAllEntitiesHelper
-     *  sets extendedEntityList to entityList
+     *  sets extendedEntityList to EntityList
     */
     public void extendAllEntities()
     {
@@ -286,6 +371,7 @@ public class Feature
     // 2. are parallel or perpendicular
     //adds extended line(parallel) or lines(perpendicular) to extendedEntityList
     //returns true if lines were extended, otherwise false
+
     public bool extendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2))
@@ -301,28 +387,28 @@ public class Feature
                 if (PointToExtendLine1 != null && PointToExtendLine2 != null)
                 {
                     // Logic for extending line1: determines what point to extend for line1
-                    if (PointToExtendLine1.X == line1.StartX && PointToExtendLine1.Y == line1.StartY)
+                    if (PointToExtendLine1.X == line1.Start.X && PointToExtendLine1.Y == line1.Start.Y)
                     {
                         //make new line1 line with extended start point
-                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.EndX, line1.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.End.X, line1.End.Y, true));
                     }
                     else
                     {
                         //make new line1 line with extended end point
-                        ExtendedEntityList.Add(new Line(line1.StartX, line1.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line1.Start.X, line1.Start.Y, intersectPoint.X, intersectPoint.Y, true));
                     }
 
 
                     // Logic for extending line2: determines what point to extend for line2
-                    if (PointToExtendLine2.X == line2.StartX && PointToExtendLine2.Y == line2.StartY)
+                    if (PointToExtendLine2.X == line2.Start.X && PointToExtendLine2.Y == line2.Start.Y)
                     {
                         //make new line2 line with extended start point
-                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.EndX, line2.EndY, true));
+                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.End.X, line2.End.Y, true));
                     }
                     else
                     {
                         //make new line2 line with extended end point
-                        ExtendedEntityList.Add(new Line(line2.StartX, line2.StartY, intersectPoint.X, intersectPoint.Y, true));
+                        ExtendedEntityList.Add(new Line(line2.Start.X, line2.Start.Y, intersectPoint.X, intersectPoint.Y, true));
                     }
                     return true;
                 }
@@ -396,5 +482,261 @@ public class Feature
         return false;
     }
 
-    
-}
+
+
+    public Point FindMaxPoint()
+    {
+        double maxX = 0;
+        //Find the starting max 
+        if (EntityList[0] is Line)
+        {
+            if (((Line)EntityList[0]).StartPoint.X > ((Line)EntityList[0]).EndPoint.X)
+            {
+                maxX = ((Line)EntityList[0]).StartPoint.X;
+            }
+            else
+            {
+                maxX = ((Line)EntityList[0]).EndPoint.X;
+            }
+        }
+        else if (EntityList[0] is Arc)
+        {
+            if (((Arc)EntityList[0]).Start.X > ((Arc)EntityList[0]).End.X)
+            {
+                maxX = ((Arc)EntityList[0]).Start.X;
+            }
+            else
+            {
+                maxX = ((Arc)EntityList[0]).End.X;
+            }
+        }
+        else if (EntityList[0] is Circle)
+        {
+            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius );
+        }
+
+        //Loop through list and see if there is a bigger X
+        for (int i = 1; i < EntityList.Count; i++)
+        {
+            if (EntityList[i] is Line)
+            {
+                if (((Line)EntityList[i]).StartPoint.X > maxX)
+                {
+                    maxX = ((Line)EntityList[i]).StartPoint.X;
+                }
+                if (((Line)EntityList[i]).EndPoint.X > maxX)
+                {
+                    maxX = ((Line)EntityList[i]).EndPoint.X;
+                }
+            }
+            else if (EntityList[i] is Arc)
+            {
+                if (((Arc)EntityList[i]).Start.X > maxX)
+                {
+                    maxX = ((Arc)EntityList[i]).Start.X;
+                }
+                if (((Arc)EntityList[i]).End.X > maxX)
+                {
+                    maxX = ((Arc)EntityList[i]).End.X;
+                }
+            }
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius) > maxX ) 
+            {
+                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius);
+            }
+            
+        }
+
+        double maxY = 0;
+        //Find the starting max Y
+        if (EntityList[0] is Line)
+        {
+            if (((Line)EntityList[0]).StartPoint.Y > ((Line)EntityList[0]).EndPoint.Y)
+            {
+                maxY = ((Line)EntityList[0]).StartPoint.Y;
+            }
+            else
+            {
+                maxY = ((Line)EntityList[0]).EndPoint.Y;
+            }
+        }
+        else if (EntityList[0] is Arc)
+        {
+            if (((Arc)EntityList[0]).Start.Y > ((Arc)EntityList[0]).End.Y)
+            {
+                maxY = ((Arc)EntityList[0]).Start.Y;
+            }
+            else
+            {
+                maxY = ((Arc)EntityList[0]).End.Y;
+            }
+        }
+        else if (EntityList[0] is Circle)
+        {
+            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
+        }
+
+        //Loop through list and see if there is a bigger Y 
+        for (int i = 1; i < EntityList.Count; i++)
+        {
+            if (EntityList[i] is Line)
+            {
+                if (((Line)EntityList[i]).StartPoint.Y > maxY)
+                {
+                    maxY = ((Line)EntityList[i]).StartPoint.Y;
+                }
+                if (((Line)EntityList[i]).EndPoint.Y > maxY)
+                {
+                    maxY = ((Line)EntityList[i]).EndPoint.Y;
+                }
+            }
+            else if (EntityList[i] is Arc)
+            {
+                if (((Arc)EntityList[i]).Start.Y > maxY)
+                {
+                    maxY = ((Arc)EntityList[i]).Start.Y;
+                }
+                if (((Arc)EntityList[i]).End.Y > maxY)
+                {
+                    maxY = ((Arc)EntityList[i]).End.Y;
+                }
+            }
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius) > maxY)
+            {
+                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
+            }
+
+        }
+        return new Point( maxX, maxY );
+    }
+
+    public Point FindMinPoint()
+    {
+        double minX = 0;
+        //Find the starting min 
+        if (EntityList[0] is Line)
+        {
+            if (((Line)EntityList[0]).StartPoint.X < ((Line)EntityList[0]).EndPoint.X)
+            {
+                minX = ((Line)EntityList[0]).StartPoint.X;
+            }
+            else
+            {
+                minX = ((Line)EntityList[0]).EndPoint.X;
+            }
+        }
+        else if (EntityList[0] is Arc)
+        {
+            if (((Arc)EntityList[0]).Start.X < ((Arc)EntityList[0]).End.X)
+            {
+                minX = ((Arc)EntityList[0]).Start.X;
+            }
+            else
+            {
+                minX = ((Arc)EntityList[0]).End.X;
+            }
+        }
+        else if (EntityList[0] is Circle)
+        {
+            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
+        }
+
+        //Loop through list and see if there is a smaller Y
+        for (int i = 1; i < EntityList.Count; i++)
+        {
+            if (EntityList[i] is Line)
+            {
+                if (((Line)EntityList[i]).StartPoint.X < minX)
+                {
+                    minX = ((Line)EntityList[i]).StartPoint.X;
+                }
+                if (((Line)EntityList[i]).EndPoint.X < minX)
+                {
+                    minX = ((Line)EntityList[i]).EndPoint.X;
+                }
+            }
+            else if (EntityList[i] is Arc)
+            {
+                if (((Arc)EntityList[i]).Start.X < minX)
+                {
+                    minX = ((Arc)EntityList[i]).Start.X;
+                }
+                if (((Arc)EntityList[i]).End.X < minX)
+                {
+                    minX = ((Arc)EntityList[i]).End.X;
+                }
+            }
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius) > minX)
+            {
+                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
+            }
+
+        }
+
+        double minY = 0;
+        //Find the starting minumum 
+        if (EntityList[0] is Line)
+        {
+            if (((Line)EntityList[0]).StartPoint.Y < ((Line)EntityList[0]).EndPoint.Y)
+            {
+                minY = ((Line)EntityList[0]).StartPoint.Y;
+            }
+            else
+            {
+                minY = ((Line)EntityList[0]).EndPoint.Y;
+            }
+        }
+        else if (EntityList[0] is Arc)
+        {
+            if (((Arc)EntityList[0]).Start.Y < ((Arc)EntityList[0]).End.Y)
+            {
+                minY = ((Arc)EntityList[0]).Start.Y;
+            }
+            else
+            {
+                minY = ((Arc)EntityList[0]).End.Y;
+            }
+        }
+        else if (EntityList[0] is Circle)
+        {
+            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
+        }
+
+        //Loop through list and see if there is a smaller Y
+        for (int i = 1; i < EntityList.Count; i++)
+        {
+            if (EntityList[i] is Line)
+            {
+                if (((Line)EntityList[i]).StartPoint.Y < minY)
+                {
+                    minY = ((Line)EntityList[i]).StartPoint.Y;
+                }
+                if (((Line)EntityList[i]).EndPoint.Y < minY)
+                {
+                    minY = ((Line)EntityList[i]).EndPoint.Y;
+                }
+            }
+            else if (EntityList[i] is Arc)
+            {
+                if (((Arc)EntityList[i]).Start.Y < minY)
+                {
+                    minY = ((Arc)EntityList[i]).Start.Y;
+                }
+                if (((Arc)EntityList[i]).End.Y < minY)
+                {
+                    minY = ((Arc)EntityList[i]).End.Y;
+                }
+            }
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius) > minY)
+            {
+                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
+            }
+
+        }
+        return new Point(minX, minY);
+
+    }
+
+} 
+
+

@@ -10,18 +10,9 @@ namespace FeatureRecognitionAPI.Models
 
     public class Arc : Entity
     {
-        //Center point of arc - x value
-        public  double centerX { get; set; }
-        //Center point of arc - y value
-        public  double centerY { get; set; }
-        //Starting point of arc - x value
-        public  double startX { get; }
-        //Starting point of arc - y value
-        public  double startY { get; }
-        //Ending point of arc - x value
-        public  double endX { get; }
-        //Ending point of arc - y value
-        public  double endY { get; }
+        public Point Center { get; set; }
+        public Point Start {  get; set; }
+        public Point End { get; set; }
         public  double radius { get; set; }
         //Start angle for starting coordinate values
         public  double startAngle { get; set; }
@@ -37,15 +28,12 @@ namespace FeatureRecognitionAPI.Models
         public Arc( double centerX,  double centerY,  double radius,  double startAngle,  double endAngle)
         {
             entityType = PossibleEntityTypes.arc;
-            this.centerX = centerX;
-            this.centerY = centerY;
+            Center = new Point(centerX, centerY);
             this.radius = radius;
             this.startAngle = startAngle;
             this.endAngle = endAngle;
-            this.startX = calcXCoord(centerX, radius, startAngle);
-            this.startY = calcYCoord(centerY, radius, startAngle);
-            this.endX = calcXCoord(centerX, radius, endAngle);
-            this.endY = calcYCoord(centerY, radius, endAngle);
+            Start = new (calcXCoord(centerX, radius, startAngle),calcYCoord(centerY, radius, startAngle));
+            End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
             this.centralAngle = calcCentralAngle(startAngle, endAngle);
             this.Length = (calcLength(radius, centralAngle));
         }
@@ -93,6 +81,21 @@ namespace FeatureRecognitionAPI.Models
         private  double calcLength( double radius,  double centralAngle)
         {
             return (2 * Math.PI * radius * (centralAngle / 360));
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Arc)
+            {
+                if (((Arc)obj).radius == this.radius
+                    && ((Arc)obj).startAngle == startAngle
+                    && ((Arc)obj).endAngle == endAngle)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
         }
     }
 }

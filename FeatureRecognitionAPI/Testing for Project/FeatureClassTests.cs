@@ -11,12 +11,13 @@ namespace Testing_for_Project
 {
     internal class FeatureClassTests
     {
-        [Test] 
+        #region CheckGroup1B
+        [Test]
         public void CheckGroup1B_Circle_ReturnsTrue()
         {
             Circle circle = new(0.0, 0.0, 10.0);
             List<Entity> entities = new List<Entity>() { circle };
-            Feature testFeature = new(entities) { baseEntityList = entities};
+            Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
             Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Group1B1));
         }
@@ -29,7 +30,7 @@ namespace Testing_for_Project
             Line line1 = new(0.0, 5.0, 10.0, 5.0);
             Line line2 = new(0.0, -5.0, 10.0, -5.0);
             List<Entity> entities = new List<Entity>() { arc1, arc2, line1, line2 };
-            Feature testFeature = new(entities) { baseEntityList = entities};
+            Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
             Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Group1B2));
         }
@@ -44,5 +45,45 @@ namespace Testing_for_Project
             testFeature.DetectFeatures();
             Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Punch));
         }
+        #endregion
+        #region CheckGroup5
+        [Test]
+        public void CheckGroup5_3LineCompartment_ReturnsTrue()
+        {
+            Line line1 = new(0.0, 0.0, 0.0, 5.0);
+            Line line2 = new(0.0, 5.0, 5.0, 5.0);
+            Line line3 = new(5.0, 5.0, 5.0, 0.0);
+            List<Entity> entities = new List<Entity>() { line1, line2, line3 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+        }
+
+        [Test]
+        public void CheckGroup5_2Line1Arc_ReturnsTrue()
+        {
+            Line line1 = new(-1.0, 0.0, -1.0, 5.0);
+            Arc arc1 = new(0.0, 0.0, 1.0, 180, 360);
+            Line line2 = new(1.0, 0.0, 1.0, 5.0);
+            List<Entity> entities = new List<Entity>() { line1, arc1, line2 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+        }
+
+        [Test]
+        public void CheckGroup5_3Line2Arc_ReturnsTrue()
+        {
+            Line line1 = new(0.0, 1.0, 0.0, 5.0);
+            Arc arc1 = new(1.0, 1.0, 1.0, 180, 270);
+            Line line2 = new(1.0, 0.0, 4.0, 0.0);
+            Arc arc2 = new(4.0, 1.0, 1.0, 270, 360);
+            Line line3 = new(5.0, 1.0, 5.0, 5.0);
+            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+        }
+        #endregion
     }
 }
