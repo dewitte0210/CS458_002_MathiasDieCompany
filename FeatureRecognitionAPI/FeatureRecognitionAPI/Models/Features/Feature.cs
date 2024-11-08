@@ -84,8 +84,8 @@ public class Feature
     public Feature(List<Entity> EntityList)
     {
         this.count = 1;
-        this.EntityList = entityList;
-        this.baseEntityList = entityList;
+        this.EntityList = EntityList;
+        this.baseEntityList = EntityList;
         this.perimeterFeatures = new List<PerimeterFeatureTypes>();
         
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
@@ -96,6 +96,9 @@ public class Feature
 
     public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
     {
+        numLines = 0;
+        numArcs = 0;
+        numCircles = 0;
 
         //count the number of each entity type
         for (int i = 0; i < EntityList.Count; i++)
