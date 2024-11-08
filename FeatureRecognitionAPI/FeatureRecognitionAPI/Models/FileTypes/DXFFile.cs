@@ -19,7 +19,6 @@ namespace FeatureRecognitionAPI.Models
             entityList = new List<Entity>();
             this.path = path;
             fileType = SupportedExtensions.dxf;
-            //_fileVersion = GetFileVersion();
             
             if (File.Exists(path))
             {
