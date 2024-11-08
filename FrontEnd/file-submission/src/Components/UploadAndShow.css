@@ -242,7 +242,8 @@
 }
 
 .quote-container {
-  overflow-y: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
   position: relative;
 }
 
