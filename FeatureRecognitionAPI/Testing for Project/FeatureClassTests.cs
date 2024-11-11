@@ -19,7 +19,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { circle };
             Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Group1B1));
+            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group1B1));
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc2, line1, line2 };
             Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Group1B2));
+            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group1B2));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { arc, circle };
             Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.featureType, Is.EqualTo(PossibleFeatureTypes.Punch));
+            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Punch));
         }
         #endregion
         #region CheckGroup5

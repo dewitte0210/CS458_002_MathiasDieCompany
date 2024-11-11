@@ -63,7 +63,7 @@ public class Feature
         this.count = 1;
         //change string input to enum value
         PossibleFeatureTypes inputAsEnum = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), featureType);
-        this.featureType = inputAsEnum;
+        this.FeatureType = inputAsEnum;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
         this.border = border;
@@ -92,7 +92,7 @@ public class Feature
     public Feature(List<Entity> entityList)
     {
         this.count = 1;
-        this.EntityList = EntityList;
+        this.EntityList = entityList;
         this.baseEntityList = EntityList;
         this.perimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
@@ -138,16 +138,16 @@ public class Feature
         //check two conditions possible to make Group1B (with no perimeter features)
         if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
         {
-            featureType = type;
+            FeatureType = type;
         }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4)
         {
             if (numArcs == 0)
             {
-                featureType = PossibleFeatureTypes.Group1A1;
+                FeatureType = PossibleFeatureTypes.Group1A1;
             }
-            else featureType = PossibleFeatureTypes.Group1A2;
+            else FeatureType = PossibleFeatureTypes.Group1A2;
         }
         else
         {
@@ -204,7 +204,7 @@ public class Feature
             if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
             foreach (Entity entity in perimeterFeatures)
             {
-                if(entity is Arc && ((entity as Arc).centralAngle != 90 || (entity as Arc).centralAngle != 180)) { break; }
+                if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
             }
             
             // If the feature is group5, add it to the list! 
