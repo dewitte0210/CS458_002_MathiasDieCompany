@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import DragDropZone from './DragDropZone';
-import LoadingIndicator from './LoadingIndicator';
-import QuoteSubmission from './QuoteSubmission'; // Import your QuoteSubmission component
+import QuoteSubmission from './QuoteSubmission';
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -64,42 +63,38 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
   };
 
   return (
-    <section className="drag-drop">
+    <div className="upload-and-show">
       {isLoading ? ( // Display loading screen during file upload
-        <LoadingIndicator />
+        <div className="loader"></div>
       ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
         <>
+        <div className="upload-container">
+        <div className="drag-drop">
           <DragDropZone
             file={file}
             allowedFileExtensions={allowedFileExtensions}
             setFile={setFile}
             onFilesSelected={onFilesSelected}
           />
+          </div>
           {file && (
+            <div className="submit-button-container">
             <button className="animated-button" onClick={handleSubmit}>
               <span>Submit File</span>
               <span></span>
             </button>
+            </div>
           )}
-        </>
-      ) : ( // Show success message after submission
-        <div className="success-message">
-          {jsonResponse && ( // Conditionally render the JSON response
-            <QuoteSubmission jsonResponse={jsonResponse} />
-          )}
-          <div className="button-container">
-            <button className="animated-button" onClick={backToUpload}>
-              <span>Confirm</span>
-              <span></span>
-            </button>
-            <button className="animated-button" onClick={backToUpload}>
-              <span>Go Back</span>
-              <span></span>
-            </button>
-          </div>
         </div>
+        </>
+      ) : ( // Show retrieved data
+        <div className="response-container">
+          {jsonResponse && ( // Conditionally render the JSON response
+            <QuoteSubmission jsonResponse={jsonResponse} backToUpload={backToUpload}/>
+          )}
+          </div>
       )}
-    </section>
+    </div>
   );
 };
 

@@ -15,28 +15,35 @@ using System;
 using System.IO;
 using System.Numerics;
 using FeatureRecognitionAPI.Models.Enums;
+using System.Security.Cryptography.Xml;
+using NHibernate.Action;
 
 public class Feature
 {
     [JsonProperty]
-    public PossibleFeatureTypes featureType { get; set; }
+    public PossibleFeatureTypes FeatureType { get; set; }
+    
+    // A list of all the perimeter features attached to this features.
+    [JsonProperty]
+    public List<PerimeterFeatureTypes> perimeterFeatures { get; set; }
+
     [JsonProperty]
     public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty]
-    bool kissCut;
+    public bool kissCut;
     [JsonProperty]
-    bool multipleRadius;
+    public bool multipleRadius;
     [JsonProperty]
-    double perimeter;
+    public double perimeter;
     [JsonProperty]
-    bool border;
+    public bool border;
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
     internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
     internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
-                                          // contain entities that make up the base shape and possibly corner features
-    protected List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
+                                           // contain entities that make up the base shape and possibly corner features
+    internal List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
                                                       // touching entities that make up a single perimeter feature for
                                                       // the original feature
                                                       //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
@@ -64,6 +71,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
+        perimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
@@ -76,6 +84,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
@@ -83,17 +92,23 @@ public class Feature
     public Feature(List<Entity> entityList)
     {
         this.count = 1;
-        this.EntityList = entityList;
-        baseEntityList = new List<Entity>();
+        this.EntityList = EntityList;
+        this.baseEntityList = EntityList;
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
-        psuedoFeatureDetection(entityList);
+
+        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
+        
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
 
-    public void psuedoFeatureDetection(List<Entity> entityList)
+    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
     {
+        numLines = 0;
+        numArcs = 0;
+        numCircles = 0;
 
         //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)
@@ -138,7 +153,13 @@ public class Feature
         {
             //Console.WriteLine("Error: Cannot assign feature type.");
         }
+
+        //Finally Add the perimeter features
+        CheckGroup5();
+        //calculate and set the perimeter of the feature
+        calcPerimeter();
     }
+
     // Checks the feature to see if it is one of the Group 1B features
     internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
     {
@@ -170,6 +191,54 @@ public class Feature
         // set a dummy type and return false.
         type = PossibleFeatureTypes.Punch;
         return false;
+    }
+    
+    //Checks the perimiter features attached to this feature and adds to the perimiterFeature list for every one we find
+    public void CheckGroup5()
+    {
+        if(PerimeterEntityList == null) { return; }
+
+        foreach (List<Entity> perimeterFeatures in PerimeterEntityList)
+        {
+            CountEntities(perimeterFeatures, out int lineCount, out int arcCount, out int circCount);
+            if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
+            foreach (Entity entity in perimeterFeatures)
+            {
+                if(entity is Arc && ((entity as Arc).centralAngle != 90 || (entity as Arc).centralAngle != 180)) { break; }
+            }
+            
+            // If the feature is group5, add it to the list! 
+            if(HasTwoParalellLine(perimeterFeatures))
+            {
+                this.perimeterFeatures.Add(PerimeterFeatureTypes.Group5);
+            }
+        }
+    }
+    
+    // Checks if an entity list has atleast one set of parralell lines
+    private bool HasTwoParalellLine(List<Entity> entities)
+    {
+        for(int i = 0; i < entities.Count(); i++)
+        {
+            if (entities[i] is Line)
+            {
+                for(int j = 0; j < entities.Count(); j++)
+                {
+                    if(j == i || entities[j] is not Line) { continue; }
+                   
+                    Line entityI = (entities[i] as Line);
+                    Line entityJ = (entities[j] as Line);
+                    double slopeI = Math.Abs(entityI.SlopeY / entityI.SlopeX);
+                    double slopeJ = Math.Abs(entityJ.SlopeY / entityJ.SlopeX);
+                   
+                    if (slopeI == slopeJ) 
+                    {
+                        return true; 
+                    }
+                }
+            }
+        }
+        return false; 
     }
 
     //calculates the perimeter of the feature
