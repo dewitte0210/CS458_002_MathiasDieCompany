@@ -1,4 +1,5 @@
 ﻿using FeatureRecognitionAPI.Services;
+using System.Runtime.Intrinsics.Arm;
 
 namespace FeatureRecognitionAPI.Models.Features
 {
@@ -9,9 +10,9 @@ namespace FeatureRecognitionAPI.Models.Features
         protected int totalLines;
         protected int totalCircles;
         protected List<Feature> features;
-        public FeatureGroup(int count, List<Feature> features) 
+        public FeatureGroup( List<Feature> features) 
         {
-            this.count = count;
+           // this.count = count;
             this.features = features;
 
             foreach( Feature feature in features)
@@ -23,9 +24,35 @@ namespace FeatureRecognitionAPI.Models.Features
 
         }
 
+        //Check of all features in the group have a corresponding feature in other group, return true if they do
         public override bool Equals(object? obj)
         {
-            return base.Equals(obj);
+            if (!(obj is FeatureGroup) || obj == null)
+            {
+                return false;
+            }
+            else if (obj == this)
+            {
+                return true;
+            }
+            else
+            {
+                //If in here, obj is a FeatureGroup
+
+                if (totalArcs == ((FeatureGroup)obj).totalArcs
+                    && totalLines == ((FeatureGroup)obj).totalLines
+                    && totalCircles == ((FeatureGroup)obj).totalCircles)
+                {
+                    //Do something
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+
         }
     }
 }
