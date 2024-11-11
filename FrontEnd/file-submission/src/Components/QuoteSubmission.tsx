@@ -10,10 +10,12 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse, backToU
   // Initialize state with the JSON response
   const [data, setData] = useState(jsonResponse);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formFields, setFormFields] = useState({
     ruleType: '',
     ejecMethod: '',
   });
+  const [priceJSON, setPriceJSON] = useState(null);
 
   // Handle input change
   const handleChange = (key: string, value: any, index?: number) => {
@@ -24,6 +26,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse, backToU
     } else {
       setFormFields((prev) => ({ ...prev, [key]: value }));
     }
+  };
+
+  const backToForm = () => {
+    setIsSubmitted(false);
   };
 
   // Handle form submission
@@ -46,8 +52,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse, backToU
   formData.append("ruleType", form.ruleType.value);
   formData.append("ejecMethod", form.ejecMethod.value);
   formData.append("features", new Blob([JSON.stringify(updatedData)], { type: 'application/json' }));
-
-  console.log(formData);
 
   var object: any = {};
   formData.forEach((value, key) => {
@@ -78,22 +82,35 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({ jsonResponse, backToU
       });
 
       if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
-
-      const priceJSON = await res.json(); // Capture JSON responses
-      alert(`Your quote is: ${priceJSON.price}`); // Display
+      setPriceJSON(await res.json()); // Store response in state
 
     } catch (error) {
       alert('An error occurred while submitting your quote. Please try again.');
     } finally {
+      setIsSubmitted(true);
       setIsLoading(false); // End loading
     }
   };
 
   return (
     <div className="quote-container">
-      {isLoading ? ( // Display loading screen during file upload
+      {isLoading ? (
         <div className="loader"></div>
-      ) : ( // Display quote form if not loading
+      ) : isSubmitted ? (
+        <div className="submission-message">
+          <p>Your estimated price is: {priceJSON} </p>
+          <div className="button-container">
+          <button className="animated-button" onClick={backToForm}>
+            <span>Back to Feature List</span>
+            <span></span>
+          </button>
+          <button className="animated-button" onClick={backToUpload}>
+            <span>Back to File Upload</span>
+            <span></span>
+          </button>
+        </div>
+        </div>
+      ) : (
         <>
       <form id="quote-form" onSubmit={handleSubmit} className="quote-form">
       <div className="quote-form-fields">

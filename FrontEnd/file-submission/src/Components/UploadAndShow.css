@@ -242,8 +242,6 @@
 }
 
 .quote-container {
-  overflow-y: hidden;
-  overflow-x: hidden;
   position: relative;
 }
 
@@ -305,4 +303,9 @@ table tbody tr:nth-child(odd) {
 
 h3 {
   text-align: center;
+}
+
+.submission-message {
+  text-align: center;
+  font-size: larger;
 }
