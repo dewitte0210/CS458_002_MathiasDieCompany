@@ -4,12 +4,14 @@ namespace FeatureRecognitionAPI.Models.Enums
 {
     public enum PossibleFeatureTypes
     {
-        StdTubePunch,
-        SideOutletPunch,
-        HDSideOutletPunch,
-        StdFeedThroughPunch,
-        StdStraightWallPunch,
-        StdRetractablePinPunch,
+        [JsonProperty]
+        SideTubePunch,
+        SideOutlet,
+        HDSideOutlet,
+        StdFTPunch,
+        StdSWPunch,
+        StdRetractPins,
+        Punch,
         Group1A1,
         Group1A2,
         Group1B1, // Circle

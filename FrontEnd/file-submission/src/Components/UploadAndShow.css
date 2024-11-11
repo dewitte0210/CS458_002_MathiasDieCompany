@@ -214,6 +214,7 @@
   border-radius: 50%;
   border-right-color: #25b09b;
   animation: l15 1s infinite linear;
+  overflow: clip;
 }
 .loader::before,
 .loader::after {    
@@ -241,8 +242,6 @@
 }
 
 .quote-container {
-
-  overflow-y: auto;
   position: relative;
 }
 
@@ -250,6 +249,17 @@
   margin-bottom: 5%;
   display: flex;
   flex-direction: row;
+  gap: 7%;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 1%;
+}
+
+.quote-form-label-and-select {
+  display: flex;
+  flex-direction: column;
   gap: 3%;
 }
 
@@ -293,4 +303,9 @@ table tbody tr:nth-child(odd) {
 
 h3 {
   text-align: center;
+}
+
+.submission-message {
+  text-align: center;
+  font-size: larger;
 }

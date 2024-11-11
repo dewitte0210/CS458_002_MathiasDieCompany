@@ -90,19 +90,9 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
       ) : ( // Show retrieved data
         <div className="response-container">
           {jsonResponse && ( // Conditionally render the JSON response
-            <QuoteSubmission jsonResponse={jsonResponse} />
+            <QuoteSubmission jsonResponse={jsonResponse} backToUpload={backToUpload}/>
           )}
-          <div className="button-container">
-            <button form="quote-form" type="submit" className="animated-button">
-              <span>Confirm</span>
-              <span></span>
-            </button>
-            <button className="animated-button" onClick={backToUpload}>
-              <span>Go Back</span>
-              <span></span>
-            </button>
           </div>
-        </div>
       )}
     </div>
   );

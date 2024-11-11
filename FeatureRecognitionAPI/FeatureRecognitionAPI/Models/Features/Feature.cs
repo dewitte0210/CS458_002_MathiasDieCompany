@@ -71,7 +71,7 @@ public class Feature
         calcPerimeter();
     }
 
-    public Feature(List<Entity> entityList, bool kissCut, bool multipleRadius)
+    public Feature(List<Entity> EntityList, bool kissCut, bool multipleRadius)
     {
         this.EntityList = EntityList;
         this.kissCut = kissCut;
