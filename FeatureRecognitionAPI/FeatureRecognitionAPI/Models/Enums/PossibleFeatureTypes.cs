@@ -4,7 +4,6 @@ namespace FeatureRecognitionAPI.Models.Enums
 {
     public enum PossibleFeatureTypes
     {
-        [JsonProperty]
         SideTubePunch,
         SideOutlet,
         HDSideOutlet,

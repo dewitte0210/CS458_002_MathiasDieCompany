@@ -1,11 +1,14 @@
 ﻿using FeatureRecognitionAPI.Models.Dtos;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Services
 {
     public class PricingService : IPricingService
     {
-        public PricingService() { }
+        public PricingService() 
+        {
+        }
 
         public async Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param)
         {
@@ -17,6 +20,10 @@ namespace FeatureRecognitionAPI.Services
             {
                 return (OperationStatus.ExternalApiFailure, ex.Message, null);
             }
+        }
+
+        private void InitializePunchLists()
+        {
         }
     }
 }
