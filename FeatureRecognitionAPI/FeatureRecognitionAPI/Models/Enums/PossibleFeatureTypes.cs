@@ -17,6 +17,8 @@ namespace FeatureRecognitionAPI.Models.Enums
         Group1B1, // Circle
         Group1B2, // Rounded Rectangle
         Group3,
+        Group4,
+        Group5,
         Group1C,
         Group6,
         Group2A

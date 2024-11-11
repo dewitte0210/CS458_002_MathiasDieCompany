@@ -67,7 +67,7 @@ public class Feature
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
         this.border = border;
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        perimeterFeatures = new List<PerimeterFeatureTypes>();
         calcPerimeter();
     }
 
@@ -76,17 +76,25 @@ public class Feature
         this.EntityList = EntityList;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        perimeterFeatures = new List<PerimeterFeatureTypes>();
         
+        calcPerimeter();
+    }
+
+    public Feature(PerimeterFeatureTypes perimeterFeatureType)
+    {
+        count = 1;
+        featureType = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), perimeterFeatureType.ToString());
+
         calcPerimeter();
     }
 
     public Feature(List<Entity> EntityList)
     {
-        this.count = 1;
+        count = 1;
         this.EntityList = EntityList;
-        this.baseEntityList = EntityList;
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        baseEntityList = EntityList;
+        perimeterFeatures = new List<PerimeterFeatureTypes>();
         
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
         
@@ -156,7 +164,15 @@ public class Feature
         // Entity is just a circle
         if (numCircles == 1 && numLines == 0 && numArcs == 0)
         {
-            type = PossibleFeatureTypes.Group1B1;
+            Circle c = baseEntityList[0] as Circle;
+            if (c.radius * 2 <= 1.75)
+            {
+                type = PossibleFeatureTypes.Punch;
+            }
+            else
+            {
+                type = PossibleFeatureTypes.Group1B1;
+            }
             return true;
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
