@@ -44,6 +44,7 @@ namespace FeatureRecognitionAPI.Models.Features
                     && totalCircles == ((FeatureGroup)obj).totalCircles)
                 {
                     //Do something
+                    return true;
                 }
                 else
                 {
