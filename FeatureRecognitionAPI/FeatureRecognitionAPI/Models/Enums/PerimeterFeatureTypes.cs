@@ -6,6 +6,6 @@ namespace FeatureRecognitionAPI.Models.Enums
     {
         [JsonProperty]         
         Group5,
-        Dummy
+        Group4,
     }
 }

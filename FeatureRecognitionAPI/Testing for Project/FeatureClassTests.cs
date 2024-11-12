@@ -46,6 +46,7 @@ namespace Testing_for_Project
             Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Punch));
         }
         #endregion
+       
         #region CheckGroup5
         [Test]
         public void CheckGroup5_3LineCompartment_ReturnsTrue()
@@ -85,5 +86,43 @@ namespace Testing_for_Project
             Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
         }
         #endregion
+        
+        #region CheckGroup4
+        [Test]
+        public void CheckGroup4_2LineAngled_ReturnsTrue()
+        {
+            Line line1 = new(0.0, 1.0, 1.0, 0.0);
+            Line line2 = new(1.0, 0.0, 2.0, 1.0);
+            List<Entity> entities = new List<Entity>() { line1, line2 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+        }
+
+        [Test]
+        public void CheckGroup4_2Arc2Line_ReturnsTrue()
+        {
+
+            Arc arc1 = new(0.0, 3.0, 2, 0, 90);
+            Line line1 = new(1.0, 2.0, 1.0, 1.0);
+            Line line2 = new(1.0, 1.0, 2.0, 1.0);
+            Arc arc2 = new(3.0, 0.0, 2, 0, 90);
+            List<Entity> entities = new List<Entity> { arc1, line1, line2, arc2 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+        }
+
+        [Test]
+        public void CheckGroup4_2LineNotAngled_ReturnsTrue()
+        {
+            Line line1 = new(0.0, 1.0, 0.0, 0.0);
+            Line line2 = new(0.0, 0.0, 1.0, 0.0);
+            List<Entity> entities = new List<Entity> { line1, line2 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+        }
+        #endregion 
     }
 }

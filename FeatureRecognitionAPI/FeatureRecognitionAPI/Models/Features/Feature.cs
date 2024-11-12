@@ -159,6 +159,7 @@ public class Feature
 
         //Finally Add the perimeter features
         CheckGroup5();
+        CheckGroup4();
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
@@ -169,7 +170,15 @@ public class Feature
         // Entity is just a circle
         if (numCircles == 1 && numLines == 0 && numArcs == 0)
         {
-            type = PossibleFeatureTypes.Group1B1;
+            Circle c = baseEntityList[0] as Circle;
+            if (c.radius * 2 <= 1.75)
+            {
+                type = PossibleFeatureTypes.Punch;
+            }
+            else
+            {
+                type = PossibleFeatureTypes.Group1B1;
+            }
             return true;
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
@@ -196,24 +205,55 @@ public class Feature
         return false;
     }
     
-    //Checks the perimiter features attached to this feature and adds to the perimiterFeature list for every one we find
+    //Checks the perimiter entity list to detect if any of the features there belong to group 4, then adds any we find to the perimiterFeature list 
+    public void CheckGroup4()
+    {
+        if(PerimeterEntityList == null) { return;  }
+
+        foreach (List<Entity> feature in PerimeterEntityList)
+        {
+            bool g4Detected = false;
+            Line tempLine = null;
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+
+            if (lineCount != 2 || (arcCount != 2 && arcCount !=0)) { continue; }
+
+            foreach (Entity entity in feature)
+            {
+                if (entity is Line && tempLine == null)
+                {
+                    tempLine = (entity as Line);  
+                } else if(entity is Line)
+                {
+                    g4Detected = tempLine.DoesIntersect(entity);
+                }
+            }
+            if (g4Detected)
+            {
+                perimeterFeatures.Add(PerimeterFeatureTypes.Group4);
+            }
+        }
+    }
+
+    //Checks the perimiter entity list to detect if any of the features there belong to group 5, then adds any we find to the perimiterFeature list 
     public void CheckGroup5()
     {
         if(PerimeterEntityList == null) { return; }
 
-        foreach (List<Entity> perimeterFeatures in PerimeterEntityList)
+        foreach (List<Entity> feature in PerimeterEntityList)
         {
-            CountEntities(perimeterFeatures, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
             if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
-            foreach (Entity entity in perimeterFeatures)
+            foreach (Entity entity in feature)
             {
                 if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
             }
             
             // If the feature is group5, add it to the list! 
-            if(HasTwoParalellLine(perimeterFeatures))
+            if(HasTwoParalellLine(feature))
             {
-                this.perimeterFeatures.Add(PerimeterFeatureTypes.Group5);
+                perimeterFeatures.Add(PerimeterFeatureTypes.Group5);
+                
             }
         }
     }
@@ -231,8 +271,15 @@ public class Feature
                    
                     Line entityI = (entities[i] as Line);
                     Line entityJ = (entities[j] as Line);
-                    double slopeI = Math.Abs(entityI.SlopeY / entityI.SlopeX);
-                    double slopeJ = Math.Abs(entityJ.SlopeY / entityJ.SlopeX);
+                    
+                    // Check for verticality
+                    if((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0)) 
+                    {
+                        return true;
+                    }
+                    
+                    double slopeI = entityI.SlopeY / entityI.SlopeX;
+                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
                    
                     if (slopeI == slopeJ) 
                     {
