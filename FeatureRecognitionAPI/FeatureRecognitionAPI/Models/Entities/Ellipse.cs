@@ -75,5 +75,14 @@ namespace FeatureRecognitionAPI.Models
         {
             return 0;
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Ellipse)
+            {
+
+            }
+            return false;
+        }
     }
 }

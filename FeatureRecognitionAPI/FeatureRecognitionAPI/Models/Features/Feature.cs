@@ -269,7 +269,7 @@ public class Feature
     */
     public override bool Equals(object obj)
     {
-        if (!(obj is Feature) || (obj == null))
+        if ((!(obj is Feature)) || (obj == null))
         {
             return false;
         }
@@ -303,15 +303,6 @@ public class Feature
             && ((Feature)obj).numArcs == numArcs
             && ((Feature)obj).perimeter == perimeter)
         {
-           // List<Entity> tmpList = new List<Entity>(((Feature)obj).EntityList);
-
-            //Creat an array of booleans for every entity in this EntityList
-            bool[] validArray = new bool[EntityList.Count];
-            for(int i = 0; i < validArray.Length; i++)
-            {
-                validArray[i] = false;
-            }
-
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
             EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
@@ -319,96 +310,14 @@ public class Feature
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
             //Remove the entity if it's found, and set the corresponding value in validArray to true
-
-            for (int i = 0; i < EntityList.Count; i++)
+            bool equalLists = true;
+            foreach(Entity j in ((Feature)obj).EntityList)
             {
-                switch (EntityList[i].GetEntityType())
-                {
-                    //All of these cases are essentially the same, but it's needed to specify which entity type
-                    //.equals to use (or else it doesn't work)
-                    case ("arc"):
-                        {
-                            int j = i;
-                            //If current entities are not equal, but lengths are equal, then try next element in list
-                            //Once loop ends, if obj.entitylist @ j is not equal to entitylist @ i features are not the same
-                            while (!((Arc)EntityList[i]).Equals(((Feature)obj).EntityList[j])
-                                && ((Feature)obj).EntityList[j].Length == EntityList[i].Length)
-                            {
-                                j++;
-                                if (j >= EntityList.Count)
-                                    break;
-                            }
-                            if(((Arc)EntityList[i]).Equals(((Feature)obj).EntityList[j]))
-                            {
-                                validArray[i] = true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        }
-                    case ("circle"):
-                        {
-                            int j = i;
-
-                            while (!((Circle)EntityList[i]).Equals(((Feature)obj).EntityList[j])
-                                && ((Feature)obj).EntityList[j].Length == EntityList[i].Length)
-                            {
-                                j++;
-                                if (j >= EntityList.Count)
-                                    break;
-                            }
-                            if (((Circle)EntityList[i]).Equals(((Feature)obj).EntityList[j]))
-                            {
-                                validArray[i] = true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        }
-                    case ("line"):
-                        {
-                            int j = i;
-                            while (!((Line)EntityList[i]).Equals(((Feature)obj).EntityList[j])
-                                && ((Feature)obj).EntityList[j].Length == EntityList[i].Length)
-                            {
-                                j++;
-                                if (j >= EntityList.Count)
-                                    break;
-                            }
-                            if (((Line)EntityList[i]).Equals(((Feature)obj).EntityList[j]))
-                            {
-                                validArray[i] = true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        }
-                    default:
-                        {
-                            //why are we here?
-                            return false;
-                        }
-                }
-            }// End of for loop
-            //After exiting for loop, every value of validArray should be true (if features are equal)
-            foreach(bool var in validArray)
-            {
-                if(!var)
-                {
-                    return false;
-                }
+                if (!EntityList.Contains(j)) { equalLists = false; }
             }
-            //If false isn't returned in foreach loop, return true
-            return true;
+            return equalLists;
         }
         else return false;
-
     }
 
 

@@ -104,7 +104,8 @@ namespace FeatureRecognitionAPI.Models
         {
             if (obj is Arc)
             {
-                if (((Arc)obj).Radius == this.Radius
+                if (((Arc)obj).Length == Length
+                    &&((Arc)obj).Radius == Radius
                     && ((Arc)obj).StartAngle == StartAngle
                     && ((Arc)obj).EndAngle == EndAngle)
                 {

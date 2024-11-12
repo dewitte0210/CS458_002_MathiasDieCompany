@@ -475,5 +475,6 @@ namespace FeatureRecognitionAPI.Models
             return intersect1IsValid || intersect2IsValid; 
 ;
         }
+        public abstract override bool Equals(object? obj);
     }
 }

@@ -97,7 +97,7 @@ namespace FeatureRecognitionAPI.Models
         public override bool Equals(object? obj)
         {
             //If both lines have the same length, and the slopes are within a tight tollerance, they are equal
-            if (obj is Line)
+            if (obj is Line && ((Line)obj).Length == Length)
             {
                 double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
                 double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);

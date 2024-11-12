@@ -49,7 +49,8 @@ namespace FeatureRecognitionAPI.Models
 
             if (obj is Circle)
             {
-                if (((Circle)obj).Radius == this.Radius)
+                if (((Circle)obj).Length == Length
+                    && ((Circle)obj).Radius == this.Radius)
                 {
                     return true;
                 }
