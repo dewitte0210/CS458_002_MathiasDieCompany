@@ -92,10 +92,10 @@ public class Feature
         calcPerimeter();
     }
 
-    public Feature(List<Entity> entityList)
+    public Feature(List<Entity> EntityList)
     {
         this.count = 1;
-        this.EntityList = entityList;
+        this.EntityList = EntityList;
         this.baseEntityList = EntityList;
         this.perimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
@@ -104,6 +104,13 @@ public class Feature
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
         
         //calculate and set the perimeter of the feature
+        calcPerimeter();
+    }
+    public Feature(PerimeterFeatureTypes perimeterFeatureType)
+    {
+        count = 1;
+        FeatureType = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), perimeterFeatureType.ToString());
+
         calcPerimeter();
     }
 
@@ -171,7 +178,7 @@ public class Feature
         if (numCircles == 1 && numLines == 0 && numArcs == 0)
         {
             Circle c = baseEntityList[0] as Circle;
-            if (c.radius * 2 <= 1.75)
+            if (c.Radius * 2 <= 1.75)
             {
                 type = PossibleFeatureTypes.Punch;
             }
