@@ -28,7 +28,7 @@ public class Feature
     
     // A list of all the perimeter features attached to this features.
     [JsonProperty]
-    public List<PerimeterFeatureTypes> perimeterFeatures { get; set; }
+    public List<PerimeterFeatureTypes> PerimeterFeatures { get; set; }
 
     [JsonProperty]
     public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
@@ -74,7 +74,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
-        perimeterFeatures = new List<PerimeterFeatureTypes>();
+        PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
@@ -87,7 +87,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
@@ -97,7 +97,7 @@ public class Feature
         this.count = 1;
         this.EntityList = EntityList;
         this.baseEntityList = EntityList;
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
 
@@ -237,7 +237,7 @@ public class Feature
             }
             if (g4Detected)
             {
-                perimeterFeatures.Add(PerimeterFeatureTypes.Group4);
+                PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);
             }
         }
     }
@@ -259,7 +259,7 @@ public class Feature
             // If the feature is group5, add it to the list! 
             if(HasTwoParalellLine(feature))
             {
-                perimeterFeatures.Add(PerimeterFeatureTypes.Group5);
+                PerimeterFeatures.Add(PerimeterFeatureTypes.Group5);
                 
             }
         }
