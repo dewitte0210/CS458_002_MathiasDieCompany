@@ -24,7 +24,7 @@ using NHibernate.Type;
 public class Feature
 {
     [JsonProperty]
-    public PossibleFeatureTypes featureType { get; set; }
+    public PossibleFeatureTypes FeatureType { get; set; }
     
     // A list of all the perimeter features attached to this features.
     [JsonProperty]
@@ -66,42 +66,51 @@ public class Feature
         this.count = 1;
         //change string input to enum value
         PossibleFeatureTypes inputAsEnum = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), featureType);
-        this.featureType = inputAsEnum;
+        this.FeatureType = inputAsEnum;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
         this.border = border;
+        EntityList = new List<Entity>();
+        baseEntityList = new List<Entity>();
+        ExtendedEntityList = new List<Entity>();
+        PerimeterEntityList = new List<List<Entity>>();
         perimeterFeatures = new List<PerimeterFeatureTypes>();
+
         calcPerimeter();
     }
 
-    public Feature(List<Entity> EntityList, bool kissCut, bool multipleRadius)
+    public Feature (List<Entity> entityList, bool kissCut, bool multipleRadius)
     {
-        this.EntityList = EntityList;
+        EntityList = entityList;
         this.kissCut = kissCut;
         this.multipleRadius = multipleRadius;
-        perimeterFeatures = new List<PerimeterFeatureTypes>();
-        
-        calcPerimeter();
-    }
-
-    public Feature(PerimeterFeatureTypes perimeterFeatureType)
-    {
-        count = 1;
-        featureType = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), perimeterFeatureType.ToString());
+        baseEntityList = new List<Entity>();
+        ExtendedEntityList = new List<Entity>();
+        PerimeterEntityList = new List<List<Entity>>();
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
 
     public Feature(List<Entity> EntityList)
     {
-        count = 1;
+        this.count = 1;
         this.EntityList = EntityList;
-        baseEntityList = EntityList;
-        perimeterFeatures = new List<PerimeterFeatureTypes>();
-        
+        this.baseEntityList = EntityList;
+        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        ExtendedEntityList = new List<Entity>();
+        PerimeterEntityList = new List<List<Entity>>();
+
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
         
         //calculate and set the perimeter of the feature
+        calcPerimeter();
+    }
+    public Feature(PerimeterFeatureTypes perimeterFeatureType)
+    {
+        count = 1;
+        FeatureType = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), perimeterFeatureType.ToString());
+
         calcPerimeter();
     }
 
@@ -112,17 +121,17 @@ public class Feature
         numCircles = 0;
 
         //count the number of each entity type
-        for (int i = 0; i < EntityList.Count; i++)
+        for (int i = 0; i < entityList.Count; i++)
         {
-            if (EntityList[i] is Line)
+            if (entityList[i] is Line)
             {
                 numLines++;
             }
-            else if (EntityList[i] is Arc)
+            else if (entityList[i] is Arc)
             {
                 numArcs++;
             }
-            else if (EntityList[i] is Circle)
+            else if (entityList[i] is Circle)
             {
                 numCircles++;
             }
@@ -139,20 +148,20 @@ public class Feature
         //check two conditions possible to make Group1B (with no perimeter features)
         if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
         {
-            featureType = type;
+            FeatureType = type;
         }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4)
         {
             if (numArcs == 0)
             {
-                featureType = PossibleFeatureTypes.Group1A1;
+                FeatureType = PossibleFeatureTypes.Group1A1;
             }
-            else featureType = PossibleFeatureTypes.Group1A2;
+            else FeatureType = PossibleFeatureTypes.Group1A2;
         }
         else
         {
-            Console.WriteLine("Error: Cannot assign feature type.");
+            //Console.WriteLine("Error: Cannot assign feature type.");
         }
 
         //Finally Add the perimeter features
@@ -169,7 +178,7 @@ public class Feature
         if (numCircles == 1 && numLines == 0 && numArcs == 0)
         {
             Circle c = baseEntityList[0] as Circle;
-            if (c.radius * 2 <= 1.75)
+            if (c.Radius * 2 <= 1.75)
             {
                 type = PossibleFeatureTypes.Punch;
             }
@@ -188,7 +197,7 @@ public class Feature
             {
                 if (entity is Arc)
                 {
-                    totalDegrees += (entity as Arc).centralAngle;
+                    totalDegrees += (entity as Arc).CentralAngle;
                 }
             });
             if (totalDegrees > 359.999 && totalDegrees < 360.0009)
@@ -244,7 +253,7 @@ public class Feature
             if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
             foreach (Entity entity in feature)
             {
-                if(entity is Arc && ((entity as Arc).centralAngle != 90 || (entity as Arc).centralAngle != 180)) { break; }
+                if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
             }
             
             // If the feature is group5, add it to the list! 
@@ -292,11 +301,14 @@ public class Feature
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
+        /*if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
+        {
+            perimeter = EntityList[0].Length / Math.PI;
+        }*/
+        if (EntityList[0] is Circle)
         {
             perimeter = EntityList[0].Length / Math.PI;
         }
-
         else
         {
             for (int i = 0; i < EntityList.Count; i++)
@@ -311,7 +323,7 @@ public class Feature
     */
     public override bool Equals(object obj)
     {
-        if (!(obj is Feature) || (obj == null))
+        if ((!(obj is Feature)) || (obj == null))
         {
             return false;
         }
@@ -345,15 +357,6 @@ public class Feature
             && ((Feature)obj).numArcs == numArcs
             && ((Feature)obj).perimeter == perimeter)
         {
-           // List<Entity> tmpList = new List<Entity>(((Feature)obj).EntityList);
-
-            //Creat an array of booleans for every entity in this EntityList
-            bool[] validArray = new bool[EntityList.Count];
-            for(int i = 0; i < validArray.Length; i++)
-            {
-                validArray[i] = false;
-            }
-
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
             EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
@@ -361,96 +364,14 @@ public class Feature
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
             //Remove the entity if it's found, and set the corresponding value in validArray to true
-
-            for (int i = 0; i < EntityList.Count; i++)
+            bool equalLists = true;
+            foreach(Entity j in ((Feature)obj).EntityList)
             {
-                switch (EntityList[i].GetEntityType())
-                {
-                    //All of these cases are essentially the same, but it's needed to specify which entity type
-                    //.equals to use (or else it doesn't work)
-                    case ("arc"):
-                        {
-                            int j = i;
-                            //If current entities are not equal, but lengths are equal, then try next element in list
-                            //Once loop ends, if obj.entitylist @ j is not equal to entitylist @ i features are not the same
-                            while (!((Arc)EntityList[i]).Equals(((Feature)obj).EntityList[j])
-                                && ((Feature)obj).EntityList[j].Length == EntityList[i].Length)
-                            {
-                                j++;
-                                if (j >= EntityList.Count)
-                                    break;
-                            }
-                            if(((Arc)EntityList[i]).Equals(((Feature)obj).EntityList[j]))
-                            {
-                                validArray[i] = true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        }
-                    case ("circle"):
-                        {
-                            int j = i;
-
-                            while (!((Circle)EntityList[i]).Equals(((Feature)obj).EntityList[j])
-                                && ((Feature)obj).EntityList[j].Length == EntityList[i].Length)
-                            {
-                                j++;
-                                if (j >= EntityList.Count)
-                                    break;
-                            }
-                            if (((Circle)EntityList[i]).Equals(((Feature)obj).EntityList[j]))
-                            {
-                                validArray[i] = true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        }
-                    case ("line"):
-                        {
-                            int j = i;
-                            while (!((Line)EntityList[i]).Equals(((Feature)obj).EntityList[j])
-                                && ((Feature)obj).EntityList[j].Length == EntityList[i].Length)
-                            {
-                                j++;
-                                if (j >= EntityList.Count)
-                                    break;
-                            }
-                            if (((Line)EntityList[i]).Equals(((Feature)obj).EntityList[j]))
-                            {
-                                validArray[i] = true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                            break;
-                        }
-                    default:
-                        {
-                            //why are we here?
-                            return false;
-                        }
-                }
-            }// End of for loop
-            //After exiting for loop, every value of validArray should be true (if features are equal)
-            foreach(bool var in validArray)
-            {
-                if(!var)
-                {
-                    return false;
-                }
+                if (!EntityList.Contains(j)) { equalLists = false; }
             }
-            //If false isn't returned in foreach loop, return true
-            return true;
+            return equalLists;
         }
         else return false;
-
     }
 
 
@@ -517,7 +438,6 @@ public class Feature
     // 2. are parallel or perpendicular
     //adds extended line(parallel) or lines(perpendicular) to extendedEntityList
     //returns true if lines were extended, otherwise false
-
     public bool extendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2))
@@ -610,22 +530,83 @@ public class Feature
 
     public bool sortExtendedLines()
     {
-        Stack<Entity> path = new Stack<Entity>();
-        sortExtendedLinesHelper(path, 0);
-        return false;
-    }
-    public bool sortExtendedLinesHelper(Stack<Entity> curPath, int index)
-    {
-        curPath.Push(ExtendedEntityList[index]);
-        List<Entity> connectedEntities = new List<Entity>();
-        foreach (Entity entity in ExtendedEntityList)
+        if (ExtendedEntityList.Count == 1 && ExtendedEntityList[0] is Circle && baseEntityList.Count ==0)
         {
-            if (ExtendedEntityList[index] != entity)
+            baseEntityList.Add((Circle)ExtendedEntityList[0]);
+            return true;
+        }
+        Stack<Entity> curPath = new Stack<Entity>();
+        List<Entity> testedEntities = new List<Entity>();
+
+        Entity head = ExtendedEntityList[0];
+        foreach(Entity entity in ExtendedEntityList)
+            //this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
+        {
+            if (entity.Length > head.Length)
             {
-              
+                head = entity;
             }
         }
+
+        curPath.Push(head);
+        if (sortExtendedLinesHelper(curPath, testedEntities, head))
+        {
+            baseEntityList = curPath.ToList();
+            baseEntityList.Reverse();
+            return true;
+        }
         return false;
+    }
+    /*recursive helper function to find a closed shape with extended lines
+     */
+    public bool sortExtendedLinesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
+    {
+        if (curPath.Count > 2)
+        {
+            //base case where the current entity touches the head (means its a closed shape)
+            //checks if contained in testedEntities to avoid the second entity from triggering this
+            //checks if current entity is the same as head to avoid a false true
+            if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
+            {
+                return true;//path found
+            }
+        }
+
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+
+        foreach (Entity entity in ExtendedEntityList)
+        {
+            if (entity != curPath.Peek())
+            { // checks if entity in loop is not the curent entity being checked
+                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                // checks that the entitiy has not already been tested and is touching the entity
+                {
+                    curPath.Push(entity);//adds to stack
+                    if (sortExtendedLinesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        //this point in the function means nothing is touching current entity
+
+        if (curPath.Peek() == head)
+            //if the function of the head reaches this point it means it has not found a path back to the head
+        {
+            foreach (Entity entity in ExtendedEntityList)
+            {
+                if (!testedEntities.Contains(entity)) // finds the first entity that has not been tested and selects it as the head
+                {
+                    curPath.Clear();//clears curPath and adds the new head to it
+                    curPath.Push(entity);
+                    return sortExtendedLinesHelper(curPath, testedEntities, entity);
+                }
+            }
+        }
+
+        curPath.Pop();
+        return false;//nothing is touching this entity so it is popped off of curPath
     }
 
 
@@ -658,7 +639,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius );
+            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius );
         }
 
         //Loop through list and see if there is a bigger X
@@ -686,9 +667,9 @@ public class Feature
                     maxX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius) > maxX ) 
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius) > maxX ) 
             {
-                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).radius);
+                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
             }
             
         }
@@ -719,7 +700,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
+            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a bigger Y 
@@ -747,9 +728,9 @@ public class Feature
                     maxY = ((Arc)EntityList[i]).End.Y;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius) > maxY)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius) > maxY)
             {
-                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).radius);
+                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius);
             }
 
         }
@@ -784,7 +765,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
+            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a smaller Y
@@ -812,9 +793,9 @@ public class Feature
                     minX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius) > minX)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius) > minX)
             {
-                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).radius);
+                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius);
             }
 
         }
@@ -845,7 +826,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
+            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a smaller Y
@@ -873,9 +854,9 @@ public class Feature
                     minY = ((Arc)EntityList[i]).End.Y;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius) > minY)
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius) > minY)
             {
-                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).radius);
+                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius);
             }
 
         }
