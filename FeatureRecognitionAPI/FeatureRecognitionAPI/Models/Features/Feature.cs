@@ -161,7 +161,7 @@ public class Feature
         }
         else if (CheckGroup2A(out type))
         {
-            featureType = type;
+            FeatureType = type;
         }
         else
         {
@@ -250,7 +250,7 @@ public class Feature
         {
             if (entity is Arc)
             {
-                sumAngles += (entity as Arc).centralAngle;
+                sumAngles += (entity as Arc).CentralAngle;
             }
         });
         if (sumAngles > 359.9 && sumAngles < 360.09)
@@ -304,9 +304,6 @@ public class Feature
     {
         return false;
     }
-
-//calculates the perimeter of the feature
-public void calcPerimeter()
     
     //Checks the perimiter entity list to detect if any of the features there belong to group 4, then adds any we find to the perimiterFeature list 
     public void CheckGroup4()
