@@ -90,11 +90,11 @@ namespace FeatureRecognitionAPI.Models
 
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
-         * @Param myEntityList - the list of entites in the file
+         * @Param entityList - the list of entites in the file
          */
         public List<List<Entity>> makeTouchingEntitiesList(List<Entity> entityList)
         {
-            List<Entity> myEntityList = entityList;
+            List<Entity> myEntityList = new List<Entity>(entityList);
             //  Return list of features
             List<List<Entity>> touchingEntityList = new List<List<Entity>>();
             //  myEntityList is modified in the process, so it will eventually be empty

@@ -95,7 +95,7 @@ namespace Testing_for_Project
 
         #region SortIntoBaseEntityList
         [Test]
-        public void averageCaseEntities()
+        public void example1Entities()
         {
             //Set path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
@@ -124,6 +124,32 @@ namespace Testing_for_Project
                 Feature testFeature = new Feature(feature.baseEntityList);
                 testFeature.DetectFeatures();
                 Assert.IsTrue(feature.Equals(testFeature));
+            }
+        }
+        [Test]
+        public void example3EveryBaseEntityinOriginalList()
+        {
+            //Set path to any filepath containing the 3rd example dxf file
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
+            DXFFile exampleOne = new DXFFile(path);
+
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+            foreach (Feature feature in featureList)
+            {
+                bool inBaseList = false;                
+                for (int i = 0; i < feature.baseEntityList.Count; i++)
+                {
+                    if (feature.EntityList.Contains(feature.ExtendedEntityList[i]))
+                    {
+                        inBaseList = true;
+                    }
+                }            
+
+                Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
             }
         }
         #endregion

@@ -99,7 +99,7 @@ public class Feature
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
 
-        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
+        CountEntities(EntityList, out numLines, out numArcs, out numCircles);
         
         //calculate and set the perimeter of the feature
         calcPerimeter();
@@ -299,6 +299,7 @@ public class Feature
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
+        perimeter = 0;
         for (int i = 0; i < EntityList.Count; i++)
         {
             perimeter += EntityList[i].Length;
@@ -397,7 +398,7 @@ public class Feature
                 //foreach (var otherEntity in extendedEntityList)
                 for (int j = 0; j < ExtendedEntityList.Count; j++)
                 {   
-                    if (ExtendedEntityList[j] is Line && ExtendedEntityList[i] != ExtendedEntityList[j])
+                    if ((ExtendedEntityList[j] is Line) && ExtendedEntityList[i] != ExtendedEntityList[j])
                     {
                         // for each entity it checks if it can extend with every other entity and does so
                         // removes the two previous entities
@@ -405,6 +406,7 @@ public class Feature
                         if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
                             extendedALine = true;
+                            break;
                         }
                     }
                 }

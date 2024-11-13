@@ -24,16 +24,16 @@ namespace FeatureRecognitionAPI.Models
             Y = y; 
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (!(obj is Point))
+            if (obj is Point)
             {
-                return false;
-            }
-            if (this.X == ((Point)obj).X && this.Y == ((Point)obj).Y)
-            {
-                //dont need to check the intersect value
-                return true;
+                double xDiff = Math.Abs((obj as Point).X - this.X);
+                double yDiff = Math.Abs((obj as Point).Y - this.Y);
+                if (xDiff < 0.0009 && yDiff < 0.0009)
+                {
+                    return true;
+                }
             }
             return false;
         }
