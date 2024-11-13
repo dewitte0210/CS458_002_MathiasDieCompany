@@ -46,6 +46,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         multipleRadius: false,
         kissCut: false,
         border: false,
+        EntityList: [],
       },
     ]);
   };
@@ -216,7 +217,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                     <th>Perimeter/Diameter</th>
                     <th>Multiple Radius</th>
                     <th>Kiss Cut</th>
-                    <th>Border</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -321,19 +321,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               />
                             </td>
                             <td>
-                              <input
-                                type="checkbox"
-                                checked={info.border}
-                                onChange={(e) =>
-                                  handleChange(
-                                    "border",
-                                    e.target.checked,
-                                    index
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteFeature(index)}
@@ -394,13 +381,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                             </td>
                             <td>
                               {info.kissCut ? (
-                                <span className="checkmark">&#10003;</span>
-                              ) : (
-                                <span className="crossmark">&#10005;</span>
-                              )}
-                            </td>
-                            <td>
-                              {info.border ? (
                                 <span className="checkmark">&#10003;</span>
                               ) : (
                                 <span className="crossmark">&#10005;</span>
