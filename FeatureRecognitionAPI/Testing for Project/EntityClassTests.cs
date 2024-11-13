@@ -10,32 +10,35 @@ namespace Testing_for_Project
         [Test]
         public void IsInArcRange_HappyPath_ReturnTrue()
         {
-            Line resultEntity = new(0.0,0.0,0.0,0.0);
-            bool result = resultEntity.IsInArcRange(0.0,0.0,1.0,0.0, 0, 90);
+            Arc testArc = new Arc(0, 0, 5, 0, 90);
+            Point testPoint = new Point(1,0);
+            bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.True);
         }
 
         [Test]
         public void IsInArcRange_XisNegativeOne_ReturnTrue()
         {
-            Line resultEntity = new(0.0,0.0,0.0,0.0);
-            bool result = resultEntity.IsInArcRange(0.0,0.0,-1.0,0.0, 90, 180);
+            Arc testArc = new Arc(0, 0, 5, 90, 180);
+            Point testPoint = new Point(-1, 0);
+            bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.True);
         }
        
         [Test]
         public void IsInArcRange_NotInRange_ReturnFalse()
         {
-            Line resultEntity = new(0.0,0.0,0.0,0.0);
-            bool result = resultEntity.IsInArcRange(0.0,0.0,0.0,-1.0, 0, 90);
+            Arc testArc = new Arc(0, 0, 5, 0, 90);
+            Point testPoint = new Point(0, -1);
+            bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.False);
         }
         [Test] 
         public void IsInArcRange_StartGreaterThanEnd_ReturnTrue()
         {
-
-            Line resultEntity = new(0.0,0.0,0.0,0.0);
-            bool result = resultEntity.IsInArcRange(0.0,0.0,1.0,0.0, 270, 0);
+            Arc testArc = new Arc(0, 0, 5, 270, 0);
+            Point testPoint = new Point(1, 0);
+            bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.True);
         }
         #endregion
