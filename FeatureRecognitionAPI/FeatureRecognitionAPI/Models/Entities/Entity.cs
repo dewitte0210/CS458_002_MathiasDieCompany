@@ -396,7 +396,7 @@ namespace FeatureRecognitionAPI.Models
                         double y = solns[i];
                         //  Solution x value
                         double x = line.EndPoint.X;
-                        if (arc.IsInArcRange(new Point(x, y))) { return true; }
+                        if (arc.IsInArcRange(new Point(x, y)) && line.StartPoint.X <= x && line.StartPoint.Y <= y && line.EndPoint.X >= x && line.EndPoint.Y >= y) { return true; }
                     }
                 }
                 else
@@ -415,7 +415,7 @@ namespace FeatureRecognitionAPI.Models
                         //Solution y value
                         double y = slope * solns[i] + intercept;
 
-                        if (arc.IsInArcRange(new Point(x,y))) { return true; };
+                        if (arc.IsInArcRange(new Point(x,y)) && line.StartPoint.X <= x && line.StartPoint.Y <= y && line.EndPoint.X >= x && line.EndPoint.Y >= y) { return true; };
                     }
                 }
             }
