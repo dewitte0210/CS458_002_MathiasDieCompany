@@ -237,18 +237,12 @@ public class Feature
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
-        {
-            perimeter = EntityList[0].Length / Math.PI;
-        }
-
-        else
-        {
+        
             for (int i = 0; i < EntityList.Count; i++)
             {
                 perimeter += EntityList[i].Length;
             }
-        }
+        
     }
 
     /*
@@ -294,10 +288,11 @@ public class Feature
 
             //Creat an array of booleans for every entity in this EntityList
             bool[] validArray = new bool[EntityList.Count];
-            for(int i = 0; i < validArray.Length; i++)
-            {
-                validArray[i] = false;
-            }
+            //Boolean arrays should be false by default
+            //for(int i = 0; i < validArray.Length; i++)
+            //{
+            //    validArray[i] = false;
+            //}
 
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length

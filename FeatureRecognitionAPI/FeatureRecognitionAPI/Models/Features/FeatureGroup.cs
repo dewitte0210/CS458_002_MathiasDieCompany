@@ -41,9 +41,37 @@ namespace FeatureRecognitionAPI.Models.Features
 
                 if (totalArcs == ((FeatureGroup)obj).totalArcs
                     && totalLines == ((FeatureGroup)obj).totalLines
-                    && totalCircles == ((FeatureGroup)obj).totalCircles)
+                    && totalCircles == ((FeatureGroup)obj).totalCircles
+                    )
                 {
-                    //Do something
+                    //Sort by perimiter
+                    features.Sort((x,y) => x.perimeter.CompareTo(y.perimeter));
+                    ((FeatureGroup)obj).features.Sort ((x,y) => x.perimeter.CompareTo((y.perimeter)));
+
+
+                    for (int i = 0; i < features.Count; i++)
+                    {
+                        //While this features @ i has same permiter as obj.features[j] check if any j = features[i]
+                        int j = i;
+                        bool checkPoint = false;
+                        while (j < features.Count &&
+                            features[i].perimeter == ((FeatureGroup)obj).features[j].perimeter) 
+                        {
+                            if (features[i].Equals(features[j]))
+                            {
+                                checkPoint = true;
+                                break;
+                            }
+                            //If first element checked isn't equal, increment J
+                            j++;
+                        }
+                        if (!checkPoint)
+                        {
+                            return false;
+                        }
+                    }
+                    //If we got here, checkPoint was never false, so return true;
+                    return true;
                 }
                 else
                 {
