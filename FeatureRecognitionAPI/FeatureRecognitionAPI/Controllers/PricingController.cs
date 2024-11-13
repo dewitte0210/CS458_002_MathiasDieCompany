@@ -27,6 +27,7 @@ namespace FeatureRecognitionAPI.Controllers
         {
             try
             {
+                var text = param.GetRawText();
                 var quoteSubmissionDto = JsonConvert.DeserializeObject<QuoteSubmissionDto>(param.GetRawText());
                 if (quoteSubmissionDto == null)
                 {

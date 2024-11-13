@@ -11,7 +11,7 @@ namespace FeatureRecognitionAPI.Models.Dtos
 
         public List<EntityDto> EntityList { get; set; }
         public int Count { get; set; }
-        public double Perimiter { get; set; }
+        public double Perimeter { get; set; }
         public bool MultipleRadius { get; set; }
         public bool KissCut { get; set; }
     }
