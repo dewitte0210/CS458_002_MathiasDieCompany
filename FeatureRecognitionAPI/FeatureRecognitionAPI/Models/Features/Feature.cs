@@ -301,20 +301,9 @@ public class Feature
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        /*if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
+        for (int i = 0; i < EntityList.Count; i++)
         {
-            perimeter = EntityList[0].Length / Math.PI;
-        }*/
-        if (EntityList[0] is Circle)
-        {
-            perimeter = EntityList[0].Length / Math.PI;
-        }
-        else
-        {
-            for (int i = 0; i < EntityList.Count; i++)
-            {
-                perimeter += EntityList[i].Length;
-            }
+            perimeter += EntityList[i].Length;
         }
     }
 
