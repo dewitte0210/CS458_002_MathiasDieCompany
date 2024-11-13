@@ -14,9 +14,7 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeX { get; }
         public bool ExtendedLine { get; set; }
 
-
-
-        private Line() { }
+        protected Line() { }
         public Line(bool ExtendedLine)
         {
             this.ExtendedLine = ExtendedLine;

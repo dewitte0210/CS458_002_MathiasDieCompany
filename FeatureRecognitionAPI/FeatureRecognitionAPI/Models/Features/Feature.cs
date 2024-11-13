@@ -422,6 +422,8 @@ public class Feature
         }
     }
 
+
+
     //Method that takes two lines and extends them to touch if they are:
     // 1. not already touching
     // 2. are parallel or perpendicular
@@ -471,7 +473,7 @@ public class Feature
             if (line1.isParallel(line2))
             {
                 Point pointToExtend;
-                Line tempLine = new Line(true);//makes a new line object with extendedLine boolean to true
+                ExtendedLine tempLine = new ExtendedLine();//makes a new line object with extendedLine boolean to true
                 if (line1.findDistance(
                     line1.StartPoint,
                     line2.StartPoint)
