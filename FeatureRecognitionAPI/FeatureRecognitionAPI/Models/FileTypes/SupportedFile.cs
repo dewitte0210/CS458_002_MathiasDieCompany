@@ -46,13 +46,7 @@ namespace FeatureRecognitionAPI.Models
         {
             this.featureList = featureList;
         }
-        public void writeFeatures()
-        {
         
-        }
-        public void readFeatures()
-        {
-        }
         public List<Feature> getFeatureList(List<List<Entity>> entities)
         {
             List<Feature> featureList = new List<Feature>();
@@ -61,6 +55,7 @@ namespace FeatureRecognitionAPI.Models
             {
                 Feature feature = new Feature(entities[i]);
                 feature.extendAllEntities();
+                feature.sortExtendedLines();
                 feature.DetectFeatures();
                 featureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
@@ -149,9 +144,6 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
-
-
-
 
         /*
          * Groups features together and stores how many of each feature group are present in the file

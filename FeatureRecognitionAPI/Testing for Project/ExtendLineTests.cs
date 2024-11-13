@@ -120,7 +120,7 @@ namespace Testing_for_Project
                     }
                 }
             
-                Assert.IsTrue(equalLists);
+                Assert.IsTrue(equalLists);//base entity list and normal entity list is the same (only works for example 1)
                 Feature testFeature = new Feature(feature.baseEntityList);
                 testFeature.DetectFeatures();
                 Assert.IsTrue(feature.Equals(testFeature));

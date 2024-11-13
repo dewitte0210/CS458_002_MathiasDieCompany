@@ -59,8 +59,6 @@ public class Feature
     private int numCircles = 0;
     public int getNumCircles() { return numCircles; }
 
-    private Feature() { }//should not use default constructor
-
     public Feature(string featureType, bool kissCut, bool multipleRadius, bool border)
     {
         this.count = 1;
