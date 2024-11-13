@@ -55,6 +55,13 @@ namespace Testing_for_Project
             Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 0, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Assert.That(ellipse1.Length, Is.EqualTo(15.865439589290595));
         }
+        [Test]
+        public void TestPointEquals()
+        {
+            Point point1 = new Point(2, 3);
+            Point point2 = new Point(2, 3);
+            Assert.That(point1.Equals(point2));
+        }
         #endregion
 
         #region TestingDXF&DWG

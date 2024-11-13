@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Numerics;
 using FeatureRecognitionAPI.Models.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 public class Feature
 {
@@ -128,6 +129,10 @@ public class Feature
             }
             else featureType = PossibleFeatureTypes.Group1A2;
         }
+        else if (CheckGroup2A(out type))
+        {
+            featureType = type;
+        }
         else
         {
             Console.WriteLine("Error: Cannot assign feature type.");
@@ -166,8 +171,97 @@ public class Feature
         return false;
     }
 
-    //calculates the perimeter of the feature
-    public void calcPerimeter()
+    internal bool CheckGroup2A(out PossibleFeatureTypes type)
+    {
+        if (numArcs >= 2 && numCircles == 0)
+        {
+            //  Possible ellipse
+            if (numArcs > 2 && numLines == 0)
+            {
+                if (DoAnglesAddTo360())
+                {
+                    if (IsEllipse())
+                    {
+                        type = PossibleFeatureTypes.Group2A;
+                        return true;
+                    }
+                }
+            }
+            //  Possible bowtie
+            else if (numLines == 2)
+            {
+
+            }
+        }
+        type = PossibleFeatureTypes.Punch;
+        return false;
+    }
+
+     //Checks if the angles of all the arcs add up to 360
+    internal bool DoAnglesAddTo360()
+    {
+        double sumAngles = 0;
+        baseEntityList.ForEach(entity =>
+        {
+            if (entity is Arc)
+            {
+                sumAngles += (entity as Arc).centralAngle;
+            }
+        });
+        if (sumAngles > 359.9 && sumAngles < 360.09)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    internal bool IsEllipse()
+    {
+        //Ensures the porgam will not crash if called in other circumstances
+        if (numCircles != 0 || numLines != 0)
+        {
+            return false;
+        }
+        //List that will be sorted in order of touching arcs
+        List<Entity> connectedInOrder = new List<Entity>();
+        connectedInOrder.Add(baseEntityList[0]);
+        while (connectedInOrder.Count != baseEntityList.Count)
+        {
+            if (!sortEllipseListHelper(connectedInOrder, connectedInOrder[connectedInOrder.Count - 1] as Arc))
+            {
+                //Prevents from running infinitely in certain circumstances
+                return false;
+            }
+        }
+        //If end points do not connect, it is not an ellipse
+        if (!(connectedInOrder[0] as Arc).Start.Equals((connectedInOrder[connectedInOrder.Count - 1] as Arc).End)) { return false; }
+        return true;
+    }
+
+    /**
+     * Detects the next touching arc in a base entity list of arcs
+     */
+    private bool sortEllipseListHelper(List<Entity> connectedInOrder, Arc arc1)
+    {
+        for (int i = 0; i < baseEntityList.Count; i++)
+        {
+            if (arc1.End.Equals((baseEntityList[i] as Arc).Start))
+            {
+                connectedInOrder.Add(baseEntityList[i]);
+                return true;
+            }
+        }
+        //Ensures the while loop in IsEllipse does not run infinitely if feature is not a closed loop
+        return false;
+    }
+
+    internal bool isBowtie()
+    {
+        return false;
+    }
+
+//calculates the perimeter of the feature
+public void calcPerimeter()
     {
         if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
         {
@@ -411,7 +505,7 @@ public class Feature
         {
             if (ExtendedEntityList[index] != entity)
             {
-              
+                
             }
         }
         return false;
