@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { useState } from 'react';
-import DragDropZone from './DragDropZone';
-import QuoteSubmission from './QuoteSubmission';
+import * as React from "react";
+import { useState } from "react";
+import DragDropZone from "./DragDropZone";
+import QuoteSubmission from "./QuoteSubmission";
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -20,7 +20,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
   const [jsonResponse, setJsonResponse] = useState<any>(null); // Stores JSON response
   const [isLoading, setIsLoading] = useState(false); // State for loading
 
-  const allowedFileExtensions = ['.pdf', '.dwg', '.dxf'];
+  const allowedFileExtensions = [".pdf", ".dwg", ".dxf"];
 
   /*
     Event handler for when the user clicks the submit file button.
@@ -35,19 +35,23 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
     formData.append("file", file);
 
     try {
-      const res = await fetch("https://localhost:44373/api/FeatureRecognition/uploadFile", {
-        method: "POST",
-        body: formData
-      });
+      const res = await fetch(
+        "https://localhost:44373/api/FeatureRecognition/uploadFile",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      if (!res.ok)
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
 
       const jsonResponse = await res.json(); // Capture JSON responses
+      console.log(jsonResponse);
       setJsonResponse(jsonResponse); // Store response in state
       setSubmitted(true); // Update the state to indicate successful submission
-
     } catch (error) {
-      alert('An error occurred while submitting the file. Please try again.');
+      alert("An error occurred while submitting the file. Please try again.");
     } finally {
       setIsLoading(false); // End loading
     }
@@ -68,31 +72,35 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
         <div className="loader"></div>
       ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
         <>
-        <div className="upload-container">
-        <div className="drag-drop">
-          <DragDropZone
-            file={file}
-            allowedFileExtensions={allowedFileExtensions}
-            setFile={setFile}
-            onFilesSelected={onFilesSelected}
-          />
-          </div>
-          {file && (
-            <div className="submit-button-container">
-            <button className="animated-button" onClick={handleSubmit}>
-              <span>Submit File</span>
-              <span></span>
-            </button>
+          <div className="upload-container">
+            <div className="drag-drop">
+              <DragDropZone
+                file={file}
+                allowedFileExtensions={allowedFileExtensions}
+                setFile={setFile}
+                onFilesSelected={onFilesSelected}
+              />
             </div>
-          )}
-        </div>
+            {file && (
+              <div className="submit-button-container">
+                <button className="animated-button" onClick={handleSubmit}>
+                  <span>Submit File</span>
+                  <span></span>
+                </button>
+              </div>
+            )}
+          </div>
         </>
-      ) : ( // Show retrieved data
+      ) : (
+        // Show retrieved data
         <div className="response-container">
           {jsonResponse && ( // Conditionally render the JSON response
-            <QuoteSubmission jsonResponse={jsonResponse} backToUpload={backToUpload}/>
+            <QuoteSubmission
+              jsonResponse={jsonResponse}
+              backToUpload={backToUpload}
+            />
           )}
-          </div>
+        </div>
       )}
     </div>
   );
