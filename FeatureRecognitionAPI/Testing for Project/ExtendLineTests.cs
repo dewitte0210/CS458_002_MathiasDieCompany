@@ -9,6 +9,7 @@ namespace Testing_for_Project
 {
     internal class ExtendLineTests
     {
+        #region ExtendingLines
         [Test]
         public void ExtendVerticalLines() {
             Line line1 = new(7,4,7,6);
@@ -90,5 +91,41 @@ namespace Testing_for_Project
             Assert.IsTrue(finalTestLine1 == arc1);
             Assert.IsTrue(finalTestLine2 == circle1);
         }
+        #endregion
+
+        #region SortIntoBaseEntityList
+        [Test]
+        public void averageCaseEntities()
+        {
+            //Set path to any filepath containing the 3rd example dxf file
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
+            DXFFile exampleOne = new DXFFile(path);
+
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+            foreach (Feature feature in featureList)
+            {
+                bool equalLists = false;
+                if (feature.EntityList.Count == feature.baseEntityList.Count)
+                {
+                    for (int i = 0; i < feature.EntityList.Count; i++)
+                    {
+                        if (feature.baseEntityList.Contains(feature.EntityList[i]))
+                        {
+                            equalLists = true;
+                        }
+                    }
+                }
+            
+                Assert.IsTrue(equalLists);
+                Feature testFeature = new Feature(feature.baseEntityList);
+                testFeature.DetectFeatures();
+                Assert.IsTrue(feature.Equals(testFeature));
+            }
+        }
+        #endregion
     }
 }

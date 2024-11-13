@@ -21,7 +21,7 @@ namespace Testing_for_Project
             Arc arc2 = new(8, 4, 1, 180, 0);
             Line line5 = new(2, 2, 2, 8);
             Line line6 = new(12, 2, 12, 8);
-            DXFFile dxf = new("dfghj");
+            DXFFile dxf = new();
             List<Entity> entities = new List<Entity>() { line1, line2, circle1, line3, line4, arc1, arc2, line5, line6 };
             List<List<Entity>> expectedTouchingEntities = new List<List<Entity>>();
             expectedTouchingEntities.Add(new List<Entity>() { line1, arc1, line2, arc2 });

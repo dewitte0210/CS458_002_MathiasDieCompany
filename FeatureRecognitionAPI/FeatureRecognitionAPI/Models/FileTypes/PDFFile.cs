@@ -61,20 +61,6 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        /*
-         * Finds all features in the file based of the entities within the file
-         * calls findEntities to garuantee an updated entity list
-         * returns false if fails, otherwise returns true
-         */
-        public override bool findFeatures()
-        {
-            if (findEntities())
-            {
-                //TODO
-            }
-            return false;
-        }
-
         public override void readEntities()
         {
             throw new NotImplementedException();
