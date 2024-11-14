@@ -16,14 +16,21 @@ namespace FeatureRecognitionAPI.Models
     {
         protected string path;
         protected SupportedExtensions fileType;
-        protected List<Feature> featureList = [];
+        protected List<Feature> featureList;
         protected List<Entity> entityList;
         protected List<FeatureGroup> featureGroups;
         public int GetFeatureGroupsCount() { return featureList.Count; }
         //protected keyword for nested enum is about granting 
+        protected SupportedFile()
+        {
+            entityList = new List<Entity>();
+            featureList = new List<Feature>();
+        }
         public SupportedFile(string path)
         {
             this.path = path;
+            entityList = new List<Entity>();
+            featureList = new List<Feature>();
             featureGroups = new List<FeatureGroup>();
         }
         public void setPath(string path)
@@ -37,6 +44,10 @@ namespace FeatureRecognitionAPI.Models
         public string getFileType()
         {
             return fileType.ToString();
+        }
+        public void setFeatureList(List<Feature> featureList)
+        {
+            this.featureList = featureList;
         }
         public void writeFeatures()
         {
@@ -52,7 +63,17 @@ namespace FeatureRecognitionAPI.Models
             for (int i = 0; i < entities.Count(); i++)
             {
                 Feature feature = new Feature(entities[i]);
+                feature.extendAllEntities();
+                feature.DetectFeatures();
                 featureList.Add(feature);
+                if (feature.PerimeterEntityList != null)
+                {
+                    for (int j = 0; j < feature.PerimeterEntityList.Count(); j++)
+                    {
+                        Feature newFeat = new Feature(feature.PerimeterEntityList[j]);
+                        featureList.Add(newFeat);
+                    }
+                }
             }
 
 
@@ -73,13 +94,15 @@ namespace FeatureRecognitionAPI.Models
 
             return featureList;
         }
+        public List<Feature> getFeatureList() { return featureList; }
 
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
          * @Param myEntityList - the list of entites in the file
          */
-        public List<List<Entity>> makeTouchingEntitiesList(List<Entity> myEntityList)
+        public List<List<Entity>> makeTouchingEntitiesList(List<Entity> entityList)
         {
+            List<Entity> myEntityList = entityList;
             //  Return list of features
             List<List<Entity>> touchingEntityList = new List<List<Entity>>();
             //  myEntityList is modified in the process, so it will eventually be empty
@@ -217,10 +240,23 @@ namespace FeatureRecognitionAPI.Models
         }
 
         /* 
-         * Method that should be implemented by each child 
-         * This is where the feature recognition logic will go
+         * method that goes from the path to detected features
         */
-        abstract public bool findFeatures();
+        public void detectAllFeatures()
+        {
+            detectAllFeatures(entityList);
+        }
+        public void detectAllFeatures(List<Entity> myEntityList)
+        {
+            List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
+            featureList = getFeatureList(touchingEntities);
+            foreach (Feature feature in featureList)
+            {
+                    feature.DetectFeatures();
+                    feature.extendAllEntities();
+                    feature.sortExtendedLines();
+            }
+        }
         // Method to read the data from a file and fill the entityList with entities
         public abstract void readEntities();
     }

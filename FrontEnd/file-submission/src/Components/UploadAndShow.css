@@ -309,3 +309,10 @@ h3 {
   text-align: center;
   font-size: larger;
 }
+
+.add-feature {
+  display: flex;
+  margin-top: 2%;
+  margin-bottom: 2%;
+  justify-content: center;
+}
