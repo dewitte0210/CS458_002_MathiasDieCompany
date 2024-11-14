@@ -9,13 +9,14 @@ namespace FeatureRecognitionAPI.Models
 {
     public class ExtendedLine : Line
     {
-        public Line Parent1 { get { return Parent1; } set { Parent1 = value; calcPoints(); } }
-        public Line Parent2 { get { return Parent2; } set { Parent2 = value; calcPoints(); } }
+        //public Line Parent1 { get { return Parent1; } set { Parent1 = value; calcPoints(); } }
+        public Line Parent1 { get; set; }
+        public Line Parent2 { get; set; }
 
         public ExtendedLine() 
         {
         }
-        public ExtendedLine(Line parent1, Line parent2)
+        public ExtendedLine(Line parent1, Line parent2) : base(parent1)
         {
             Parent1 = new Line(parent1);
             Parent2 = new Line(parent2);
