@@ -43,7 +43,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { arc, circle };
             Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Punch));
+            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
         }
         #endregion
        
