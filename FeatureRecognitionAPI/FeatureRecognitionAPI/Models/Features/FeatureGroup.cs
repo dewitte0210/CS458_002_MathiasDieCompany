@@ -5,7 +5,7 @@ namespace FeatureRecognitionAPI.Models.Features
 {
     public class FeatureGroup
     {
-        protected int count; //Track how many feature groups of this type are found
+        public int Count { get; set; } //Track how many feature groups of this type are found
         protected int totalArcs;
         protected int totalLines;
         protected int totalCircles;
