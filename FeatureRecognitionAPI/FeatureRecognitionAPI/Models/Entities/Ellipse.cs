@@ -8,10 +8,10 @@ namespace FeatureRecognitionAPI.Models
      */
     public class Ellipse : Entity
     {
-        public double CenterX { get; set; }
-        public double CenterY { get; set; }
+        public Point Center { get; set; }
         public double MajorAxisXValue { get; set; }
         public double MajorAxisYValue { get; set; }
+        public Point MajorAxisEndPoint { get; set; }
         public double ExtrusionDirectionX {  get; set; }
         public double ExtrusionDirectionY { get; set; }
         public double MinorToMajorAxisRatio { get; set; }
@@ -23,10 +23,8 @@ namespace FeatureRecognitionAPI.Models
             double majorAxisYValue, double extrusionDirectionX, double extrusionDirectionY,
             double minorToMajorAxisRatio, double startParameter, double endParameter)
         {
-            this.CenterX = centerX;
-            this.CenterY = centerY;
-            this.MajorAxisXValue = majorAxisXValue;
-            this.MajorAxisYValue = majorAxisYValue;
+            Center = new Point(centerX, centerY);
+            MajorAxisEndPoint = new Point(majorAxisXValue, majorAxisYValue);
             this.ExtrusionDirectionX = extrusionDirectionX;
             this.ExtrusionDirectionY = extrusionDirectionY;
             this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
@@ -49,13 +47,13 @@ namespace FeatureRecognitionAPI.Models
         {
             //Major axis Radius
             double majorAxis;
-            if (CenterX == MajorAxisXValue)
+            if (Center.X == MajorAxisXValue)
             {
-                majorAxis = MajorAxisYValue - CenterY;
+                majorAxis = MajorAxisYValue - Center.Y;
             }
             else
             {
-                majorAxis = MajorAxisXValue - CenterX;
+                majorAxis = MajorAxisXValue - Center.X;
             }
             double a = 1;
             double g = MinorToMajorAxisRatio;
@@ -73,7 +71,7 @@ namespace FeatureRecognitionAPI.Models
         //TODO might not be possible
         private double partialPerimterCalc()
         {
-            return 0;
+            return fullPerimeterCalc() / ((EndParameter - StartParameter) / 2 * Math.PI);
         }
 
         public override bool Equals(object? obj)

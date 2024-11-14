@@ -194,20 +194,45 @@ public class Feature
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if (numArcs == 2 && numLines == 2)
+        else if (numArcs == 2 && numLines == 2 && getBothLinesAndDetermineParallelization())
         {
-            double totalDegrees = 0;
-            baseEntityList.ForEach(entity =>
+            if (DoAnglesAddTo360())
             {
-                if (entity is Arc)
+                Arc arc1 = new Arc(0, 0, 0, 0, 0);
+                Arc arc2 = new Arc(0, 0, 0, 0, 0);
+                Line line = new Line(0, 0, 0, 0);
+                bool gotArc1 = false;
+                bool gotArc2 = false;
+                bool gotLine = false;
+                int index = 0;
+                //Get one of the 2 lines and arcs to run isArcConcave
+                while (!gotArc1 || !gotLine || !gotArc2)
                 {
-                    totalDegrees += (entity as Arc).CentralAngle;
+                    if (baseEntityList[index] is Arc)
+                    {
+                        if (!gotArc1)
+                        {
+                            arc1 = (Arc)baseEntityList[index];
+                            gotArc1 = true;
+                        }
+                        else
+                        {
+                            arc2 = (Arc)baseEntityList[index];
+                            gotArc2 = true;
+                        }
+                    }
+                    else if (baseEntityList[index] is Line)
+                    {
+                        line = (Line)baseEntityList[index];
+                        gotLine = true;
+                    }
+                    index++;
                 }
-            });
-            if (totalDegrees > 359.999 && totalDegrees < 360.0009)
-            {
-                type = PossibleFeatureTypes.Group1B2;
-                return true;
+                if (!IsArcConcave(arc1, line) && !IsArcConcave(arc2, line))
+                {
+                    type = PossibleFeatureTypes.Group1B2;
+                    return true;
+                }
             }
         }
 
@@ -233,9 +258,13 @@ public class Feature
                 }
             }
             //  Possible bowtie
-            else if (numLines == 2)
+            else if (numLines == 2 && getBothLinesAndDetermineParallelization())
             {
-
+                if (IsBowtie())
+                {
+                    type = PossibleFeatureTypes.Group2A;
+                    return true;
+                }
             }
         }
         type = PossibleFeatureTypes.Punch;
@@ -272,7 +301,7 @@ public class Feature
         connectedInOrder.Add(baseEntityList[0]);
         while (connectedInOrder.Count != baseEntityList.Count)
         {
-            if (!sortEllipseListHelper(connectedInOrder, connectedInOrder[connectedInOrder.Count - 1] as Arc))
+            if (!SortEllipseListHelper(connectedInOrder, connectedInOrder[connectedInOrder.Count - 1] as Arc))
             {
                 //Prevents from running infinitely in certain circumstances
                 return false;
@@ -286,7 +315,7 @@ public class Feature
     /**
      * Detects the next touching arc in a base entity list of arcs
      */
-    private bool sortEllipseListHelper(List<Entity> connectedInOrder, Arc arc1)
+    private bool SortEllipseListHelper(List<Entity> connectedInOrder, Arc arc1)
     {
         for (int i = 0; i < baseEntityList.Count; i++)
         {
@@ -300,8 +329,105 @@ public class Feature
         return false;
     }
 
-    internal bool isBowtie()
+    internal bool IsBowtie()
     {
+        if (numArcs == 2)
+        {
+            Arc arc1 = new Arc(0, 0, 0, 0, 0);
+            Arc arc2 = new Arc(0, 0, 0, 0, 0);
+            Line line = new Line(0, 0, 0, 0);
+            bool gotArc1 = false;
+            bool gotArc2 = false;
+            bool gotLine = false;
+            int index = 0;
+            //Get one of the 2 lines and arcs to run isArcConcave
+            while (!gotArc1 || !gotLine || !gotArc2) {
+                //For some reason there was not a line and arc, return
+                if (index == baseEntityList.Count)
+                {
+                    return false;
+                }
+                if (baseEntityList[index] is Arc)
+                {
+                    if (!gotArc1)
+                    {
+                        arc1 = (Arc)baseEntityList[index];
+                        gotArc1 = true;
+                    }
+                    else
+                    {
+                        arc2 = (Arc)baseEntityList[index];
+                        gotArc2 = true;
+                    }
+                }
+                else if (baseEntityList[index] is Line)
+                {
+                    line = (Line)baseEntityList[index];
+                    gotLine = true;
+                }
+                index++;
+            }
+            return (IsArcConcave(arc1, line) && IsArcConcave(arc2, line));
+        }
+        return false;
+    }
+
+    private bool getBothLinesAndDetermineParallelization()
+    {
+        Line line1 = new Line(0, 0, 0, 0);
+        Line line2 = new Line(0, 0, 0, 0);
+        bool gotLine1 = false;
+        bool gotLine2 = false;
+        int index = 0;
+        //Get one of the 2 lines and arcs to run isArcConcave
+        while (!gotLine1 || !gotLine2)
+        {
+            //For some reason there was not a line and arc, return
+            if (index == baseEntityList.Count)
+            {
+                return false;
+            }
+            if (baseEntityList[index] is Line)
+            {
+                if (!gotLine1)
+                {
+                    line1 = (Line)baseEntityList[index];
+                    gotLine1 = true;
+                }
+                else
+                {
+                    line2 = (Line)baseEntityList[index];
+                    gotLine2 = true;
+                }
+            }
+            index++;
+        }
+        return line1.isParallel(line2);
+    }
+
+    private bool IsArcConcave(Arc arc, Line line)
+    {
+        double middleAngle; 
+        if (arc.EndAngle - arc.StartAngle < 0)
+        {
+            middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle + 360) / 2);
+        }
+        else
+        {
+             middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle) / 2);
+        }
+        if (middleAngle < 0)
+        {
+            middleAngle += 360;
+        }
+        Point edgeOfArc = new Point(arc.Radius * Math.Cos(middleAngle * Math.PI / 180) + arc.Center.X, arc.Radius * Math.Sin(middleAngle * Math.PI / 180) + arc.Center.Y);
+        Line cw = new Line(edgeOfArc.X, edgeOfArc.Y, (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X, -1 * (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
+        Line ccw = new Line(edgeOfArc.X, edgeOfArc.Y, -1 * (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X, (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
+        //Slope of perpendicular line will be vertical
+        if (line.DoesIntersect(cw) || line.DoesIntersect(ccw))
+        {
+            return true;
+        }
         return false;
     }
     

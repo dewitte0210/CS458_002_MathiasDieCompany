@@ -301,17 +301,17 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Check if the intersection is in bounds of both line segments
-            bool line1InBoundsX = intersectX >= Math.Min(line1.StartPoint.X, line1.EndPoint.X) &&
-                    intersectX <= Math.Max(line1.StartPoint.X, line1.EndPoint.X);
+            bool line1InBoundsX = Math.Round(intersectX, 4) >= Math.Min(Math.Round(line1.StartPoint.X, 4), Math.Round(line1.EndPoint.X, 4)) &&
+                    Math.Round(intersectX, 4) <= Math.Max(Math.Round(line1.StartPoint.X, 4), Math.Round(line1.EndPoint.X, 4));
 
-            bool line1InBoundsY = intersectY >= Math.Min(line1.StartPoint.Y, line1.EndPoint.Y) &&
-                    intersectY <= Math.Max(line1.StartPoint.Y, line1.EndPoint.Y);
+            bool line1InBoundsY = Math.Round(intersectY, 4) >= Math.Min(Math.Round(line1.StartPoint.Y, 4), Math.Round(line1.EndPoint.Y, 4)) &&
+                    Math.Round(intersectY, 4) <= Math.Max(Math.Round(line1.StartPoint.Y, 4), Math.Round(line1.EndPoint.Y, 4));
 
-            bool line2InBoundsX = intersectX >= Math.Min(line2.StartPoint.X, line2.EndPoint.X) &&
-                    intersectX <= Math.Max(line2.StartPoint.X, line2.EndPoint.X);
+            bool line2InBoundsX = Math.Round(intersectX, 4) >= Math.Min(Math.Round(line2.StartPoint.X, 4), Math.Round(line2.EndPoint.X, 4)) &&
+                    Math.Round(intersectX, 4) <= Math.Max(Math.Round(line2.StartPoint.X, 4), Math.Round(line2.EndPoint.X, 4));
 
-            bool line2InBoundsY = intersectY >= Math.Min(line2.StartPoint.Y, line2.EndPoint.Y) &&
-                    intersectY <= Math.Max(line2.StartPoint.Y, line2.EndPoint.Y);
+            bool line2InBoundsY = Math.Round(intersectY, 4) >= Math.Min(Math.Round(line2.StartPoint.Y, 4), Math.Round(line2.EndPoint.Y, 4)) &&
+                    Math.Round(intersectY, 4) <= Math.Max(Math.Round(line2.StartPoint.Y, 4), Math.Round(line2.EndPoint.Y, 4));
 
             return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
