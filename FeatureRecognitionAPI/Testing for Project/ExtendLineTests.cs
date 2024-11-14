@@ -140,17 +140,25 @@ namespace Testing_for_Project
             List<Feature> featureList = exampleOne.getFeatureList();
             foreach (Feature feature in featureList)
             {
-                bool inBaseList = false;                
+                bool inBaseList = false;
                 for (int i = 0; i < feature.baseEntityList.Count; i++)
                 {
                     if (feature.EntityList.Contains(feature.ExtendedEntityList[i]))
                     {
                         inBaseList = true;
                     }
-                }            
+                }
 
                 Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
             }
+
+
+        }
+        [Test]
+        public void doesChildPassAsParent()
+        {
+                ExtendedLine child = new ExtendedLine();
+                Assert.IsTrue(child is Line);
         }
         #endregion
     }

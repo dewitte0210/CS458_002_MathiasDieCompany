@@ -22,6 +22,16 @@ namespace FeatureRecognitionAPI.Models
             EndPoint = new Point();
         }
 
+        public Line(Line line)
+        {
+            StartPoint = line.StartPoint;
+            EndPoint = line.EndPoint;
+            SlopeY = line.SlopeY;
+            SlopeX = line.SlopeX;
+            ExtendedLine = ExtendedLine;
+            Length = line.Length;
+        }
+
         public Line( double startX,  double startY,  double endX,  double endY)
         {
             StartPoint = new Point(startX, startY);

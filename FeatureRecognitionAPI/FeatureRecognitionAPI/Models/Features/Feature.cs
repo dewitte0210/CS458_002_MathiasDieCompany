@@ -219,7 +219,7 @@ public class Feature
         {
             bool g4Detected = false;
             Line tempLine = null;
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circleCount);
 
             if (lineCount != 2 || (arcCount != 2 && arcCount !=0)) { continue; }
 
@@ -472,44 +472,7 @@ public class Feature
             }*/
             if (line1.isParallel(line2))
             {
-                Point pointToExtend;
-                ExtendedLine tempLine = new ExtendedLine();//makes a new line object with extendedLine boolean to true
-                if (line1.findDistance(
-                    line1.StartPoint,
-                    line2.StartPoint)
-                    < line1.findDistance(
-                    line1.EndPoint,
-                    line2.StartPoint))
-                //This looks like a lot but all this is doing is finding the closest point on line1 to line2
-                {
-                    //At this point we know the point to be extended on line1 is the start point, meaning the end point can stay the same
-                    //  Hence why tempLine end point is set to line1's
-                    pointToExtend = line1.StartPoint;
-                    tempLine.StartPoint.X = line1.EndPoint.X;
-                    tempLine.StartPoint.Y = line1.EndPoint.Y;
-                }
-                else
-                {
-                    pointToExtend = line1.EndPoint;
-                    tempLine.StartPoint.X = line1.StartPoint.X;
-                    tempLine.StartPoint.Y = line1.StartPoint.Y;
-                }
-                if (line2.findDistance(
-                    pointToExtend,
-                    line2.StartPoint)
-                    > line2.findDistance(
-                    pointToExtend,
-                    line2.EndPoint))
-                //Similar to the one above but finds what point on line2 is farthest from line1's point to extend
-                {
-                    tempLine.EndPoint.X = line2.StartPoint.X;
-                    tempLine.EndPoint.Y = line2.StartPoint.Y;
-                }
-                else
-                {
-                    tempLine.EndPoint.X = line2.EndPoint.X;
-                    tempLine.EndPoint.Y = line2.EndPoint.Y;
-                }
+                ExtendedLine tempLine = new ExtendedLine(line1, line2);//makes a new line object with extendedLine boolean to      
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
