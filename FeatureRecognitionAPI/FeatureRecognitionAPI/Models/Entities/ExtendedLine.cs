@@ -16,6 +16,9 @@ namespace FeatureRecognitionAPI.Models
         public ExtendedLine() 
         {
         }
+        //runs into issues if more than one perimeter feature is on a line
+        //would show up as an ExtendedLine being a parent
+        //this would also throw an error when trying to find a path because the parent would not be in EntityList
         public ExtendedLine(Line parent1, Line parent2) : base(parent1)
         {
             Parent1 = new Line(parent1);

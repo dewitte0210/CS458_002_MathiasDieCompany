@@ -132,7 +132,7 @@ namespace Testing_for_Project
             //Set path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
-            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
             DXFFile exampleOne = new DXFFile(path);
 
             exampleOne.detectAllFeatures();
@@ -151,15 +151,46 @@ namespace Testing_for_Project
 
                 Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
             }
-
-
         }
+
         [Test]
         public void doesChildPassAsParent()
         {
                 ExtendedLine child = new ExtendedLine();
                 Assert.IsTrue(child is Line);
         }
+
+        [Test]
+        public void lilBitOfEverythingPerimeterEntitiesInEntityList()
+        {
+            //Set path to any filepath containing the 3rd example dxf file
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-LilBitOfEverything.dxf";
+            DXFFile exampleOne = new DXFFile(path);
+
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+            foreach (Feature feature in featureList)
+            {
+                if (feature.PerimeterEntityList.Count > 1)
+                    { 
+                    bool inBaseList = false;
+                    foreach (List<Entity> perimeterFeature in feature.PerimeterEntityList)
+                    {
+                        foreach (Entity entity in perimeterFeature)
+                        {
+                            if (feature.EntityList.Contains(entity)) { inBaseList = true; }
+                            else { inBaseList = false; }
+                        }
+                    }
+
+                    Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
+                }
+            }
+        }
+        //should have two perimeter features
         #endregion
     }
 }

@@ -55,7 +55,7 @@ namespace FeatureRecognitionAPI.Models
             {
                 Feature feature = new Feature(entities[i]);
                 feature.extendAllEntities();
-                feature.sortExtendedLines();
+                feature.seperateBaseEntities();
                 feature.DetectFeatures();
                 featureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
@@ -158,9 +158,10 @@ namespace FeatureRecognitionAPI.Models
             featureList = getFeatureList(touchingEntities);
             foreach (Feature feature in featureList)
             {
-                    feature.DetectFeatures();
-                    feature.extendAllEntities();
-                    feature.sortExtendedLines();
+                feature.extendAllEntities();
+                feature.seperateBaseEntities();
+                feature.seperatePerimeterEntities();
+                feature.DetectFeatures();
             }
         }
         // Method to read the data from a file and fill the entityList with entities

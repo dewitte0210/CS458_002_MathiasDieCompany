@@ -379,7 +379,7 @@ public class Feature
     */
     public void extendAllEntities()
     {
-        ExtendedEntityList = EntityList;
+        ExtendedEntityList = new List<Entity>(EntityList);
         extendAllEntitiesHelper();
     }
 
@@ -421,8 +421,6 @@ public class Feature
             return;
         }
     }
-
-
 
     //Method that takes two lines and extends them to touch if they are:
     // 1. not already touching
@@ -482,7 +480,7 @@ public class Feature
         return false;
     }
 
-    public bool sortExtendedLines()
+    public bool seperateBaseEntities()
     {
         if (ExtendedEntityList.Count == 1 && ExtendedEntityList[0] is Circle && baseEntityList.Count ==0)
         {
@@ -503,7 +501,7 @@ public class Feature
         }
 
         curPath.Push(head);
-        if (sortExtendedLinesHelper(curPath, testedEntities, head))
+        if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
         {
             baseEntityList = curPath.ToList();
             baseEntityList.Reverse();
@@ -513,7 +511,7 @@ public class Feature
     }
     /*recursive helper function to find a closed shape with extended lines
      */
-    public bool sortExtendedLinesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
+    public bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
         if (curPath.Count > 2)
         {
@@ -536,7 +534,7 @@ public class Feature
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity);//adds to stack
-                    if (sortExtendedLinesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
                     {
                         return true;
                     }
@@ -554,7 +552,7 @@ public class Feature
                 {
                     curPath.Clear();//clears curPath and adds the new head to it
                     curPath.Push(entity);
-                    return sortExtendedLinesHelper(curPath, testedEntities, entity);
+                    return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
             }
         }
@@ -563,7 +561,56 @@ public class Feature
         return false;//nothing is touching this entity so it is popped off of curPath
     }
 
+    public List<Entity> findPathFromStartToTargetInEntityList( Entity start, Entity target)
+    {
+        if (EntityList.Contains(start) && EntityList.Contains(target))
+        {
+            Stack<Entity> path = new Stack<Entity>();
+            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) { return path.ToList(); }
+            else { return null; }
+        }
+        else { return null; }
+    }
 
+    public bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head, Entity target)
+    {
+        if (curPath.Peek() == target) { return true; }
+
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+
+        foreach (Entity entity in EntityList)
+        {
+            if (entity != curPath.Peek())
+            { // checks if entity in loop is not the curent entity being checked
+                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                // checks that the entitiy has not already been tested and is touching the entity
+                {
+                    curPath.Push(entity);//adds to stack
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        //this point in the function means nothing is touching current entity
+
+        curPath.Pop();
+        return false;//nothing is touching this entity so it is popped off of curPath
+    }
+
+    public bool seperatePerimeterEntities()
+    {
+        foreach(Entity entity in baseEntityList)
+        {
+            if(entity is ExtendedLine)
+            {
+                List<Entity> path = findPathFromStartToTargetInEntityList(((ExtendedLine)entity).Parent1, ((ExtendedLine)entity).Parent2);            
+                PerimeterEntityList.Add(path);
+            }
+        }
+        return true;
+    }
 
     public Point FindMaxPoint()
     {
