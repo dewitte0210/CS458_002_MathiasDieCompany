@@ -46,13 +46,7 @@ namespace FeatureRecognitionAPI.Models
         {
             this.featureList = featureList;
         }
-        public void writeFeatures()
-        {
         
-        }
-        public void readFeatures()
-        {
-        }
         public List<Feature> getFeatureList(List<List<Entity>> entities)
         {
             List<Feature> featureList = new List<Feature>();
@@ -61,6 +55,7 @@ namespace FeatureRecognitionAPI.Models
             {
                 Feature feature = new Feature(entities[i]);
                 feature.extendAllEntities();
+                feature.seperateBaseEntities();
                 feature.DetectFeatures();
                 featureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
@@ -95,11 +90,11 @@ namespace FeatureRecognitionAPI.Models
 
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
-         * @Param myEntityList - the list of entites in the file
+         * @Param entityList - the list of entites in the file
          */
         public List<List<Entity>> makeTouchingEntitiesList(List<Entity> entityList)
         {
-            List<Entity> myEntityList = entityList;
+            List<Entity> myEntityList = new List<Entity>(entityList);
             //  Return list of features
             List<List<Entity>> touchingEntityList = new List<List<Entity>>();
             //  myEntityList is modified in the process, so it will eventually be empty
@@ -150,23 +145,6 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
-
-
-
-        /*
-         * Groups features together and stores how many of each feature group are present in the file
-         * Initliazes class variable featuresList
-         */
-        void SetFeatureGroups()
-        {
-            List<Feature> features = getFeatureList(makeTouchingEntitiesList(entityList));
-
-            for (int i = 0; i < features.Count; i++)
-            {
-                
-            }
-        }
-
         /* 
          * method that goes from the path to detected features
         */
@@ -180,9 +158,10 @@ namespace FeatureRecognitionAPI.Models
             featureList = getFeatureList(touchingEntities);
             foreach (Feature feature in featureList)
             {
-                    feature.DetectFeatures();
-                    feature.extendAllEntities();
-                    feature.sortExtendedLines();
+                feature.extendAllEntities();
+                feature.seperateBaseEntities();
+                feature.seperatePerimeterEntities();
+                feature.DetectFeatures();
             }
         }
         // Method to read the data from a file and fill the entityList with entities

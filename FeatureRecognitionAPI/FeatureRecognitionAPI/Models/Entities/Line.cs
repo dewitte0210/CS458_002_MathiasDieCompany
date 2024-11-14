@@ -14,14 +14,22 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeX { get; }
         public bool ExtendedLine { get; set; }
 
-
-
-        private Line() { }
+        protected Line() { }
         public Line(bool ExtendedLine)
         {
             this.ExtendedLine = ExtendedLine;
             StartPoint = new Point();
             EndPoint = new Point();
+        }
+
+        public Line(Line line)
+        {
+            StartPoint = line.StartPoint;
+            EndPoint = line.EndPoint;
+            SlopeY = line.SlopeY;
+            SlopeX = line.SlopeX;
+            ExtendedLine = ExtendedLine;
+            Length = line.Length;
         }
 
         public Line( double startX,  double startY,  double endX,  double endY)

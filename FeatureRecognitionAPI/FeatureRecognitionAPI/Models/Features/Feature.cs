@@ -28,7 +28,7 @@ public class Feature
     
     // A list of all the perimeter features attached to this features.
     [JsonProperty]
-    public List<PerimeterFeatureTypes> perimeterFeatures { get; set; }
+    public List<PerimeterFeatureTypes> PerimeterFeatures { get; set; }
 
     [JsonProperty]
     public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
@@ -59,8 +59,6 @@ public class Feature
     private int numCircles = 0;
     public int getNumCircles() { return numCircles; }
 
-    private Feature() { }//should not use default constructor
-
     public Feature(string featureType, bool kissCut, bool multipleRadius, bool border)
     {
         this.count = 1;
@@ -74,7 +72,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
-        perimeterFeatures = new List<PerimeterFeatureTypes>();
+        PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
@@ -87,7 +85,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         calcPerimeter();
     }
@@ -97,11 +95,11 @@ public class Feature
         this.count = 1;
         this.EntityList = EntityList;
         this.baseEntityList = EntityList;
-        this.perimeterFeatures = new List<PerimeterFeatureTypes>();
+        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
 
-        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
+        CountEntities(EntityList, out numLines, out numArcs, out numCircles);
         
         //calculate and set the perimeter of the feature
         calcPerimeter();
@@ -221,7 +219,7 @@ public class Feature
         {
             bool g4Detected = false;
             Line tempLine = null;
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circleCount);
 
             if (lineCount != 2 || (arcCount != 2 && arcCount !=0)) { continue; }
 
@@ -237,7 +235,7 @@ public class Feature
             }
             if (g4Detected)
             {
-                perimeterFeatures.Add(PerimeterFeatureTypes.Group4);
+                PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);
             }
         }
     }
@@ -259,7 +257,7 @@ public class Feature
             // If the feature is group5, add it to the list! 
             if(HasTwoParalellLine(feature))
             {
-                perimeterFeatures.Add(PerimeterFeatureTypes.Group5);
+                PerimeterFeatures.Add(PerimeterFeatureTypes.Group5);
                 
             }
         }
@@ -301,20 +299,10 @@ public class Feature
     //calculates the perimeter of the feature
     public void calcPerimeter()
     {
-        /*if (featureType == PossibleFeatureTypes.Punch || featureType == PossibleFeatureTypes.Group1B1)
+        perimeter = 0;
+        for (int i = 0; i < EntityList.Count; i++)
         {
-            perimeter = EntityList[0].Length / Math.PI;
-        }*/
-        if (EntityList[0] is Circle)
-        {
-            perimeter = EntityList[0].Length / Math.PI;
-        }
-        else
-        {
-            for (int i = 0; i < EntityList.Count; i++)
-            {
-                perimeter += EntityList[i].Length;
-            }
+            perimeter += EntityList[i].Length;
         }
     }
 
@@ -391,7 +379,7 @@ public class Feature
     */
     public void extendAllEntities()
     {
-        ExtendedEntityList = EntityList;
+        ExtendedEntityList = new List<Entity>(EntityList);
         extendAllEntitiesHelper();
     }
 
@@ -410,7 +398,7 @@ public class Feature
                 //foreach (var otherEntity in extendedEntityList)
                 for (int j = 0; j < ExtendedEntityList.Count; j++)
                 {   
-                    if (ExtendedEntityList[j] is Line && ExtendedEntityList[i] != ExtendedEntityList[j])
+                    if ((ExtendedEntityList[j] is Line) && ExtendedEntityList[i] != ExtendedEntityList[j])
                     {
                         // for each entity it checks if it can extend with every other entity and does so
                         // removes the two previous entities
@@ -418,6 +406,7 @@ public class Feature
                         if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
                             extendedALine = true;
+                            break;
                         }
                     }
                 }
@@ -481,44 +470,7 @@ public class Feature
             }*/
             if (line1.isParallel(line2))
             {
-                Point pointToExtend;
-                Line tempLine = new Line(true);//makes a new line object with extendedLine boolean to true
-                if (line1.findDistance(
-                    line1.StartPoint,
-                    line2.StartPoint)
-                    < line1.findDistance(
-                    line1.EndPoint,
-                    line2.StartPoint))
-                //This looks like a lot but all this is doing is finding the closest point on line1 to line2
-                {
-                    //At this point we know the point to be extended on line1 is the start point, meaning the end point can stay the same
-                    //  Hence why tempLine end point is set to line1's
-                    pointToExtend = line1.StartPoint;
-                    tempLine.StartPoint.X = line1.EndPoint.X;
-                    tempLine.StartPoint.Y = line1.EndPoint.Y;
-                }
-                else
-                {
-                    pointToExtend = line1.EndPoint;
-                    tempLine.StartPoint.X = line1.StartPoint.X;
-                    tempLine.StartPoint.Y = line1.StartPoint.Y;
-                }
-                if (line2.findDistance(
-                    pointToExtend,
-                    line2.StartPoint)
-                    > line2.findDistance(
-                    pointToExtend,
-                    line2.EndPoint))
-                //Similar to the one above but finds what point on line2 is farthest from line1's point to extend
-                {
-                    tempLine.EndPoint.X = line2.StartPoint.X;
-                    tempLine.EndPoint.Y = line2.StartPoint.Y;
-                }
-                else
-                {
-                    tempLine.EndPoint.X = line2.EndPoint.X;
-                    tempLine.EndPoint.Y = line2.EndPoint.Y;
-                }
+                ExtendedLine tempLine = new ExtendedLine(line1, line2);//makes a new line object with extendedLine boolean to      
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
@@ -528,7 +480,7 @@ public class Feature
         return false;
     }
 
-    public bool sortExtendedLines()
+    public bool seperateBaseEntities()
     {
         if (ExtendedEntityList.Count == 1 && ExtendedEntityList[0] is Circle && baseEntityList.Count ==0)
         {
@@ -549,7 +501,7 @@ public class Feature
         }
 
         curPath.Push(head);
-        if (sortExtendedLinesHelper(curPath, testedEntities, head))
+        if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
         {
             baseEntityList = curPath.ToList();
             baseEntityList.Reverse();
@@ -559,7 +511,7 @@ public class Feature
     }
     /*recursive helper function to find a closed shape with extended lines
      */
-    public bool sortExtendedLinesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
+    public bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
         if (curPath.Count > 2)
         {
@@ -582,7 +534,7 @@ public class Feature
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity);//adds to stack
-                    if (sortExtendedLinesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
                     {
                         return true;
                     }
@@ -600,7 +552,7 @@ public class Feature
                 {
                     curPath.Clear();//clears curPath and adds the new head to it
                     curPath.Push(entity);
-                    return sortExtendedLinesHelper(curPath, testedEntities, entity);
+                    return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
             }
         }
@@ -609,7 +561,56 @@ public class Feature
         return false;//nothing is touching this entity so it is popped off of curPath
     }
 
+    public List<Entity> findPathFromStartToTargetInEntityList( Entity start, Entity target)
+    {
+        if (EntityList.Contains(start) && EntityList.Contains(target))
+        {
+            Stack<Entity> path = new Stack<Entity>();
+            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) { return path.ToList(); }
+            else { return null; }
+        }
+        else { return null; }
+    }
 
+    public bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head, Entity target)
+    {
+        if (curPath.Peek() == target) { return true; }
+
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+
+        foreach (Entity entity in EntityList)
+        {
+            if (entity != curPath.Peek())
+            { // checks if entity in loop is not the curent entity being checked
+                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                // checks that the entitiy has not already been tested and is touching the entity
+                {
+                    curPath.Push(entity);//adds to stack
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        //this point in the function means nothing is touching current entity
+
+        curPath.Pop();
+        return false;//nothing is touching this entity so it is popped off of curPath
+    }
+
+    public bool seperatePerimeterEntities()
+    {
+        foreach(Entity entity in baseEntityList)
+        {
+            if(entity is ExtendedLine)
+            {
+                List<Entity> path = findPathFromStartToTargetInEntityList(((ExtendedLine)entity).Parent1, ((ExtendedLine)entity).Parent2);            
+                PerimeterEntityList.Add(path);
+            }
+        }
+        return true;
+    }
 
     public Point FindMaxPoint()
     {
