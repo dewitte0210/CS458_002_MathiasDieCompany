@@ -20,6 +20,7 @@ using NHibernate.Action;
 using iText.Commons.Utils.Collections;
 using System.Web.Http.ModelBinding;
 using NHibernate.Type;
+using NHibernate.SqlCommand;
 
 public class Feature
 {
@@ -39,7 +40,6 @@ public class Feature
     [JsonProperty]
     public double perimeter;
     [JsonProperty]
-    public bool border;
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -59,24 +59,17 @@ public class Feature
     private int numCircles = 0;
     public int getNumCircles() { return numCircles; }
 
-    public Feature(string featureType, bool kissCut, bool multipleRadius, bool border)
-    {
-        this.count = 1;
-        //change string input to enum value
-        PossibleFeatureTypes inputAsEnum = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), featureType);
-        this.FeatureType = inputAsEnum;
-        this.kissCut = kissCut;
-        this.multipleRadius = multipleRadius;
-        this.border = border;
-        EntityList = new List<Entity>();
-        baseEntityList = new List<Entity>();
-        ExtendedEntityList = new List<Entity>();
-        PerimeterEntityList = new List<List<Entity>>();
-        PerimeterFeatures = new List<PerimeterFeatureTypes>();
-
-        calcPerimeter();
-    }
-
+    /*
+     * Constructor that passes in an entityList for the feature. Feature detection is expected to be
+     * called on a feature using this constructor. This was mostly used for testing when wanting to
+     * avoid feature detection in the constructor. Could probably be deleted at this point since
+     * feature detection was moved out of the constructors.
+     * 
+     * @Param entityList is the entityList being passed into the feature. could be a base feature,
+     * that includes perimeter features, or just the list for a perimeter feature
+     * @Param kissCut stores whether the feature is kiss cut
+     * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
+     */
     public Feature (List<Entity> entityList, bool kissCut, bool multipleRadius)
     {
         EntityList = entityList;
@@ -90,6 +83,15 @@ public class Feature
         calcPerimeter();
     }
 
+    /*
+     * Constructor that is expected to be used the most as it just passes in the entityList for the 
+     * feature and detection, along with all other fields will be calculated based off this list in
+     * a seperate function
+     * 
+     * @Param EntityList is the list being passed into the feature which includes all base entities
+     * of the feature, including the perimeter features entities, unless the feature is just a
+     * perimeter one
+     */
     public Feature(List<Entity> EntityList)
     {
         this.count = 1;
@@ -104,14 +106,21 @@ public class Feature
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
-    public Feature(PerimeterFeatureTypes perimeterFeatureType)
-    {
-        count = 1;
-        FeatureType = (PossibleFeatureTypes)Enum.Parse(typeof(PossibleFeatureTypes), perimeterFeatureType.ToString());
 
-        calcPerimeter();
-    }
-
+    /*
+     * Counts the Lines, Arcs, and Circles in the entityList. 
+     * 
+     * @Param entityList is the list that is being looped through. Note that it is passed by reference
+     * and any changes to the list in this function will change the list in the scope of wherever this
+     * function was called from
+     * @Param numLines is the counted number of lines. The out keyword means that the value is returned
+     * to the paramter passed when calling the function
+     * @Param numArcs is the counted number of arcs. The out keyword means that the value is returned
+     * to the paramter passed when calling the function
+     * @Param numCircles is the counted number of circles. The out keyword means that the value is returned
+     * to the paramter passed when calling the function. As far as I can tell there should only ever be one
+     * circle in a feature, and should be the only entity in the list
+     */
     public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
     {
         numLines = 0;
@@ -141,7 +150,11 @@ public class Feature
         }
     }
 
-    internal void DetectFeatures()
+    /*
+     * Function that calls several other functions to determine this feature's type. Outside of testing this
+     * should be called on every feature, including seperated perimeter features
+     */
+    public void DetectFeatures()
     {
         //check two conditions possible to make Group1B (with no perimeter features)
         if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
@@ -169,7 +182,13 @@ public class Feature
         calcPerimeter();
     }
 
-    // Checks the feature to see if it is one of the Group 1B features
+    /* 
+     * Checks the baseEntityList to see if this feature is one of the Group 1B features
+     * 
+     * @Param numCircles, numLines, numArcs is the number of the respective entities in the EntityList
+     * @Param type is used as a return value with the out keyword
+     * @Return true if the type was detected
+     */
     internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
     {
         // Entity is just a circle
@@ -210,7 +229,10 @@ public class Feature
         return false;
     }
     
-    //Checks the perimiter entity list to detect if any of the features there belong to group 4, then adds any we find to the perimiterFeature list 
+    /*
+     * Checks the perimiterEntityList to detect if any of the features there belong to group 4,
+     * then adds any we find to the perimiterFeature list 
+     */
     public void CheckGroup4()
     {
         if(PerimeterEntityList == null) { return;  }
@@ -240,7 +262,9 @@ public class Feature
         }
     }
 
-    //Checks the perimiter entity list to detect if any of the features there belong to group 5, then adds any we find to the perimiterFeature list 
+    /* Checks the perimiter entity list to detect if any of the features there belong to group 5, 
+     * then adds any we find to the perimiterFeature list 
+     */
     public void CheckGroup5()
     {
         if(PerimeterEntityList == null) { return; }
@@ -263,7 +287,12 @@ public class Feature
         }
     }
     
-    // Checks if an entity list has atleast one set of parralell lines
+    /*
+     * Function that checks if the list passed in has at least one set of parallel lines
+     * 
+     * @Param entities is the Entity list that is checked
+     * @Return true if a set of parrallel lines is found
+     */
     private bool HasTwoParalellLine(List<Entity> entities)
     {
         for(int i = 0; i < entities.Count(); i++)
@@ -296,7 +325,11 @@ public class Feature
         return false; 
     }
 
-    //calculates the perimeter of the feature
+    /*
+     * Function that calculates the perimeter of this feature by going through every entity in EntityList and adding the length.
+     * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
+     * called more than once.
+     */
     public void calcPerimeter()
     {
         perimeter = 0;
@@ -308,6 +341,9 @@ public class Feature
 
     /*
      * Overriding the Equals method to compare two Feature objects
+     * 
+     * @Param obj is the object being compared to this
+     * @Return true if the objects are equal
     */
     public override bool Equals(object obj)
     {
@@ -317,7 +353,7 @@ public class Feature
         }
         else if (obj == this) return true;
         /*
-        * Way to quickly determin that it's likely that the features are equal.
+        * Way to quickly determine that it's likely that the features are equal.
         * There are edge cases where two features that aren't the same could be set as equal,
         * for instance, 2 arcs and 2 lines could have an equal perimeter, but be different feature types
         */
@@ -364,7 +400,9 @@ public class Feature
 
 
     /*
-     * Recursive function that calls extendAllEntitiesHelper
+     * Recursive function that calls extendAllEntitiesHelper. Useful for testing if you want to extend entities
+     * on a certain list without changing the baseEntityList
+     * 
      * @Param myEntityList parameter that extendedEntityList is set equal to
     */
     public void extendAllEntities(List<Entity> myEntityList)
@@ -374,8 +412,8 @@ public class Feature
     }
 
     /*
-     *  Recursive function that calls extendAllEntitiesHelper
-     *  sets extendedEntityList to EntityList
+     *  Recursive function that calls extendAllEntitiesHelper. Sets extendedEntityList to EntityList. 
+     *  This is the main function that should be called to extend entities
     */
     public void extendAllEntities()
     {
@@ -384,7 +422,9 @@ public class Feature
     }
 
     /*
-     * This is a recursive helper function to extend every line in extendedEntityList
+     * This is a recursive helper function to extend every line in ExtendedEntityList.
+     * Should be N^N runtime seeing as the nested for loops is N^2, then it is called recursively with N-1 every time.
+     * This makes it (((N!)^2) * N!) which is 
     */
     private void extendAllEntitiesHelper()
     {
@@ -416,18 +456,21 @@ public class Feature
         {
             extendAllEntitiesHelper();
         }
-        else
-        {
-            return;
-        }
     }
 
-    //Method that takes two lines and extends them to touch if they are:
-    // 1. not already touching
-    // 2. are parallel or perpendicular
-    //adds extended line(parallel) or lines(perpendicular) to extendedEntityList
-    //returns true if lines were extended, otherwise false
-    public bool extendTwoLines(Line line1, Line line2)
+    /* Method that takes two lines and extends them to touch if they are:
+     * 1. not already touching
+     * 2. are parallel or perpendicular
+     * adds extended line(parallel) or lines(perpendicular) to extendedEntityList
+     * Perpendicular functionality has been commented out due to inconsistent slopes of lines,
+     * which means a perpendicular angle of intersection is not garunteed on features it should be
+     * 
+     * @Param line1 is the first line being extended
+     * @Param line2 is the second line being extended
+     * @Return true if succesfully extended. Could be false if the two lines dont have an intersect point,
+     * arent the same infinate line, or already touch
+     */
+    private bool extendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2))
         //makes sure youre not extending lines that already touch
@@ -480,19 +523,31 @@ public class Feature
         return false;
     }
 
+    /*
+     * Function that seperates the base entities, which will have been extended, if possible, at this point,
+     * from ExtendedEntityList into baseEntityList. Most logic for seperation lies in seperateBaseEntitiesHelper
+     * 
+     * @Return true if successfully seperates base entities
+     */
     public bool seperateBaseEntities()
     {
-        if (ExtendedEntityList.Count == 1 && ExtendedEntityList[0] is Circle && baseEntityList.Count ==0)
+        if (ExtendedEntityList[0] is Circle) // case where the feature contains a circle
         {
-            baseEntityList.Add((Circle)ExtendedEntityList[0]);
-            return true;
+            if (ExtendedEntityList.Count == 1 && baseEntityList.Count == 0) // it should be the only entity in the list
+            {
+                baseEntityList.Add((Circle)ExtendedEntityList[0]); // adds the circle to the baseEntityList
+                return true;
+            }
+            else { return false; } // means that it contains a circle but is not the only entity
         }
+
+        // lists to pass to the helper function
         Stack<Entity> curPath = new Stack<Entity>();
         List<Entity> testedEntities = new List<Entity>();
 
-        Entity head = ExtendedEntityList[0];
+        Entity head = ExtendedEntityList[0]; // default head is the first index of ExtendedEntityList
         foreach(Entity entity in ExtendedEntityList)
-            //this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
+            // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
             if (entity.Length > head.Length)
             {
@@ -500,18 +555,26 @@ public class Feature
             }
         }
 
-        curPath.Push(head);
+        curPath.Push(head); // pushes the head to the current path
         if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
+            // if it can find a path
         {
-            baseEntityList = curPath.ToList();
-            baseEntityList.Reverse();
+            baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
+            baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
             return true;
         }
         return false;
     }
-    /*recursive helper function to find a closed shape with extended lines
+
+    /*
+     * recursive helper function to find a closed shape with extended lines
+     * 
+     * @Param curPath is the current path that has been taken
+     * @Param testedEnttiies is a list of enties that have been visited
+     * @Param head is the target entity that is trying to loop back through
+     * @Return true if a path has been found
      */
-    public bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
+    private bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
         if (curPath.Count > 2)
         {
@@ -561,18 +624,39 @@ public class Feature
         return false;//nothing is touching this entity so it is popped off of curPath
     }
 
-    public List<Entity> findPathFromStartToTargetInEntityList( Entity start, Entity target)
+    /*
+     * function that finds a path from start to target in Entity list
+     * 
+     * @Param start is the entity that this algorithm starts
+     * @Param target is the entity that is trying to be reached
+     * @Return the path from start to target. Null if no viable path
+     */
+    private List<Entity> findPathFromStartToTargetInEntityList( Entity start, Entity target)
     {
         if (EntityList.Contains(start) && EntityList.Contains(target))
         {
             Stack<Entity> path = new Stack<Entity>();
-            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) { return path.ToList(); }
+            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) 
+            {
+                List<Entity> temp = path.ToList();
+                temp.Reverse();
+                return temp; 
+            }
             else { return null; }
         }
         else { return null; }
     }
 
-    public bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head, Entity target)
+    /*
+     * Helper function to find the path from head to traget. Contains the actual logic for this task
+     * 
+     * @Param curPath is the current path taken
+     * @Param testedEntities contains all visited entities
+     * @Param head is the starting node
+     * @Param target is the entity trying to be reached
+     * @Return true if path is found
+     */
+    private bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head, Entity target)
     {
         if (curPath.Peek() == target) { return true; }
 
@@ -599,6 +683,12 @@ public class Feature
         return false;//nothing is touching this entity so it is popped off of curPath
     }
 
+    /*
+     * Function that uses finds the path from the two parents of all extended lines and adds the path as a group of
+     * entities at new index in PerimeterEntityList
+     * 
+     * @Return true if a valid path is found and seperated successfully
+     */
     public bool seperatePerimeterEntities()
     {
         foreach(Entity entity in baseEntityList)
