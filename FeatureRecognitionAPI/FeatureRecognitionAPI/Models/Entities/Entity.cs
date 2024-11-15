@@ -14,6 +14,9 @@ namespace FeatureRecognitionAPI.Models
 
         public Entity() { }//Enables the use of a default constructor
 
+        private const int intersectTolerance = 4;//Precision for x and y intersect values to
+                                                 //account for inaccurate calculated values
+
         /**
          * Function that checks if this entity intersects with another entity
          * 
@@ -301,17 +304,17 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Check if the intersection is in bounds of both line segments
-            bool line1InBoundsX = Math.Round(intersectX, 4) >= Math.Min(Math.Round(line1.StartPoint.X, 4), Math.Round(line1.EndPoint.X, 4)) &&
-                    Math.Round(intersectX, 4) <= Math.Max(Math.Round(line1.StartPoint.X, 4), Math.Round(line1.EndPoint.X, 4));
+            bool line1InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line1.StartPoint.X, intersectTolerance), Math.Round(line1.EndPoint.X, intersectTolerance)) &&
+                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line1.StartPoint.X, intersectTolerance), Math.Round(line1.EndPoint.X, intersectTolerance));
 
-            bool line1InBoundsY = Math.Round(intersectY, 4) >= Math.Min(Math.Round(line1.StartPoint.Y, 4), Math.Round(line1.EndPoint.Y, 4)) &&
-                    Math.Round(intersectY, 4) <= Math.Max(Math.Round(line1.StartPoint.Y, 4), Math.Round(line1.EndPoint.Y, 4));
+            bool line1InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line1.StartPoint.Y, intersectTolerance), Math.Round(line1.EndPoint.Y, intersectTolerance)) &&
+                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line1.StartPoint.Y, intersectTolerance), Math.Round(line1.EndPoint.Y, intersectTolerance));
 
-            bool line2InBoundsX = Math.Round(intersectX, 4) >= Math.Min(Math.Round(line2.StartPoint.X, 4), Math.Round(line2.EndPoint.X, 4)) &&
-                    Math.Round(intersectX, 4) <= Math.Max(Math.Round(line2.StartPoint.X, 4), Math.Round(line2.EndPoint.X, 4));
+            bool line2InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line2.StartPoint.X, intersectTolerance), Math.Round(line2.EndPoint.X, intersectTolerance)) &&
+                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line2.StartPoint.X, intersectTolerance), Math.Round(line2.EndPoint.X, intersectTolerance));
 
-            bool line2InBoundsY = Math.Round(intersectY, 4) >= Math.Min(Math.Round(line2.StartPoint.Y, 4), Math.Round(line2.EndPoint.Y, 4)) &&
-                    Math.Round(intersectY, 4) <= Math.Max(Math.Round(line2.StartPoint.Y, 4), Math.Round(line2.EndPoint.Y, 4));
+            bool line2InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line2.StartPoint.Y, intersectTolerance), Math.Round(line2.EndPoint.Y, intersectTolerance)) &&
+                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line2.StartPoint.Y, intersectTolerance), Math.Round(line2.EndPoint.Y, intersectTolerance));
 
             return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
