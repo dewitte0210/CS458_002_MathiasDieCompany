@@ -39,9 +39,9 @@ namespace FeatureRecognitionAPI.Models.Features
             {
                 //If in here, obj is a FeatureGroup
 
-                if (totalArcs == ((FeatureGroup)obj).totalArcs
-                    && totalLines == ((FeatureGroup)obj).totalLines
-                    && totalCircles == ((FeatureGroup)obj).totalCircles
+                if (this.totalArcs == ((FeatureGroup)obj).totalArcs
+                    && this.totalLines == ((FeatureGroup)obj).totalLines
+                    && this.totalCircles == ((FeatureGroup)obj).totalCircles
                     )
                 {
                     //Sort by perimiter
@@ -54,8 +54,8 @@ namespace FeatureRecognitionAPI.Models.Features
                         //While this features @ i has same permiter as obj.features[j] check if any j = features[i]
                         int j = i;
                         bool checkPoint = false;
-                        while (j < features.Count &&
-                            features[i].perimeter == ((FeatureGroup)obj).features[j].perimeter) 
+                        while (j < features.Count 
+                            && Math.Abs( features[i].perimeter - ((FeatureGroup)obj).features[j].perimeter) < Entity.EntityTolerance) 
                         {
                             if (features[i].Equals(features[j]))
                             {

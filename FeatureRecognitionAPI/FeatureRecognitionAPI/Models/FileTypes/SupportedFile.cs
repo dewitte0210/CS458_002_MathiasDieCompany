@@ -19,7 +19,18 @@ namespace FeatureRecognitionAPI.Models
         protected List<Feature> featureList;
         protected List<Entity> entityList;
         protected List<FeatureGroup> featureGroups;
-        public int GetFeatureGroupsCount() { return featureList.Count; }
+
+        //These two functiuons below exist for testing purposes
+        public int GetFeatureGroupCount() { return featureGroups.Count; }
+        public int GetTotalFeatureGroups()
+        {
+            int tmp = 0;
+            foreach(FeatureGroup fGroup in featureGroups)
+            {
+                tmp += fGroup.Count;
+            }
+            return tmp;
+        }
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
         {
@@ -241,7 +252,7 @@ namespace FeatureRecognitionAPI.Models
                 FeatureGroup newfGroup = new FeatureGroup(featureGroupList);
                 if (featureGroupList.Count > 0)
                 {
-                    foreach(FeatureGroup fGroup in featureGroups)
+                    foreach (FeatureGroup fGroup in featureGroups)
                     {
                         if (fGroup.Equals(newfGroup))
                         {
@@ -251,12 +262,17 @@ namespace FeatureRecognitionAPI.Models
                         }
                     }
                     //If the foreach loop was excited without adding anything add newFGroup to the featuregroup list
-                    if(!added)
+                    if (!added)
                     {
+                        newfGroup.Count++;
                         featureGroups.Add(newfGroup);
                     }
                 }
-                else featureGroups.Add(newfGroup);
+                else
+                {
+                    newfGroup.Count++;
+                    featureGroups.Add(newfGroup);
+                }
             }
         }
 

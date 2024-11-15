@@ -305,13 +305,6 @@ public class Feature
             perimeter += EntityList[i].Length;
         }
     }
-        
-            for (int i = 0; i < EntityList.Count; i++)
-            {
-                perimeter += EntityList[i].Length;
-            }
-        
-    }
 
     /*
      * Overriding the Equals method to compare two Feature objects
@@ -347,10 +340,10 @@ public class Feature
          * If there are the same number of arcs lines and circles, and permiters match, 
          * then check to see if all entities have a corresponding entity with matching values
          */
-        if (((Feature)obj).numLines == numLines
-            && ((Feature)obj).numCircles == numCircles
-            && ((Feature)obj).numArcs == numArcs
-            && ((Feature)obj).perimeter == perimeter)
+        if ( ((Feature)obj).numLines == this.numLines
+            && ((Feature)obj).numCircles == this.numCircles
+            && ((Feature)obj).numArcs == this.numArcs
+            && Math.Abs( ((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance )
         {
            // List<Entity> tmpList = new List<Entity>(((Feature)obj).EntityList);
 
@@ -368,7 +361,9 @@ public class Feature
             ((Feature)obj).EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
+
             //Remove the entity if it's found, and set the corresponding value in validArray to true
+
             bool equalLists = true;
             foreach(Entity j in ((Feature)obj).EntityList)
             {

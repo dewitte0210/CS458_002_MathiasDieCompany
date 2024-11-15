@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using DecimalMath;
 using FeatureRecognitionAPI.Models.Enums;
 
@@ -12,6 +13,7 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity {
         public double Length { get; set; }//length of the entity
 
+        public const double EntityTolerance = 0.00005;
         public Entity() { }//Enables the use of a default constructor
 
         /**

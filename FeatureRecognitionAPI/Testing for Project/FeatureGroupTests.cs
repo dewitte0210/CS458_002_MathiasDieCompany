@@ -21,7 +21,10 @@ namespace Testing_for_Project
 
             dwgFile.SetFeatureGroups();
 
-            Assert.That(dwgFile.GetFeatureGroupsCount(), Is.EqualTo(1));
+            //Check that we have the correct number of feature groups (1 from example 1)
+            Assert.That(dwgFile.GetFeatureGroupCount(), Is.EqualTo(1));
+            //Check that the one feature group has a count of 2
+            Assert.That(dwgFile.GetTotalFeatureGroups(), Is.EqualTo(2)); 
         }
     }
 }
