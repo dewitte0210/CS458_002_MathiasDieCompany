@@ -162,44 +162,70 @@ namespace FeatureRecognitionAPI.Models
          */
         public void SetFeatureGroups()
         {
-            List<Feature> features = getFeatureList(makeTouchingEntitiesList(entityList));
+            List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
+           // List<Feature> brokenFeatures = getFeatureList(entities);
+            List<Feature> features = new List<Feature>();
+
+            //Create features groups things in a way that breaks the logic here
+            foreach (List<Entity> entityList in entities)
+            {
+                features.Add(new Feature(entityList));
+            }
+
 
             //First iteration of loop (Declaring variables outside loop)
-            Point minPoint = features[0].FindMinPoint();
-            Point maxPoint = features[0].FindMaxPoint();
-            Point maxDiff = new((maxPoint.X-minPoint.X), (maxPoint.Y-minPoint.Y));
+            Point minPoint = new(0, 0);
+            Point maxPoint = new(0,0);
+            Point maxDiff = new(0,0);
             int maxDiffIndex = 0;
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = minPoint;
-            Point tempMaxPoint = maxPoint;
+            Point tempMinPoint = new(0, 0);
+            Point tempMaxPoint = new(0,0);
 
+            bool firstrun = true;
             while (features.Count > 0)
             {
-                for (int i = 1; i < features.Count; i++)
+
+
+                    //Set max values to zero before run, if its not the first one
+                    maxDiffIndex = 0;
+                    maxDiff.X = 0; maxDiff.Y = 0;
+                    maxPoint.X = 0; maxDiff.X = 0;
+                    minPoint.X = 0; minPoint.Y = 0;
+
+                for (int i = 0; i < features.Count; i++)
                 {
+                    //If first run don't start at 0, otherwise reset max 
+                    if (firstrun) { i = 1; firstrun = false; }
+                   
                     tempMinPoint = features[i].FindMinPoint();
                     tempMaxPoint = features[i].FindMaxPoint();
+                    tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);
+                    tempDiff.Y = (tempMaxPoint.Y - tempMinPoint.Y);
+                    
 
-                    tempDiff.X = maxPoint.X - minPoint.X;
-                    tempDiff.Y = maxPoint.Y - minPoint.Y;
+
                     if (tempDiff.X > maxDiff.X && tempDiff.Y > maxDiff.Y)
                     {
-                        maxPoint = tempMaxPoint;
-                        minPoint = tempMinPoint;
-                        maxDiff = tempDiff;
-                        maxDiffIndex = i;
+                            maxPoint = tempMaxPoint;
+                            minPoint = tempMinPoint;
+                            maxDiff.X = tempDiff.X; maxDiff.Y = tempDiff.Y;
+                            maxDiffIndex = i;
                     }
+                    
                 }
 
                 //Start the list
-                
+                List<Feature> featureGroupList = new List<Feature>();
                 Feature bigFeature = features[maxDiffIndex];
+                featureGroupList.Add(bigFeature);
+
                 features.RemoveAt(maxDiffIndex);
 
-                List<Feature> featureGroupList = new List<Feature>();
-                featureGroupList.Add(bigFeature);
+                
+                
 
                 for (int i = 0; i < features.Count; i++)
                 {
