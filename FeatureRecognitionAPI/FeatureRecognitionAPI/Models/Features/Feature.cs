@@ -397,14 +397,17 @@ public class Feature
             ((Feature)obj).EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
-
             //Remove the entity if it's found, and set the corresponding value in validArray to true
-
             bool equalLists = true;
-            foreach(Entity j in ((Feature)obj).EntityList)
+            foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Contains(j)) { equalLists = false; }
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance)) 
+                { 
+                    equalLists = false;
+                    break;
+                }
             }
+
             return equalLists;
         }
         else return false;
