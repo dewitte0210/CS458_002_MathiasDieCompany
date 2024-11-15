@@ -376,23 +376,41 @@ public class Feature
          * If there are the same number of arcs lines and circles, and permiters match, 
          * then check to see if all entities have a corresponding entity with matching values
          */
-        if (((Feature)obj).numLines == numLines
-            && ((Feature)obj).numCircles == numCircles
-            && ((Feature)obj).numArcs == numArcs
-            && ((Feature)obj).perimeter == perimeter)
-        {
-            //Genuinly my first time ever using lambda expression for something actually useful
-            //sort both lists by length
-            EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
-            ((Feature)obj).EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
 
-            //For each entity in this.EntityList check for a corresponding entity in tmpList
-            //Remove the entity if it's found, and set the corresponding value in validArray to true
+        double tolerance = 0.00001;
+
+        if (((Feature)obj).numLines == numLines
+           && ((Feature)obj).numCircles == numCircles
+           && ((Feature)obj).numArcs == numArcs
+           && Math.Abs(((Feature)obj).perimeter - perimeter) < tolerance)
+        {
+            ////Genuinly my first time ever using lambda expression for something actually useful
+            ////sort both lists by length
+            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+
+            ////For each entity in this.EntityList check for a corresponding entity in tmpList
+            ////Remove the entity if it's found, and set the corresponding value in validArray to true
+            //bool equalLists = true;
+            //foreach(Entity j in ((Feature)obj).EntityList)
+            //{
+            //    if (!EntityList.Contains(j)) { equalLists = false; }
+            //}
+            //return equalLists;
+
+            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+
             bool equalLists = true;
-            foreach(Entity j in ((Feature)obj).EntityList)
+            foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Contains(j)) { equalLists = false; }
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < tolerance)) 
+                { 
+                    equalLists = false;
+                    break;
+                }
             }
+
             return equalLists;
         }
         else return false;
