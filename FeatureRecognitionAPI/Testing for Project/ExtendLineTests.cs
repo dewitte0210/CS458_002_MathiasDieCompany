@@ -95,7 +95,7 @@ namespace Testing_for_Project
 
         #region SortIntoBaseEntityList
         [Test]
-        public void averageCaseEntities()
+        public void example1Entities()
         {
             //Set path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
@@ -120,12 +120,77 @@ namespace Testing_for_Project
                     }
                 }
             
-                Assert.IsTrue(equalLists);
+                Assert.IsTrue(equalLists);//base entity list and normal entity list is the same (only works for example 1)
                 Feature testFeature = new Feature(feature.baseEntityList);
                 testFeature.DetectFeatures();
                 Assert.IsTrue(feature.Equals(testFeature));
             }
         }
+        [Test]
+        public void example3EveryBaseEntityinOriginalList()
+        {
+            //Set path to any filepath containing the 3rd example dxf file
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
+            DXFFile exampleOne = new DXFFile(path);
+
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+            foreach (Feature feature in featureList)
+            {
+                bool inBaseList = false;
+                for (int i = 0; i < feature.baseEntityList.Count; i++)
+                {
+                    if (feature.EntityList.Contains(feature.ExtendedEntityList[i]))
+                    {
+                        inBaseList = true;
+                    }
+                }
+
+                Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
+            }
+        }
+
+        [Test]
+        public void doesChildPassAsParent()
+        {
+                ExtendedLine child = new ExtendedLine();
+                Assert.IsTrue(child is Line);
+        }
+
+        [Test]
+        public void lilBitOfEverythingPerimeterEntitiesInEntityList()
+        {
+            //Set path to any filepath containing the 3rd example dxf file
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-LilBitOfEverything.dxf";
+            DXFFile exampleOne = new DXFFile(path);
+
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+            foreach (Feature feature in featureList)
+            {
+                if (feature.PerimeterEntityList.Count > 1)
+                    { 
+                    bool inBaseList = false;
+                    foreach (List<Entity> perimeterFeature in feature.PerimeterEntityList)
+                    {
+                        foreach (Entity entity in perimeterFeature)
+                        {
+                            if (feature.EntityList.Contains(entity)) { inBaseList = true; }
+                            else { inBaseList = false; }
+                        }
+                    }
+
+                    Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
+                }
+            }
+        }
+        //should have two perimeter features
         #endregion
     }
 }
