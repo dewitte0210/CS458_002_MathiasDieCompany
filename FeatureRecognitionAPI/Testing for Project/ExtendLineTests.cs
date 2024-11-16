@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSMath.Geometry;
 using FeatureRecognitionAPI.Models;
 
 namespace Testing_for_Project
@@ -27,6 +28,25 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void ExtendThreeVerticalLines()
+        {
+            Line line1 = new(7, 4, 7, 6);
+            Line line2 = new(7, 8, 7, 10);
+            Line line3 = new(7, 12, 7, 14);
+
+            List<Entity> testEntities = [line1, line2, line3];
+            Feature testFeature = new(testEntities, false, false);
+            testFeature.extendAllEntities();
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
+            Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
+            Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
+            Assert.IsTrue(finalTestLine.StartPoint.X == 7);
+            Assert.IsTrue(finalTestLine.EndPoint.X == 7);
+            Assert.IsTrue(finalTestLine.StartPoint.Y == 4);
+            Assert.IsTrue(finalTestLine.EndPoint.Y == 14);
+        }
+
+        [Test]
         public void ExtendHorizontalLines()
         {
             Line line1 = new(4, 7, 6, 7);
@@ -44,6 +64,98 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void ExtendThreeHorizontalLines()
+        {
+            Line line1 = new(4, 7, 6, 7);
+            Line line2 = new(8, 7, 10, 7);
+            Line line3 = new(12, 7, 14, 7);
+            List<Entity> testEntities = [line1, line2, line3];
+            Feature testFeature = new(testEntities, false, false);
+            testFeature.extendAllEntities();
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
+            Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
+            Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
+            Assert.IsTrue(finalTestLine.StartPoint.X == 4);
+            Assert.IsTrue(finalTestLine.EndPoint.X == 14);
+            Assert.IsTrue(finalTestLine.StartPoint.Y == 7);
+            Assert.IsTrue(finalTestLine.EndPoint.Y == 7);
+        }
+
+        [Test]
+        public void ExtendHorizontalLinesWithPerimeterFeatures()
+        {
+            Line line1 = new(4, 7, 6, 7);
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+            Line line5 = new(8, 7, 10, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5];
+            Feature testFeature = new(testEntities, false, false);
+            testFeature.extendAllEntities();
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 4);
+            bool hasExtendedLine = false;
+            foreach(Entity entity in testFeature.ExtendedEntityList)
+            {
+                if (entity is ExtendedLine) 
+                {
+                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.X == 4);
+                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.X == 10);
+                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.Y == 7);
+                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.Y == 7);
+                    hasExtendedLine = true;
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+            Assert.IsTrue(testFeature.EntityList.Contains(line2));
+            Assert.IsTrue(testFeature.EntityList.Contains(line3));
+            Assert.IsTrue(testFeature.EntityList.Contains(line4));
+        }
+
+        [Test]
+        public void ExtendThreeHorizontalLinesWithPerimeterFeatures()
+        {
+            Line line1 = new(4, 7, 6, 7);
+
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+
+            Line line5 = new(8, 7, 10, 7);
+
+            Line line6 = new(10, 7, 10, 3);
+            Line line7 = new(10, 3, 12, 3);
+            Line line8 = new(12, 3, 12, 7);
+
+            Line line9 = new(12, 7, 14, 7);
+
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9];
+            Feature testFeature = new(testEntities, false, false);
+            testFeature.extendAllEntities();
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 7);
+            bool hasExtendedLine = false;
+            foreach (Entity entity in testFeature.ExtendedEntityList)
+            {
+                if (entity is ExtendedLine)
+                {
+                    Assert.IsFalse(hasExtendedLine);
+                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.X == 4);
+                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.X == 14);
+                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.Y == 7);
+                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.Y == 7);
+                    hasExtendedLine = true;
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+            Assert.IsTrue(testFeature.EntityList.Contains(line2));
+            Assert.IsTrue(testFeature.EntityList.Contains(line3));
+            Assert.IsTrue(testFeature.EntityList.Contains(line4));
+
+            Assert.IsTrue(testFeature.EntityList.Contains(line6));
+            Assert.IsTrue(testFeature.EntityList.Contains(line7));
+            Assert.IsTrue(testFeature.EntityList.Contains(line8));
+        }
+
+        [Test]
         public void ExtendSlopedLines()
         {
             Line line1 = new(0, 0, 4, 4);
@@ -58,6 +170,24 @@ namespace Testing_for_Project
             Assert.IsTrue(finalTestLine.EndPoint.X == 9);
             Assert.IsTrue(finalTestLine.StartPoint.Y == 0);
             Assert.IsTrue(finalTestLine.EndPoint.Y == 9);
+        }
+
+        [Test]
+        public void ExtendThreeSlopedLines()
+        {
+            Line line1 = new(0, 0, 4, 4);
+            Line line2 = new(6, 6, 9, 9);
+            Line line3 = new(12, 12, 18, 18);
+            List<Entity> testEntities = [line1, line2, line3];
+            Feature testFeature = new(testEntities, false, false);
+            testFeature.extendAllEntities();
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
+            Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
+            Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
+            Assert.IsTrue(finalTestLine.StartPoint.X == 0);
+            Assert.IsTrue(finalTestLine.EndPoint.X == 18);
+            Assert.IsTrue(finalTestLine.StartPoint.Y == 0);
+            Assert.IsTrue(finalTestLine.EndPoint.Y == 18);
         }
 
         [Test]
@@ -126,6 +256,8 @@ namespace Testing_for_Project
                 Assert.IsTrue(feature.Equals(testFeature));
             }
         }
+
+        //Example 3 has no perimeter feature so all entities in in BaseEntityList should be in EntityList and not be changed
         [Test]
         public void example3EveryBaseEntityinOriginalList()
         {
@@ -153,6 +285,7 @@ namespace Testing_for_Project
             }
         }
 
+        // Basic test to understand the logic of an if statement when dealing with inheritance
         [Test]
         public void doesChildPassAsParent()
         {
@@ -160,6 +293,8 @@ namespace Testing_for_Project
                 Assert.IsTrue(child is Line);
         }
 
+        // This is to test that all entities in the perimeter list are in EntityList and have not been changed
+        // Does not check if the perimeter features are correct
         [Test]
         public void lilBitOfEverythingPerimeterEntitiesInEntityList()
         {
@@ -172,23 +307,42 @@ namespace Testing_for_Project
             exampleOne.detectAllFeatures();
 
             List<Feature> featureList = exampleOne.getFeatureList();
+            bool hasSquareFeature = false;
+            bool hasCircleFeature = false;
+            bool oneFeatureWithTwoPerimeterFeatures = false;
+            int count = 0; // number of features with 2 perimeter features
             foreach (Feature feature in featureList)
             {
-                if (feature.PerimeterEntityList.Count > 1)
-                    { 
-                    bool inBaseList = false;
-                    foreach (List<Entity> perimeterFeature in feature.PerimeterEntityList)
+                if (feature.PerimeterEntityList.Count == 2)
                     {
-                        foreach (Entity entity in perimeterFeature)
+                    oneFeatureWithTwoPerimeterFeatures = true;
+                    count++;
+                    Assert.IsTrue(count == 1); // there should be only 1 feature with two perimeter features
+                    bool inBaseList = false;
+                    foreach (List<Entity> perimeterFeatureEntities in feature.PerimeterEntityList)
+                    {
+                        Feature perimeterFeature = new Feature(perimeterFeatureEntities);
+                        foreach (Entity entity in perimeterFeature.EntityList)
                         {
                             if (feature.EntityList.Contains(entity)) { inBaseList = true; }
                             else { inBaseList = false; }
                         }
+                        perimeterFeature.CountEntities(perimeterFeature.EntityList, out int numLines, out int numArcs, out int numCircles);
+                        Assert.IsTrue(numCircles == 0);
+                        if (numLines == 3 && numArcs == 2) { hasSquareFeature = true; }
+                        if (numLines == 2 && numArcs == 1) { hasCircleFeature = true; }
                     }
 
                     Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
+                } 
+                else
+                {
+                    Assert.IsTrue(feature.PerimeterEntityList.Count == 0); // if the feature does not have 2 perimeter features, it should have none
                 }
             }
+            Assert.IsTrue(oneFeatureWithTwoPerimeterFeatures);
+            Assert.IsTrue(hasSquareFeature);
+            Assert.IsTrue(hasCircleFeature);
         }
         //should have two perimeter features
         #endregion

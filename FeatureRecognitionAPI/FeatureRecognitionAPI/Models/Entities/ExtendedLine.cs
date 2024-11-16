@@ -19,11 +19,17 @@ namespace FeatureRecognitionAPI.Models
         //runs into issues if more than one perimeter feature is on a line
         //would show up as an ExtendedLine being a parent
         //this would also throw an error when trying to find a path because the parent would not be in EntityList
-        public ExtendedLine(Line parent1, Line parent2) : base(parent1)
+        public ExtendedLine(Line parent1, Line parent2) : base(parent1) // This just gives the line parent1's values by default
         {
             Parent1 = new Line(parent1);
             Parent2 = new Line(parent2);
             calcPoints();
+
+            SlopeY = EndPoint.Y - StartPoint.Y;
+            SlopeX = EndPoint.X - StartPoint.X;
+
+            // Distance Calculation
+            this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
         }
 
         //Function that calculates StartPoint and EndPoint based off parents

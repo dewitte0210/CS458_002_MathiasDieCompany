@@ -422,22 +422,22 @@ public class Feature
     }
 
     /*
-     * This is a recursive helper function to extend every line in ExtendedEntityList.
+     * This is a recursive helper function to extend every line in ExtendedEntityList. It will loop through ExtendedEntityList,
+     * previously set to EntityList, until it can find a Line to extend. Will recurss if extended. Base case is no more lines to extend
      * Should be N^N runtime seeing as the nested for loops is N^2, then it is called recursively with N-1 every time.
      * This makes it (((N!)^2) * N!) which is 
     */
     private void extendAllEntitiesHelper()
     {
-        bool extendedALine = false; // repeats recursivly if this is true
-        //this block extends every line in extendedEntityList
-        //foreach (var entity in extendedEntityList)
-        for (int i = 0; i < ExtendedEntityList.Count; i++)
+        bool extendedALine = false;
+        int i = 0;
+        do
         {
             if (ExtendedEntityList[i] is Line)
-            {
-                //foreach (var otherEntity in extendedEntityList)
-                for (int j = 0; j < ExtendedEntityList.Count; j++)
-                {   
+            { 
+                int j = 0;
+                do
+                {
                     if ((ExtendedEntityList[j] is Line) && ExtendedEntityList[i] != ExtendedEntityList[j])
                     {
                         // for each entity it checks if it can extend with every other entity and does so
@@ -446,12 +446,13 @@ public class Feature
                         if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
                             extendedALine = true;
-                            break;
                         }
                     }
-                }
+                    j++;
+                } while (!extendedALine && j < ExtendedEntityList.Count);
             }
-        }
+            i++;
+        } while (!extendedALine && i < ExtendedEntityList.Count);
         if (extendedALine)
         {
             extendAllEntitiesHelper();
@@ -472,7 +473,7 @@ public class Feature
      */
     private bool extendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2))
+        if (!line1.DoesIntersect(line2) || line1 is ExtendedLine || line2 is ExtendedLine)
         //makes sure youre not extending lines that already touch
         {
             //Does not need to detect if lines are perpendicular since they might not be perfectly perpendicular
@@ -511,7 +512,7 @@ public class Feature
                     return true;
                 }
             }*/
-            if (line1.isParallel(line2))
+            if (line1.isSameInfinateLine(line2))
             {
                 ExtendedLine tempLine = new ExtendedLine(line1, line2);//makes a new line object with extendedLine boolean to      
                 ExtendedEntityList.Remove(line1);

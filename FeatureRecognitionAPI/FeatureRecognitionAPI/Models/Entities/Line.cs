@@ -10,17 +10,10 @@ namespace FeatureRecognitionAPI.Models
     {
         public Point StartPoint { get; set; }
         public Point EndPoint { get; set; }
-        public double SlopeY { get; }
-        public double SlopeX { get; }
-        public bool ExtendedLine { get; set; }
+        public double SlopeY { get; set; }
+        public double SlopeX { get; set; }
 
         protected Line() { }
-        public Line(bool ExtendedLine)
-        {
-            this.ExtendedLine = ExtendedLine;
-            StartPoint = new Point();
-            EndPoint = new Point();
-        }
 
         public Line(Line line)
         {
@@ -28,7 +21,6 @@ namespace FeatureRecognitionAPI.Models
             EndPoint = line.EndPoint;
             SlopeY = line.SlopeY;
             SlopeX = line.SlopeX;
-            ExtendedLine = ExtendedLine;
             Length = line.Length;
         }
 
@@ -36,7 +28,6 @@ namespace FeatureRecognitionAPI.Models
         {
             StartPoint = new Point(startX, startY);
             EndPoint = new Point(endX, endY);
-            ExtendedLine = false;
 
             SlopeY = endY - startY;
             SlopeX = endX - startX;
@@ -45,28 +36,43 @@ namespace FeatureRecognitionAPI.Models
             this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
         }
 
-        //constructor with extendedline parameter
-        public Line(double startX, double startY, double endX, double endY, bool extendedLine)
+        public Line(Point startPoint, Point endPoint)
         {
-            StartPoint = new Point(startX, startY);
-            EndPoint = new Point(endX, endY);
-            ExtendedLine = extendedLine;
+            StartPoint = startPoint;
+            EndPoint = endPoint;
 
-            SlopeY = endY - startY;
-            SlopeX = endX - startX;
+            SlopeY = EndPoint.Y - StartPoint.Y;
+            SlopeX = EndPoint.X - StartPoint.X;
 
             // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
+            this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
         }
 
-        public bool isParallel(Entity other)
+        public bool isSameInfinateLine(Entity other)
         {
             if (other is Line)
             {
                 Line lineOther = (Line)other;
+                if (this.SlopeX > -0.00005 && this.SlopeX < 0.00005) // means this is a verticle line
+                {
+                    if (lineOther.SlopeX > -0.00005 && lineOther.SlopeX < 0.00005) // means other is a verticle line
+                    {
+                        return ((this.StartPoint.X >  (lineOther.StartPoint.X - 0.00005)) && (this.StartPoint.X < (lineOther.StartPoint.X + 0.00005))); // checks that the x values are within .00005 of each other
+                    }
+                    else
+                    {
+                        return false; // both have to be a verticle line
+                    }
+
+                }
+                else if (lineOther.SlopeX > -0.00005 && lineOther.SlopeX < 0.00005)
+                {
+                    return false; // means other is a verticle line but this is not
+                }
+
                 double ThisYintercept = this.StartPoint.Y - ((this.SlopeY / this.SlopeX) * this.StartPoint.X);
                 double OtherYintercept = lineOther.StartPoint.Y - ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.StartPoint.X);
-                if (((this.SlopeY / this.SlopeX) == (lineOther.SlopeY / lineOther.SlopeX)) && (ThisYintercept == OtherYintercept))
+                if ((Math.Abs((this.SlopeY / this.SlopeX)) == Math.Abs((lineOther.SlopeY / lineOther.SlopeX))) && (ThisYintercept == OtherYintercept))
                 {
                     return true;
                 }

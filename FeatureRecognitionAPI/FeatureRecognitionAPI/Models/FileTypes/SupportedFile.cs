@@ -56,6 +56,7 @@ namespace FeatureRecognitionAPI.Models
                 Feature feature = new Feature(entities[i]);
                 feature.extendAllEntities();
                 feature.seperateBaseEntities();
+                feature.seperatePerimeterEntities();
                 feature.DetectFeatures();
                 featureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
@@ -150,20 +151,9 @@ namespace FeatureRecognitionAPI.Models
         */
         public void detectAllFeatures()
         {
-            detectAllFeatures(entityList);
+            getFeatureList(makeTouchingEntitiesList(entityList));
         }
-        public void detectAllFeatures(List<Entity> myEntityList)
-        {
-            List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
-            featureList = getFeatureList(touchingEntities);
-            foreach (Feature feature in featureList)
-            {
-                feature.extendAllEntities();
-                feature.seperateBaseEntities();
-                feature.seperatePerimeterEntities();
-                feature.DetectFeatures();
-            }
-        }
+
         // Method to read the data from a file and fill the entityList with entities
         public abstract void readEntities();
     }
