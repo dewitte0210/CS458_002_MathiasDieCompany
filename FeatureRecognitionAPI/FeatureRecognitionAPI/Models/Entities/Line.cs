@@ -17,8 +17,8 @@ namespace FeatureRecognitionAPI.Models
 
         public Line(Line line)
         {
-            StartPoint = line.StartPoint;
-            EndPoint = line.EndPoint;
+            StartPoint = new Point(line.StartPoint);
+            EndPoint = new Point(line.EndPoint);
             SlopeY = line.SlopeY;
             SlopeX = line.SlopeX;
             Length = line.Length;
@@ -46,6 +46,11 @@ namespace FeatureRecognitionAPI.Models
 
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+        }
+
+        public bool hasPoint(Point point)
+        {
+            return (StartPoint.Equals(point) || EndPoint.Equals(point));
         }
 
         public bool isSameInfinateLine(Entity other)
@@ -116,8 +121,7 @@ namespace FeatureRecognitionAPI.Models
                 double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
                 double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
 
-                if (((Line)obj).Length == Length
-                    && slopeDifY < 0.000009
+                if (slopeDifY < 0.000009
                     && slopeDifX < 0.000009)
                 {
                     return true;

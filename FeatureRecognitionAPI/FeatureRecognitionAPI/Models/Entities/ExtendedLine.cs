@@ -48,13 +48,13 @@ namespace FeatureRecognitionAPI.Models
                 {
                     //At this point we know the point to be extended on line1 is the start point, meaning the end point can stay the same
                     //  Hence why tempLine end point is set to line1's
-                    pointToExtend = Parent1.StartPoint;
+                    pointToExtend = new Point(Parent1.StartPoint);
                     StartPoint.X = Parent1.EndPoint.X;
                     StartPoint.Y = Parent1.EndPoint.Y;
                 }
                 else
                 {
-                    pointToExtend = Parent1.EndPoint;
+                    pointToExtend = new Point(Parent1.EndPoint);
                     StartPoint.X = Parent1.StartPoint.X;
                     StartPoint.Y = Parent1.StartPoint.Y;
                 }

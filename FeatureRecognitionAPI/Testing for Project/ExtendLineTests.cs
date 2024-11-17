@@ -21,10 +21,9 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartPoint.X == 7);
-            Assert.IsTrue(finalTestLine.EndPoint.X == 7);
-            Assert.IsTrue(finalTestLine.StartPoint.Y == 4);
-            Assert.IsTrue(finalTestLine.EndPoint.Y == 10);
+
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 4)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 10)));
         }
 
         [Test]
@@ -40,10 +39,9 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartPoint.X == 7);
-            Assert.IsTrue(finalTestLine.EndPoint.X == 7);
-            Assert.IsTrue(finalTestLine.StartPoint.Y == 4);
-            Assert.IsTrue(finalTestLine.EndPoint.Y == 14);
+
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 4)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point (7, 14)));
         }
 
         [Test]
@@ -57,10 +55,9 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartPoint.X == 4);
-            Assert.IsTrue(finalTestLine.EndPoint.X == 10);
-            Assert.IsTrue(finalTestLine.StartPoint.Y == 7);
-            Assert.IsTrue(finalTestLine.EndPoint.Y == 7);
+
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(4, 7)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(10, 7)));
         }
 
         [Test]
@@ -75,10 +72,9 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartPoint.X == 4);
-            Assert.IsTrue(finalTestLine.EndPoint.X == 14);
-            Assert.IsTrue(finalTestLine.StartPoint.Y == 7);
-            Assert.IsTrue(finalTestLine.EndPoint.Y == 7);
+
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(4, 7)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(14, 7)));
         }
 
         [Test]
@@ -98,10 +94,9 @@ namespace Testing_for_Project
             {
                 if (entity is ExtendedLine) 
                 {
-                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.X == 4);
-                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.X == 10);
-                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.Y == 7);
-                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.Y == 7);
+
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
                     hasExtendedLine = true;
                 }
             }
