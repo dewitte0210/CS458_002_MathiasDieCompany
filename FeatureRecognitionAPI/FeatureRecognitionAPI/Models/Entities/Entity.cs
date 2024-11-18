@@ -477,6 +477,11 @@ namespace FeatureRecognitionAPI.Models
             return intersect1IsValid || intersect2IsValid; 
 ;
         }
+
+
         public abstract override bool Equals(object? obj);
+
+        //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
+        public abstract bool Compare(object? obj);
     }
 }

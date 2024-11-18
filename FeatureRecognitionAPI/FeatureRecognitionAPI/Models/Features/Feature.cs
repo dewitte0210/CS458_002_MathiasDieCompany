@@ -381,28 +381,52 @@ public class Feature
             && ((Feature)obj).numArcs == this.numArcs
             && Math.Abs( ((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance )
         {
-           // List<Entity> tmpList = new List<Entity>(((Feature)obj).EntityList);
-
-            //Creat an array of booleans for every entity in this EntityList
-            bool[] validArray = new bool[EntityList.Count];
-            //Boolean arrays should be false by default
-            //for(int i = 0; i < validArray.Length; i++)
-            //{
-            //    validArray[i] = false;
-            //}
-
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
             EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
             ((Feature)obj).EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
+
+            //For each entity in this.EntityList check for a corresponding entity obj.EntityList
+            bool equalLists = true;
+            foreach (Entity j in ((Feature)obj).EntityList)
+            {
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance)) 
+                { 
+                    equalLists = false;
+                    break;
+                }
+            }
+
+            return equalLists;
+        }
+        else return false;
+    }
+
+    public bool Compare(object obj)
+    {
+        if ((!(obj is Feature)) || (obj == null))
+        {
+            return false;
+        }
+        else if (obj == this) return true;
+     
+        if (((Feature)obj).numLines == this.numLines
+            && ((Feature)obj).numCircles == this.numCircles
+            && ((Feature)obj).numArcs == this.numArcs
+            && Math.Abs(((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance)
+        {
+            //Genuinly my first time ever using lambda expression for something actually useful
+            //sort both lists by length
+            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
             //Remove the entity if it's found, and set the corresponding value in validArray to true
             bool equalLists = true;
             foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance)) 
-                { 
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                {
                     equalLists = false;
                     break;
                 }

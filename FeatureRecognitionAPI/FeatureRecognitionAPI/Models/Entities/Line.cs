@@ -120,8 +120,25 @@ namespace FeatureRecognitionAPI.Models
                 else return false;
             }
             else return false;
+        }
 
+        public override bool Compare(object? obj)
+        {
+            //If both lines have the same length , and the slopes are equal (within tight tollerance)
+            if (obj is Line && Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance)
+            {
+                double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
+                double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
 
+                if (Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance
+                    && slopeDifY < EntityTolerance
+                    && slopeDifX < EntityTolerance)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
         }
     }
 }
