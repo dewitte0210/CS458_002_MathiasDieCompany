@@ -265,7 +265,7 @@ public class Feature
     /* Checks the perimiter entity list to detect if any of the features there belong to group 5, 
      * then adds any we find to the perimiterFeature list 
      */
-    public void CheckGroup5()
+    internal void CheckGroup5()
     {
         if(PerimeterEntityList == null) { return; }
 
@@ -283,6 +283,28 @@ public class Feature
             {
                 PerimeterFeatures.Add(PerimeterFeatureTypes.Group5);
                 
+            }
+        }
+    }
+
+    // Very simillar check to Group5, changes the entity count constraints
+    internal void CheckGroup6()
+    {
+        if (PerimeterEntityList == null){ return; }
+        
+        foreach (List<Entity> feature in PerimeterEntityList)
+        {
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            if(lineCount != 2 || arcCount < 2 || arcCount > 4 || circCount != 0) { return; } 
+            foreach(Entity entity in feature)
+            {
+                if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
+            }
+
+            // If the feature is group6, add it to the list! 
+            if(HasTwoParalellLine(feature))
+            {
+                PerimeterFeatures.Add(PerimeterFeatureTypes.Group6);
             }
         }
     }

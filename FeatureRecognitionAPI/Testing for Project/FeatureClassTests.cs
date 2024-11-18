@@ -123,6 +123,9 @@ namespace Testing_for_Project
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
         }
-        #endregion 
+        #endregion
+        #region CheckGroup6
+
+        #endregion
     }
 }
