@@ -117,6 +117,22 @@ namespace FeatureRecognitionAPI.Models
             else return false;
         }
 
+        public override bool Compare(object? obj)
+        {
+            if (obj is Arc)
+            {
+                if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
+                    && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
+                    && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
+                    && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
         /**
          * Function that determines if a point is in between the start and end angles
          * (already checked to be on the line if the arc is treated as a circle)

@@ -58,5 +58,20 @@ namespace FeatureRecognitionAPI.Models
             else return false;
         }
 
+        public override bool Compare(object? obj)
+        {
+            //If the object is a cricle, and the circles have even Radius, within tollerance then the circles are equal
+
+            if (obj is Circle)
+            {
+                if (Math.Abs(((Circle)obj).Radius - this.Radius) < EntityTolerance)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
     }
 }

@@ -24,6 +24,8 @@ namespace FeatureRecognitionAPI.Models.Features
 
         }
 
+
+
         //Check of all features in the group have a corresponding feature in other group, return true if they do
         public override bool Equals(object? obj)
         {
