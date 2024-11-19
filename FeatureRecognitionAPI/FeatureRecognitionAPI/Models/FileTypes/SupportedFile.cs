@@ -63,8 +63,6 @@ namespace FeatureRecognitionAPI.Models
         
         public List<Feature> getFeatureList(List<List<Entity>> entities)
         {
-            List<Feature> featureList = new List<Feature>();
-
             for (int i = 0; i < entities.Count(); i++)
             {
                 Feature feature = new Feature(entities[i]);

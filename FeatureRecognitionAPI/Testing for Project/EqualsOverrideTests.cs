@@ -19,13 +19,13 @@ namespace Testing_for_Project
             Line line2 = new(2, 2, 3, 3);
             Line line3 = new(1, 2, 2, 2);
 
-            bool equals1 = line1.Equals(line2);
+            bool equals1 = line1.Compare(line2);
 
-            bool equals2 = line1.Equals(line3);
+            bool equals2 = line1.Compare(line3);
 
-            Assert.That(equals1, Is.EqualTo(true));
+            Assert.IsTrue(equals1);
 
-            Assert.That(equals2, Is.EqualTo(false));
+            Assert.IsFalse(equals2);
         }
 
         [Test]

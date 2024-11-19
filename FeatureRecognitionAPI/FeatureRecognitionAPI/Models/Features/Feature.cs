@@ -676,6 +676,7 @@ public class Feature
         if (EntityList.Contains(start) && EntityList.Contains(target))
         {
             Stack<Entity> path = new Stack<Entity>();
+            path.Push(start);
             if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) 
             {
                 List<Entity> temp = path.ToList();
@@ -719,8 +720,9 @@ public class Feature
         }
         //this point in the function means nothing is touching current entity
 
-        curPath.Pop();
-        return false;//nothing is touching this entity so it is popped off of curPath
+        if (curPath.Peek() == head) { return false; } // if the current entity is the head it means nothing is touching it and there is no path
+        curPath.Pop(); // nothing is touching this entity so it is popped off of curPath
+        return false; // returns false so the previous recursive call can check the next touching entity
     }
 
     /*

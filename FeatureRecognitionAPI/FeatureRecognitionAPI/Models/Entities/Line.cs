@@ -124,7 +124,9 @@ namespace FeatureRecognitionAPI.Models
 
                 if (Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance
                     && slopeDifY < EntityTolerance
-                    && slopeDifX < EntityTolerance)
+                    && slopeDifX < EntityTolerance
+                    && this.hasPoint(((Line)obj).EndPoint)
+                    && this.hasPoint(((Line)obj).StartPoint))
                 {
                     return true;
                 }

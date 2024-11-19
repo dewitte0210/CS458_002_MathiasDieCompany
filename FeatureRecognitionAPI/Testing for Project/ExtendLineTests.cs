@@ -133,10 +133,8 @@ namespace Testing_for_Project
                 if (entity is ExtendedLine)
                 {
                     Assert.IsFalse(hasExtendedLine);
-                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.X == 4);
-                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.X == 14);
-                    Assert.IsTrue(((ExtendedLine)entity).StartPoint.Y == 7);
-                    Assert.IsTrue(((ExtendedLine)entity).EndPoint.Y == 7);
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(14, 7)));
                     hasExtendedLine = true;
                 }
             }
@@ -161,10 +159,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartPoint.X == 0);
-            Assert.IsTrue(finalTestLine.EndPoint.X == 9);
-            Assert.IsTrue(finalTestLine.StartPoint.Y == 0);
-            Assert.IsTrue(finalTestLine.EndPoint.Y == 9);
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(0, 0)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(9, 9)));
         }
 
         [Test]
@@ -179,10 +175,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.StartPoint.X == 0);
-            Assert.IsTrue(finalTestLine.EndPoint.X == 18);
-            Assert.IsTrue(finalTestLine.StartPoint.Y == 0);
-            Assert.IsTrue(finalTestLine.EndPoint.Y == 18);
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(0, 0)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(18, 18)));
         }
 
         [Test]
