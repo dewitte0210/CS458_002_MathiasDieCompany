@@ -376,23 +376,62 @@ public class Feature
          * If there are the same number of arcs lines and circles, and permiters match, 
          * then check to see if all entities have a corresponding entity with matching values
          */
-        if (((Feature)obj).numLines == numLines
-            && ((Feature)obj).numCircles == numCircles
-            && ((Feature)obj).numArcs == numArcs
-            && ((Feature)obj).perimeter == perimeter)
+        if ( ((Feature)obj).numLines == this.numLines
+            && ((Feature)obj).numCircles == this.numCircles
+            && ((Feature)obj).numArcs == this.numArcs
+            && Math.Abs( ((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance )
         {
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
             EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
             ((Feature)obj).EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
 
+            //For each entity in this.EntityList check for a corresponding entity obj.EntityList
+            bool equalLists = true;
+            foreach (Entity j in ((Feature)obj).EntityList)
+            {
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance)) 
+                { 
+                    equalLists = false;
+                    break;
+                }
+            }
+
+            return equalLists;
+        }
+        else return false;
+    }
+
+    public bool Compare(object obj)
+    {
+        if ((!(obj is Feature)) || (obj == null))
+        {
+            return false;
+        }
+        else if (obj == this) return true;
+     
+        if (((Feature)obj).numLines == this.numLines
+            && ((Feature)obj).numCircles == this.numCircles
+            && ((Feature)obj).numArcs == this.numArcs
+            && Math.Abs(((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance)
+        {
+            //Genuinly my first time ever using lambda expression for something actually useful
+            //sort both lists by length
+            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+
             //For each entity in this.EntityList check for a corresponding entity in tmpList
             //Remove the entity if it's found, and set the corresponding value in validArray to true
             bool equalLists = true;
-            foreach(Entity j in ((Feature)obj).EntityList)
+            foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Contains(j)) { equalLists = false; }
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                {
+                    equalLists = false;
+                    break;
+                }
             }
+
             return equalLists;
         }
         else return false;

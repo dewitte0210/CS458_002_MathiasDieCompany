@@ -4,6 +4,7 @@
  */
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using Remotion.Linq.Clauses.ResultOperators;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,6 +19,18 @@ namespace FeatureRecognitionAPI.Models
         protected List<Feature> featureList;
         protected List<Entity> entityList;
         protected List<FeatureGroup> featureGroups;
+
+        //These two functiuons below exist for testing purposes
+        public int GetFeatureGroupCount() { return featureGroups.Count; }
+        public int GetTotalFeatureGroups()
+        {
+            int tmp = 0;
+            foreach(FeatureGroup fGroup in featureGroups)
+            {
+                tmp += fGroup.Count;
+            }
+            return tmp;
+        }
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
         {
@@ -29,6 +42,7 @@ namespace FeatureRecognitionAPI.Models
             this.path = path;
             entityList = new List<Entity>();
             featureList = new List<Feature>();
+            featureGroups = new List<FeatureGroup>();
         }
         public void setPath(string path)
         {
@@ -142,6 +156,123 @@ namespace FeatureRecognitionAPI.Models
                     myEntityList.RemoveAt(i);
                     i--;
                     scanThroughEntityList(temp, myEntityList, features);
+                }
+            }
+        }
+
+
+
+
+        /*
+         * Groups features together and stores how many of each feature group are present in the file
+         * Initliazes class variable featuresList
+         */
+        public void SetFeatureGroups()
+        {
+            List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
+           // List<Feature> brokenFeatures = getFeatureList(entities);
+            List<Feature> features = new List<Feature>();
+
+            //Create features groups things in a way that breaks the logic here
+            foreach (List<Entity> entityList in entities)
+            {
+                features.Add(new Feature(entityList));
+            }
+
+
+            //First iteration of loop (Declaring variables outside loop)
+            Point minPoint = new(0, 0);
+            Point maxPoint = new(0,0);
+            Point maxDiff = new(0,0);
+            int maxDiffIndex = 0;
+
+            //Temp variables to overwrite
+            Point tempDiff = new(0, 0);
+            Point tempMinPoint = new(0, 0);
+            Point tempMaxPoint = new(0,0);
+
+            bool firstrun = true;
+            while (features.Count > 0)
+            {
+
+
+                    //Set max values to zero before run, if its not the first one
+                    maxDiffIndex = 0;
+                    maxDiff.X = 0; maxDiff.Y = 0;
+                    maxPoint.X = 0; maxDiff.X = 0;
+                    minPoint.X = 0; minPoint.Y = 0;
+
+                for (int i = 0; i < features.Count; i++)
+                {
+                    //If first run don't start at 0, otherwise reset max 
+                    if (firstrun) { i = 1; firstrun = false; }
+                   
+                    tempMinPoint = features[i].FindMinPoint();
+                    tempMaxPoint = features[i].FindMaxPoint();
+                    tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);
+                    tempDiff.Y = (tempMaxPoint.Y - tempMinPoint.Y);
+                    
+
+
+                    if (tempDiff.X > maxDiff.X && tempDiff.Y > maxDiff.Y)
+                    {
+                            maxPoint = tempMaxPoint;
+                            minPoint = tempMinPoint;
+                            maxDiff.X = tempDiff.X; maxDiff.Y = tempDiff.Y;
+                            maxDiffIndex = i;
+                    }
+                    
+                }
+
+                //Start the list
+                List<Feature> featureGroupList = new List<Feature>();
+                Feature bigFeature = features[maxDiffIndex];
+                featureGroupList.Add(bigFeature);
+
+                features.RemoveAt(maxDiffIndex);
+
+                
+                
+
+                for (int i = 0; i < features.Count; i++)
+                {
+                    tempMaxPoint = features[i].FindMaxPoint();
+                    tempMinPoint = features[i].FindMinPoint();
+                    //Temp max should be less than maxPoint (if it's the same it also shouldn't be added)
+                    if (tempMaxPoint.X < maxPoint.X && tempMaxPoint.Y < maxPoint.Y
+                        //TempMin should be greater than minPoint
+                        && tempMinPoint.X > minPoint.X && tempMinPoint.Y > minPoint.Y)
+                    {
+                        featureGroupList.Add(features[i]);
+                        features.RemoveAt(i);
+                        i--;
+                    }
+                }
+                //featureGroupList should now contain all features that fall inside of bigFeature
+                bool added = false;
+                FeatureGroup newfGroup = new FeatureGroup(featureGroupList);
+                if (featureGroupList.Count > 0)
+                {
+                    foreach (FeatureGroup fGroup in featureGroups)
+                    {
+                        if (fGroup.Equals(newfGroup))
+                        {
+                            fGroup.Count++;
+                            added = true;
+                            break;
+                        }
+                    }
+                    //If the foreach loop was excited without adding anything add newFGroup to the featuregroup list
+                    if (!added)
+                    {
+                        newfGroup.Count++;
+                        featureGroups.Add(newfGroup);
+                    }
+                }
+                else
+                {
+                    newfGroup.Count++;
+                    featureGroups.Add(newfGroup);
                 }
             }
         }

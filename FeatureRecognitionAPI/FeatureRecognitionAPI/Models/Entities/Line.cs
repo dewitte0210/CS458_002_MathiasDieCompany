@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Numerics;
 using DecimalMath;
+using ACadSharp.Entities;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -115,14 +116,34 @@ namespace FeatureRecognitionAPI.Models
 
         public override bool Equals(object? obj)
         {
-            //If both lines have the same length, and the slopes are within a tight tollerance, they are equal
-            if (obj is Line && ((Line)obj).Length == Length)
+            //If both lines have the same length , and the slopes are equal (within tight tollerance)
+            if (obj is Line && Math.Abs( ((Line)obj).Length - this.Length ) < EntityTolerance ) 
             {
                 double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
                 double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
 
-                if (slopeDifY < 0.000009
-                    && slopeDifX < 0.000009)
+                if (Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance
+                    && slopeDifY < EntityTolerance
+                    && slopeDifX < EntityTolerance)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public override bool Compare(object? obj)
+        {
+            //If both lines have the same length , and the slopes are equal (within tight tollerance)
+            if (obj is Line && Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance)
+            {
+                double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
+                double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
+
+                if (Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance
+                    && slopeDifY < EntityTolerance
+                    && slopeDifX < EntityTolerance)
                 {
                     return true;
                 }

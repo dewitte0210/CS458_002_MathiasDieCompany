@@ -5,7 +5,7 @@ namespace FeatureRecognitionAPI.Models.Features
 {
     public class FeatureGroup
     {
-        protected int count; //Track how many feature groups of this type are found
+        public int Count { get; set; } //Track how many feature groups of this type are found
         protected int totalArcs;
         protected int totalLines;
         protected int totalCircles;
@@ -24,6 +24,8 @@ namespace FeatureRecognitionAPI.Models.Features
 
         }
 
+
+
         //Check of all features in the group have a corresponding feature in other group, return true if they do
         public override bool Equals(object? obj)
         {
@@ -39,11 +41,38 @@ namespace FeatureRecognitionAPI.Models.Features
             {
                 //If in here, obj is a FeatureGroup
 
-                if (totalArcs == ((FeatureGroup)obj).totalArcs
-                    && totalLines == ((FeatureGroup)obj).totalLines
-                    && totalCircles == ((FeatureGroup)obj).totalCircles)
+                if (this.totalArcs == ((FeatureGroup)obj).totalArcs
+                    && this.totalLines == ((FeatureGroup)obj).totalLines
+                    && this.totalCircles == ((FeatureGroup)obj).totalCircles
+                    )
                 {
-                    //Do something
+                    //Sort by perimiter
+                    features.Sort((x,y) => x.perimeter.CompareTo(y.perimeter));
+                    ((FeatureGroup)obj).features.Sort ((x,y) => x.perimeter.CompareTo((y.perimeter)));
+
+
+                    for (int i = 0; i < features.Count; i++)
+                    {
+                        //While this features @ i has same permiter as obj.features[j] check if any j = features[i]
+                        int j = i;
+                        bool checkPoint = false;
+                        while (j < features.Count 
+                            && Math.Abs( features[i].perimeter - ((FeatureGroup)obj).features[j].perimeter) < Entity.EntityTolerance) 
+                        {
+                            if (features[i].Equals(features[j]))
+                            {
+                                checkPoint = true;
+                                break;
+                            }
+                            //If first element checked isn't equal, increment J
+                            j++;
+                        }
+                        if (!checkPoint)
+                        {
+                            return false;
+                        }
+                    }
+                    //If we got here, checkPoint was never false, so return true;
                     return true;
                 }
                 else
