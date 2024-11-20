@@ -176,8 +176,10 @@ public class Feature
         }
 
         //Finally Add the perimeter features
-        CheckGroup5();
         CheckGroup4();
+        CheckGroup5();
+        CheckGroup6(); 
+
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
@@ -295,7 +297,7 @@ public class Feature
         foreach (List<Entity> feature in PerimeterEntityList)
         {
             CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
-            if(lineCount != 2 || arcCount < 2 || arcCount > 4 || circCount != 0) { return; } 
+            if(lineCount < 2 || arcCount < 2 || arcCount > 4 || circCount != 0) { return; } 
             foreach(Entity entity in feature)
             {
                 if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }

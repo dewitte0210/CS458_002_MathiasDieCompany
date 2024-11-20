@@ -125,7 +125,50 @@ namespace Testing_for_Project
         }
         #endregion
         #region CheckGroup6
+        
+        [Test]
+        public void CheckGroup6_4Arc3Line_ReturnsTrue()
+        {
+            Arc arc1 = new(0.0, 3.0, 1, 0, 90);
+            Line line1 = new(1.0, 3.0, 1.0, 1.0);
+            Arc arc2 = new(2.0, 1.0, 1, 180, 270);
+            Line line2 = new(2.0, 0.0, 3.0, 0.0);
+            Arc arc3 = new(3.0, 1.0, 1.0, 270, 0);
+            Line line3 = new(4.0, 1.0, 4.0, 3.0);
+            Arc arc4 = new(4.0, 3.0, 1.0, 90, 180);
+            List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, arc4, line1, line2, line3 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group6));
+        }
 
+        [Test]
+        public void CheckGroup6_3Arc2Line_ReturnsTrue()
+        {
+            Arc arc1 = new(0.0, 3.0, 1, 0, 90);
+            Line line1 = new(1.0, 3.0, 1.0, 1.0);
+            Arc arc2 = new(2.0, 1.0, 1.0, 180, 0);
+            Line line2 = new(3.0, 1.0, 3.0, 3.0);
+            Arc arc3 = new(4.0, 3.0, 1.0, 90, 180);
+            List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, line1, line2 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group6));
+        }
+
+        [Test]
+        public void CheckGroup6_Group5Feature_ReturnsFalse()
+        {
+            Line line1 = new(0.0, 1.0, 0.0, 5.0);
+            Arc arc1 = new(1.0, 1.0, 1.0, 180, 270);
+            Line line2 = new(1.0, 0.0, 4.0, 0.0);
+            Arc arc2 = new(4.0, 1.0, 1.0, 270, 360);
+            Line line3 = new(5.0, 1.0, 5.0, 5.0);
+            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
+            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6)); 
+        }
         #endregion
     }
 }
