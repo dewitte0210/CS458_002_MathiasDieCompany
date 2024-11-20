@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using DecimalMath;
 using FeatureRecognitionAPI.Models.Enums;
 
@@ -12,6 +13,7 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity {
         public double Length { get; set; }//length of the entity
 
+        public const double EntityTolerance = 0.00005;
         public Entity() { }//Enables the use of a default constructor
 
         /**
@@ -396,7 +398,7 @@ namespace FeatureRecognitionAPI.Models
                         double y = solns[i];
                         //  Solution x value
                         double x = line.EndPoint.X;
-                        if (arc.IsInArcRange(new Point(x, y))) { return true; }
+                        if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x && Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y && Math.Max(line.StartPoint.X, line.EndPoint.X) >= x && Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y) { return true; }
                     }
                 }
                 else
@@ -415,7 +417,7 @@ namespace FeatureRecognitionAPI.Models
                         //Solution y value
                         double y = slope * solns[i] + intercept;
 
-                        if (arc.IsInArcRange(new Point(x,y))) { return true; };
+                        if (arc.IsInArcRange(new Point(x,y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x && Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y && Math.Max(line.StartPoint.X, line.EndPoint.X) >= x && Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y) { return true; };
                     }
                 }
             }
@@ -475,6 +477,11 @@ namespace FeatureRecognitionAPI.Models
             return intersect1IsValid || intersect2IsValid; 
 ;
         }
+
+
         public abstract override bool Equals(object? obj);
+
+        //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
+        public abstract bool Compare(object? obj);
     }
 }

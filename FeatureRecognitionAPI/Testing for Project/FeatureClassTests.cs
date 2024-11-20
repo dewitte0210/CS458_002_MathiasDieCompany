@@ -43,7 +43,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { arc, circle };
             Feature testFeature = new(entities) { baseEntityList = entities };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Punch));
+            Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
         }
         #endregion
        
@@ -57,7 +57,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2, line3 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
         }
         #endregion
         
@@ -96,7 +96,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { arc1, line1, line2, arc2 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { line1, line2 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.perimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
         }
         #endregion 
     }

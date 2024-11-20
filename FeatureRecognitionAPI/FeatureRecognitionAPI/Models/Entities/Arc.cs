@@ -104,10 +104,27 @@ namespace FeatureRecognitionAPI.Models
         {
             if (obj is Arc)
             {
-                if (((Arc)obj).Length == Length
-                    &&((Arc)obj).Radius == Radius
-                    && ((Arc)obj).StartAngle == StartAngle
-                    && ((Arc)obj).EndAngle == EndAngle)
+                //IDE Mapped everything to work with tolerance in one tab push :O
+                if (Math.Abs( ((Arc)obj).Length - this.Length) < EntityTolerance
+                    && Math.Abs( ((Arc)obj).Radius - this.Radius) < EntityTolerance
+                    && Math.Abs( ((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
+                    && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public override bool Compare(object? obj)
+        {
+            if (obj is Arc)
+            {
+                if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
+                    && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
+                    && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
+                    && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
                 {
                     return true;
                 }

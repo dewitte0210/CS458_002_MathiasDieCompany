@@ -40,18 +40,31 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
       ...prev,
       {
         newFeature: true,
-        count: 0,
+        count: 1,
         FeatureType: "",
         perimeter: 0,
         multipleRadius: false,
         kissCut: false,
         border: false,
+        EntityList: [],
       },
     ]);
   };
 
   const handleDeleteFeature = (index: number) => {
-    setData((prev) => prev.filter((_, i) => i !== index));
+    // Decrease count of deleted feature by 1
+    if (data[index].newFeature || data[index].count === 1) {
+      setData((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setData((prev) =>
+        prev.map((item, i) => {
+          if (i === index) {
+            return { ...item, count: item.count - 1 };
+          }
+          return item;
+        })
+      );
+    }
   };
 
   // Handle form submission
@@ -216,7 +229,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                     <th>Perimeter/Diameter</th>
                     <th>Multiple Radius</th>
                     <th>Kiss Cut</th>
-                    <th>Border</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -321,19 +333,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               />
                             </td>
                             <td>
-                              <input
-                                type="checkbox"
-                                checked={info.border}
-                                onChange={(e) =>
-                                  handleChange(
-                                    "border",
-                                    e.target.checked,
-                                    index
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteFeature(index)}
@@ -394,13 +393,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                             </td>
                             <td>
                               {info.kissCut ? (
-                                <span className="checkmark">&#10003;</span>
-                              ) : (
-                                <span className="crossmark">&#10005;</span>
-                              )}
-                            </td>
-                            <td>
-                              {info.border ? (
                                 <span className="checkmark">&#10003;</span>
                               ) : (
                                 <span className="crossmark">&#10005;</span>
