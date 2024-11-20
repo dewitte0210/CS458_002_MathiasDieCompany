@@ -512,7 +512,7 @@ public class Feature
      */
     private bool extendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2) || line1 is ExtendedLine || line2 is ExtendedLine)
+        if (!line1.DoesIntersect(line2))
         //makes sure youre not extending lines that already touch
         {
             //Does not need to detect if lines are perpendicular since they might not be perfectly perpendicular
@@ -553,7 +553,7 @@ public class Feature
             }*/
             if (line1.isSameInfinateLine(line2))
             {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2);//makes a new line object with extendedLine boolean to      
+                ExtendedLine tempLine = new ExtendedLine(line1, line2); //makes a new extended line object     
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);

@@ -19,7 +19,7 @@ namespace FeatureRecognitionAPI.Models
         //runs into issues if more than one perimeter feature is on a line
         //would show up as an ExtendedLine being a parent
         //this would also throw an error when trying to find a path because the parent would not be in EntityList
-        public ExtendedLine(Line parent1, Line parent2) : base(parent1) // This just gives the line parent1's values by default
+        public ExtendedLine(Line parent1, Line parent2) // calls line's default constructor to initialize StartPsoint and EndPoint
         {
             Parent1 = new Line(parent1);
             Parent2 = new Line(parent2);

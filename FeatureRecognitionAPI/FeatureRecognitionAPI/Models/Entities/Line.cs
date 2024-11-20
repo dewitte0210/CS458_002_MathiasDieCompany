@@ -14,7 +14,11 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
 
-        protected Line() { }
+        protected Line()
+        {
+            StartPoint = new Point();
+            EndPoint = new Point();
+        }
 
         public Line(Line line)
         {
