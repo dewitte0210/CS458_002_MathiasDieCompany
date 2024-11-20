@@ -18,7 +18,6 @@ namespace FeatureRecognitionAPI.Models
         public DXFFile(string path) : base(path)
         {
             fileType = SupportedExtensions.dxf;
-            //_fileVersion = GetFileVersion();
 
             if (File.Exists(path))
             {
