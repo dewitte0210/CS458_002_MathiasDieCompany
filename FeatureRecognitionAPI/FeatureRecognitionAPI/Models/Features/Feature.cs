@@ -58,6 +58,8 @@ public class Feature
     public int getNumArcs() { return numArcs; }
     private int numCircles = 0;
     public int getNumCircles() { return numCircles; }
+    public int numEllipses = 0;
+    public int getNumEllipses() { return numEllipses; }
 
     private Feature() { }//should not use default constructor
 
@@ -101,7 +103,7 @@ public class Feature
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
 
-        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles);
+        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
         
         //calculate and set the perimeter of the feature
         calcPerimeter();
@@ -114,11 +116,12 @@ public class Feature
         calcPerimeter();
     }
 
-    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
+    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles, out int numEllipses)
     {
         numLines = 0;
         numArcs = 0;
         numCircles = 0;
+        numEllipses = 0;
 
         //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)
@@ -134,6 +137,10 @@ public class Feature
             else if (entityList[i] is Circle)
             {
                 numCircles++;
+            }
+            else if (entityList[i] is Ellipse)
+            {
+                numEllipses++;
             }
             else
             {
@@ -245,7 +252,7 @@ public class Feature
     {
         if (numArcs >= 2 && numCircles == 0)
         {
-            //  Possible ellipse
+            //Possible ellipse with arcs
             if (numArcs > 2 && numLines == 0)
             {
                 if (DoAnglesAddTo360())
@@ -257,7 +264,7 @@ public class Feature
                     }
                 }
             }
-            //  Possible bowtie
+            //Possible bowtie
             else if (numLines == 2 && getBothLinesAndDetermineParallelization())
             {
                 if (IsBowtie())
@@ -265,6 +272,15 @@ public class Feature
                     type = PossibleFeatureTypes.Group2A;
                     return true;
                 }
+            }
+        }
+        //Ellipse entity check
+        else if (numLines == 0 && numArcs == 0 && numCircles == 0 && numEllipses == 1)
+        {
+            if ((baseEntityList[0] as Ellipse).IsFullEllipse)
+            {
+                type = PossibleFeatureTypes.Group2A;
+                return true;
             }
         }
         type = PossibleFeatureTypes.Punch;
@@ -331,6 +347,7 @@ public class Feature
 
     internal bool IsBowtie()
     {
+        //Sharp bowties with arcs
         if (numArcs == 2)
         {
             Arc arc1 = new Arc(0, 0, 0, 0, 0);
@@ -372,6 +389,9 @@ public class Feature
         return false;
     }
 
+    /**
+     * Retrieves 2 lines from the base entity list to determine parallelization
+     */
     private bool getBothLinesAndDetermineParallelization()
     {
         Line line1 = new Line(0, 0, 0, 0);
@@ -405,6 +425,10 @@ public class Feature
         return line1.isParallel(line2);
     }
 
+    /**
+     * Checks to see if the point on the center most angle of the arc is concave to
+     * the line (within the bounds) or convex (extends past the bounds)
+     */
     private bool IsArcConcave(Arc arc, Line line)
     {
         double middleAngle; 
@@ -421,6 +445,9 @@ public class Feature
             middleAngle += 360;
         }
         Point edgeOfArc = new Point(arc.Radius * Math.Cos(middleAngle * Math.PI / 180) + arc.Center.X, arc.Radius * Math.Sin(middleAngle * Math.PI / 180) + arc.Center.Y);
+        //Essentially vectors to use basic linear algebra so that they are perpendicular to
+        //  the vector that extends from the center of the arc to the edge point. Need to
+        //  create 2 vectors because the touching line that was grabbed is random
         Line cw = new Line(edgeOfArc.X, edgeOfArc.Y, (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X, -1 * (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
         Line ccw = new Line(edgeOfArc.X, edgeOfArc.Y, -1 * (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X, (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
         //Slope of perpendicular line will be vertical
@@ -440,7 +467,7 @@ public class Feature
         {
             bool g4Detected = false;
             Line tempLine = null;
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
 
             if (lineCount != 2 || (arcCount != 2 && arcCount !=0)) { continue; }
 
@@ -468,7 +495,7 @@ public class Feature
 
         foreach (List<Entity> feature in PerimeterEntityList)
         {
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
             if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
             foreach (Entity entity in feature)
             {

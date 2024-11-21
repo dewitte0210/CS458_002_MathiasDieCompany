@@ -418,7 +418,7 @@ namespace FeatureRecognitionAPI.Models
                         //Solution y value
                         double y = slope * solns[i] + intercept;
 
-                        if (arc.IsInArcRange(new Point(x,y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x && Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y && Math.Max(line.StartPoint.X, line.EndPoint.X) >= x && Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y) { return true; };
+                        if (arc.IsInArcRange(new Point(x,y)) && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= x && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= y && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= x && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= y) { return true; };
                     }
                 }
             }
@@ -477,6 +477,30 @@ namespace FeatureRecognitionAPI.Models
             
             return intersect1IsValid || intersect2IsValid; 
 ;
+        }
+
+        /**
+         * Solves the quadratic formula
+         * 
+         * @Return - List of solutions
+         */
+        internal List<double> QuadraticFormula(double a, double b, double c)
+        {
+            List<double> solns = new List<double>();
+            double insideSqrt = Math.Pow(b, 2) - (4 * a * c);
+            //Two real solutions
+            if (insideSqrt > 0)
+            {
+                solns.Add(((-1 * b) + Math.Sqrt(insideSqrt)) / (2 * a));
+                solns.Add(((-1 * b) - Math.Sqrt(insideSqrt)) / (2 * a));
+            }
+            //One real solution
+            else if (insideSqrt == 0)
+            {
+                solns.Add((-1 * b) / (2 * a));
+            }
+            return solns;
+            
         }
         public abstract override bool Equals(object? obj);
     }

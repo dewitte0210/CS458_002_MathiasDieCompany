@@ -50,17 +50,42 @@ namespace Testing_for_Project
             Assert.That(circle1.Radius, Is.EqualTo(0.2577228596164672));
         }
         [Test]
-        public void TestEllipseClass()
+        public void TestFullEllipseClass()
         {
-            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 0, 0, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Assert.That(ellipse1.Length, Is.EqualTo(15.865439589290595));
         }
+
+        [Test]
+        public void TestPartialEllipseClass()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+            Assert.That(Math.Round(ellipse1.Length, 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
+        }
+
+        [Test]
+        public void TestPartialRotatedEllipseClass()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 0, 3, 2.0 / 3.0, 0, Math.PI);
+            Assert.That(Math.Round(ellipse1.Length, 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
+        }
+
         [Test]
         public void TestPointEquals()
         {
             Point point1 = new Point(2, 3);
             Point point2 = new Point(2, 3);
             Assert.That(point1.Equals(point2));
+        }
+
+        [Test]
+        public void TestQuadraticFormula()
+        {
+            Line test = new Line(0, 0, 0, 0);
+            List<double> solutions1 = new List<double>() { 2, 5 };
+            List<double> solutions2 = new List<double>() { 5, 2 };
+            List<double> actual = test.QuadraticFormula(1, -7, 10);
+            Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
         }
         #endregion
 

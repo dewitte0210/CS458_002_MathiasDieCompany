@@ -48,6 +48,7 @@ namespace Testing_for_Project
         #endregion
 
         #region CheckGroup2A
+        [Test]
         public void CheckGroup2A_EllipseMadeOfArcs_ReturnsTrue()
         {
             Arc arc1 = new(1.1399417701703984, 1.8531050558148150, 0.1680136484100009, 0.9555661934363535, 36.8885215710321290);
@@ -94,7 +95,27 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc5, arc7, arc9, arc2, arc4, arc3, arc16, arc11, arc10, arc12, arc6, arc13, arc8, arc14, arc15 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Punch));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
+        }
+
+        [Test]
+        public void CheckGroup2A_EllipseFromEllipseClass_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
+            List<Entity> entities = new List<Entity>() { ellipse1 };
+            Feature feature = new(entities) { baseEntityList = entities };
+            feature.DetectFeatures();
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+        }
+
+        [Test]
+        public void CheckGroup2A_EllipseFromEllipseClass_ReturnsFalse()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+            List<Entity> entities = new List<Entity>() { ellipse1 };
+            Feature feature = new(entities) { baseEntityList = entities };
+            feature.DetectFeatures();
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
         }
 
         [Test]
@@ -159,7 +180,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Punch));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
         }
         #endregion
 
