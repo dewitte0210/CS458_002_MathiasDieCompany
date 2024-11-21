@@ -40,7 +40,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
       ...prev,
       {
         newFeature: true,
-        count: 0,
+        count: 1,
         FeatureType: "",
         perimeter: 0,
         multipleRadius: false,
@@ -52,7 +52,19 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
   };
 
   const handleDeleteFeature = (index: number) => {
-    setData((prev) => prev.filter((_, i) => i !== index));
+    // Decrease count of deleted feature by 1
+    if (data[index].newFeature || data[index].count === 1) {
+      setData((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setData((prev) =>
+        prev.map((item, i) => {
+          if (i === index) {
+            return { ...item, count: item.count - 1 };
+          }
+          return item;
+        })
+      );
+    }
   };
 
   // Handle form submission

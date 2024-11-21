@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using DecimalMath;
 using FeatureRecognitionAPI.Models.Enums;
 
@@ -12,6 +13,7 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity {
         public double Length { get; set; }//length of the entity
 
+        public const double EntityTolerance = 0.00005;
         public Entity() { }//Enables the use of a default constructor
 
         private const int intersectTolerance = 4;//Precision for x and y intersect values to
@@ -503,5 +505,8 @@ namespace FeatureRecognitionAPI.Models
             
         }
         public abstract override bool Equals(object? obj);
+
+        //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
+        public abstract bool Compare(object? obj);
     }
 }

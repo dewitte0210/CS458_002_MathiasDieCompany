@@ -422,7 +422,11 @@ namespace Testing_for_Project
         //Test to verify that library returns the expected entity count
        public void testingACadSharpLibrary()
         {
-            string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
+
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
+          
             DwgReader dwgReader = new DwgReader(path);
 
             CadDocument test = dwgReader.Read();

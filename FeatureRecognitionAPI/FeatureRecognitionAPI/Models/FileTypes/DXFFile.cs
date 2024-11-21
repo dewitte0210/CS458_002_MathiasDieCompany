@@ -17,8 +17,6 @@ namespace FeatureRecognitionAPI.Models
         public DXFFile() { }
         public DXFFile(string path) : base(path)
         {
-            entityList = new List<Entity>();
-            this.path = path;
             fileType = SupportedExtensions.dxf;
             //_fileVersion = GetFileVersion();
 

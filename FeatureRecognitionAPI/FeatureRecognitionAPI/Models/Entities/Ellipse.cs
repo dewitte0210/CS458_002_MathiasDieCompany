@@ -162,5 +162,13 @@ namespace FeatureRecognitionAPI.Models
             }
             return false;
         }
+        public override bool Compare(object? obj)
+        {
+            if (obj is Ellipse)
+            {
+
+            }
+            return false;
+        }
     }
 }
