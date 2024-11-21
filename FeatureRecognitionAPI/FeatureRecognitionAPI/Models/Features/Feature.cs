@@ -123,7 +123,7 @@ public class Feature
      * to the paramter passed when calling the function. As far as I can tell there should only ever be one
      * circle in a feature, and should be the only entity in the list
      */
-    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
+    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles, out int numEllipses)
     {
         numLines = 0;
         numArcs = 0;
@@ -542,7 +542,7 @@ public class Feature
         
         foreach (List<Entity> feature in PerimeterEntityList)
         {
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
             if(lineCount < 2 || arcCount < 2 || arcCount > 4 || circCount != 0) { return; } 
             foreach(Entity entity in feature)
             {
