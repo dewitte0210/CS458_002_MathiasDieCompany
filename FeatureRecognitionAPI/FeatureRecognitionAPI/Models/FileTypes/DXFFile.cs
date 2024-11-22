@@ -157,6 +157,19 @@ namespace FeatureRecognitionAPI.Models
                             entityList.Add(circleEntity);
                             break;
                         }
+                    case "ELLIPSE":
+                        {
+                            Ellipse ellipseEntity =
+                                new Ellipse(((ACadSharp.Entities.Ellipse)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).EndPoint.X,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).EndPoint.Y,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).RadiusRatio,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).StartParameter,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).EndParameter);
+                            entityList.Add(ellipseEntity);
+                            break;
+                        }
                 }
             }
         }

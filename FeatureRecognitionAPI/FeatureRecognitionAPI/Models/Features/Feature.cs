@@ -40,6 +40,8 @@ public class Feature
     [JsonProperty]
     public double perimeter;
     [JsonProperty]
+    public double diameter;
+    [JsonProperty]
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -58,7 +60,10 @@ public class Feature
     public int getNumArcs() { return numArcs; }
     private int numCircles = 0;
     public int getNumCircles() { return numCircles; }
+    public int numEllipses = 0;
+    public int getNumEllipses() { return numEllipses; }
 
+    #region Constructors
     /*
      * Constructor that passes in an entityList for the feature. Feature detection is expected to be
      * called on a feature using this constructor. This was mostly used for testing when wanting to
@@ -101,12 +106,14 @@ public class Feature
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
 
-        CountEntities(EntityList, out numLines, out numArcs, out numCircles);
+        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
         
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
+    #endregion
 
+    #region FeatureDetection
     /*
      * Counts the Lines, Arcs, and Circles in the entityList. 
      * 
@@ -121,11 +128,12 @@ public class Feature
      * to the paramter passed when calling the function. As far as I can tell there should only ever be one
      * circle in a feature, and should be the only entity in the list
      */
-    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles)
+    public void CountEntities(List<Entity> entityList, out int numLines, out int numArcs, out int numCircles, out int numEllipses)
     {
         numLines = 0;
         numArcs = 0;
         numCircles = 0;
+        numEllipses = 0;
 
         //count the number of each entity type
         for (int i = 0; i < entityList.Count; i++)
@@ -141,6 +149,10 @@ public class Feature
             else if (entityList[i] is Circle)
             {
                 numCircles++;
+            }
+            else if (entityList[i] is Ellipse)
+            {
+                numEllipses++;
             }
             else
             {
@@ -170,18 +182,25 @@ public class Feature
             }
             else FeatureType = PossibleFeatureTypes.Group1A2;
         }
+        else if (CheckGroup2A(out type))
+        {
+            FeatureType = type;
+        }
         else
         {
             //Console.WriteLine("Error: Cannot assign feature type.");
         }
 
         //Finally Add the perimeter features
-        CheckGroup5();
         CheckGroup4();
+        CheckGroup5();
+        CheckGroup6(); 
+
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
 
+    #region Group1B
     /* 
      * Checks the baseEntityList to see if this feature is one of the Group 1B features
      * 
@@ -207,20 +226,45 @@ public class Feature
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if (numArcs == 2 && numLines == 2)
+        else if (numArcs == 2 && numLines == 2 && getBothLinesAndDetermineParallelization())
         {
-            double totalDegrees = 0;
-            baseEntityList.ForEach(entity =>
+            if (DoAnglesAddTo360())
             {
-                if (entity is Arc)
+                Arc arc1 = new Arc(0, 0, 0, 0, 0);
+                Arc arc2 = new Arc(0, 0, 0, 0, 0);
+                Line line = new Line(0, 0, 0, 0);
+                bool gotArc1 = false;
+                bool gotArc2 = false;
+                bool gotLine = false;
+                int index = 0;
+                //Get one of the 2 lines and arcs to run isArcConcave
+                while (!gotArc1 || !gotLine || !gotArc2)
                 {
-                    totalDegrees += (entity as Arc).CentralAngle;
+                    if (baseEntityList[index] is Arc)
+                    {
+                        if (!gotArc1)
+                        {
+                            arc1 = (Arc)baseEntityList[index];
+                            gotArc1 = true;
+                        }
+                        else
+                        {
+                            arc2 = (Arc)baseEntityList[index];
+                            gotArc2 = true;
+                        }
+                    }
+                    else if (baseEntityList[index] is Line)
+                    {
+                        line = (Line)baseEntityList[index];
+                        gotLine = true;
+                    }
+                    index++;
                 }
-            });
-            if (totalDegrees > 359.999 && totalDegrees < 360.0009)
-            {
-                type = PossibleFeatureTypes.Group1B2;
-                return true;
+                if (!IsArcConcave(arc1, line) && !IsArcConcave(arc2, line))
+                {
+                    type = PossibleFeatureTypes.Group1B2;
+                    return true;
+                }
             }
         }
 
@@ -228,7 +272,203 @@ public class Feature
         type = PossibleFeatureTypes.Punch;
         return false;
     }
-    
+    #endregion
+
+    #region Group2A
+    internal bool CheckGroup2A(out PossibleFeatureTypes type)
+    {
+        if (numArcs >= 2 && numCircles == 0)
+        {
+            //Possible ellipse with arcs
+            if (numArcs > 2 && numLines == 0)
+            {
+                if (DoAnglesAddTo360())
+                {
+                    if (IsEllipse())
+                    {
+                        type = PossibleFeatureTypes.Group2A;
+                        return true;
+                    }
+                }
+            }
+            //Possible bowtie
+            else if (numLines == 2 && getBothLinesAndDetermineParallelization())
+            {
+                if (IsBowtie())
+                {
+                    type = PossibleFeatureTypes.Group2A;
+                    return true;
+                }
+            }
+        }
+        //Ellipse entity check
+        else if (numLines == 0 && numArcs == 0 && numCircles == 0 && numEllipses == 1)
+        {
+            if ((baseEntityList[0] as Ellipse).IsFullEllipse)
+            {
+                type = PossibleFeatureTypes.Group2A;
+                return true;
+            }
+        }
+        type = PossibleFeatureTypes.Punch;
+        return false;
+    }
+
+    internal bool IsEllipse()
+    {
+        //Ensures the porgam will not crash if called in other circumstances
+        if (numCircles != 0 || numLines != 0)
+        {
+            return false;
+        }
+        //List that will be sorted in order of touching arcs
+        List<Entity> connectedInOrder = new List<Entity>();
+        connectedInOrder.Add(baseEntityList[0]);
+        while (connectedInOrder.Count != baseEntityList.Count)
+        {
+            if (!SortEllipseListHelper(connectedInOrder, connectedInOrder[connectedInOrder.Count - 1] as Arc))
+            {
+                //Prevents from running infinitely in certain circumstances
+                return false;
+            }
+        }
+        //If end points do not connect, it is not an ellipse
+        if (!(connectedInOrder[0] as Arc).Start.Equals((connectedInOrder[connectedInOrder.Count - 1] as Arc).End)) { return false; }
+        return true;
+    }
+
+    /**
+     * Detects the next touching arc in a base entity list of arcs
+     */
+    private bool SortEllipseListHelper(List<Entity> connectedInOrder, Arc arc1)
+    {
+        for (int i = 0; i < baseEntityList.Count; i++)
+        {
+            if (arc1.End.Equals((baseEntityList[i] as Arc).Start))
+            {
+                connectedInOrder.Add(baseEntityList[i]);
+                return true;
+            }
+        }
+        //Ensures the while loop in IsEllipse does not run infinitely if feature is not a closed loop
+        return false;
+    }
+
+    internal bool IsBowtie()
+    {
+        //Sharp bowties with arcs
+        if (numArcs == 2)
+        {
+            Arc arc1 = new Arc(0, 0, 0, 0, 0);
+            Arc arc2 = new Arc(0, 0, 0, 0, 0);
+            Line line = new Line(0, 0, 0, 0);
+            bool gotArc1 = false;
+            bool gotArc2 = false;
+            bool gotLine = false;
+            int index = 0;
+            //Get one of the 2 lines and arcs to run isArcConcave
+            while (!gotArc1 || !gotLine || !gotArc2) {
+                //For some reason there was not a line and arc, return
+                if (index == baseEntityList.Count)
+                {
+                    return false;
+                }
+                if (baseEntityList[index] is Arc)
+                {
+                    if (!gotArc1)
+                    {
+                        arc1 = (Arc)baseEntityList[index];
+                        gotArc1 = true;
+                    }
+                    else
+                    {
+                        arc2 = (Arc)baseEntityList[index];
+                        gotArc2 = true;
+                    }
+                }
+                else if (baseEntityList[index] is Line)
+                {
+                    line = (Line)baseEntityList[index];
+                    gotLine = true;
+                }
+                index++;
+            }
+            return (IsArcConcave(arc1, line) && IsArcConcave(arc2, line));
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves 2 lines from the base entity list to determine parallelization
+     */
+    private bool getBothLinesAndDetermineParallelization()
+    {
+        Line line1 = new Line(0, 0, 0, 0);
+        Line line2 = new Line(0, 0, 0, 0);
+        bool gotLine1 = false;
+        bool gotLine2 = false;
+        int index = 0;
+        //Get one of the 2 lines and arcs to run isArcConcave
+        while (!gotLine1 || !gotLine2)
+        {
+            //For some reason there was not a line and arc, return
+            if (index == baseEntityList.Count)
+            {
+                return false;
+            }
+            if (baseEntityList[index] is Line)
+            {
+                if (!gotLine1)
+                {
+                    line1 = (Line)baseEntityList[index];
+                    gotLine1 = true;
+                }
+                else
+                {
+                    line2 = (Line)baseEntityList[index];
+                    gotLine2 = true;
+                }
+            }
+            index++;
+        }
+        return line1.isParallel(line2);
+    }
+
+    /**
+     * Checks to see if the point on the center most angle of the arc is concave to
+     * the line (within the bounds) or convex (extends past the bounds)
+     */
+    private bool IsArcConcave(Arc arc, Line line)
+    {
+        double middleAngle; 
+        if (arc.EndAngle - arc.StartAngle < 0)
+        {
+            middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle + 360) / 2);
+        }
+        else
+        {
+             middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle) / 2);
+        }
+        if (middleAngle < 0)
+        {
+            middleAngle += 360;
+        }
+        Point edgeOfArc = new Point(arc.Radius * Math.Cos(middleAngle * Math.PI / 180) + arc.Center.X, arc.Radius * Math.Sin(middleAngle * Math.PI / 180) + arc.Center.Y);
+        //Essentially vectors to use basic linear algebra so that they are perpendicular to
+        //  the vector that extends from the center of the arc to the edge point. Need to
+        //  create 2 vectors because the touching line that was grabbed is random
+        Line cw = new Line(edgeOfArc.X, edgeOfArc.Y, (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X, -1 * (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
+        Line ccw = new Line(edgeOfArc.X, edgeOfArc.Y, -1 * (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X, (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
+        //Slope of perpendicular line will be vertical
+        if (line.DoesIntersect(cw) || line.DoesIntersect(ccw))
+        {
+            return true;
+        }
+        return false;
+    }
+    #endregion
+
+    #region Group4
     /*
      * Checks the perimiterEntityList to detect if any of the features there belong to group 4,
      * then adds any we find to the perimiterFeature list 
@@ -241,7 +481,7 @@ public class Feature
         {
             bool g4Detected = false;
             Line tempLine = null;
-            CountEntities(feature, out int lineCount, out int arcCount, out int circleCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
 
             if (lineCount != 2 || (arcCount != 2 && arcCount !=0)) { continue; }
 
@@ -261,17 +501,19 @@ public class Feature
             }
         }
     }
+    #endregion
 
+    #region Group5
     /* Checks the perimiter entity list to detect if any of the features there belong to group 5, 
      * then adds any we find to the perimiterFeature list 
      */
-    public void CheckGroup5()
+    internal void CheckGroup5()
     {
         if(PerimeterEntityList == null) { return; }
 
         foreach (List<Entity> feature in PerimeterEntityList)
         {
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount);
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
             if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
             foreach (Entity entity in feature)
             {
@@ -286,59 +528,34 @@ public class Feature
             }
         }
     }
-    
-    /*
-     * Function that checks if the list passed in has at least one set of parallel lines
-     * 
-     * @Param entities is the Entity list that is checked
-     * @Return true if a set of parrallel lines is found
-     */
-    private bool HasTwoParalellLine(List<Entity> entities)
+    #endregion
+
+    #region Group6
+    // Very simillar check to Group5, changes the entity count constraints
+    internal void CheckGroup6()
     {
-        for(int i = 0; i < entities.Count(); i++)
+        if (PerimeterEntityList == null){ return; }
+        
+        foreach (List<Entity> feature in PerimeterEntityList)
         {
-            if (entities[i] is Line)
+            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
+            if(lineCount < 2 || arcCount < 2 || arcCount > 4 || circCount != 0) { return; } 
+            foreach(Entity entity in feature)
             {
-                for(int j = 0; j < entities.Count(); j++)
-                {
-                    if(j == i || entities[j] is not Line) { continue; }
-                   
-                    Line entityI = (entities[i] as Line);
-                    Line entityJ = (entities[j] as Line);
-                    
-                    // Check for verticality
-                    if((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0)) 
-                    {
-                        return true;
-                    }
-                    
-                    double slopeI = entityI.SlopeY / entityI.SlopeX;
-                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
-                   
-                    if (slopeI == slopeJ) 
-                    {
-                        return true; 
-                    }
-                }
+                if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
+            }
+
+            // If the feature is group6, add it to the list! 
+            if(HasTwoParalellLine(feature))
+            {
+                PerimeterFeatures.Add(PerimeterFeatureTypes.Group6);
             }
         }
-        return false; 
     }
+    #endregion
+    #endregion
 
-    /*
-     * Function that calculates the perimeter of this feature by going through every entity in EntityList and adding the length.
-     * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
-     * called more than once.
-     */
-    public void calcPerimeter()
-    {
-        perimeter = 0;
-        for (int i = 0; i < EntityList.Count; i++)
-        {
-            perimeter += EntityList[i].Length;
-        }
-    }
-
+    #region OverrideFunctions
     /*
      * Overriding the Equals method to compare two Feature objects
      * 
@@ -436,8 +653,9 @@ public class Feature
         }
         else return false;
     }
+    #endregion
 
-
+    #region ExtendEntities
     /*
      * Recursive function that calls extendAllEntitiesHelper. Useful for testing if you want to extend entities
      * on a certain list without changing the baseEntityList
@@ -561,7 +779,9 @@ public class Feature
         }
         return false;
     }
+    #endregion
 
+    #region SeperateBaseEntities
     /*
      * Function that seperates the base entities, which will have been extended, if possible, at this point,
      * from ExtendedEntityList into baseEntityList. Most logic for seperation lies in seperateBaseEntitiesHelper
@@ -662,7 +882,9 @@ public class Feature
         curPath.Pop();
         return false;//nothing is touching this entity so it is popped off of curPath
     }
+    #endregion
 
+    #region PerimeterFeatureFunctions
     /*
      * function that finds a path from start to target in Entity list
      * 
@@ -740,7 +962,9 @@ public class Feature
         }
         return true;
     }
+    #endregion
 
+    #region MaxAndMinPoint
     public Point FindMaxPoint()
     {
         double maxX = 0;
@@ -993,7 +1217,81 @@ public class Feature
         return new Point(minX, minY);
 
     }
+    #endregion
 
-} 
+    //Checks if the angles of all the arcs add up to 360
+    internal bool DoAnglesAddTo360()
+    {
+        double sumAngles = 0;
+        baseEntityList.ForEach(entity =>
+        {
+            if (entity is Arc)
+            {
+                sumAngles += (entity as Arc).CentralAngle;
+            }
+        });
+        if (sumAngles > 359.9 && sumAngles < 360.09)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     * Function that checks if the list passed in has at least one set of parallel lines
+     * 
+     * @Param entities is the Entity list that is checked
+     * @Return true if a set of parrallel lines is found
+     */
+    private bool HasTwoParalellLine(List<Entity> entities)
+    {
+        for (int i = 0; i < entities.Count(); i++)
+        {
+            if (entities[i] is Line)
+            {
+                for (int j = 0; j < entities.Count(); j++)
+                {
+                    if (j == i || entities[j] is not Line) { continue; }
+
+                    Line entityI = (entities[i] as Line);
+                    Line entityJ = (entities[j] as Line);
+
+                    // Check for verticality
+                    if ((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0))
+                    {
+                        return true;
+                    }
+
+                    double slopeI = entityI.SlopeY / entityI.SlopeX;
+                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
+
+                    if (slopeI == slopeJ)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /*
+     * Function that calculates the perimeter of this feature by going through every entity in EntityList and adding the length.
+     * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
+     * called more than once.
+     */
+    public void calcPerimeter()
+    {
+        perimeter = 0;
+        for (int i = 0; i < EntityList.Count; i++)
+        {
+            perimeter += EntityList[i].Length;
+        }
+        if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch)
+        {
+            diameter = perimeter / Math.PI;
+        }
+    }
+}
 
 
