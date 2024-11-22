@@ -200,14 +200,6 @@ public class Feature
         calcPerimeter();
     }
 
-    #region Group1B
-    /* 
-     * Checks the baseEntityList to see if this feature is one of the Group 1B features
-     * 
-     * @Param numCircles, numLines, numArcs is the number of the respective entities in the EntityList
-     * @Param type is used as a return value with the out keyword
-     * @Return true if the type was detected
-     */
     internal bool CheckGroup1C()
     {
         if (numLines != 3) return false;
@@ -218,6 +210,15 @@ public class Feature
             //if there are arcs, track which lines touch which arcs, see if these are triangles and mark the corner features
         }
     }
+
+    #region Group1B
+    /* 
+     * Checks the baseEntityList to see if this feature is one of the Group 1B features
+     * 
+     * @Param numCircles, numLines, numArcs is the number of the respective entities in the EntityList
+     * @Param type is used as a return value with the out keyword
+     * @Return true if the type was detected
+     */
     internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
     {
         // Entity is just a circle
