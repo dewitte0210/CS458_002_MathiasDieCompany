@@ -40,6 +40,8 @@ public class Feature
     [JsonProperty]
     public double perimeter;
     [JsonProperty]
+    public double diameter;
+    [JsonProperty]
     public int count;
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -606,6 +608,10 @@ public class Feature
         for (int i = 0; i < EntityList.Count; i++)
         {
             perimeter += EntityList[i].Length;
+        }
+        if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch )
+        {
+            diameter = perimeter / Math.PI;
         }
     }
 
