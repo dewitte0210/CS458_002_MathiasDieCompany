@@ -431,7 +431,7 @@ public class Feature
             }
             index++;
         }
-        return line1.isParallel(line2);
+        return line1.SlopeX.Equals(line2.SlopeX) && line1.SlopeY.Equals(line2.SlopeY);
     }
 
     /**
