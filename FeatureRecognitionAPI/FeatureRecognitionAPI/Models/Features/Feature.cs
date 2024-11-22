@@ -733,16 +733,52 @@ public class Feature
      */
     public bool seperatePerimeterEntities()
     {
-        foreach(Entity entity in baseEntityList)
+        addBackParents();
+
+        List<Entity> visited = new List<Entity>();
+        foreach(Entity entity in ExtendedEntityList)
         {
-            if(entity is ExtendedLine)
+            if (((!visited.Contains(entity)) && (!baseEntityList.Contains(entity))))
             {
-                List<Entity> path = findPathFromStartToTargetInEntityList(((ExtendedLine)entity).Parent1, ((ExtendedLine)entity).Parent2);            
-                PerimeterEntityList.Add(path);
+
             }
+            visited.Add(entity);
         }
+
         return true;
     }
+
+    private void addBackParents()
+    {
+        foreach (Entity entity in ExtendedEntityList)
+        {
+            if (entity is ExtendedLine && (!baseEntityList.Contains(entity)))
+            {
+                addBackParentsHelper((ExtendedLine)entity);
+            }
+        }
+    }
+    private void addBackParentsHelper(ExtendedLine exLine)
+    {
+        if (exLine.Parent1 is ExtendedLine)
+        {
+            addBackParentsHelper((ExtendedLine)exLine.Parent1);
+        }
+        else
+        {
+            ExtendedEntityList.Add(exLine.Parent1);
+        }
+        if (exLine.Parent2 is ExtendedLine)
+        {
+            addBackParentsHelper((ExtendedLine)exLine.Parent2);
+        }
+        else
+        {
+            ExtendedEntityList.Add(exLine.Parent2);
+        }
+        ExtendedEntityList.Remove(exLine);
+    }
+
 
     public Point FindMaxPoint()
     {
