@@ -45,6 +45,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         count: 1,
         FeatureType: "",
         perimeter: 0,
+        diameter: 0,
         multipleRadius: false,
         kissCut: false,
         border: false,
@@ -394,7 +395,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                 info.FeatureType
                               )}
                             </td>
-                            <td>{info.perimeter.toFixed(3)}</td>
+                            <td>{info.diameter !== 0 ? info.diameter.toFixed(3) : info.perimeter.toFixed(3)}</td>
                             <td>
                               {info.multipleRadius ? (
                                 <span className="checkmark">&#10003;</span>
