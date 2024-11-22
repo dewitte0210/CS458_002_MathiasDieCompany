@@ -568,9 +568,6 @@ public class Feature
             }
         }
     }
-    #endregion
-
-    #endregion
 
     /*
      * Overriding the Equals method to compare two Feature objects
