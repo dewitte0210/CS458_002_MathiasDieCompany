@@ -13,8 +13,9 @@ namespace FeatureRecognitionAPI.Models
         public Point EndPoint { get; set; }
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
-
-        protected Line()
+        
+        // Don't Delete. Called from ExtendedLine constructor
+        protected Line() 
         {
             StartPoint = new Point();
             EndPoint = new Point();

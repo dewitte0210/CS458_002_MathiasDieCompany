@@ -86,7 +86,7 @@ namespace FeatureRecognitionAPI.Services
                         {
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            features = dXFFile.getFeatureList(touchingEntityList);
+                            features = dXFFile.makeFeatureList(touchingEntityList);
                             json = JsonConvert.SerializeObject(features, settings);
                         }
                         break;
@@ -95,7 +95,7 @@ namespace FeatureRecognitionAPI.Services
                         {
                             DWGFile dwgFile = new DWGFile(dwgStream.Name);
                             touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
-                            features = dwgFile.getFeatureList(touchingEntityList);
+                            features = dwgFile.makeFeatureList(touchingEntityList);
                             json = JsonConvert.SerializeObject(features, settings);
                         }
                         break;

@@ -88,11 +88,12 @@ namespace Testing_for_Project
             List<Entity> testEntities = [line1, line2, line3, line4, line5];
             Feature testFeature = new(testEntities, false, false);
             testFeature.extendAllEntities();
+            // Checks for ExtendedEntityList
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 4);
             bool hasExtendedLine = false;
-            foreach(Entity entity in testFeature.ExtendedEntityList)
+            foreach (Entity entity in testFeature.ExtendedEntityList)
             {
-                if (entity is ExtendedLine) 
+                if (entity is ExtendedLine)
                 {
 
                     Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
@@ -101,9 +102,17 @@ namespace Testing_for_Project
                 }
             }
             Assert.IsTrue(hasExtendedLine);
+
+            Assert.IsTrue(testFeature.ExtendedEntityList.Contains(line2));
+            Assert.IsTrue(testFeature.ExtendedEntityList.Contains(line3));
+            Assert.IsTrue(testFeature.ExtendedEntityList.Contains(line4));
+            // Checks that EntityList has not changed
+            Assert.IsTrue(testFeature.EntityList.Count == 5);
+            Assert.IsTrue(testFeature.EntityList.Contains(line1));
             Assert.IsTrue(testFeature.EntityList.Contains(line2));
             Assert.IsTrue(testFeature.EntityList.Contains(line3));
             Assert.IsTrue(testFeature.EntityList.Contains(line4));
+            Assert.IsTrue(testFeature.EntityList.Contains(line5));
         }
 
         [Test]
@@ -212,7 +221,239 @@ namespace Testing_for_Project
         }
         #endregion
 
-        #region SortIntoBaseEntityList
+        #region seperationTests
+
+        [Test]
+        public void SeperateBaseEntitiesWithOnePerimeterFeature() // Horizontal lines
+        {
+         // Extend Lines
+            // Added lines to make the feature a closed shape
+            Line line6 = new(4, 7, 4, 3);
+            Line line7 = new(4, 3, 10, 3);
+            Line line8 = new(10, 3, 10, 7);
+            // Pretty much the same as a test above
+            Line line1 = new(4, 7, 6, 7);
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+            Line line5 = new(8, 7, 10, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8];
+            Feature testFeature = new(testEntities, false, false);
+
+            testFeature.extendAllEntities();
+
+            // Checks for ExtendedEntityList
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 7);
+            bool hasExtendedLine = false;
+            foreach (Entity entity in testFeature.ExtendedEntityList)
+            {
+                if (entity is ExtendedLine)
+                {
+                    Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
+                    // Checks correct point values
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    // Checks correct parent values
+                    Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
+                    Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));         
+
+                    hasExtendedLine = true;
+                }
+                else
+                {
+                    Assert.IsTrue(entity is Line); // if not extended line it must be a line
+                                                   // Technically an extended line would pass here but it would be caught above
+
+                    Assert.IsTrue(testEntities.Contains(entity)); // If entity is not an extended line it should be contained in testEntities
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+
+            // Checks that EntityList did not change
+            Assert.IsTrue(testFeature.EntityList.Equals(testEntities));
+            Assert.IsTrue(testFeature.EntityList.Count == 8);
+
+         // Seperate base entities
+            testFeature.seperateBaseEntities();
+
+            // Make sure these still pass
+            // Checks for ExtendedEntityList
+            Assert.IsTrue(testFeature.ExtendedEntityList.Count == 7);
+            hasExtendedLine = false;
+            foreach (Entity entity in testFeature.ExtendedEntityList)
+            {
+                if (entity is ExtendedLine)
+                {
+                    Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
+                    // Checks correct point values
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    // Checks correct parent values
+                    Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
+                    Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));
+
+                    hasExtendedLine = true;
+                }
+                else
+                {
+                    Assert.IsTrue(entity is Line); // if not extended line it must be a line
+                                                   // Technically an extended line would pass here but it would be caught above
+
+                    Assert.IsTrue(testEntities.Contains(entity)); // If entity is not an extended line it should be contained in testEntities
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+
+            // Checks that EntityList did not change
+            Assert.IsTrue(testFeature.EntityList.Equals(testEntities));
+            Assert.IsTrue(testFeature.EntityList.Count == 8);
+
+            // Checks for baseEntityList
+            hasExtendedLine = false;
+            foreach(Entity entity in  testFeature.baseEntityList) 
+            {
+                Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
+                if (entity is ExtendedLine)
+                {
+                    Assert.IsFalse(hasExtendedLine);
+                    // Checks correct point values
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    // Checks correct parent values
+                    Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
+                    Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));
+
+                    hasExtendedLine = true;
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+        }
+
+        [Test]
+        public void SeperateBaseEntitiesWithTwoPerimeterFeature() // Horizontal lines
+        {
+            // Added lines to make the feature a closed shape
+            Line line10 = new(4, 7, 4, 0);
+            Line line11 = new(4, 0, 14, 0);
+            Line line12 = new(14, 0, 14, 7);
+            // Pretty much the same as a test above
+            Line line1 = new(4, 7, 6, 7);
+
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+
+            Line line5 = new(8, 7, 10, 7);
+
+            Line line6 = new(10, 7, 10, 3);
+            Line line7 = new(10, 3, 12, 3);
+            Line line8 = new(12, 3, 12, 7);
+
+            Line line9 = new(12, 7, 14, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
+            Feature testFeature = new(testEntities, false, false);
+
+            testFeature.extendAllEntities();
+
+            testFeature.seperateBaseEntities();
+
+            // Checks for baseEntityList
+            bool hasExtendedLine = false;
+            foreach (Entity entity in testFeature.baseEntityList)
+            {
+                Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
+                if (entity is ExtendedLine)
+                {
+                    Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
+                    // Checks correct point values
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(14, 7)));
+                    // Checks correct parent values
+                    ExtendedLine extendedLineParent = new ExtendedLine();
+                    Line lineParent = new ExtendedLine();
+
+                    if (((ExtendedLine)entity).Parent1 is ExtendedLine)
+                    {
+                        extendedLineParent = (ExtendedLine)((ExtendedLine)entity).Parent1;
+                        lineParent = ((ExtendedLine)entity).Parent2;
+                    }
+                    else if (((ExtendedLine)entity).Parent2 is ExtendedLine)
+                    {
+                        extendedLineParent = (ExtendedLine)((ExtendedLine)entity).Parent2;
+                        lineParent = ((ExtendedLine)entity).Parent1;
+                    }
+                    else { Assert.IsTrue(false); } // if neither is an ExtendedLine test fails
+
+                    Assert.IsFalse(lineParent is ExtendedLine);
+
+                    if ((extendedLineParent.Parent1.Equals(line1) && extendedLineParent.Parent2.Equals(line5)) ||
+                        (extendedLineParent.Parent1.Equals(line5) && extendedLineParent.Parent2.Equals(line1)))
+                    {
+                        // entity Parent1 is an extended line and has parents of line1 and line5, which means entity parent 2 must be line9
+                        Assert.IsTrue(lineParent.Equals(line9));
+                    }
+                    else if ((extendedLineParent.Parent1.Equals(line5) && extendedLineParent.Parent2.Equals(line9)) ||
+                        (extendedLineParent.Parent1.Equals(line9) && extendedLineParent.Parent2.Equals(line5)))
+                    {
+                        // entity Parent1 is an extended line and has parents of line5 and line9, which means entity parent 2 must be line1
+                        Assert.IsTrue(lineParent.Equals(line1));
+                    }
+                    else { Assert.IsTrue(false); } // if it does not meet either conditions test fails
+
+                    hasExtendedLine = true;
+                }
+                else
+                {
+                    Assert.IsTrue(entity is Line); // if not extended line it must be a line
+                                                   // Technically an extended line would pass here but it would be caught above
+
+                    Assert.IsTrue(testEntities.Contains(entity)); // If entity is not an extended line it should be contained in testEntities
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+        }
+
+        [Test]
+        public void SeperateOnePerimeterFeatures()
+        {
+            // Extend Lines
+            // Added lines to make the feature a closed shape
+            Line line6 = new(4, 7, 4, 3);
+            Line line7 = new(4, 3, 10, 3);
+            Line line8 = new(10, 3, 10, 7);
+            // Pretty much the same as a test above
+            Line line1 = new(4, 7, 6, 7);
+
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+
+            Line line5 = new(8, 7, 10, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8];
+            Feature testFeature = new(testEntities, false, false);
+
+            testFeature.extendAllEntities();
+
+            testFeature.seperateBaseEntities();
+
+            testFeature.seperatePerimeterEntities();
+
+            Assert.IsTrue(testFeature.PerimeterEntityList.Count == 1);
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Count == 3);
+
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line2));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line3));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line4));
+        }
+
+        [Test]
+        public void SeperateTwoPerimeterFeatures()
+        {
+
+        }
+        #endregion
+
+        #region exampleFileTests
         [Test]
         public void example1Entities()
         {

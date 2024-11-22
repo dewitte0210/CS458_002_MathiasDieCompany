@@ -61,7 +61,7 @@ namespace FeatureRecognitionAPI.Models
             this.featureList = featureList;
         }
         
-        public List<Feature> getFeatureList(List<List<Entity>> entities)
+        public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
             for (int i = 0; i < entities.Count(); i++)
             {
@@ -168,7 +168,7 @@ namespace FeatureRecognitionAPI.Models
         public void SetFeatureGroups()
         {
             List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
-           // List<Feature> brokenFeatures = getFeatureList(entities);
+           // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
             //Create features groups things in a way that breaks the logic here
@@ -280,7 +280,7 @@ namespace FeatureRecognitionAPI.Models
         */
         public void detectAllFeatures()
         {
-            getFeatureList(makeTouchingEntitiesList(entityList));
+            makeFeatureList(makeTouchingEntitiesList(entityList));
         }
 
         // Method to read the data from a file and fill the entityList with entities
