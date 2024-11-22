@@ -11,6 +11,7 @@ namespace Testing_for_Project
 {
     internal class FeatureClassTests
     {
+
         #region CheckGroup1B
         [Test]
         public void CheckGroup1B_Circle_ReturnsTrue()
@@ -45,6 +46,45 @@ namespace Testing_for_Project
             testFeature.DetectFeatures();
             Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
         }
+        #endregion
+
+        #region CheckGroup1C
+
+        [Test]
+        //Make sure a standard triangle is detected as a triangle
+        public void CheckGroup1C_Good() 
+        {
+            Line line1 = new(1, 1, 1, 3);
+            Line line2 = new(1, 3, 3, 2);
+            Line line3 = new(1, 1, 3, 2);
+
+            List<Entity> entities = new List<Entity>() {line1, line2, line3 };
+
+            Feature feature = new Feature(entities);
+
+            bool isTriangle = feature.CheckGroup1C();
+
+            Assert.That(isTriangle, Is.True);
+        }
+
+        [Test]
+        public void CheckGroup1C_Bad()
+        {
+
+        }
+
+        [Test]
+        public void CheckGroup1C_RoundedCorners_Good()
+        {
+
+        }
+
+        [Test]
+        public void CheckGroup1C_RoundedCorners_Bad()
+        {
+
+        }
+
         #endregion
 
         #region CheckGroup2A

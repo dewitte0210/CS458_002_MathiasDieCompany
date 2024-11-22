@@ -200,16 +200,32 @@ public class Feature
         calcPerimeter();
     }
 
-    internal bool CheckGroup1C()
-    {
-        if (numLines != 3) return false;
-        else if (numArcs == 0)
-        {
-            //Check for arcs, if there are non see if all lines are touching
+    #region Group1C
 
-            //if there are arcs, track which lines touch which arcs, see if these are triangles and mark the corner features
+    public bool CheckGroup1C()
+    {
+        //Use local variables for lines cirlces arcs and elipses
+        int lines, circles, arcs, elipses;
+
+        //gives the count of lines arcs circles and elipses
+        CountEntities(baseEntityList, out lines, out arcs, out circles, out elipses);
+
+        //Triange base shape needs 3 lines
+        if (lines != 3) return false;
+        //If there are 3 lines and zero arcs then it should be a triangle
+        else if (arcs == 0) return true;
+        else if (arcs > 3) return false;
+        //At this point arcs is between 1-3
+        else
+        {
+            //Logic to make sure everything checks out to be a triangle here
         }
+
+        //If somehow there is no decision made by this point then there is an error
+        
     }
+
+    #endregion
 
     #region Group1B
     /* 
