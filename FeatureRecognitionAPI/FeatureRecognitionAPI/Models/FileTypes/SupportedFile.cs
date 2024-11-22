@@ -14,8 +14,8 @@ namespace FeatureRecognitionAPI.Models
 {
     abstract public class SupportedFile
     {
-        protected string path;
-        protected SupportedExtensions fileType;
+        protected string path { get; set; }
+        protected SupportedExtensions fileType { get; set; }
         protected List<Feature> featureList;
         protected List<Entity> entityList;
         protected List<FeatureGroup> featureGroups;
@@ -31,6 +31,7 @@ namespace FeatureRecognitionAPI.Models
             }
             return tmp;
         }
+        #region Constructors
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
         {
@@ -44,18 +45,9 @@ namespace FeatureRecognitionAPI.Models
             featureList = new List<Feature>();
             featureGroups = new List<FeatureGroup>();
         }
-        public void setPath(string path)
-        {
-            this.path = path;
-        }
-        public string getPath()
-        {
-            return this.path;
-        }
-        public string getFileType()
-        {
-            return fileType.ToString();
-        }
+        #endregion
+
+        #region SpecialGettersAndSetters
         public void setFeatureList(List<Feature> featureList)
         {
             this.featureList = featureList;
@@ -101,7 +93,9 @@ namespace FeatureRecognitionAPI.Models
             return featureList;
         }
         public List<Feature> getFeatureList() { return featureList; }
+        #endregion
 
+        #region MakeTouchingEntities
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
          * @Param entityList - the list of entites in the file
@@ -158,10 +152,9 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
+        #endregion
 
-
-
-
+        #region SetFeatureGroups
         /*
          * Groups features together and stores how many of each feature group are present in the file
          * Initliazes class variable featuresList
@@ -275,7 +268,9 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
+        #endregion
 
+        #region DetectFeatures
         /* 
          * method that goes from the path to detected features
         */
@@ -295,6 +290,7 @@ namespace FeatureRecognitionAPI.Models
                 feature.DetectFeatures();
             }
         }
+        #endregion
         // Method to read the data from a file and fill the entityList with entities
         public abstract void readEntities();
     }
