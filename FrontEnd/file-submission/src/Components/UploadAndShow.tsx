@@ -2,6 +2,8 @@ import * as React from "react";
 import { useState } from "react";
 import DragDropZone from "./DragDropZone";
 import QuoteSubmission from "./QuoteSubmission";
+import ParentModal from "./SupportedFeaturesModal";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -19,6 +21,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
   const [submitted, setSubmitted] = useState(false); // Tracks submission
   const [jsonResponse, setJsonResponse] = useState<any>(null); // Stores JSON response
   const [isLoading, setIsLoading] = useState(false); // State for loading
+  const [showModal, setShowModal] = useState(false); // State for modal
 
   const allowedFileExtensions = [".pdf", ".dwg", ".dxf"];
 
@@ -57,6 +60,8 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
     }
   };
 
+  const handleCloseModal = () => setShowModal(false);
+
   /*
     Event handler for when the user clicks the back button after submission.
   */
@@ -73,6 +78,15 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
       ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
         <>
           <div className="upload-container">
+            <button
+              className="animated-button modal-button"
+              onClick={() => setShowModal(true)}
+            >
+              <span>Supported Features</span>
+              <span></span>
+            </button>
+            <ParentModal showModal={showModal} handleCloseModal={handleCloseModal} />
+            
             <div className="drag-drop">
               <DragDropZone
                 file={file}
