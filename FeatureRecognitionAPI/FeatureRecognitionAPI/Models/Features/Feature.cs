@@ -204,6 +204,16 @@ public class Feature
      * @Param type is used as a return value with the out keyword
      * @Return true if the type was detected
      */
+    internal bool CheckGroup1C()
+    {
+        if (numLines != 3) return false;
+        else if (numArcs == 0)
+        {
+            //Check for arcs, if there are non see if all lines are touching
+
+            //if there are arcs, track which lines touch which arcs, see if these are triangles and mark the corner features
+        }
+    }
     internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
     {
         // Entity is just a circle
@@ -558,62 +568,9 @@ public class Feature
             }
         }
     }
-    
-    /*
-     * Function that checks if the list passed in has at least one set of parallel lines
-     * 
-     * @Param entities is the Entity list that is checked
-     * @Return true if a set of parrallel lines is found
-     */
-    private bool HasTwoParalellLine(List<Entity> entities)
-    {
-        for(int i = 0; i < entities.Count(); i++)
-        {
-            if (entities[i] is Line)
-            {
-                for(int j = 0; j < entities.Count(); j++)
-                {
-                    if(j == i || entities[j] is not Line) { continue; }
-                   
-                    Line entityI = (entities[i] as Line);
-                    Line entityJ = (entities[j] as Line);
-                    
-                    // Check for verticality
-                    if((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0)) 
-                    {
-                        return true;
-                    }
-                    
-                    double slopeI = entityI.SlopeY / entityI.SlopeX;
-                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
-                   
-                    if (slopeI == slopeJ) 
-                    {
-                        return true; 
-                    }
-                }
-            }
-        }
-        return false; 
-    }
+    #endregion
 
-    /*
-     * Function that calculates the perimeter of this feature by going through every entity in EntityList and adding the length.
-     * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
-     * called more than once.
-     */
-    public void calcPerimeter()
-    {
-        perimeter = 0;
-        for (int i = 0; i < EntityList.Count; i++)
-        {
-            perimeter += EntityList[i].Length;
-        }
-        if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch )
-        {
-            diameter = perimeter / Math.PI;
-        }
-    }
+    #endregion
 
     /*
      * Overriding the Equals method to compare two Feature objects
@@ -1017,6 +974,7 @@ public class Feature
         return true;
     }
 
+  
     public Point FindMaxPoint()
     {
         double maxX = 0;
