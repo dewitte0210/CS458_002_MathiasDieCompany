@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
+import { MdQuestionMark } from "react-icons/md";
 
 interface QuoteSubmissionProps {
   jsonResponse: any[];
@@ -157,7 +158,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
           <form id="quote-form" onSubmit={handleSubmit} className="quote-form">
             <div className="quote-form-fields">
               <div className="quote-form-label-and-select">
+                <div className="quote-form-label">
                 <label htmlFor="ruleType">Rule Type</label>
+                <MdQuestionMark className = "question-icon" />
+                </div>
                 <select
                   id="ruleType"
                   name="ruleType"
@@ -202,7 +206,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
               </div>
 
               <div className="quote-form-label-and-select">
+                <div className="quote-form-label">
                 <label htmlFor="ejecMethod">Ejection Method</label>
+                <MdQuestionMark className = "question-icon" />
+                </div>
                 <select
                   id="ejecMethod"
                   name="ejecMethod"

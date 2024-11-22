@@ -77,7 +77,8 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
         <div className="loader"></div>
       ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
         <>
-          <div className="upload-container">
+          <div className="supported-features">
+            <p>Please view our supported features before submitting</p>
             <button
               className="animated-button modal-button"
               onClick={() => setShowModal(true)}
@@ -85,24 +86,28 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
               <span>Supported Features</span>
               <span></span>
             </button>
-            <ParentModal showModal={showModal} handleCloseModal={handleCloseModal} />
-            
-            <div className="drag-drop">
-              <DragDropZone
-                file={file}
-                allowedFileExtensions={allowedFileExtensions}
-                setFile={setFile}
-                onFilesSelected={onFilesSelected}
-              />
+          </div>
+          <ParentModal
+            showModal={showModal}
+            handleCloseModal={handleCloseModal}
+          />
+          <div className="drag-drop">
+            <DragDropZone
+              file={file}
+              allowedFileExtensions={allowedFileExtensions}
+              setFile={setFile}
+              onFilesSelected={onFilesSelected}
+            />
+            <div className="upload-container">
+              {file && (
+                <div className="submit-button-container">
+                  <button className="animated-button" onClick={handleSubmit}>
+                    <span>Submit File</span>
+                    <span></span>
+                  </button>
+                </div>
+              )}
             </div>
-            {file && (
-              <div className="submit-button-container">
-                <button className="animated-button" onClick={handleSubmit}>
-                  <span>Submit File</span>
-                  <span></span>
-                </button>
-              </div>
-            )}
           </div>
         </>
       ) : (
