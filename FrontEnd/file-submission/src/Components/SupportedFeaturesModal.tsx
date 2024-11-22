@@ -106,7 +106,6 @@ const ParentModal: React.FC<ParentModalProps> = ({
                 className="modal-individual-image-container"
                 key={index}
                 onClick={() => handleImageClick(image)}
-                style={{ cursor: "pointer" }}
               >
                 <img className="modal-image" src={image.src} alt={image.alt} />
                 <p className="modal-image-description">{image.description}</p>

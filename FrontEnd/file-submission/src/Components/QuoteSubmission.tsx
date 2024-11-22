@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import { Button } from "react-bootstrap";
 
 interface QuoteSubmissionProps {
   jsonResponse: any[];
@@ -240,6 +241,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                           <>
                             <td>
                               <input
+                                className="count-input"
                                 type="number"
                                 value={info.count}
                                 onChange={(e) =>
@@ -294,6 +296,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                             </td>
                             <td>
                               <input
+                                className="perimeter-input"
                                 type="number"
                                 value={info.perimeter}
                                 onChange={(e) =>
@@ -333,12 +336,13 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               />
                             </td>
                             <td>
-                              <button
+                              <Button
                                 type="button"
+                                variant="danger"
                                 onClick={() => handleDeleteFeature(index)}
                               >
                                 Delete
-                              </button>
+                              </Button>
                             </td>
                           </>
                         ) : (
@@ -399,12 +403,13 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               )}
                             </td>
                             <td>
-                              <button
+                            <Button
                                 type="button"
+                                variant="danger"
                                 onClick={() => handleDeleteFeature(index)}
                               >
                                 Delete
-                              </button>
+                              </Button>
                             </td>
                           </>
                         )}

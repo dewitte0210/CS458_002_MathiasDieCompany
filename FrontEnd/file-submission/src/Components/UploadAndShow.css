@@ -161,15 +161,18 @@
   padding: 12px 48px;
   border: none;
   font-size: 16px;
-  background: rgb(84,114,210);
-  background: linear-gradient(circle, rgba(84,114,210,1) 0%, rgba(0,95,255,1) 100%);
+  background: rgb(84, 114, 210);
+  background: linear-gradient(
+    circle,
+    rgba(84, 114, 210, 1) 0%,
+    rgba(0, 95, 255, 1) 100%
+  );
   font-weight: 600;
   color: #ffffff;
   cursor: pointer;
   transition: all 0.3s ease;
   box-sizing: border-box;
   border: 3px solid #5472d2;
-
 }
 
 .animated-button span:first-child {
@@ -193,7 +196,7 @@
   box-shadow: 0 0 0 5px #ffffff;
   color: #000000;
   border: 3px solid #5472d2;
-  animation: .18s ease-in-out;
+  animation: 0.18s ease-in-out;
 }
 
 .animated-button:active {
@@ -217,7 +220,7 @@
   overflow: clip;
 }
 .loader::before,
-.loader::after {    
+.loader::after {
   content: "";
   grid-area: 1/1;
   margin: 2px;
@@ -229,8 +232,10 @@
   margin: 8px;
   animation-duration: 3s;
 }
-@keyframes l15{ 
-  100%{transform: rotate(1turn)}
+@keyframes l15 {
+  100% {
+    transform: rotate(1turn);
+  }
 }
 
 .button-container {
@@ -269,12 +274,13 @@ label {
 }
 
 table {
-	border-collapse: collapse;
-    font-family: Tahoma, Geneva, sans-serif;
+  border-collapse: collapse;
 }
+
 table td {
-	padding: 15px;
+  padding: 15px;
 }
+
 table th {
   position: sticky;
   top: 0;
@@ -284,21 +290,32 @@ table th {
 }
 
 table thead td {
-	background-color: #54585d;
-	color: #ffffff;
-	font-weight: bold;
-	font-size: 13px;
-	border: 1px solid #54585d;
+  background-color: #54585d;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 13px;
+  border: 1px solid #54585d;
 }
+
 table tbody td {
-	color: #636363;
-	border: 1px solid #dddfe1;
+  color: #636363;
+  border: 1px solid #dddfe1;
 }
+
 table tbody tr {
-	background-color: #f9fafb;
+  background-color: #f9fafb;
 }
+
 table tbody tr:nth-child(odd) {
-	background-color: #ffffff;
+  background-color: #ffffff;
+}
+
+.count-input {
+  width: 45.36px;
+}
+
+.perimeter-input {
+  width: 150.04px;
 }
 
 h3 {
@@ -336,6 +353,7 @@ h3 {
   width: 100px;
   margin-left: auto;
   margin-right: auto;
+  cursor: pointer;
 }
 
 .modal-image {
@@ -349,4 +367,3 @@ h3 {
 .modal-image-description {
   text-align: center;
 }
-

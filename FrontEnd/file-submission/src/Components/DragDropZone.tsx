@@ -67,7 +67,7 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
         </div>
       </div>
       <input type="file" hidden id="browse" onChange={handleFileChange} accept=".dxf,.dwg,.pdf" />
-      <label htmlFor="browse" className="browse-btn">Browse file</label>
+      <label htmlFor="browse" className="browse-btn">Browse files</label>
       {file && (
         <FileDisplay file={file} onRemoveFile={handleRemoveFile} />
       )}
