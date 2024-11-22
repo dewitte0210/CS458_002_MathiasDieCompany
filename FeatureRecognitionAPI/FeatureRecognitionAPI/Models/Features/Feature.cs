@@ -63,6 +63,7 @@ public class Feature
     public int numEllipses = 0;
     public int getNumEllipses() { return numEllipses; }
 
+    #region Constructors
     /*
      * Constructor that passes in an entityList for the feature. Feature detection is expected to be
      * called on a feature using this constructor. This was mostly used for testing when wanting to
@@ -110,7 +111,9 @@ public class Feature
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
+    #endregion
 
+    #region FeatureDetection
     /*
      * Counts the Lines, Arcs, and Circles in the entityList. 
      * 
@@ -197,6 +200,7 @@ public class Feature
         calcPerimeter();
     }
 
+    #region Group1B
     /* 
      * Checks the baseEntityList to see if this feature is one of the Group 1B features
      * 
@@ -268,7 +272,9 @@ public class Feature
         type = PossibleFeatureTypes.Punch;
         return false;
     }
+    #endregion
 
+    #region Group2A
     internal bool CheckGroup2A(out PossibleFeatureTypes type)
     {
         if (numArcs >= 2 && numCircles == 0)
@@ -305,24 +311,6 @@ public class Feature
             }
         }
         type = PossibleFeatureTypes.Punch;
-        return false;
-    }
-
-     //Checks if the angles of all the arcs add up to 360
-    internal bool DoAnglesAddTo360()
-    {
-        double sumAngles = 0;
-        baseEntityList.ForEach(entity =>
-        {
-            if (entity is Arc)
-            {
-                sumAngles += (entity as Arc).CentralAngle;
-            }
-        });
-        if (sumAngles > 359.9 && sumAngles < 360.09)
-        {
-            return true;
-        }
         return false;
     }
 
@@ -478,7 +466,9 @@ public class Feature
         }
         return false;
     }
-    
+    #endregion
+
+    #region Group4
     /*
      * Checks the perimiterEntityList to detect if any of the features there belong to group 4,
      * then adds any we find to the perimiterFeature list 
@@ -511,7 +501,9 @@ public class Feature
             }
         }
     }
+    #endregion
 
+    #region Group5
     /* Checks the perimiter entity list to detect if any of the features there belong to group 5, 
      * then adds any we find to the perimiterFeature list 
      */
@@ -536,7 +528,9 @@ public class Feature
             }
         }
     }
+    #endregion
 
+    #region Group6
     // Very simillar check to Group5, changes the entity count constraints
     internal void CheckGroup6()
     {
@@ -558,63 +552,10 @@ public class Feature
             }
         }
     }
-    
-    /*
-     * Function that checks if the list passed in has at least one set of parallel lines
-     * 
-     * @Param entities is the Entity list that is checked
-     * @Return true if a set of parrallel lines is found
-     */
-    private bool HasTwoParalellLine(List<Entity> entities)
-    {
-        for(int i = 0; i < entities.Count(); i++)
-        {
-            if (entities[i] is Line)
-            {
-                for(int j = 0; j < entities.Count(); j++)
-                {
-                    if(j == i || entities[j] is not Line) { continue; }
-                   
-                    Line entityI = (entities[i] as Line);
-                    Line entityJ = (entities[j] as Line);
-                    
-                    // Check for verticality
-                    if((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0)) 
-                    {
-                        return true;
-                    }
-                    
-                    double slopeI = entityI.SlopeY / entityI.SlopeX;
-                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
-                   
-                    if (slopeI == slopeJ) 
-                    {
-                        return true; 
-                    }
-                }
-            }
-        }
-        return false; 
-    }
+    #endregion
+    #endregion
 
-    /*
-     * Function that calculates the perimeter of this feature by going through every entity in EntityList and adding the length.
-     * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
-     * called more than once.
-     */
-    public void calcPerimeter()
-    {
-        perimeter = 0;
-        for (int i = 0; i < EntityList.Count; i++)
-        {
-            perimeter += EntityList[i].Length;
-        }
-        if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch )
-        {
-            diameter = perimeter / Math.PI;
-        }
-    }
-
+    #region OverrideFunctions
     /*
      * Overriding the Equals method to compare two Feature objects
      * 
@@ -712,8 +653,9 @@ public class Feature
         }
         else return false;
     }
+    #endregion
 
-
+    #region ExtendEntities
     /*
      * Recursive function that calls extendAllEntitiesHelper. Useful for testing if you want to extend entities
      * on a certain list without changing the baseEntityList
@@ -837,7 +779,9 @@ public class Feature
         }
         return false;
     }
+    #endregion
 
+    #region SeperateBaseEntities
     /*
      * Function that seperates the base entities, which will have been extended, if possible, at this point,
      * from ExtendedEntityList into baseEntityList. Most logic for seperation lies in seperateBaseEntitiesHelper
@@ -938,7 +882,9 @@ public class Feature
         curPath.Pop();
         return false;//nothing is touching this entity so it is popped off of curPath
     }
+    #endregion
 
+    #region PerimeterFeatureFunctions
     /*
      * function that finds a path from start to target in Entity list
      * 
@@ -1016,7 +962,9 @@ public class Feature
         }
         return true;
     }
+    #endregion
 
+    #region MaxAndMinPoint
     public Point FindMaxPoint()
     {
         double maxX = 0;
@@ -1269,7 +1217,81 @@ public class Feature
         return new Point(minX, minY);
 
     }
+    #endregion
 
-} 
+    //Checks if the angles of all the arcs add up to 360
+    internal bool DoAnglesAddTo360()
+    {
+        double sumAngles = 0;
+        baseEntityList.ForEach(entity =>
+        {
+            if (entity is Arc)
+            {
+                sumAngles += (entity as Arc).CentralAngle;
+            }
+        });
+        if (sumAngles > 359.9 && sumAngles < 360.09)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     * Function that checks if the list passed in has at least one set of parallel lines
+     * 
+     * @Param entities is the Entity list that is checked
+     * @Return true if a set of parrallel lines is found
+     */
+    private bool HasTwoParalellLine(List<Entity> entities)
+    {
+        for (int i = 0; i < entities.Count(); i++)
+        {
+            if (entities[i] is Line)
+            {
+                for (int j = 0; j < entities.Count(); j++)
+                {
+                    if (j == i || entities[j] is not Line) { continue; }
+
+                    Line entityI = (entities[i] as Line);
+                    Line entityJ = (entities[j] as Line);
+
+                    // Check for verticality
+                    if ((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0))
+                    {
+                        return true;
+                    }
+
+                    double slopeI = entityI.SlopeY / entityI.SlopeX;
+                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
+
+                    if (slopeI == slopeJ)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /*
+     * Function that calculates the perimeter of this feature by going through every entity in EntityList and adding the length.
+     * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
+     * called more than once.
+     */
+    public void calcPerimeter()
+    {
+        perimeter = 0;
+        for (int i = 0; i < EntityList.Count; i++)
+        {
+            perimeter += EntityList[i].Length;
+        }
+        if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch)
+        {
+            diameter = perimeter / Math.PI;
+        }
+    }
+}
 
 
