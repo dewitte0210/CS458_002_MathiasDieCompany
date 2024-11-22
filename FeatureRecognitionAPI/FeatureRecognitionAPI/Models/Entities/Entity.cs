@@ -16,6 +16,9 @@ namespace FeatureRecognitionAPI.Models
         public const double EntityTolerance = 0.00005;
         public Entity() { }//Enables the use of a default constructor
 
+        private const int intersectTolerance = 4;//Precision for x and y intersect values to
+                                                 //account for inaccurate calculated values
+
         /**
          * Function that checks if this entity intersects with another entity
          * 
@@ -303,17 +306,17 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Check if the intersection is in bounds of both line segments
-            bool line1InBoundsX = intersectX >= Math.Min(line1.StartPoint.X, line1.EndPoint.X) &&
-                    intersectX <= Math.Max(line1.StartPoint.X, line1.EndPoint.X);
+            bool line1InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line1.StartPoint.X, intersectTolerance), Math.Round(line1.EndPoint.X, intersectTolerance)) &&
+                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line1.StartPoint.X, intersectTolerance), Math.Round(line1.EndPoint.X, intersectTolerance));
 
-            bool line1InBoundsY = intersectY >= Math.Min(line1.StartPoint.Y, line1.EndPoint.Y) &&
-                    intersectY <= Math.Max(line1.StartPoint.Y, line1.EndPoint.Y);
+            bool line1InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line1.StartPoint.Y, intersectTolerance), Math.Round(line1.EndPoint.Y, intersectTolerance)) &&
+                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line1.StartPoint.Y, intersectTolerance), Math.Round(line1.EndPoint.Y, intersectTolerance));
 
-            bool line2InBoundsX = intersectX >= Math.Min(line2.StartPoint.X, line2.EndPoint.X) &&
-                    intersectX <= Math.Max(line2.StartPoint.X, line2.EndPoint.X);
+            bool line2InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line2.StartPoint.X, intersectTolerance), Math.Round(line2.EndPoint.X, intersectTolerance)) &&
+                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line2.StartPoint.X, intersectTolerance), Math.Round(line2.EndPoint.X, intersectTolerance));
 
-            bool line2InBoundsY = intersectY >= Math.Min(line2.StartPoint.Y, line2.EndPoint.Y) &&
-                    intersectY <= Math.Max(line2.StartPoint.Y, line2.EndPoint.Y);
+            bool line2InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line2.StartPoint.Y, intersectTolerance), Math.Round(line2.EndPoint.Y, intersectTolerance)) &&
+                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line2.StartPoint.Y, intersectTolerance), Math.Round(line2.EndPoint.Y, intersectTolerance));
 
             return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
@@ -417,7 +420,7 @@ namespace FeatureRecognitionAPI.Models
                         //Solution y value
                         double y = slope * solns[i] + intercept;
 
-                        if (arc.IsInArcRange(new Point(x,y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x && Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y && Math.Max(line.StartPoint.X, line.EndPoint.X) >= x && Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y) { return true; };
+                        if (arc.IsInArcRange(new Point(x,y)) && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= x && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= y && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= x && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= y) { return true; };
                     }
                 }
             }
@@ -478,7 +481,29 @@ namespace FeatureRecognitionAPI.Models
 ;
         }
 
-
+        /**
+         * Solves the quadratic formula
+         * 
+         * @Return - List of solutions
+         */
+        internal List<double> QuadraticFormula(double a, double b, double c)
+        {
+            List<double> solns = new List<double>();
+            double insideSqrt = Math.Pow(b, 2) - (4 * a * c);
+            //Two real solutions
+            if (insideSqrt > 0)
+            {
+                solns.Add(((-1 * b) + Math.Sqrt(insideSqrt)) / (2 * a));
+                solns.Add(((-1 * b) - Math.Sqrt(insideSqrt)) / (2 * a));
+            }
+            //One real solution
+            else if (insideSqrt == 0)
+            {
+                solns.Add((-1 * b) / (2 * a));
+            }
+            return solns;
+            
+        }
         public abstract override bool Equals(object? obj);
 
         //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
