@@ -70,7 +70,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc5, arc7, arc9, arc2, arc4, arc3, arc16, arc11, arc10, arc12, arc6, arc13, arc8, arc14, arc15 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A1));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { ellipse1 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A1));
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
         }
 
         [Test]
@@ -141,7 +141,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
         }
 
         [Test]
@@ -167,7 +167,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
         }
 
         [Test]
