@@ -218,6 +218,7 @@ public class Feature
         //At this point arcs is between 1-3
         else
         {
+            return false;
             //Logic to make sure everything checks out to be a triangle here
         }
 
