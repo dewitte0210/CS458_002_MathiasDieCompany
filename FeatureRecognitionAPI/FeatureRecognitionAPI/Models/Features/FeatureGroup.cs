@@ -10,12 +10,14 @@ namespace FeatureRecognitionAPI.Models.Features
         protected int totalLines;
         protected int totalCircles;
         protected List<Feature> features;
+        public List<List<Entity>> touchingEntities;
         public FeatureGroup( List<Feature> features) 
         {
            // this.count = count;
             this.features = features;
+            touchingEntities = new List<List<Entity>>();
 
-            foreach( Feature feature in features)
+            foreach ( Feature feature in features)
             {
                 this.totalArcs += feature.getNumArcs();
                 this.totalLines += feature.getNumLines();

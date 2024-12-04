@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json.Converters;
+using FeatureRecognitionAPI.Models.Features;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -77,6 +78,7 @@ namespace FeatureRecognitionAPI.Services
                 
                 List<List<Entity>> touchingEntityList;
                 List<Feature> features;
+                List<FeatureGroup> featureGroups;
                 var settings = new JsonSerializerSettings();
                 settings.Converters.Add(new StringEnumConverter());
                 switch (ext)
@@ -86,7 +88,17 @@ namespace FeatureRecognitionAPI.Services
                         {
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            features = dXFFile.getFeatureList(touchingEntityList);
+                            featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
+                            if (featureGroups.Count == 1)
+                            {
+                                features = dXFFile.getFeatureList(featureGroups[0].touchingEntities);
+                            }
+                            else
+                            {
+                                //TODO: logic for multiple feature groups
+                                features = dXFFile.getFeatureList(touchingEntityList);
+                            }
+                            //TODO: return featureGroups instead of features
                             json = JsonConvert.SerializeObject(features, settings);
                         }
                         break;

@@ -434,7 +434,7 @@ public class Feature
             }
             index++;
         }
-        return line1.SlopeX.Equals(line2.SlopeX) && line1.SlopeY.Equals(line2.SlopeY);
+        return (Math.Abs(line1.SlopeX - (line2.SlopeX)) < Entity.EntityTolerance) && (Math.Abs(line1.SlopeY - (line2.SlopeY)) < Entity.EntityTolerance);
     }
 
     /**
