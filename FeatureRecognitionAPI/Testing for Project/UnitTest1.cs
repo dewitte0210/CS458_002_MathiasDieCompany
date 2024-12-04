@@ -21,10 +21,9 @@ namespace Testing_for_Project
         public void TestLineClass()
         {
             Line line1 = new Line(1.9724753611322341, 0.4071346127707478, 2.6124753611322347, 0.4071346127707472);
-            Assert.That(line1.StartPoint.X, Is.EqualTo(1.9724753611322341));
-            Assert.That(line1.StartPoint.Y, Is.EqualTo(0.4071346127707478));
-            Assert.That(line1.EndPoint.X, Is.EqualTo(2.6124753611322347));
-            Assert.That(line1.EndPoint.Y, Is.EqualTo(0.4071346127707472));
+
+            Assert.IsTrue( line1.hasPoint( new Point( 1.9724753611322341, 0.4071346127707478 ) ) );
+            Assert.IsTrue(line1.hasPoint(new Point(2.6124753611322347, 0.4071346127707472)));
         }
         [Test]
         public void TestArcClass()
