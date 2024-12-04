@@ -61,8 +61,8 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() {line1, line2, line3 };
 
             Feature feature = new Feature(entities);
-
-            bool isTriangle = feature.CheckGroup1C();
+            PossibleFeatureTypes test;
+            bool isTriangle = feature.CheckGroup1C(out test);
 
             Assert.That(isTriangle, Is.True);
         }
@@ -77,13 +77,14 @@ namespace Testing_for_Project
             Line line4 = new(3, 3, 3, 1);
 
             Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 } );
-            bool squareCheck = square.CheckGroup1C();
+            PossibleFeatureTypes test;
+            bool squareCheck = square.CheckGroup1C(out test);
 
             //Circle
             Circle circle1 = new(1, 1, 4.5);
 
             Feature circle = new Feature(new List<Entity>() { circle1 } );
-            bool circleCheck = circle.CheckGroup1C();
+            bool circleCheck = circle.CheckGroup1C(out test);
 
             //3 Arcs + 3 lines that are not triangle
             Line line5 = new(1, 1, 1, 4);
@@ -95,7 +96,7 @@ namespace Testing_for_Project
             
             
             Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6,line7, arc1, arc2, arc3 });
-            bool fakeCheck = fakeTriangle.CheckGroup1C();
+            bool fakeCheck = fakeTriangle.CheckGroup1C(out test);
             //Assert all are expected
 
             Assert.That(squareCheck, Is.False);

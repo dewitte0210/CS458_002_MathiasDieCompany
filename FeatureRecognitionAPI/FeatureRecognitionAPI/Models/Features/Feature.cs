@@ -173,6 +173,9 @@ public class Feature
         {
             FeatureType = type;
         }
+        else if (CheckGroup1C(out type)) {
+            FeatureType = type;
+        }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines == 4)
         {
@@ -281,13 +284,14 @@ public class Feature
 
     #region Group1C
 
-    public bool CheckGroup1C()
+    public bool CheckGroup1C(out PossibleFeatureTypes type)
     {
         //Use local variables for lines cirlces arcs and elipses
         int lines, circles, arcs, elipses;
 
         //gives the count of lines arcs circles and elipses
         CountEntities(baseEntityList, out lines, out arcs, out circles, out elipses);
+        type = PossibleFeatureTypes.Group1C;
 
         //Triange base shape needs 3 lines
         if (lines != 3) return false;
