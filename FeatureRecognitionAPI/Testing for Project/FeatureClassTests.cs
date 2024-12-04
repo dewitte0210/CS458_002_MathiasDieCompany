@@ -70,7 +70,40 @@ namespace Testing_for_Project
         [Test]
         public void CheckGroup1C_Bad()
         {
+            //Square
+            Line line1 = new(1, 1, 1, 3);
+            Line line2 = new(3, 1, 1, 1);
+            Line line3 = new(3, 3, 1, 3);
+            Line line4 = new(3, 3, 3, 1);
 
+            Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 } );
+            bool squareCheck = square.CheckGroup1C();
+
+            //Circle
+            Circle circle1 = new(1, 1, 4.5);
+
+            Feature circle = new Feature(new List<Entity>() { circle1 } );
+            bool circleCheck = circle.CheckGroup1C();
+
+            //3 Arcs + 3 lines that are not triangle
+            Line line5 = new(1, 1, 1, 4);
+            Line line6 = new(3, 1, 1, 1);
+            Line line7 = new(4, 3, 4, 1);
+            Arc arc1 = new(1.5, 3, .5, 0, 180);
+            Arc arc2 = new(2.5, 3, .5, 0, 180);
+            Arc arc3 = new(3.5, 3, .5, 0, 180);
+            
+            
+            Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6,line7, arc1, arc2, arc3 });
+            bool fakeCheck = fakeTriangle.CheckGroup1C();
+            //Assert all are expected
+
+            Assert.That(squareCheck, Is.False);
+            Assert.That(circleCheck, Is.False);
+
+            //This edge case wont be encountered unless object submitted is freehand - expected result is true
+            //(further detection possible, but likely not needed)
+            Assert.That(fakeCheck, Is.True);
         }
 
         [Test]
@@ -82,6 +115,7 @@ namespace Testing_for_Project
         [Test]
         public void CheckGroup1C_RoundedCorners_Bad()
         {
+            //Square with rounded corners used in place of triangle
 
         }
 

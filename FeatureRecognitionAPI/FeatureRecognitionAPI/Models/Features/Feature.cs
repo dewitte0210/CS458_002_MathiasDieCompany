@@ -215,11 +215,66 @@ public class Feature
         //If there are 3 lines and zero arcs then it should be a triangle
         else if (arcs == 0) return true;
         else if (arcs > 3) return false;
-        //At this point arcs is between 1-3
+        //At this point arcs is between 1-3 and lines = 3
         else
         {
-            return false;
-            //Logic to make sure everything checks out to be a triangle here
+            switch (arcs)
+            {
+                case 1:
+                    {
+                        //Find the arc
+                        int arcIndex = 0;
+                        for(int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Arc)
+                            {
+                                arcIndex = i;
+                                break;
+                            }
+                        }
+                        //Array of 2 entities to contain lines touching the arc.
+                        Entity[] touchingArc = new Entity[2];
+                        int eIndex = 0;
+                        //Find the two lines
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Line && eIndex < 2)
+                            {
+                                if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i], (Arc)baseEntityList[arcIndex])) 
+                                {
+                                    touchingArc[eIndex] = (Line)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            if(eIndex == 2)
+                            {
+                                break;
+                            }
+                        }
+                        if (touchingArc[0] is Line && touchingArc[1] is Line)
+                        {
+                            if( touchingArc[0].IntersectLineWithLine( (Line)touchingArc[0], (Line)touchingArc[1] ) )
+                            {
+
+                            }
+                        }
+                        //Two arcs obtained
+                        break;
+                    }
+                case 2:
+                    {
+
+                        break;
+                    }
+                case 3:
+                    {
+
+                        break;
+                    }
+                default: return false;
+            }
+
+
         }
 
         //If somehow there is no decision made by this point then there is an error
