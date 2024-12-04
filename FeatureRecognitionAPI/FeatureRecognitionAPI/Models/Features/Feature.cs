@@ -733,50 +733,75 @@ public class Feature
      */
     public bool seperatePerimeterEntities()
     {
+        // lists to pass to the helper function
+        List<Entity> curPath = new List<Entity>();
         addBackParents();
+        List<Entity> testedEntities = new List<Entity>(baseEntityList);
 
-        List<Entity> visited = new List<Entity>();
-        foreach(Entity entity in ExtendedEntityList)
+        Entity head = ExtendedEntityList[0]; // default head is the first index of ExtendedEntityList
+        ExtendedEntityList.Remove(baseEntityList);
+        foreach (Entity entity in ExtendedEntityList)
+        // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
-            if (((!visited.Contains(entity)) && (!baseEntityList.Contains(entity))))
+            if (entity.Length > head.Length)
             {
-
+                head = entity;
             }
-            visited.Add(entity);
         }
 
-        return true;
+        curPath.add(head); // pushes the head to the current path
+        if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
+        // if it can find a path
+        {
+            baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
+            baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
+            return true;
+        }
+        return false;
     }
 
+    // Adds back all parents of all extended lines in targetList
+    private void addBackParents(List<Entity> targetList)
+    {
+        foreach (Entity entity in targetList)
+        {
+            if (entity is ExtendedLine)
+            {
+                addBackParentsHelper((ExtendedLine)entity, targetList);
+            }
+        }
+    }
+
+    // Adds back all parents of extended lines that are not in baseEntityList back into ExtendedEntityList
     private void addBackParents()
     {
         foreach (Entity entity in ExtendedEntityList)
         {
             if (entity is ExtendedLine && (!baseEntityList.Contains(entity)))
             {
-                addBackParentsHelper((ExtendedLine)entity);
+                addBackParentsHelper((ExtendedLine)entity, ExtendedEntityList);
             }
         }
     }
-    private void addBackParentsHelper(ExtendedLine exLine)
+    private void addBackParentsHelper(ExtendedLine exLine, List<Entity> targetList)
     {
         if (exLine.Parent1 is ExtendedLine)
         {
-            addBackParentsHelper((ExtendedLine)exLine.Parent1);
+            addBackParentsHelper((ExtendedLine)exLine.Parent1, targetList);
         }
         else
         {
-            ExtendedEntityList.Add(exLine.Parent1);
+            targetList.Add(exLine.Parent1);
         }
         if (exLine.Parent2 is ExtendedLine)
         {
-            addBackParentsHelper((ExtendedLine)exLine.Parent2);
+            addBackParentsHelper((ExtendedLine)exLine.Parent2, targetList);
         }
         else
         {
-            ExtendedEntityList.Add(exLine.Parent2);
+            targetList.Add(exLine.Parent2);
         }
-        ExtendedEntityList.Remove(exLine);
+        targetList.Remove(exLine);
     }
 
 
