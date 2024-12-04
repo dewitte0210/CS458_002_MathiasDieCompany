@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
+import { Button } from "react-bootstrap";
+import { MdQuestionMark } from "react-icons/md";
 
 interface QuoteSubmissionProps {
   jsonResponse: any[];
@@ -43,6 +45,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         count: 1,
         FeatureType: "",
         perimeter: 0,
+        diameter: 0,
         multipleRadius: false,
         kissCut: false,
         border: false,
@@ -156,7 +159,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
           <form id="quote-form" onSubmit={handleSubmit} className="quote-form">
             <div className="quote-form-fields">
               <div className="quote-form-label-and-select">
+                <div className="quote-form-label">
                 <label htmlFor="ruleType">Rule Type</label>
+                <MdQuestionMark className = "question-icon" />
+                </div>
                 <select
                   id="ruleType"
                   name="ruleType"
@@ -201,7 +207,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
               </div>
 
               <div className="quote-form-label-and-select">
+                <div className="quote-form-label">
                 <label htmlFor="ejecMethod">Ejection Method</label>
+                <MdQuestionMark className = "question-icon" />
+                </div>
                 <select
                   id="ejecMethod"
                   name="ejecMethod"
@@ -240,6 +249,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                           <>
                             <td>
                               <input
+                                className="count-input"
                                 type="number"
                                 value={info.count}
                                 onChange={(e) =>
@@ -294,6 +304,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                             </td>
                             <td>
                               <input
+                                className="perimeter-input"
                                 type="number"
                                 value={info.perimeter}
                                 onChange={(e) =>
@@ -333,12 +344,13 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               />
                             </td>
                             <td>
-                              <button
+                              <Button
                                 type="button"
+                                variant="danger"
                                 onClick={() => handleDeleteFeature(index)}
                               >
                                 Delete
-                              </button>
+                              </Button>
                             </td>
                           </>
                         ) : (
@@ -383,7 +395,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                 info.FeatureType
                               )}
                             </td>
-                            <td>{info.perimeter.toFixed(3)}</td>
+                            <td>{info.diameter !== 0 ? info.diameter.toFixed(3) : info.perimeter.toFixed(3)}</td>
                             <td>
                               {info.multipleRadius ? (
                                 <span className="checkmark">&#10003;</span>
@@ -399,12 +411,13 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               )}
                             </td>
                             <td>
-                              <button
+                            <Button
                                 type="button"
+                                variant="danger"
                                 onClick={() => handleDeleteFeature(index)}
                               >
                                 Delete
-                              </button>
+                              </Button>
                             </td>
                           </>
                         )}

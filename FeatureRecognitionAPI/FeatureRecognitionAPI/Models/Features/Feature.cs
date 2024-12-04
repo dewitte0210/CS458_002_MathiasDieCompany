@@ -198,6 +198,9 @@ public class Feature
 
         //calculate and set the perimeter of the feature
         calcPerimeter();
+
+        //check if the feature has multiple radii
+        checkMultipleRadius();
     }
 
     #region Group1C
@@ -460,7 +463,7 @@ public class Feature
                 {
                     if (IsEllipse())
                     {
-                        type = PossibleFeatureTypes.Group2A;
+                        type = PossibleFeatureTypes.Group2A1;
                         return true;
                     }
                 }
@@ -470,7 +473,7 @@ public class Feature
             {
                 if (IsBowtie())
                 {
-                    type = PossibleFeatureTypes.Group2A;
+                    type = PossibleFeatureTypes.Group2A2;
                     return true;
                 }
             }
@@ -480,7 +483,7 @@ public class Feature
         {
             if ((baseEntityList[0] as Ellipse).IsFullEllipse)
             {
-                type = PossibleFeatureTypes.Group2A;
+                type = PossibleFeatureTypes.Group2A1;
                 return true;
             }
         }
@@ -605,7 +608,7 @@ public class Feature
             }
             index++;
         }
-        return line1.isParallel(line2);
+        return line1.SlopeX.Equals(line2.SlopeX) && line1.SlopeY.Equals(line2.SlopeY);
     }
 
     /**
@@ -1466,6 +1469,36 @@ public class Feature
             diameter = perimeter / Math.PI;
         }
     }
-}
 
+    public void checkMultipleRadius()
+    {
+        if (FeatureType == PossibleFeatureTypes.Group1A2 || FeatureType == PossibleFeatureTypes.Group1C || FeatureType == PossibleFeatureTypes.Group2A2)
+        {
+            // TODO: Add logic to check for multiple radii on bowtie features
+            if (FeatureType == PossibleFeatureTypes.Group2A2) return;
+
+            List<Entity> arcList = new List<Entity>();
+            foreach (Entity entity in baseEntityList)
+            {
+                if (entity is Arc)
+                {
+                    arcList.Add(entity);
+                }
+            }
+
+            for (int i = 0; i < arcList.Count; i++)
+            {
+                for (int j = i + 1; j < arcList.Count; j++)
+                {
+                    if ((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius > Entity.EntityTolerance)
+                    {
+                        multipleRadius = true;
+                        return;
+                    }
+                }
+            }
+
+        }
+    }
+}
 

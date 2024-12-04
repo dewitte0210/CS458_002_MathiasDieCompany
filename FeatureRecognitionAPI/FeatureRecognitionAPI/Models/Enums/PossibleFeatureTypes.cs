@@ -21,6 +21,7 @@ namespace FeatureRecognitionAPI.Models.Enums
         Group5,
         Group1C,
         Group6,
-        Group2A
+        Group2A1,
+        Group2A2
     }
 }
