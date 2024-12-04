@@ -11,6 +11,7 @@ namespace Testing_for_Project
 {
     internal class FeatureClassTests
     {
+
         #region CheckGroup1B
         [Test]
         public void CheckGroup1B_Circle_ReturnsTrue()
@@ -45,6 +46,73 @@ namespace Testing_for_Project
             testFeature.DetectFeatures();
             Assert.That(testFeature.FeatureType, Is.EqualTo(PossibleFeatureTypes.SideTubePunch));
         }
+        #endregion
+
+        #region CheckGroup1C
+
+        [Test]
+        //Make sure a standard triangle is detected as a triangle
+        public void CheckGroup1C_Good() 
+        {
+            Line line1 = new(1, 1, 1, 3);
+            Line line2 = new(1, 3, 3, 2);
+            Line line3 = new(1, 1, 3, 2);
+
+            List<Entity> entities = new List<Entity>() {line1, line2, line3 };
+
+            Feature feature = new Feature(entities);
+
+            bool isTriangle = feature.CheckGroup1C();
+
+            Assert.That(isTriangle, Is.True);
+        }
+
+        [Test]
+        public void CheckGroup1C_Bad()
+        {
+            //Square
+            Line line1 = new(1, 1, 1, 3);
+            Line line2 = new(3, 1, 1, 1);
+            Line line3 = new(3, 3, 1, 3);
+            Line line4 = new(3, 3, 3, 1);
+
+            Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 } );
+            bool squareCheck = square.CheckGroup1C();
+
+            //Circle
+            Circle circle1 = new(1, 1, 4.5);
+
+            Feature circle = new Feature(new List<Entity>() { circle1 } );
+            bool circleCheck = circle.CheckGroup1C();
+
+            //3 Arcs + 3 lines that are not triangle
+            Line line5 = new(1, 1, 1, 4);
+            Line line6 = new(3, 1, 1, 1);
+            Line line7 = new(4, 3, 4, 1);
+            Arc arc1 = new(1.5, 3, .5, 0, 180);
+            Arc arc2 = new(2.5, 3, .5, 0, 180);
+            Arc arc3 = new(3.5, 3, .5, 0, 180);
+            
+            
+            Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6,line7, arc1, arc2, arc3 });
+            bool fakeCheck = fakeTriangle.CheckGroup1C();
+            //Assert all are expected
+
+            Assert.That(squareCheck, Is.False);
+            Assert.That(circleCheck, Is.False);
+
+            //This edge case shouldn't be detected as a triangle
+            Assert.That(fakeCheck, Is.False);
+        }
+
+        [Test]
+        public void CheckGroup1C_RoundedCorners_Bad()
+        {
+            //Not tested because if 4 lines are detected it 1c check returns false
+            //Square with rounded corners used in place of triangle
+
+        }
+
         #endregion
 
         #region CheckGroup2A
