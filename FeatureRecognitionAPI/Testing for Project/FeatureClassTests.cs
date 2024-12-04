@@ -101,20 +101,14 @@ namespace Testing_for_Project
             Assert.That(squareCheck, Is.False);
             Assert.That(circleCheck, Is.False);
 
-            //This edge case wont be encountered unless object submitted is freehand - expected result is true
-            //(further detection possible, but likely not needed)
-            Assert.That(fakeCheck, Is.True);
-        }
-
-        [Test]
-        public void CheckGroup1C_RoundedCorners_Good()
-        {
-
+            //This edge case shouldn't be detected as a triangle
+            Assert.That(fakeCheck, Is.False);
         }
 
         [Test]
         public void CheckGroup1C_RoundedCorners_Bad()
         {
+            //Not tested because if 4 lines are detected it 1c check returns false
             //Square with rounded corners used in place of triangle
 
         }

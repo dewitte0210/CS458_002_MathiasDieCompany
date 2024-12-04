@@ -253,23 +253,114 @@ public class Feature
                         }
                         if (touchingArc[0] is Line && touchingArc[1] is Line)
                         {
-                            if( touchingArc[0].IntersectLineWithLine( (Line)touchingArc[0], (Line)touchingArc[1] ) )
+                            if( !touchingArc[0].IntersectLineWithLine( (Line)touchingArc[0], (Line)touchingArc[1] ) )
                             {
-
+                                return true;
                             }
                         }
-                        //Two arcs obtained
-                        break;
+                        return false;
                     }
                 case 2:
                     {
+                        //Basically same code as before, but instead of a parallel check ensure arcs aren't touching
 
-                        break;
+                        int arcIndex = 0;
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Arc)
+                            {
+                                arcIndex = i;
+                                break;
+                            }
+                        }
+
+                        Entity[] touchingArc = new Entity[2];
+                        int eIndex = 0;
+                        //Find the two lines
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Line && eIndex < 2)
+                            {
+                                if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i], (Arc)baseEntityList[arcIndex]))
+                                {
+                                    touchingArc[eIndex] = (Line)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            else if( baseEntityList[i] is Arc && eIndex < 2)
+                            {
+                                if (((Arc)baseEntityList[arcIndex]).IntersectArcWithArc((Arc)baseEntityList[i], (Arc)baseEntityList[arcIndex]))
+                                {
+                                    touchingArc[eIndex] = (Arc)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            if (eIndex == 2)
+                            {
+                                break;
+                            }
+                        }
+                        if (touchingArc[0] is Line && touchingArc[1] is Line)
+                        {
+                            return true;
+                        }
+                        return false;
                     }
                 case 3:
                     {
-
-                        break;
+                        Entity[] arcList = new Entity[2];
+                        //Find two arcs
+                        int arcIndex = 0;
+                        for (int i = 0; i< baseEntityList.Count; i++)
+                        {
+                            if( baseEntityList[i] is Arc )
+                            {
+                                arcList[arcIndex] = (Arc)baseEntityList[i];
+                                arcIndex++;
+                            }
+                            if (arcIndex == 2) break;
+                        }
+                        arcIndex = 0;
+                        //ArcList has 2 arcs, check entities touching both
+                        Entity[] touchingArc = new Entity[4];
+                        int eIndex = 0;
+                        //Find the two lines
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Line && eIndex < 2)
+                            {
+                                if (arcList[arcIndex].IntersectLineWithArc( (Line)baseEntityList[i], (Arc)arcList[arcIndex] ) )
+                                {
+                                    touchingArc[eIndex] = (Line)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            else if (baseEntityList[i] is Arc && eIndex < 2)
+                            {
+                                if ( arcList[arcIndex].IntersectArcWithArc( (Arc)baseEntityList[i], (Arc)arcList[arcIndex] ) )
+                                {
+                                    touchingArc[eIndex] = (Arc)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            if (eIndex == 2)
+                            {
+                                arcIndex++;
+                            }
+                            if(eIndex == 4)
+                            {
+                                break;
+                            }
+                        }
+                        //Should have a list of 4 entities, if any of them are arcs, return false (arc is touching an arc)
+                        foreach(Entity entity in touchingArc)
+                        {
+                            if (entity is Arc)
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
                     }
                 default: return false;
             }
