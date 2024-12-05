@@ -382,3 +382,9 @@ h3 {
   top: 10%;
   
 }
+
+.identical-text {
+  text-align: center;
+  font-weight: bold;
+  background-color: aliceblue;
+}
