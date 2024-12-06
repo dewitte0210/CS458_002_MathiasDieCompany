@@ -46,8 +46,9 @@ namespace FeatureRecognitionAPI.Services
                             setupCost = 0.3 * BASE_SHOP_RATE;
                             runCost = 1 * BASE_SHOP_RATE * 0.042 * 4;
                             break;
-                        case PossibleFeatureTypes.Group2A:
-
+                        case PossibleFeatureTypes.Group2A1:
+                            break;
+                        case PossibleFeatureTypes.Group2A2:
                             break;
                         case PossibleFeatureTypes.Group3:
                             break;
