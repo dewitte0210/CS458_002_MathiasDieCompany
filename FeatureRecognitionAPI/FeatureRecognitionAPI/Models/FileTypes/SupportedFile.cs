@@ -395,7 +395,7 @@ namespace FeatureRecognitionAPI.Models
         public void detectAllFeatures(List<Entity> myEntityList)
         {
             List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
-            featureList = getFeatureList(touchingEntities);
+            featureList = makeFeatureList(touchingEntities);
             foreach (Feature feature in featureList)
             {
                 feature.extendAllEntities();

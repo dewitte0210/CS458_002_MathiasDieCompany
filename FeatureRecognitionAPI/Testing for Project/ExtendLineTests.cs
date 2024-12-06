@@ -563,8 +563,8 @@ namespace Testing_for_Project
                             if (feature.EntityList.Contains(entity)) { inBaseList = true; }
                             else { inBaseList = false; }
                         }
-                        perimeterFeature.CountEntities(perimeterFeature.EntityList, out int numLines, out int numArcs, out int numCircles);
-                        Assert.IsTrue(numCircles == 0);
+                        perimeterFeature.CountEntities(perimeterFeature.EntityList, out int numLines, out int numArcs, out int numCircles, out int numEllipses);
+                        Assert.IsTrue(numCircles == 0 && numEllipses == 0);
                         if (numLines == 3 && numArcs == 2) { hasSquareFeature = true; }
                         if (numLines == 2 && numArcs == 1) { hasCircleFeature = true; }
                     }
