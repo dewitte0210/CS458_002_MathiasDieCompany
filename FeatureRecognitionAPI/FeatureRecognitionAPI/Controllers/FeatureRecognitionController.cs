@@ -46,7 +46,7 @@ namespace FeatureRecognitionAPI.Controllers
             var (status, output) = await _featureRecognitionService.UploadFile(file);
 
             if (status != OperationStatus.OK || output == null)
-                return BadRequest("Error uploading file.");
+                return BadRequest($"Error uploading file. OperationStatus: {status}, output: {output}");
 
             return Ok(output);
         }
