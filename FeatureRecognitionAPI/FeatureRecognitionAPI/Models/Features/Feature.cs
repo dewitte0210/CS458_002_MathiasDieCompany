@@ -410,7 +410,7 @@ public class Feature
                         //Find the two lines
                         for (int i = 0; i < baseEntityList.Count; i++)
                         {
-                            if (baseEntityList[i] is Line && eIndex < 2)
+                            if (baseEntityList[i] is Line && eIndex < 4)
                             {
                                 if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[arcIndex]))
                                 {
@@ -418,9 +418,10 @@ public class Feature
                                     eIndex++;
                                 }
                             }
-                            else if (baseEntityList[i] is Arc && eIndex < 2)
+                            else if (baseEntityList[i] is Arc && eIndex < 4)
                             {
-                                if (arcList[arcIndex].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[arcIndex]))
+                                if (!(arcList[arcIndex].Equals((Arc)baseEntityList[i]) && 
+                                    arcList[arcIndex].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[arcIndex])))
                                 {
                                     touchingArc[eIndex] = (Arc)baseEntityList[i];
                                     eIndex++;

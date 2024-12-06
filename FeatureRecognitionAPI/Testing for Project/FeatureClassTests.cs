@@ -123,9 +123,10 @@ namespace Testing_for_Project
 
             List<Feature> fList = fGroups[0].GetFeatures();
 
-            Feature baseShape = fList[0];
+            Feature baseShape = fList[1];
 
-            string breakpoint = " ";
+            PossibleFeatureTypes pType;
+            Assert.IsTrue(baseShape.CheckGroup1C(out pType));
 
         }
 
