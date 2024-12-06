@@ -61,8 +61,8 @@ namespace FeatureRecognitionAPI.Models
                 StartPoint = point2;
                 EndPoint = point1;
             }
-            SlopeY = endY - startY;
-            SlopeX = endX - startX;
+            SlopeY = EndPoint.Y - StartPoint.Y;
+            SlopeX = EndPoint.X - StartPoint.X;
 
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
@@ -71,8 +71,8 @@ namespace FeatureRecognitionAPI.Models
         //constructor with extendedline parameter
         public Line(double startX, double startY, double endX, double endY, bool extendedLine)
         {
-            StartPoint = startPoint;
-            EndPoint = endPoint;
+            StartPoint = new Point(startX, startY);
+            EndPoint = new Point(endX, endY);
 
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
@@ -86,6 +86,16 @@ namespace FeatureRecognitionAPI.Models
             return (StartPoint.Equals(point) || EndPoint.Equals(point));
         }
 
+        public bool isParallel(Line line)
+        {
+            double xSlopeDiff = this.SlopeX - line.SlopeX;
+            double ySlopeDiff = this.SlopeY - line.SlopeY;
+            if(xSlopeDiff < Entity.EntityTolerance && ySlopeDiff < Entity.EntityTolerance)
+            {
+                return true;
+            }
+            return false;
+        }
         public bool isSameInfinateLine(Entity other)
         {
             if (other is Line)
