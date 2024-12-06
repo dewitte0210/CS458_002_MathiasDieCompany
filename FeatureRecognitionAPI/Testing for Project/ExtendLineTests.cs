@@ -497,7 +497,13 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
             DXFFile exampleOne = new DXFFile(path);
 
-            exampleOne.detectAllFeatures();
+            // same as SupportedFile.makeFeatureList besides perimeter feature stuff because that destroys ExtendedEntityList
+            foreach (List<Entity> entityList in exampleOne.makeTouchingEntitiesList(exampleOne.GetEntities()))
+            {
+                Feature feature = new Feature(entityList);
+                feature.extendAllEntities();
+                feature.seperateBaseEntities();
+            }
 
             List<Feature> featureList = exampleOne.getFeatureList();
             foreach (Feature feature in featureList)

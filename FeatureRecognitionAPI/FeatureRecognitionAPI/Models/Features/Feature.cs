@@ -609,7 +609,7 @@ public class Feature
     /*
      * recursive helper function to find a closed shape with extended lines
      * 
-     * @Param curPath is the current path that has been taken
+     * @Param path is the current path that has been taken
      * @Param testedEnttiies is a list of enties that have been visited
      * @Param head is the target entity that is trying to loop back through
      * @Return true if a path has been found
@@ -619,7 +619,7 @@ public class Feature
         if (curPath.Count > 2)
         {
             //base case where the current entity touches the head (means its a closed shape)
-            //checks if contained in testedEntities to avoid the second entity from triggering this
+            //checks if contained in visitedEntities to avoid the second entity from triggering this
             //checks if current entity is the same as head to avoid a false true
             if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
             {
@@ -627,7 +627,7 @@ public class Feature
             }
         }
 
-        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the visitedEntities
 
         foreach (Entity entity in ExtendedEntityList)
         {
@@ -637,7 +637,7 @@ public class Feature
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity);//adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated path
                     {
                         return true;
                     }
@@ -653,7 +653,7 @@ public class Feature
             {
                 if (!testedEntities.Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {
-                    curPath.Clear();//clears curPath and adds the new head to it
+                    curPath.Clear();//clears path and adds the new head to it
                     curPath.Push(entity);
                     return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
@@ -661,7 +661,7 @@ public class Feature
         }
 
         curPath.Pop();
-        return false;//nothing is touching this entity so it is popped off of curPath
+        return false;//nothing is touching this entity so it is popped off of path
     }
 
     /*
@@ -691,8 +691,8 @@ public class Feature
     /*
      * Helper function to find the path from head to traget. Contains the actual logic for this task
      * 
-     * @Param curPath is the current path taken
-     * @Param testedEntities contains all visited entities
+     * @Param path is the current path taken
+     * @Param visitedEntities contains all visited entities
      * @Param head is the starting node
      * @Param target is the entity trying to be reached
      * @Return true if path is found
@@ -701,7 +701,7 @@ public class Feature
     {
         if (curPath.Peek() == target) { return true; }
 
-        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the visitedEntities
 
         foreach (Entity entity in EntityList)
         {
@@ -711,7 +711,7 @@ public class Feature
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity);//adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated path
                     {
                         return true;
                     }
@@ -721,7 +721,7 @@ public class Feature
         //this point in the function means nothing is touching current entity
 
         if (curPath.Peek() == head) { return false; } // if the current entity is the head it means nothing is touching it and there is no path
-        curPath.Pop(); // nothing is touching this entity so it is popped off of curPath
+        curPath.Pop(); // nothing is touching this entity so it is popped off of path
         return false; // returns false so the previous recursive call can check the next touching entity
     }
 
@@ -731,34 +731,60 @@ public class Feature
      * 
      * @Return true if a valid path is found and seperated successfully
      */
-    public bool seperatePerimeterEntities()
+    public void seperatePerimeterEntities()
     {
         // lists to pass to the helper function
         List<Entity> curPath = new List<Entity>();
-        addBackParents();
-        List<Entity> testedEntities = new List<Entity>(baseEntityList);
 
-        Entity head = ExtendedEntityList[0]; // default head is the first index of ExtendedEntityList
-        ExtendedEntityList.Remove(baseEntityList);
-        foreach (Entity entity in ExtendedEntityList)
-        // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
+        foreach(Entity entity in baseEntityList) // removes all base entities from ExtendedEntityList
         {
-            if (entity.Length > head.Length)
+            ExtendedEntityList.Remove(entity);
+        }
+        addBackParents();
+        // at this point ExtendedEntityList should only contain perimeter features
+
+        List<Entity> unusedEntities = new List<Entity>(ExtendedEntityList);
+
+        seperatePerimeterEntitiesHelper(curPath, unusedEntities, null);
+    }
+
+    public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+    {
+        if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
+        {
+            if (curEntity is null) // means not at any entity currently
             {
-                head = entity;
+                path.Clear();
+                path.Add(unusedEntities[0]);
+                unusedEntities.RemoveAt(0);
+                seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
+                PerimeterEntityList.Add(new List<Entity>(path));
+            }
+            else // means there is a current entity
+            {
+                bool intersected;
+                do
+                {
+                    intersected = false;
+                    foreach (Entity entity in unusedEntities)
+                    {
+                        if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
+                        {
+                            path.Add(entity);
+                            unusedEntities.Remove(entity);
+                            intersected = true;
+                            seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last()); // reruns with touching entity now being current entity
+
+                            break;
+                        }
+                    }
+                    
+                } while (intersected);
+                seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
             }
         }
-
-        curPath.add(head); // pushes the head to the current path
-        if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
-        // if it can find a path
-        {
-            baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
-            baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
-            return true;
-        }
-        return false;
     }
+
 
     // Adds back all parents of all extended lines in targetList
     private void addBackParents(List<Entity> targetList)
