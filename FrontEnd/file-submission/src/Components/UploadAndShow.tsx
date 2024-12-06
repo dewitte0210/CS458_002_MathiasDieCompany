@@ -50,7 +50,6 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
         throw new Error(`Server error: ${res.status} ${res.statusText}`);
 
       const jsonResponse = await res.json(); // Capture JSON responses
-      console.log(jsonResponse);
       setJsonResponse(jsonResponse); // Store response in state
       setSubmitted(true); // Update the state to indicate successful submission
     } catch (error) {

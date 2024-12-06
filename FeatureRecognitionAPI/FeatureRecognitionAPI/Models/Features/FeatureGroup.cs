@@ -1,4 +1,5 @@
 ﻿using FeatureRecognitionAPI.Services;
+using Newtonsoft.Json;
 using System.Runtime.Intrinsics.Arm;
 
 namespace FeatureRecognitionAPI.Models.Features
@@ -9,19 +10,27 @@ namespace FeatureRecognitionAPI.Models.Features
         protected int totalArcs;
         protected int totalLines;
         protected int totalCircles;
+        [JsonProperty]
         protected List<Feature> features;
+        public List<List<Entity>> touchingEntities;
         public FeatureGroup( List<Feature> features) 
         {
            // this.count = count;
             this.features = features;
+            touchingEntities = new List<List<Entity>>();
 
-            foreach( Feature feature in features)
+            foreach ( Feature feature in features)
             {
                 this.totalArcs += feature.getNumArcs();
                 this.totalLines += feature.getNumLines();
                 this.totalCircles += feature.getNumCircles();
             }
 
+        }
+
+        public void setFeatureList(List<Feature> features)
+        {
+            this.features = features;
         }
 
         public List<Feature> GetFeatures() { return this.features; }

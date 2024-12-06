@@ -5,6 +5,8 @@ using System.IO;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json.Converters;
+using FeatureRecognitionAPI.Models.Features;
+using iText.Kernel.Pdf;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -77,6 +79,7 @@ namespace FeatureRecognitionAPI.Services
                 
                 List<List<Entity>> touchingEntityList;
                 List<Feature> features;
+                List<FeatureGroup> featureGroups;
                 var settings = new JsonSerializerSettings();
                 settings.Converters.Add(new StringEnumConverter());
                 switch (ext)
@@ -86,17 +89,27 @@ namespace FeatureRecognitionAPI.Services
                         {
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            features = dXFFile.getFeatureList(touchingEntityList);
-                            json = JsonConvert.SerializeObject(features, settings);
+                            featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
+                            for (int i = 0; i < featureGroups.Count; i++)
+                            {
+                                features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
+                                featureGroups[i].setFeatureList(features);
+                            }
+                            json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
                         break;
                     case ".dwg":
                         using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
-                            DWGFile dwgFile = new DWGFile(dwgStream.Name);
-                            touchingEntityList = dwgFile.makeTouchingEntitiesList(dwgFile.GetEntities());
-                            features = dwgFile.getFeatureList(touchingEntityList);
-                            json = JsonConvert.SerializeObject(features, settings);
+                            DWGFile dWGFile = new DWGFile(dwgStream.Name);
+                            touchingEntityList = dWGFile.makeTouchingEntitiesList(dWGFile.GetEntities());
+                            featureGroups = dWGFile.SetFeatureGroups(touchingEntityList);
+                            for (int i = 0; i < featureGroups.Count; i++)
+                            {
+                                features = dWGFile.makeFeatureList(featureGroups[i].touchingEntities);
+                                featureGroups[i].setFeatureList(features);
+                            }
+                            json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
                         break;
                     case ".pdf":

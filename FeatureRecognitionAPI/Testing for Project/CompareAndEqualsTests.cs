@@ -23,9 +23,9 @@ namespace Testing_for_Project
 
             bool equals2 = line1.Compare(line3);
 
-            Assert.That(equals1, Is.EqualTo(true));
+            Assert.IsTrue(equals1);
 
-            Assert.That(equals2, Is.EqualTo(false));
+            Assert.IsFalse(equals2);
         }
 
         [Test]

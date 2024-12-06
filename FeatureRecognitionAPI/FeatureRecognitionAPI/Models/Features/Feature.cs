@@ -614,7 +614,7 @@ public class Feature
             }
             index++;
         }
-        return line1.SlopeX.Equals(line2.SlopeX) && line1.SlopeY.Equals(line2.SlopeY);
+        return (Math.Abs(line1.SlopeX - (line2.SlopeX)) < Entity.EntityTolerance) && (Math.Abs(line1.SlopeY - (line2.SlopeY)) < Entity.EntityTolerance);
     }
 
     /**
@@ -872,22 +872,22 @@ public class Feature
     }
 
     /*
-     * This is a recursive helper function to extend every line in ExtendedEntityList.
+     * This is a recursive helper function to extend every line in ExtendedEntityList. It will loop through ExtendedEntityList,
+     * previously set to EntityList, until it can find a Line to extend. Will recurss if extended. Base case is no more lines to extend
      * Should be N^N runtime seeing as the nested for loops is N^2, then it is called recursively with N-1 every time.
      * This makes it (((N!)^2) * N!) which is 
     */
     private void extendAllEntitiesHelper()
     {
-        bool extendedALine = false; // repeats recursivly if this is true
-        //this block extends every line in extendedEntityList
-        //foreach (var entity in extendedEntityList)
-        for (int i = 0; i < ExtendedEntityList.Count; i++)
+        bool extendedALine = false;
+        int i = 0;
+        do
         {
             if (ExtendedEntityList[i] is Line)
-            {
-                //foreach (var otherEntity in extendedEntityList)
-                for (int j = 0; j < ExtendedEntityList.Count; j++)
-                {   
+            { 
+                int j = 0;
+                do
+                {
                     if ((ExtendedEntityList[j] is Line) && ExtendedEntityList[i] != ExtendedEntityList[j])
                     {
                         // for each entity it checks if it can extend with every other entity and does so
@@ -896,12 +896,13 @@ public class Feature
                         if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
                             extendedALine = true;
-                            break;
                         }
                     }
-                }
+                    j++;
+                } while (!extendedALine && j < ExtendedEntityList.Count);
             }
-        }
+            i++;
+        } while (!extendedALine && i < ExtendedEntityList.Count);
         if (extendedALine)
         {
             extendAllEntitiesHelper();
@@ -961,9 +962,9 @@ public class Feature
                     return true;
                 }
             }*/
-            if (line1.isParallel(line2))
+            if (line1.isSameInfinateLine(line2))
             {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2);//makes a new line object with extendedLine boolean to      
+                ExtendedLine tempLine = new ExtendedLine(line1, line2); //makes a new extended line object     
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
@@ -1021,7 +1022,7 @@ public class Feature
     /*
      * recursive helper function to find a closed shape with extended lines
      * 
-     * @Param curPath is the current path that has been taken
+     * @Param path is the current path that has been taken
      * @Param testedEnttiies is a list of enties that have been visited
      * @Param head is the target entity that is trying to loop back through
      * @Return true if a path has been found
@@ -1031,7 +1032,7 @@ public class Feature
         if (curPath.Count > 2)
         {
             //base case where the current entity touches the head (means its a closed shape)
-            //checks if contained in testedEntities to avoid the second entity from triggering this
+            //checks if contained in visitedEntities to avoid the second entity from triggering this
             //checks if current entity is the same as head to avoid a false true
             if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) && !testedEntities.Contains(curPath.Peek()))
             {
@@ -1039,7 +1040,7 @@ public class Feature
             }
         }
 
-        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the visitedEntities
 
         foreach (Entity entity in ExtendedEntityList)
         {
@@ -1049,7 +1050,7 @@ public class Feature
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity);//adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated path
                     {
                         return true;
                     }
@@ -1065,7 +1066,7 @@ public class Feature
             {
                 if (!testedEntities.Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {
-                    curPath.Clear();//clears curPath and adds the new head to it
+                    curPath.Clear();//clears path and adds the new head to it
                     curPath.Push(entity);
                     return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
@@ -1073,7 +1074,7 @@ public class Feature
         }
 
         curPath.Pop();
-        return false;//nothing is touching this entity so it is popped off of curPath
+        return false;//nothing is touching this entity so it is popped off of path
     }
     #endregion
 
@@ -1090,6 +1091,7 @@ public class Feature
         if (EntityList.Contains(start) && EntityList.Contains(target))
         {
             Stack<Entity> path = new Stack<Entity>();
+            path.Push(start);
             if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) 
             {
                 List<Entity> temp = path.ToList();
@@ -1104,8 +1106,8 @@ public class Feature
     /*
      * Helper function to find the path from head to traget. Contains the actual logic for this task
      * 
-     * @Param curPath is the current path taken
-     * @Param testedEntities contains all visited entities
+     * @Param path is the current path taken
+     * @Param visitedEntities contains all visited entities
      * @Param head is the starting node
      * @Param target is the entity trying to be reached
      * @Return true if path is found
@@ -1114,7 +1116,7 @@ public class Feature
     {
         if (curPath.Peek() == target) { return true; }
 
-        testedEntities.Add(curPath.Peek());//adds the current entitiy to the testedEntities
+        testedEntities.Add(curPath.Peek());//adds the current entitiy to the visitedEntities
 
         foreach (Entity entity in EntityList)
         {
@@ -1124,7 +1126,7 @@ public class Feature
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity);//adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated curPath
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head))//recursive call with updated path
                     {
                         return true;
                     }
@@ -1133,8 +1135,9 @@ public class Feature
         }
         //this point in the function means nothing is touching current entity
 
-        curPath.Pop();
-        return false;//nothing is touching this entity so it is popped off of curPath
+        if (curPath.Peek() == head) { return false; } // if the current entity is the head it means nothing is touching it and there is no path
+        curPath.Pop(); // nothing is touching this entity so it is popped off of path
+        return false; // returns false so the previous recursive call can check the next touching entity
     }
 
     /*
@@ -1143,17 +1146,103 @@ public class Feature
      * 
      * @Return true if a valid path is found and seperated successfully
      */
-    public bool seperatePerimeterEntities()
+    public void seperatePerimeterEntities()
     {
-        foreach(Entity entity in baseEntityList)
+        // lists to pass to the helper function
+        List<Entity> curPath = new List<Entity>();
+
+        foreach(Entity entity in baseEntityList) // removes all base entities from ExtendedEntityList
         {
-            if(entity is ExtendedLine)
+            ExtendedEntityList.Remove(entity);
+        }
+        addBackParents();
+        // at this point ExtendedEntityList should only contain perimeter features
+
+        List<Entity> unusedEntities = new List<Entity>(ExtendedEntityList);
+
+        seperatePerimeterEntitiesHelper(curPath, unusedEntities, null);
+    }
+
+    public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+    {
+        if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
+        {
+            if (curEntity is null) // means not at any entity currently
             {
-                List<Entity> path = findPathFromStartToTargetInEntityList(((ExtendedLine)entity).Parent1, ((ExtendedLine)entity).Parent2);            
-                PerimeterEntityList.Add(path);
+                path.Clear();
+                path.Add(unusedEntities[0]);
+                unusedEntities.RemoveAt(0);
+                seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
+                PerimeterEntityList.Add(new List<Entity>(path));
+            }
+            else // means there is a current entity
+            {
+                bool intersected;
+                do
+                {
+                    intersected = false;
+                    foreach (Entity entity in unusedEntities)
+                    {
+                        if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
+                        {
+                            path.Add(entity);
+                            unusedEntities.Remove(entity);
+                            intersected = true;
+                            seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last()); // reruns with touching entity now being current entity
+
+                            break;
+                        }
+                    }
+                    
+                } while (intersected);
+                seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
             }
         }
-        return true;
+    }
+
+
+    // Adds back all parents of all extended lines in targetList
+    private void addBackParents(List<Entity> targetList)
+    {
+        foreach (Entity entity in targetList)
+        {
+            if (entity is ExtendedLine)
+            {
+                addBackParentsHelper((ExtendedLine)entity, targetList);
+            }
+        }
+    }
+
+    // Adds back all parents of extended lines that are not in baseEntityList back into ExtendedEntityList
+    private void addBackParents()
+    {
+        foreach (Entity entity in ExtendedEntityList)
+        {
+            if (entity is ExtendedLine && (!baseEntityList.Contains(entity)))
+            {
+                addBackParentsHelper((ExtendedLine)entity, ExtendedEntityList);
+            }
+        }
+    }
+    private void addBackParentsHelper(ExtendedLine exLine, List<Entity> targetList)
+    {
+        if (exLine.Parent1 is ExtendedLine)
+        {
+            addBackParentsHelper((ExtendedLine)exLine.Parent1, targetList);
+        }
+        else
+        {
+            targetList.Add(exLine.Parent1);
+        }
+        if (exLine.Parent2 is ExtendedLine)
+        {
+            addBackParentsHelper((ExtendedLine)exLine.Parent2, targetList);
+        }
+        else
+        {
+            targetList.Add(exLine.Parent2);
+        }
+        targetList.Remove(exLine);
     }
     #endregion
 
