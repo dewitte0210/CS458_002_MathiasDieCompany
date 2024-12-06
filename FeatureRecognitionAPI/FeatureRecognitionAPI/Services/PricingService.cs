@@ -21,9 +21,9 @@ namespace FeatureRecognitionAPI.Services
 
                 foreach (var feature in param.Features)
                 {
+                    #region Setup and Run Cost Calculation
                     double setupCost = 0;
                     double runCost = 0;
-                    double featureCost = 0;
 
                     // Setup Cost = hour/part to setup * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
@@ -46,19 +46,33 @@ namespace FeatureRecognitionAPI.Services
                             setupCost = 0.3 * BASE_SHOP_RATE;
                             runCost = 1 * BASE_SHOP_RATE * 0.042 * 4;
                             break;
-                        case PossibleFeatureTypes.Group2A1:
+                        case PossibleFeatureTypes.Group1C: // Triangles
+                            setupCost = 0.32 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.045 * 6;
                             break;
-                        case PossibleFeatureTypes.Group2A2:
+                        case PossibleFeatureTypes.Group2A1: // Elipses
+                            setupCost = 0.9 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.045 * 6;
                             break;
-                        case PossibleFeatureTypes.Group3:
+                        case PossibleFeatureTypes.Group2A2: // Bowties
+                            setupCost = 0.9 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.045 * 6;
                             break;
-                        case PossibleFeatureTypes.Group4:
+                        case PossibleFeatureTypes.Group3: // Corner Chamfer
+                            setupCost = 0.14 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 2;
                             break;
-                        case PossibleFeatureTypes.Group5:
+                        case PossibleFeatureTypes.Group4: // V-Notch & Corner Notch
+                            setupCost = 0.25 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 3;
                             break;
-                        case PossibleFeatureTypes.Group1C:
+                        case PossibleFeatureTypes.Group5: // Mitered Notches
+                            setupCost = 0.25 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
                             break;
-                        case PossibleFeatureTypes.Group6:
+                        case PossibleFeatureTypes.Group6: // Radius Notches
+                            setupCost = 0.3333 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
                             break;
                         case PossibleFeatureTypes.SideTubePunch:
                             break;
@@ -78,29 +92,30 @@ namespace FeatureRecognitionAPI.Services
                             break;
                     }
 
-                    bool isOverSized = feature.Perimeter > 20 ? true : false;
-                    int quantity = feature.Count;
-                    if (quantity > 500)
-                    {
-                        //TODO: Need to add some sort of flag to indicate that the quantity is too high
-                    }
-                    double quantityFactor = GetQuantityFactor(quantity);
-                    
-
-                    totalPerimeter += (feature.Perimeter * quantity);
-
                     if (feature.KissCut)
                     {
                         setupCost = setupCost * 1.15;
-                        oneUpCost = oneUpCost * 1.15;
+                        runCost = runCost * 1.15;
                     }
 
                     if (isOverSized)
                     {
 
                     }
+                    #endregion
 
-                    featureCost = setupCost + (oneUpCost * quantity);
+                    bool isOverSized = feature.Perimeter > 20 ? true : false;
+                    int quantity = feature.Count;
+                    double featureCost = 0;
+                    double quantityFactor = GetQuantityFactor(quantity);
+                    // TODO: Ask Ben about Number Up implementation on front end and it being passed down to pricing
+                    // AND potentially returning a 
+
+                    
+
+                    
+                    featureCost = setupCost + (runCost * quantity);
+                    totalPerimeter += (feature.Perimeter * quantity);
                     totalEstimate += featureCost;
                 }
 
@@ -128,8 +143,8 @@ namespace FeatureRecognitionAPI.Services
                 return .64;
             else if (quantity >= 500)
                 return .63;
-
-
+            else
+                return 1;
         }
     }
 }
