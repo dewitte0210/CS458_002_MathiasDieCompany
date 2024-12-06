@@ -210,10 +210,8 @@ namespace Testing_for_Project
             Assert.That(testList[10] is Line);
             Line test11 = (Line)testList[10];
 
-            Assert.That(test11.StartPoint.X, Is.EqualTo(10.2394455263713855));
-            Assert.That(test11.StartPoint.Y, Is.EqualTo(4.0313704835897939));
-            Assert.That(test11.EndPoint.X, Is.EqualTo(11.9146177922999996));
-            Assert.That(test11.EndPoint.Y, Is.EqualTo(1.1299998982999999));
+            Assert.IsTrue(test11.hasPoint(new Point(10.2394455263713855, 4.0313704835897939)));
+            Assert.IsTrue(test11.hasPoint(new Point(11.9146177922999996, 1.1299998982999999)));
 
             Assert.That(testList[11] is Line);
             Line test12 = (Line)testList[11];
