@@ -92,7 +92,7 @@ namespace FeatureRecognitionAPI.Services
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             for (int i = 0; i < featureGroups.Count; i++)
                             {
-                                features = dXFFile.getFeatureList(featureGroups[i].touchingEntities);
+                                features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
                             json = JsonConvert.SerializeObject(featureGroups, settings);
@@ -106,7 +106,7 @@ namespace FeatureRecognitionAPI.Services
                             featureGroups = dWGFile.SetFeatureGroups(touchingEntityList);
                             for (int i = 0; i < featureGroups.Count; i++)
                             {
-                                features = dWGFile.getFeatureList(featureGroups[i].touchingEntities);
+                                features = dWGFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
                             json = JsonConvert.SerializeObject(featureGroups, settings);

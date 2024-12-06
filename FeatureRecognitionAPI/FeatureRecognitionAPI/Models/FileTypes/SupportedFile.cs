@@ -53,15 +53,14 @@ namespace FeatureRecognitionAPI.Models
             this.featureList = featureList;
         }
         
-        public List<Feature> getFeatureList(List<List<Entity>> entities)
+        public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
-            List<Feature> featureList = new List<Feature>();
-
             for (int i = 0; i < entities.Count(); i++)
             {
                 Feature feature = new Feature(entities[i]);
                 feature.extendAllEntities();
                 feature.seperateBaseEntities();
+                feature.seperatePerimeterEntities();
                 feature.DetectFeatures();
                 featureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
@@ -162,7 +161,7 @@ namespace FeatureRecognitionAPI.Models
         public void SetFeatureGroups()
         {
             List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
-           // List<Feature> brokenFeatures = getFeatureList(entities);
+           // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
             //Create features groups things in a way that breaks the logic here
@@ -391,12 +390,12 @@ namespace FeatureRecognitionAPI.Models
         */
         public void detectAllFeatures()
         {
-            detectAllFeatures(entityList);
+            makeFeatureList(makeTouchingEntitiesList(entityList));
         }
         public void detectAllFeatures(List<Entity> myEntityList)
         {
             List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
-            featureList = getFeatureList(touchingEntities);
+            featureList = makeFeatureList(touchingEntities);
             foreach (Feature feature in featureList)
             {
                 feature.extendAllEntities();
