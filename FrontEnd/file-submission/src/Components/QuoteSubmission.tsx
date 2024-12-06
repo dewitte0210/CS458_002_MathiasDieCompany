@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
+import { Button } from "react-bootstrap";
+import { MdQuestionMark } from "react-icons/md";
 
 interface QuoteSubmissionProps {
   jsonResponse: any[];
@@ -21,50 +23,82 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
   const [priceJSON, setPriceJSON] = useState(null);
 
   // Handle input change
-  const handleChange = (key: string, value: any, index?: number) => {
-    if (index !== undefined) {
-      const updatedData = [...data];
-      updatedData[index] = { ...updatedData[index], [key]: value };
-      setData(updatedData);
-    } else {
-      setFormFields((prev) => ({ ...prev, [key]: value }));
-    }
+  const handleChange = (
+    key: string,
+    value: any,
+    groupIndex?: number,
+    featureIndex?: number
+  ) => {
+    setData((prev) =>
+      prev.map((group, gIdx) => {
+        if (gIdx === groupIndex) {
+          return {
+            ...group,
+            features: group.features.map((feature, fIdx) => {
+              if (fIdx === featureIndex) {
+                return {
+                  ...feature,
+                  [key]: value, // Update the specific field
+                };
+              }
+              return feature;
+            }),
+          };
+        }
+        return group;
+      })
+    );
   };
-
   const backToForm = () => {
     setIsSubmitted(false);
+  }
+
+  const handleAddFeature = (groupIndex: number) => {
+    setData((prev) =>
+      prev.map((group, idx) => {
+        if (idx === groupIndex) {
+          return {
+            ...group,
+            features: [
+              ...group.features,
+              {
+                newFeature: true,
+                count: 1,
+                FeatureType: "",
+                perimeter: 0,
+                diameter: 0,
+                multipleRadius: false,
+                kissCut: false,
+                EntityList: [],
+              },
+            ],
+          };
+        }
+        return group;
+      })
+    );
   };
 
-  const handleAddFeature = () => {
-    setData((prev) => [
-      ...prev,
-      {
-        newFeature: true,
-        count: 1,
-        FeatureType: "",
-        perimeter: 0,
-        multipleRadius: false,
-        kissCut: false,
-        border: false,
-        EntityList: [],
-      },
-    ]);
-  };
-
-  const handleDeleteFeature = (index: number) => {
-    // Decrease count of deleted feature by 1
-    if (data[index].newFeature || data[index].count === 1) {
-      setData((prev) => prev.filter((_, i) => i !== index));
-    } else {
-      setData((prev) =>
-        prev.map((item, i) => {
-          if (i === index) {
-            return { ...item, count: item.count - 1 };
-          }
-          return item;
-        })
-      );
-    }
+  const handleDeleteFeature = (groupIndex: number, featureIndex: number) => {
+    setData((prev) =>
+      prev.map((group, idx) => {
+        if (idx === groupIndex) {
+          return {
+            ...group,
+            features: group.features.map((feature, fIdx) => {
+              if (fIdx === featureIndex) {
+                if (feature.count > 1) {
+                  return { ...feature, count: feature.count - 1 };
+                }
+                return null; // Mark for removal
+              }
+              return feature;
+            }).filter((feature) => feature !== null), // Remove null entries
+          };
+        }
+        return group;
+      })
+    );
   };
 
   // Handle form submission
@@ -156,7 +190,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
           <form id="quote-form" onSubmit={handleSubmit} className="quote-form">
             <div className="quote-form-fields">
               <div className="quote-form-label-and-select">
-                <label htmlFor="ruleType">Rule Type</label>
+                <div className="quote-form-label">
+                  <label htmlFor="ruleType">Rule Type</label>
+                  <MdQuestionMark className="question-icon" />
+                </div>
                 <select
                   id="ruleType"
                   name="ruleType"
@@ -201,7 +238,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
               </div>
 
               <div className="quote-form-label-and-select">
-                <label htmlFor="ejecMethod">Ejection Method</label>
+                <div className="quote-form-label">
+                  <label htmlFor="ejecMethod">Ejection Method</label>
+                  <MdQuestionMark className="question-icon" />
+                </div>
                 <select
                   id="ejecMethod"
                   name="ejecMethod"
@@ -233,191 +273,190 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((info, index) => {
-                    return (
-                      <tr key={index}>
-                        {info.newFeature ? (
-                          <>
-                            <td>
-                              <input
-                                type="number"
-                                value={info.count}
-                                onChange={(e) =>
-                                  handleChange(
+                  {data.map((group, groupIndex) => (
+                    <>
+                      <tr key={`group-${groupIndex}`}>
+                        <td colSpan={6} className="identical-text">Number of identical dies: {group.Count}</td>
+                      </tr>
+                      {group.features.map((feature, featureIndex) => (
+                        <tr key={`${groupIndex}-${featureIndex}`}>
+                          {feature.newFeature ? (
+                            <>
+                              <td>
+                                <input
+                                  className="count-input"
+                                  type="number"
+                                  value={feature.count}
+                                  onChange={(e) => handleChange(
                                     "count",
                                     parseInt(e.target.value),
-                                    index
-                                  )
-                                }
-                                required
-                              />
-                            </td>
-                            <td>
-                              <select
-                                value={info.FeatureType}
-                                onChange={(e) =>
-                                  handleChange(
+                                    groupIndex,
+                                    featureIndex
+                                  )}
+                                  required />
+                              </td>
+                              <td>
+                                <select
+                                  value={feature.FeatureType}
+                                  onChange={(e) => handleChange(
                                     "FeatureType",
                                     e.target.value,
-                                    index
-                                  )
-                                }
-                                required
-                              >
-                                <option disabled selected value="">
-                                  Select Feature Type
-                                </option>
-                                <option value="Group1A1">Group1A1</option>
-                                <option value="Group1A2">Group1A2</option>
-                                <option value="Group1B1">Group1B1</option>
-                                <option value="Group1B2">Group1B2</option>
-                                <option value="Group1C">Group1C</option>
-                                <option value="Group2A">Group2A</option>
-                                <option value="Group3">Group3</option>
-                                <option value="Group4">Group4</option>
-                                <option value="Group5">Group5</option>
-                                <option value="Group6">Group6</option>
-                                <option value="HDSideOutlet">
-                                  HD Side Outlet
-                                </option>
-                                <option value="Punch">Punch</option>
-                                <option value="SideOutlet">Side Outlet</option>
-                                <option value="SideTubePunch">
-                                  Side Tube Punch
-                                </option>
-                                <option value="StdFTPunch">Std FT Punch</option>
-                                <option value="StdSWPunch">Std SW Punch</option>
-                                <option value="StdRetractPins">
-                                  Std Retract Pins
-                                </option>
-                              </select>
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                value={info.perimeter}
-                                onChange={(e) =>
-                                  handleChange(
-                                    "perimeter",
-                                    parseFloat(e.target.value),
-                                    index
-                                  )
-                                }
-                                required
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={info.multipleRadius}
-                                onChange={(e) =>
-                                  handleChange(
-                                    "multipleRadius",
-                                    e.target.checked,
-                                    index
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={info.kissCut}
-                                onChange={(e) =>
-                                  handleChange(
-                                    "kissCut",
-                                    e.target.checked,
-                                    index
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteFeature(index)}
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td>{info.count}</td>
-                            <td>
-                              {info.FeatureType === "Punch" ? (
-                                <select
-                                  value={info.punchType || ""}
-                                  onChange={(e) =>
-                                    handleChange(
-                                      "punchType",
-                                      e.target.value,
-                                      index
-                                    )
-                                  }
+                                    groupIndex,
+                                    featureIndex
+                                  )}
                                   required
                                 >
                                   <option disabled selected value="">
-                                    Select Punch Type
+                                    Select Feature Type
                                   </option>
-                                  <option value="SideTubePunch">
-                                    Side Tube Punch
-                                  </option>
-                                  <option value="SideOutlet">
-                                    Side Outlet
-                                  </option>
+                                  <option value="Group1A1">Group1A1</option>
+                                  <option value="Group1A2">Group1A2</option>
+                                  <option value="Group1B1">Group1B1</option>
+                                  <option value="Group1B2">Group1B2</option>
+                                  <option value="Group1C">Group1C</option>
+                                  <option value="Group2A">Group2A</option>
+                                  <option value="Group3">Group3</option>
+                                  <option value="Group4">Group4</option>
+                                  <option value="Group5">Group5</option>
+                                  <option value="Group6">Group6</option>
                                   <option value="HDSideOutlet">
                                     HD Side Outlet
                                   </option>
-                                  <option value="StdFTPunch">
-                                    Std FT Punch
+                                  <option value="Punch">Punch</option>
+                                  <option value="SideOutlet">Side Outlet</option>
+                                  <option value="SideTubePunch">
+                                    Side Tube Punch
                                   </option>
-                                  <option value="StdSWPunch">
-                                    Std SW Punch
-                                  </option>
+                                  <option value="StdFTPunch">Std FT Punch</option>
+                                  <option value="StdSWPunch">Std SW Punch</option>
                                   <option value="StdRetractPins">
                                     Std Retract Pins
                                   </option>
                                 </select>
-                              ) : (
-                                info.FeatureType
-                              )}
-                            </td>
-                            <td>{info.perimeter.toFixed(3)}</td>
-                            <td>
-                              {info.multipleRadius ? (
-                                <span className="checkmark">&#10003;</span>
-                              ) : (
-                                <span className="crossmark">&#10005;</span>
-                              )}
-                            </td>
-                            <td>
-                              {info.kissCut ? (
-                                <span className="checkmark">&#10003;</span>
-                              ) : (
-                                <span className="crossmark">&#10005;</span>
-                              )}
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteFeature(index)}
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    );
-                  })}
+                              </td>
+                              <td>
+                                <input
+                                  className="perimeter-input"
+                                  type="number"
+                                  value={feature.perimeter}
+                                  onChange={(e) => handleChange(
+                                    "perimeter",
+                                    parseFloat(e.target.value),
+                                    groupIndex,
+                                    featureIndex
+                                  )}
+                                  required />
+                              </td>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  checked={feature.multipleRadius}
+                                  onChange={(e) => handleChange(
+                                    "multipleRadius",
+                                    e.target.checked,
+                                    groupIndex,
+                                    featureIndex
+                                  )} />
+                              </td>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  checked={feature.kissCut}
+                                  onChange={(e) => handleChange(
+                                    "kissCut",
+                                    e.target.checked,
+                                    groupIndex,
+                                    featureIndex
+                                  )} />
+                              </td>
+                              <td>
+                                <Button
+                                  type="button"
+                                  variant="danger"
+                                  onClick={() => handleDeleteFeature(groupIndex, featureIndex)}
+                                >
+                                  Delete
+                                </Button>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              <td>{feature.count}</td>
+                              <td>
+                                {feature.FeatureType === "Punch" ? (
+                                  <select
+                                    value={feature.punchType || ""}
+                                    onChange={(e) => handleChange(
+                                      "punchType",
+                                      e.target.value,
+                                      groupIndex,
+                                      featureIndex
+                                    )}
+                                    required
+                                  >
+                                    <option disabled selected value="">
+                                      Select Punch Type
+                                    </option>
+                                    <option value="SideTubePunch">
+                                      Side Tube Punch
+                                    </option>
+                                    <option value="SideOutlet">
+                                      Side Outlet
+                                    </option>
+                                    <option value="HDSideOutlet">
+                                      HD Side Outlet
+                                    </option>
+                                    <option value="StdFTPunch">
+                                      Std FT Punch
+                                    </option>
+                                    <option value="StdSWPunch">
+                                      Std SW Punch
+                                    </option>
+                                    <option value="StdRetractPins">
+                                      Std Retract Pins
+                                    </option>
+                                  </select>
+                                ) : (
+                                  feature.FeatureType
+                                )}
+                              </td>
+                              <td>{feature.diameter !== 0 ? feature.diameter.toFixed(3) : feature.perimeter.toFixed(3)}</td>
+                              <td>
+                                {feature.multipleRadius ? (
+                                  <span className="checkmark">&#10003;</span>
+                                ) : (
+                                  <span className="crossmark">&#10005;</span>
+                                )}
+                              </td>
+                              <td>
+                                {feature.kissCut ? (
+                                  <span className="checkmark">&#10003;</span>
+                                ) : (
+                                  <span className="crossmark">&#10005;</span>
+                                )}
+                              </td>
+                              <td>
+                                <Button
+                                  type="button"
+                                  variant="danger"
+                                  onClick={() => handleDeleteFeature(groupIndex, featureIndex)}
+                                >
+                                  Delete
+                                </Button>
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      ))}
+                    </>
+                  ))}
                 </tbody>
               </table>
               <div className="add-feature">
                 <button
                   className="animated-button"
                   type="button"
-                  onClick={handleAddFeature}
+                  onClick={() => handleAddFeature(0)}
                 >
                   <span>Add Feature</span>
                   <span></span>

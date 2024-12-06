@@ -30,11 +30,46 @@ namespace FeatureRecognitionAPI.Models
             Length = line.Length;
         }
 
-        public Line( double startX,  double startY,  double endX,  double endY)
+        public Line(double startX, double startY, double endX, double endY)
         {
-            StartPoint = new Point(startX, startY);
-            EndPoint = new Point(endX, endY);
+            Point point1 = new Point(startX, startY);
+            Point point2 = new Point(endX, endY);
+            double xDiff = point1.X - point2.X;
+            double yDiff = point1.Y - point2.Y;
+            if (xDiff > Entity.EntityTolerance)
+            {
+                StartPoint = point1;
+                EndPoint = point2;
+            }
+            //if the difference falls between +/- entityTolerance it is equals
+            else if (Entity.EntityTolerance > xDiff && xDiff > (0 - Entity.EntityTolerance))
+            {
+                if (yDiff > Entity.EntityTolerance)
+                {
+                    StartPoint = point1;
+                    EndPoint = point2;
+                }
+                else
+                {
+                    StartPoint = point2;
+                    EndPoint = point1;
+                }
 
+            }
+            else if (xDiff < Entity.EntityTolerance)
+            {
+                if (yDiff > Entity.EntityTolerance)
+                {
+                    StartPoint = point1;
+                    EndPoint = point2;
+                }
+                else
+                {
+                    StartPoint = point2;
+                    EndPoint = point1;
+                }
+            }
+            
             SlopeY = endY - startY;
             SlopeX = endX - startX;
 

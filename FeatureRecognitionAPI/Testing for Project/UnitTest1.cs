@@ -21,10 +21,9 @@ namespace Testing_for_Project
         public void TestLineClass()
         {
             Line line1 = new Line(1.9724753611322341, 0.4071346127707478, 2.6124753611322347, 0.4071346127707472);
-            Assert.That(line1.StartPoint.X, Is.EqualTo(1.9724753611322341));
-            Assert.That(line1.StartPoint.Y, Is.EqualTo(0.4071346127707478));
-            Assert.That(line1.EndPoint.X, Is.EqualTo(2.6124753611322347));
-            Assert.That(line1.EndPoint.Y, Is.EqualTo(0.4071346127707472));
+
+            Assert.IsTrue( line1.hasPoint( new Point( 1.9724753611322341, 0.4071346127707478 ) ) );
+            Assert.IsTrue(line1.hasPoint(new Point(2.6124753611322347, 0.4071346127707472)));
         }
         [Test]
         public void TestArcClass()
@@ -50,10 +49,42 @@ namespace Testing_for_Project
             Assert.That(circle1.Radius, Is.EqualTo(0.2577228596164672));
         }
         [Test]
-        public void TestEllipseClass()
+        public void TestFullEllipseClass()
         {
-            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 0, 0, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Assert.That(ellipse1.Length, Is.EqualTo(15.865439589290595));
+        }
+
+        [Test]
+        public void TestPartialEllipseClass()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+            Assert.That(Math.Round(ellipse1.Length, 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
+        }
+
+        [Test]
+        public void TestPartialRotatedEllipseClass()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 0, 3, 2.0 / 3.0, 0, Math.PI);
+            Assert.That(Math.Round(ellipse1.Length, 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
+        }
+
+        [Test]
+        public void TestPointEquals()
+        {
+            Point point1 = new Point(2, 3);
+            Point point2 = new Point(2, 3);
+            Assert.That(point1.Equals(point2));
+        }
+
+        [Test]
+        public void TestQuadraticFormula()
+        {
+            Line test = new Line(0, 0, 0, 0);
+            List<double> solutions1 = new List<double>() { 2, 5 };
+            List<double> solutions2 = new List<double>() { 5, 2 };
+            List<double> actual = test.QuadraticFormula(1, -7, 10);
+            Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
         }
         #endregion
 
@@ -143,10 +174,8 @@ namespace Testing_for_Project
             Assert.That(testList[8] is Line);
             Line test9 = (Line)testList[8];
 
-            Assert.That(test9.StartPoint.X, Is.EqualTo(5.3651558979999994));
-            Assert.That(test9.StartPoint.Y, Is.EqualTo(1.1299998982999999));
-            Assert.That(test9.EndPoint.X, Is.EqualTo(7.0403281640286135));
-            Assert.That(test9.EndPoint.Y, Is.EqualTo(4.0313704835897957));
+            Assert.IsTrue(test9.hasPoint(new Point(5.3651558979999994, 1.1299998982999999)));
+            Assert.IsTrue(test9.hasPoint(new Point(7.0403281640286135, 4.0313704835897957)));
 
             Assert.That(testList[9] is Arc);
             Arc test10 = (Arc)testList[9];
@@ -213,10 +242,8 @@ namespace Testing_for_Project
             Assert.That(testList[0] is Line);
             Line test1 = (Line)testList[0];
 
-            Assert.That(test1.StartPoint.X, Is.EqualTo(1.9724753611322341));
-            Assert.That(test1.StartPoint.Y, Is.EqualTo(0.4071346127707478));
-            Assert.That(test1.EndPoint.X, Is.EqualTo(2.6124753611322347));
-            Assert.That(test1.EndPoint.Y, Is.EqualTo(0.4071346127707472));
+            Assert.IsTrue(test1.hasPoint(new Point(1.9724753611322341, 0.4071346127707478)));
+            Assert.IsTrue(test1.hasPoint(new Point(2.6124753611322347, 0.4071346127707472)));
 
             Assert.That(testList[1] is Arc);
             Arc test2 = (Arc)testList[1];
@@ -230,10 +257,8 @@ namespace Testing_for_Project
             Assert.That(testList[2] is Line);
             Line test3 = (Line)testList[2];
 
-            Assert.That(test3.StartPoint.X, Is.EqualTo(2.6424753611322358));
-            Assert.That(test3.StartPoint.Y, Is.EqualTo(0.4371346127707473));
-            Assert.That(test3.EndPoint.X, Is.EqualTo(2.6424753611322340));
-            Assert.That(test3.EndPoint.Y, Is.EqualTo(0.9771346127707479));
+            Assert.IsTrue(test3.hasPoint(new Point(2.6424753611322358, 0.4371346127707473)));
+            Assert.IsTrue(test3.hasPoint(new Point(2.6424753611322340, 0.9771346127707479)));
 
             Assert.That(testList[3] is Arc);
             Arc test4 = (Arc)testList[3];
@@ -289,10 +314,9 @@ namespace Testing_for_Project
             Assert.That(testList[9] is Line);
             Line test10 = (Line)testList[9];
 
-            Assert.That(test10.StartPoint.X, Is.EqualTo(1.5688878087292752));
-            Assert.That(test10.StartPoint.Y, Is.EqualTo(0.6554637349171067));
-            Assert.That(test10.EndPoint.X, Is.EqualTo(1.5688878087292759));
-            Assert.That(test10.EndPoint.Y, Is.EqualTo(0.7854637349171074));
+            Assert.IsTrue(test10.hasPoint(new Point(1.5688878087292752, 0.6554637349171067)));
+            Assert.IsTrue(test10.hasPoint(new Point(1.5688878087292759, 0.7854637349171074)));
+
 
             Assert.That(testList[10] is Line);
             Line test11 = (Line)testList[10];

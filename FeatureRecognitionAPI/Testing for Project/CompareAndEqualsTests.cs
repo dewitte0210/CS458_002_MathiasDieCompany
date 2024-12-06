@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Testing_for_Project
 {
-    internal class EqualsOverrideTests
+    internal class CompareAndEqualMethodTests
     {
         [Test]
-        public void EqualsOverrideLine()
+        public void CompareMethodLine()
         {
             Line line1 = new(1, 1, 2, 2);
             Line line2 = new(2, 2, 3, 3);
@@ -35,8 +35,8 @@ namespace Testing_for_Project
             Arc arc2 = new(3, 9, 4.5, 30, 50);
             Arc arc3 = new(4, 2, 5, 30, 50);
 
-            bool equals1 = arc1.Equals(arc2);
-            bool equals2 = arc1.Equals(arc3);
+            bool equals1 = arc1.Compare(arc2);
+            bool equals2 = arc1.Compare(arc3);
 
             Assert.That(equals1, Is.EqualTo(true));
             Assert.That(equals2, Is.EqualTo(false));
@@ -49,8 +49,8 @@ namespace Testing_for_Project
             Circle circle2 = new(4, 4, 5);
             Circle circle3 = new(5, 4, 4);
 
-            bool equals1 = circle1.Equals(circle2);
-            bool equals2 = circle1.Equals(circle3);
+            bool equals1 = circle1.Compare(circle2);
+            bool equals2 = circle1.Compare(circle3);
 
             Assert.That(equals1, Is.EqualTo(true));
             Assert.That(equals2, Is.EqualTo(false));
@@ -88,11 +88,11 @@ namespace Testing_for_Project
             Feature f1 = new(entities);
             Feature f2 = new(entities3);
 
-            //This one doesn't equal
+            //This one shouldn't equal the others
             Feature f3 = new(entities2);
 
-            bool equals1 = f1.Equals(f2);
-            bool equals2 = f1.Equals(f3);
+            bool equals1 = f1.Compare(f2);
+            bool equals2 = f1.Compare(f3);
 
             Assert.That(equals1, Is.EqualTo(true));
             Assert.That(equals2 , Is.EqualTo(false)); 

@@ -18,7 +18,6 @@ namespace FeatureRecognitionAPI.Models
         public DXFFile(string path) : base(path)
         {
             fileType = SupportedExtensions.dxf;
-            //_fileVersion = GetFileVersion();
 
             if (File.Exists(path))
             {
@@ -155,6 +154,19 @@ namespace FeatureRecognitionAPI.Models
                                 ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
                                 ((ACadSharp.Entities.Circle)entities[i]).Radius);
                             entityList.Add(circleEntity);
+                            break;
+                        }
+                    case "ELLIPSE":
+                        {
+                            Ellipse ellipseEntity =
+                                new Ellipse(((ACadSharp.Entities.Ellipse)entities[i]).Center.X,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).Center.Y,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).EndPoint.X,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).EndPoint.Y,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).RadiusRatio,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).StartParameter,
+                                ((ACadSharp.Entities.Ellipse)entities[i]).EndParameter);
+                            entityList.Add(ellipseEntity);
                             break;
                         }
                 }
