@@ -22,8 +22,61 @@ namespace FeatureRecognitionAPI.Services
                 foreach (var feature in param.Features)
                 {
                     double setupCost = 0;
-                    double oneUpCost = 0;
+                    double runCost = 0;
                     double featureCost = 0;
+
+                    // Setup Cost = hour/part to setup * ShopRate $/hour
+                    // Run cost is calculated using the following factors and variables
+                    // Difficulty Factor * mMain.ShopRate $/hr * hour/part * quantity of parts
+                    switch (feature.FeatureType)
+                    {
+                        case PossibleFeatureTypes.Group1A1: // Metered Rectangle
+                            setupCost = 0.22 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
+                            break;
+                        case PossibleFeatureTypes.Group1A2: // Radius Corner Rectangle
+                            setupCost = 0.22 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
+                            break;
+                        case PossibleFeatureTypes.Group1B1: // Circle
+                            setupCost = 0.3 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.042 * 4;
+                            break;
+                        case PossibleFeatureTypes.Group1B2: // Rounded Rectangle
+                            setupCost = 0.3 * BASE_SHOP_RATE;
+                            runCost = 1 * BASE_SHOP_RATE * 0.042 * 4;
+                            break;
+                        case PossibleFeatureTypes.Group2A:
+
+                            break;
+                        case PossibleFeatureTypes.Group3:
+                            break;
+                        case PossibleFeatureTypes.Group4:
+                            break;
+                        case PossibleFeatureTypes.Group5:
+                            break;
+                        case PossibleFeatureTypes.Group1C:
+                            break;
+                        case PossibleFeatureTypes.Group6:
+                            break;
+                        case PossibleFeatureTypes.SideTubePunch:
+                            break;
+                        case PossibleFeatureTypes.SideOutlet:
+                            break;
+                        case PossibleFeatureTypes.HDSideOutlet:
+                            break;
+                        case PossibleFeatureTypes.StdFTPunch:
+                            break;
+                        case PossibleFeatureTypes.StdSWPunch:
+                            break;
+                        case PossibleFeatureTypes.StdRetractPins:
+                            break;
+                        case PossibleFeatureTypes.Punch:
+                            break;
+                        default:
+                            break;
+                    }
+
                     bool isOverSized = feature.Perimeter > 20 ? true : false;
                     int quantity = feature.Count;
                     if (quantity > 500)

@@ -11,8 +11,8 @@ namespace FeatureRecognitionAPI.Models.Enums
         StdSWPunch,
         StdRetractPins,
         Punch,
-        Group1A1,
-        Group1A2,
+        Group1A1, // Metered Rectangle
+        Group1A2, // Radius Corner Rectangle
         Group1B1, // Circle
         Group1B2, // Rounded Rectangle
         Group3,
