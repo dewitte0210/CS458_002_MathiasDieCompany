@@ -18,9 +18,10 @@ namespace FeatureRecognitionAPI.Models
         protected SupportedExtensions fileType { get; set; }
         protected List<Feature> featureList;
         protected List<Entity> entityList;
-        protected List<FeatureGroup> featureGroups;
+        protected List<FeatureGroup> featureGroups { get; }
 
-        //These two functiuons below exist for testing purposes
+        //These functiuons below exist for testing purposes
+        #region testingFunctions
         public int GetFeatureGroupCount() { return featureGroups.Count; }
         public int GetTotalFeatureGroups()
         {
@@ -31,6 +32,10 @@ namespace FeatureRecognitionAPI.Models
             }
             return tmp;
         }
+
+        public List<FeatureGroup> GetFeatureGroups() { return featureGroups; }
+        #endregion
+
         #region Constructors
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
@@ -271,9 +276,33 @@ namespace FeatureRecognitionAPI.Models
         #endregion
 
         #region DetectFeatures
-        /* 
-         * method that goes from the path to detected features
-        */
+
+
+        /*
+         * Author: Stephen Ice
+         * Runs feature detection on features in featureGroups, 
+         */
+        public void DetectFeatures()
+        {
+            foreach (FeatureGroup fGroup in featureGroups)
+            {
+                foreach (Feature feature in fGroup.GetFeatures())
+                {
+                    PossibleFeatureTypes possibleType = new PossibleFeatureTypes();
+                    if (feature.CheckGroup1B(feature.getNumCircles(), feature.getNumLines(), feature.getNumArcs(), out possibleType))
+                        break;
+                    else if (feature.CheckGroup1C(out possibleType)) break;
+                    else if (feature.CheckGroup2A(out possibleType)) break;
+                    else if (feature.CheckGroup3()) break;
+                    //Commented lines are of the void return type
+                    //else if (feature.CheckGroup4()) break;
+                    //else if (feature.CheckGroup5()) break;
+                    //else if (feature.CheckGroup6()) break;
+                        
+                }
+            }
+        }
+
         public void detectAllFeatures()
         {
             detectAllFeatures(entityList);

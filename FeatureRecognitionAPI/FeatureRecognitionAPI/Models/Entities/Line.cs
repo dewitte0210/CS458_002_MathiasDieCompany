@@ -59,29 +59,15 @@ namespace FeatureRecognitionAPI.Models
                 }
 
             }
-            else if (xDiff < Entity.EntityTolerance)
+            else
             {
-                if (yDiff > Entity.EntityTolerance)
-                {
-                    StartPoint = point1;
-                    EndPoint = point2;
-                }
-                else
-                {
-                    StartPoint = point2;
-                    EndPoint = point1;
-                }
+                StartPoint = point2;
+                EndPoint = point1;
             }
-            
-            ExtendedLine = false;
-
             SlopeY = endY - startY;
             SlopeX = endX - startX;
-
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
         }
-
+            
         //constructor with extendedline parameter
         public Line(double startX, double startY, double endX, double endY, bool extendedLine)
         {

@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Features;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Testing_for_Project
 {
@@ -107,10 +109,23 @@ namespace Testing_for_Project
         }
 
         [Test]
-        public void CheckGroup1C_RoundedCorners_Bad()
+        public void CheckGroup1C_Example3()
         {
-            //Not tested because if 4 lines are detected it 1c check returns false
-            //Square with rounded corners used in place of triangle
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
+
+            DXFFile example3 = new DXFFile(path);
+
+            example3.SetFeatureGroups();
+
+            List<FeatureGroup> fGroups = example3.GetFeatureGroups();
+
+            List<Feature> fList = fGroups[0].GetFeatures();
+
+            Feature baseShape = fList[0];
+
+            string breakpoint = " ";
 
         }
 
