@@ -9,6 +9,8 @@ namespace FeatureRecognitionAPI.Models
 {
     public class Line : Entity
     {
+        private const double TOLERANCE = 0.00005;
+
         public Point StartPoint { get; set; }
         public Point EndPoint { get; set; }
         public double SlopeY { get; set; }
@@ -94,6 +96,10 @@ namespace FeatureRecognitionAPI.Models
             return (StartPoint.Equals(point) || EndPoint.Equals(point));
         }
 
+        private bool withinTolerance( double value, double target)
+        {
+            return ((value  <= (target + TOLERANCE)) && (value >= (target - TOLERANCE)));
+        }
         public bool isSameInfinateLine(Entity other)
         {
             if (other is Line)
@@ -101,9 +107,9 @@ namespace FeatureRecognitionAPI.Models
                 Line lineOther = (Line)other;
                 if (this.SlopeX > -0.00005 && this.SlopeX < 0.00005) // means this is a verticle line
                 {
-                    if (lineOther.SlopeX > -0.00005 && lineOther.SlopeX < 0.00005) // means other is a verticle line
+                    if (withinTolerance(lineOther.SlopeX, 0)) // means other is a verticle line
                     {
-                        return ((this.StartPoint.X >  (lineOther.StartPoint.X - 0.00005)) && (this.StartPoint.X < (lineOther.StartPoint.X + 0.00005))); // checks that the x values are within .00005 of each other
+                        return ((withinTolerance(this.StartPoint.X, lineOther.StartPoint.X))); // checks that the x values are within .00005 of each other
                     }
                     else
                     {
@@ -111,14 +117,14 @@ namespace FeatureRecognitionAPI.Models
                     }
 
                 }
-                else if (lineOther.SlopeX > -0.00005 && lineOther.SlopeX < 0.00005)
+                else if (withinTolerance(lineOther.SlopeX, 0))
                 {
                     return false; // means other is a verticle line but this is not
                 }
 
                 double ThisYintercept = this.StartPoint.Y - ((this.SlopeY / this.SlopeX) * this.StartPoint.X);
                 double OtherYintercept = lineOther.StartPoint.Y - ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.StartPoint.X);
-                if ((Math.Abs((this.SlopeY / this.SlopeX)) == Math.Abs((lineOther.SlopeY / lineOther.SlopeX))) && (ThisYintercept == OtherYintercept))
+                if ((withinTolerance((Math.Abs((this.SlopeY / this.SlopeX))), (Math.Abs((lineOther.SlopeY / lineOther.SlopeX))))) && (withinTolerance(ThisYintercept, OtherYintercept)))
                 {
                     return true;
                 }
