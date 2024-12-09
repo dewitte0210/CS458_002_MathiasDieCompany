@@ -23,7 +23,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
   const [isLoading, setIsLoading] = useState(false); // State for loading
   const [showModal, setShowModal] = useState(false); // State for modal
 
-  const allowedFileExtensions = [".pdf", ".dwg", ".dxf"];
+  const allowedFileExtensions = [".dwg", ".dxf"];
 
   /*
     Event handler for when the user clicks the submit file button.
