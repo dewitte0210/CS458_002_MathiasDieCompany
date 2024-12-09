@@ -91,6 +91,12 @@ namespace FeatureRecognitionAPI.Services
                         default:
                             break;
                     }
+                    #endregion
+
+                    bool isOverSized = feature.Perimeter > 20 ? true : false;
+                    int quantity = feature.Count;
+                    double featureCost = 0;
+                    double quantityFactor = GetQuantityFactor(quantity);
 
                     if (feature.KissCut)
                     {
@@ -102,18 +108,7 @@ namespace FeatureRecognitionAPI.Services
                     {
 
                     }
-                    #endregion
 
-                    bool isOverSized = feature.Perimeter > 20 ? true : false;
-                    int quantity = feature.Count;
-                    double featureCost = 0;
-                    double quantityFactor = GetQuantityFactor(quantity);
-                    // TODO: Ask Ben about Number Up implementation on front end and it being passed down to pricing
-                    // AND potentially returning a 
-
-                    
-
-                    
                     featureCost = setupCost + (runCost * quantity);
                     totalPerimeter += (feature.Perimeter * quantity);
                     totalEstimate += featureCost;
