@@ -21,7 +21,7 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
       setFile(newFile);
       onFilesSelected && onFilesSelected([newFile]); // Pass the file to the parent component
     } else {
-      alert('Invalid file type. Please upload a PDF, DWG, or DXF file.'); // Alert for invalid file type
+      alert('Invalid file type. Please upload a DWG or DXF file.'); // Alert for invalid file type
     }
   };
 
@@ -63,10 +63,10 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
         <AiOutlineCloudUpload />
         <div>
           <p>Drag and drop your file here</p>
-          <p>Supported files: .DXF, .DWG, .PDF</p>
+          <p>Supported files: .DXF, .DWG</p>
         </div>
       </div>
-      <input type="file" hidden id="browse" onChange={handleFileChange} accept=".dxf,.dwg,.pdf" />
+      <input type="file" hidden id="browse" onChange={handleFileChange} accept=".dxf,.dwg" />
       <label htmlFor="browse" className="browse-btn">Browse files</label>
       {file && (
         <FileDisplay file={file} onRemoveFile={handleRemoveFile} />

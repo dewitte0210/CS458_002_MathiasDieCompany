@@ -29,6 +29,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
     groupIndex?: number,
     featureIndex?: number
   ) => {
+    if (groupIndex !== undefined) {
     setData((prev) =>
       prev.map((group, gIdx) => {
         if (gIdx === groupIndex) {
@@ -48,7 +49,11 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         return group;
       })
     );
+  } else {
+    setFormFields((prev) => ({ ...prev, [key]: value }));
+  }
   };
+
   const backToForm = () => {
     setIsSubmitted(false);
   }
