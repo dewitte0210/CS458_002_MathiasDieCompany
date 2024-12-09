@@ -18,9 +18,10 @@ namespace FeatureRecognitionAPI.Models
         protected SupportedExtensions fileType { get; set; }
         protected List<Feature> featureList;
         protected List<Entity> entityList;
-        protected List<FeatureGroup> featureGroups;
+        protected List<FeatureGroup> featureGroups { get; }
 
-        //These two functiuons below exist for testing purposes
+        //These functiuons below exist for testing purposes
+        #region testingFunctions
         public int GetFeatureGroupCount() { return featureGroups.Count; }
         public int GetTotalFeatureGroups()
         {
@@ -31,6 +32,10 @@ namespace FeatureRecognitionAPI.Models
             }
             return tmp;
         }
+
+        public List<FeatureGroup> GetFeatureGroups() { return featureGroups; }
+        #endregion
+
         #region Constructors
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
@@ -53,15 +58,14 @@ namespace FeatureRecognitionAPI.Models
             this.featureList = featureList;
         }
         
-        public List<Feature> getFeatureList(List<List<Entity>> entities)
+        public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
-            List<Feature> featureList = new List<Feature>();
-
             for (int i = 0; i < entities.Count(); i++)
             {
                 Feature feature = new Feature(entities[i]);
                 feature.extendAllEntities();
                 feature.seperateBaseEntities();
+                feature.seperatePerimeterEntities();
                 feature.DetectFeatures();
                 featureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
@@ -162,7 +166,7 @@ namespace FeatureRecognitionAPI.Models
         public void SetFeatureGroups()
         {
             List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
-           // List<Feature> brokenFeatures = getFeatureList(entities);
+           // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
             //Create features groups things in a way that breaks the logic here
@@ -386,17 +390,41 @@ namespace FeatureRecognitionAPI.Models
         #endregion
 
         #region DetectFeatures
-        /* 
-         * method that goes from the path to detected features
-        */
+
+
+        /*
+         * Author: Stephen Ice
+         * Runs feature detection on features in featureGroups, 
+         */
+        public void DetectFeatures()
+        {
+            foreach (FeatureGroup fGroup in featureGroups)
+            {
+                foreach (Feature feature in fGroup.GetFeatures())
+                {
+                    PossibleFeatureTypes possibleType = new PossibleFeatureTypes();
+                    if (feature.CheckGroup1B(feature.getNumCircles(), feature.getNumLines(), feature.getNumArcs(), out possibleType))
+                        break;
+                    else if (feature.CheckGroup1C(out possibleType)) break;
+                    else if (feature.CheckGroup2A(out possibleType)) break;
+                    else if (feature.CheckGroup3()) break;
+                    //Commented lines are of the void return type
+                    //else if (feature.CheckGroup4()) break;
+                    //else if (feature.CheckGroup5()) break;
+                    //else if (feature.CheckGroup6()) break;
+                        
+                }
+            }
+        }
+
         public void detectAllFeatures()
         {
-            detectAllFeatures(entityList);
+            makeFeatureList(makeTouchingEntitiesList(entityList));
         }
         public void detectAllFeatures(List<Entity> myEntityList)
         {
             List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
-            featureList = getFeatureList(touchingEntities);
+            featureList = makeFeatureList(touchingEntities);
             foreach (Feature feature in featureList)
             {
                 feature.extendAllEntities();
