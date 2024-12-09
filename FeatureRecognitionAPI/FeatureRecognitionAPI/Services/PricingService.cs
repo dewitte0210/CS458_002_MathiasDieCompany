@@ -19,11 +19,12 @@ namespace FeatureRecognitionAPI.Services
                 double totalEstimate = 0.00;
                 double totalPerimeter = 0;
 
-                foreach (var feature in param.Features)
+                foreach (var tempfeature in param.FeatureList)
                 {
                     #region Setup and Run Cost Calculation
                     double setupCost = 0;
                     double runCost = 0;
+                    var feature = tempfeature.Features.FirstOrDefault();
 
                     // Setup Cost = hour/part to setup * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables

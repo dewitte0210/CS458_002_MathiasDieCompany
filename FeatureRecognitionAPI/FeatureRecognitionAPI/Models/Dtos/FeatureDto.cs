@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Dtos
 {
-    public class FeatureDto
+    public class Features
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public PossibleFeatureTypes FeatureType { get; set; }
@@ -14,5 +14,12 @@ namespace FeatureRecognitionAPI.Models.Dtos
         public double Perimeter { get; set; }
         public bool MultipleRadius { get; set; }
         public bool KissCut { get; set; }
+    }
+
+    public class FeatureDto
+    {
+        public List<Features> Features { get; set; }
+        public int Count { get; set; } // Number Up 
+
     }
 }
