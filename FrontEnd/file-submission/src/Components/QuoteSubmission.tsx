@@ -133,9 +133,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
       featureGroups: updatedData,
     };
     
-    console.log("Form Object:", formObject);
     const formJSON = JSON.stringify(formObject);
-    console.log("Form JSON:", formJSON);
   
     try {
       const res = await fetch(
@@ -153,7 +151,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
   
       const responseJSON = await res.json();
       setPriceJSON(responseJSON);
-      console.log("Response JSON:", responseJSON);
     } catch (error) {
       console.error("Error occurred during submission:", error);
       alert("An error occurred while submitting your quote. Please try again.");
