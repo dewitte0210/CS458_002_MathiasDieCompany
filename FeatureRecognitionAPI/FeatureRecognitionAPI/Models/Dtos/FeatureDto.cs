@@ -18,7 +18,7 @@ namespace FeatureRecognitionAPI.Models.Dtos
 
     public class FeatureDto
     {
-        public List<Features> Features { get; set; }
+        public required List<Features> Features { get; set; }
         public int Count { get; set; } // Number Up 
 
     }

@@ -24,7 +24,7 @@ namespace FeatureRecognitionAPI.Services
                     #region Setup and Run Cost Calculation
                     double setupCost = 0;
                     double runCost = 0;
-                    var feature = tempfeature.Features.FirstOrDefault();
+                    var feature = tempfeature.Features.First();
 
                     // Setup Cost = hour/part to setup * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
