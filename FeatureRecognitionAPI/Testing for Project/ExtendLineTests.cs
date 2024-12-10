@@ -414,6 +414,90 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void SeperateBaseEntitiesWithTwoParallelPerimeterFeature() // Horizontal lines
+        {
+            // Added lines to make the feature a closed shape
+            Line line10 = new(4, 7, 4, 0);
+            Line line11 = new(4, 0, 14, 0);
+            Line line12 = new(14, 0, 14, 7);
+            // Pretty much the same as a test above
+            Line line1 = new(4, 7, 6, 7);
+
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+
+            Line line5 = new(8, 7, 10, 7);
+
+            Line line6 = new(10, 7, 10, 4);
+            Line line7 = new(10, 4, 12, 4);
+            Line line8 = new(12, 4, 12, 7);
+
+            Line line9 = new(12, 7, 14, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
+            Feature testFeature = new(testEntities, false, false);
+
+            testFeature.extendAllEntities();
+
+            testFeature.seperateBaseEntities();
+
+            // Checks for baseEntityList
+            bool hasExtendedLine = false;
+            foreach (Entity entity in testFeature.baseEntityList)
+            {
+                Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
+                if (entity is ExtendedLine)
+                {
+                    Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
+                    // Checks correct point values
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(14, 7)));
+                    // Checks correct parent values
+                    ExtendedLine extendedLineParent = new ExtendedLine();
+                    Line lineParent = new ExtendedLine();
+
+                    if (((ExtendedLine)entity).Parent1 is ExtendedLine)
+                    {
+                        extendedLineParent = (ExtendedLine)((ExtendedLine)entity).Parent1;
+                        lineParent = ((ExtendedLine)entity).Parent2;
+                    }
+                    else if (((ExtendedLine)entity).Parent2 is ExtendedLine)
+                    {
+                        extendedLineParent = (ExtendedLine)((ExtendedLine)entity).Parent2;
+                        lineParent = ((ExtendedLine)entity).Parent1;
+                    }
+                    else { Assert.IsTrue(false); } // if neither is an ExtendedLine test fails
+
+                    Assert.IsFalse(lineParent is ExtendedLine);
+
+                    if ((extendedLineParent.Parent1.Equals(line1) && extendedLineParent.Parent2.Equals(line5)) ||
+                        (extendedLineParent.Parent1.Equals(line5) && extendedLineParent.Parent2.Equals(line1)))
+                    {
+                        // entity Parent1 is an extended line and has parents of line1 and line5, which means entity parent 2 must be line9
+                        Assert.IsTrue(lineParent.Equals(line9));
+                    }
+                    else if ((extendedLineParent.Parent1.Equals(line5) && extendedLineParent.Parent2.Equals(line9)) ||
+                        (extendedLineParent.Parent1.Equals(line9) && extendedLineParent.Parent2.Equals(line5)))
+                    {
+                        // entity Parent1 is an extended line and has parents of line5 and line9, which means entity parent 2 must be line1
+                        Assert.IsTrue(lineParent.Equals(line1));
+                    }
+                    else { Assert.IsTrue(false); } // if it does not meet either conditions test fails
+
+                    hasExtendedLine = true;
+                }
+                else
+                {
+                    Assert.IsTrue(entity is Line); // if not extended line it must be a line
+                                                   // Technically an extended line would pass here but it would be caught above
+
+                    Assert.IsTrue(testEntities.Contains(entity)); // If entity is not an extended line it should be contained in testEntities
+                }
+            }
+            Assert.IsTrue(hasExtendedLine);
+        }
+
+        [Test]
         public void SeperateOnePerimeterFeatures()
         {
             // Extend Lines
@@ -449,7 +533,117 @@ namespace Testing_for_Project
         [Test]
         public void SeperateTwoPerimeterFeatures()
         {
+            // Added lines to make the feature a closed shape
+            Line line10 = new(4, 7, 4, 0);
+            Line line11 = new(4, 0, 14, 0);
+            Line line12 = new(14, 0, 14, 7);
+            // Pretty much the same as a test above
+            Line line1 = new(4, 7, 6, 7);
 
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+
+            Line line5 = new(8, 7, 10, 7);
+
+            Line line6 = new(10, 7, 10, 3);
+            Line line7 = new(10, 3, 12, 3);
+            Line line8 = new(12, 3, 12, 7);
+
+            Line line9 = new(12, 7, 14, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
+            Feature testFeature = new(testEntities, false, false);
+
+            testFeature.extendAllEntities();
+
+            testFeature.seperateBaseEntities();
+
+            testFeature.seperatePerimeterEntities();
+
+            Assert.IsTrue(testFeature.PerimeterEntityList.Count == 2);
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Count == 3 && testFeature.PerimeterEntityList[1].Count == 3);
+
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line2) || testFeature.PerimeterEntityList[1].Contains(line2));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line3) || testFeature.PerimeterEntityList[1].Contains(line3));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line4) || testFeature.PerimeterEntityList[1].Contains(line4));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line6) || testFeature.PerimeterEntityList[1].Contains(line6));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line7) || testFeature.PerimeterEntityList[1].Contains(line7));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line8) || testFeature.PerimeterEntityList[1].Contains(line8));
+
+            Assert.IsTrue(
+                (testFeature.PerimeterEntityList[0].Contains(line2)
+                && testFeature.PerimeterEntityList[0].Contains(line3)
+                && testFeature.PerimeterEntityList[0].Contains(line4)
+                && testFeature.PerimeterEntityList[1].Contains(line6)
+                && testFeature.PerimeterEntityList[1].Contains(line7)
+                && testFeature.PerimeterEntityList[1].Contains(line8))
+                ||
+                ((testFeature.PerimeterEntityList[1].Contains(line2)
+                && testFeature.PerimeterEntityList[1].Contains(line3)
+                && testFeature.PerimeterEntityList[1].Contains(line4)
+                && testFeature.PerimeterEntityList[0].Contains(line6)
+                && testFeature.PerimeterEntityList[0].Contains(line7)
+                && testFeature.PerimeterEntityList[0].Contains(line8)))
+                );
+        }
+
+        [Test]
+        public void SeperateTwoParallelPerimeterFeatures()
+        {
+            // Added lines to make the feature a closed shape
+            Line line10 = new(4, 7, 4, 0);
+            Line line11 = new(4, 0, 14, 0);
+            Line line12 = new(14, 0, 14, 7);
+            // Pretty much the same as a test above
+            Line line1 = new(4, 7, 6, 7);
+
+            Line line2 = new(6, 7, 6, 4);
+            Line line3 = new(6, 4, 8, 4);
+            Line line4 = new(8, 4, 8, 7);
+
+            Line line5 = new(8, 7, 10, 7);
+
+            Line line6 = new(10, 7, 10, 4);
+            Line line7 = new(10, 4, 12, 4);
+            Line line8 = new(12, 4, 12, 7);
+
+            Line line9 = new(12, 7, 14, 7);
+            List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
+            Feature testFeature = new(testEntities, false, false);
+
+            testFeature.extendAllEntities();
+
+            testFeature.seperateBaseEntities();
+
+            testFeature.seperatePerimeterEntities();
+
+            Assert.IsTrue(testFeature.PerimeterEntityList.Count == 2);
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Count == 3 && testFeature.PerimeterEntityList[1].Count == 3);
+
+            // Checks that the needed lines are contained in either perimeter feature
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line2) || testFeature.PerimeterEntityList[1].Contains(line2));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line3) || testFeature.PerimeterEntityList[1].Contains(line3));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line4) || testFeature.PerimeterEntityList[1].Contains(line4));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line6) || testFeature.PerimeterEntityList[1].Contains(line6));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line7) || testFeature.PerimeterEntityList[1].Contains(line7));
+            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line8) || testFeature.PerimeterEntityList[1].Contains(line8));
+
+            // Check that the entities are grouped together
+            Assert.IsTrue(
+                (testFeature.PerimeterEntityList[0].Contains(line2)
+                && testFeature.PerimeterEntityList[0].Contains(line3)
+                && testFeature.PerimeterEntityList[0].Contains(line4)
+                && testFeature.PerimeterEntityList[1].Contains(line6)
+                && testFeature.PerimeterEntityList[1].Contains(line7)
+                && testFeature.PerimeterEntityList[1].Contains(line8))
+                ||
+                ((testFeature.PerimeterEntityList[1].Contains(line2)
+                && testFeature.PerimeterEntityList[1].Contains(line3)
+                && testFeature.PerimeterEntityList[1].Contains(line4)
+                && testFeature.PerimeterEntityList[0].Contains(line6)
+                && testFeature.PerimeterEntityList[0].Contains(line7)
+                && testFeature.PerimeterEntityList[0].Contains(line8)))
+                );
         }
         #endregion
 
@@ -579,8 +773,37 @@ namespace Testing_for_Project
             Assert.IsTrue(oneFeatureWithTwoPerimeterFeatures);
             Assert.IsTrue(hasSquareFeature);
             Assert.IsTrue(hasCircleFeature);
+            //should have two perimeter features
         }
-        //should have two perimeter features
+
+        [Test]
+        public void Example2PerimeterFeatures() // This is working without chamfered corners being added as their own feature
+        {
+            //Set path to any filepath containing the 3rd example dxf file
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
+            DXFFile exampleOne = new DXFFile(path);
+
+            exampleOne.detectAllFeatures();
+
+            List<Feature> featureList = exampleOne.getFeatureList();
+
+            Assert.IsTrue(featureList.Count == 6); // same features are grouped together
+            int totalFeatures = 0;
+            Assert.IsTrue(featureList.Count == 6);
+            foreach (Feature feature in featureList)
+            {
+                totalFeatures += feature.count; 
+                if (feature.PerimeterEntityList.Count != 0)
+                {
+                    Assert.IsTrue(feature.PerimeterEntityList.Count == 1);
+                }
+            }
+
+            Assert.IsTrue(totalFeatures == 48); // Count of all features
+        }
+
         #endregion
     }
 }
