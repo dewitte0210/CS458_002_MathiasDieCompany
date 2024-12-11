@@ -6,7 +6,7 @@ namespace FeatureRecognitionAPI.Models.Enums
     {
         [JsonProperty]
         Unknown,
-        SideTubePunch,
+        StdTubePunch,
         SideOutlet,
         HDSideOutlet,
         StdFTPunch,

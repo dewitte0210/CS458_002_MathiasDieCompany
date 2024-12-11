@@ -16,10 +16,12 @@ namespace FeatureRecognitionAPI.Models.Dtos
         public bool KissCut { get; set; }
     }
 
-    public class FeatureDto
+    public class DieDto
     {
         public required List<Features> Features { get; set; }
-        public int Count { get; set; } // Number Up 
+
+        [JsonProperty(PropertyName = "Count")]
+        public int NumberUp { get; set; } // Number Up 
 
     }
 }
