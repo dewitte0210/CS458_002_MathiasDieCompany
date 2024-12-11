@@ -98,7 +98,7 @@ namespace FeatureRecognitionAPI.Models
          * Overides .Equals function for the Arc object
          * 
          * @param obj object being compared to this
-         * @return true if equal, false if not
+         * @return true if the same arc, false if not
          */
         public override bool Equals(object? obj)
         {
@@ -108,7 +108,8 @@ namespace FeatureRecognitionAPI.Models
                 if (Math.Abs( ((Arc)obj).Length - this.Length) < EntityTolerance
                     && Math.Abs( ((Arc)obj).Radius - this.Radius) < EntityTolerance
                     && Math.Abs( ((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
-                    && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
+                    && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance
+                    && ((Arc)obj).Start.Equals(this.Start) && ((Arc)obj).End.Equals(this.End))
                 {
                     return true;
                 }

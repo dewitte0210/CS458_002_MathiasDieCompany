@@ -404,33 +404,35 @@ public class Feature
                             if (arcIndex == 2) break;
                         }
                         arcIndex = 0;
-                        //ArcList has 2 arcs, check entities touching both
-                        Entity[] touchingArc = new Entity[4];
+                        //ArcList has 2 arcs, check entities touching both (at least one line should be touching both arcs, so only 3 entities should be added )
+                        Entity[] touchingArc = new Entity[3];
                         int eIndex = 0;
                         //Find the two lines
                         for (int i = 0; i < baseEntityList.Count; i++)
                         {
-                            if (baseEntityList[i] is Line && eIndex < 2)
+                            if (baseEntityList[i] is Line && eIndex < 4)
                             {
-                                if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[arcIndex]))
+                                if ( arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0]) 
+                                    || arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
                                 {
                                     touchingArc[eIndex] = (Line)baseEntityList[i];
                                     eIndex++;
                                 }
                             }
-                            else if (baseEntityList[i] is Arc && eIndex < 2)
+                            else if (baseEntityList[i] is Arc && eIndex < 4)
                             {
-                                if (arcList[arcIndex].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[arcIndex]))
+                                //If not equal to arc at 0 and 1
+                                if ( !arcList[0].Equals((Arc)baseEntityList[i]) 
+                                    && !arcList[1].Equals((Arc)baseEntityList[i])
+                                    //And if the arc intersects with the arc at 0 or at 1
+                                    &&  ( arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0]) 
+                                          || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1]) ) )
                                 {
                                     touchingArc[eIndex] = (Arc)baseEntityList[i];
                                     eIndex++;
                                 }
                             }
-                            if (eIndex == 2)
-                            {
-                                arcIndex++;
-                            }
-                            if (eIndex == 4)
+                            if (eIndex == 3)
                             {
                                 break;
                             }
@@ -964,11 +966,11 @@ public class Feature
             }*/
             if (line1.isSameInfinateLine(line2))
             {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2); //makes a new extended line object     
+                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
-                return true;//extended two parallel lines into 1
+                return true; // extended two parallel lines into 1
             }
         }
         return false;
@@ -1149,7 +1151,7 @@ public class Feature
     public void seperatePerimeterEntities()
     {
         // lists to pass to the helper function
-        List<Entity> curPath = new List<Entity>();
+        List<Entity> path = new List<Entity>();
 
         foreach(Entity entity in baseEntityList) // removes all base entities from ExtendedEntityList
         {
@@ -1160,20 +1162,33 @@ public class Feature
 
         List<Entity> unusedEntities = new List<Entity>(ExtendedEntityList);
 
-        seperatePerimeterEntitiesHelper(curPath, unusedEntities, null);
-    }
+        //seperatePerimeterEntitiesHelper(path, unusedEntities, null);
 
+        while (unusedEntities.Count > 0)
+        {
+            getTouchingList(path, unusedEntities, null);
+            if (path.Count > 0)
+            {
+                PerimeterEntityList.Add(new List<Entity>(path));
+            }
+            path.Clear();
+        }
+    }
+/*
     public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
     {
         if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
         {
             if (curEntity is null) // means not at any entity currently
             {
+                if (path.Count > 0)
+                {
+                    PerimeterEntityList.Add(new List<Entity>(path)); // adds all perimeter feature paths besides last one
+                }
                 path.Clear();
                 path.Add(unusedEntities[0]);
                 unusedEntities.RemoveAt(0);
                 seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
-                PerimeterEntityList.Add(new List<Entity>(path));
             }
             else // means there is a current entity
             {
@@ -1195,11 +1210,48 @@ public class Feature
                     }
                     
                 } while (intersected);
+
+                if (path.Count > 0)
+                {
+                    PerimeterEntityList.Add(new List<Entity>(path));
+                }
                 seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
             }
         }
     }
+*/
+    /* Recursive function that adds all entities in unusedEntities that intersect curEntity into path
+     * 
+     * @Param path is the list of touching entities
+     * @Param unusedEntities are all available entities to add
+     * @Param curEntity is the current entity being checked
+     */ 
+    public void getTouchingList(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+    {
+        if (curEntity is null)
+        {
+            curEntity = unusedEntities[0];
+            path.Add(unusedEntities[0]);
+            unusedEntities.RemoveAt(0);
+        }
 
+        List<Entity> touchingList = new List<Entity>();
+        for (int i = 0; i < unusedEntities.Count; i++) // adds all entities in unusedEntities that touch curEntitty to path and touchinglist and removes them from unusedEntities
+        {
+            if (curEntity.DoesIntersect(unusedEntities[i]))
+            {
+                touchingList.Add(unusedEntities[i]);    
+                path.Add(unusedEntities[i]);
+                unusedEntities.Remove(unusedEntities[i]);
+                i--; // i needs to stay the same since everything to the right of the moved entity is shifted left once
+            }
+        }
+
+        foreach (Entity entity in touchingList)
+        {
+            getTouchingList(path, unusedEntities, entity);
+        }
+    }
 
     // Adds back all parents of all extended lines in targetList
     private void addBackParents(List<Entity> targetList)
@@ -1216,11 +1268,12 @@ public class Feature
     // Adds back all parents of extended lines that are not in baseEntityList back into ExtendedEntityList
     private void addBackParents()
     {
-        foreach (Entity entity in ExtendedEntityList)
+        for(int i = 0; i < ExtendedEntityList.Count; i++) 
         {
-            if (entity is ExtendedLine && (!baseEntityList.Contains(entity)))
+            if (ExtendedEntityList[i] is ExtendedLine && (!baseEntityList.Contains(ExtendedEntityList[i])))
             {
-                addBackParentsHelper((ExtendedLine)entity, ExtendedEntityList);
+                addBackParentsHelper((ExtendedLine)ExtendedEntityList[i], ExtendedEntityList);
+                i--;
             }
         }
     }
@@ -1242,7 +1295,7 @@ public class Feature
         {
             targetList.Add(exLine.Parent2);
         }
-        targetList.Remove(exLine);
+        targetList.Remove(exLine); // targetList will not have a parent that is an extended line in it
     }
     #endregion
 
