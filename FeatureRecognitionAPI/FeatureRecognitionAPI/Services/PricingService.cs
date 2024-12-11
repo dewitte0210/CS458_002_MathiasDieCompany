@@ -119,6 +119,7 @@ namespace FeatureRecognitionAPI.Services
                             break;
                         case PossibleFeatureTypes.StdTubePunch:
                             //TODO: Need to initialize punch list with base/cut size, needs to be returned as well
+                            // Cut size will be diameter returned 
                             break;
                         case PossibleFeatureTypes.SideOutlet:
                             break;
