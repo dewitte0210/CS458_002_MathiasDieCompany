@@ -2,6 +2,7 @@
 using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -11,7 +12,7 @@ namespace FeatureRecognitionAPI.Services
         private const double DIE_CUTTING_SHOP_RATE = 126.45;
         private const double PLUG_RATE = 95.17;
 
-        public PricingService() {}
+        public PricingService() { }
 
         public async Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param)
         {
@@ -23,6 +24,9 @@ namespace FeatureRecognitionAPI.Services
                 double totalEstimate = 0.00;
                 double totalPerimeter = 0.00;
                 double ruleFactor = 0.00;
+
+                //Get Punch Lists
+                var (tubePunchList, soPunchList, hdsoPunchList, ftPunchList, swPunchList, retractList) = await GetPunchLists();
 
                 switch (param.RuleType)
                 {
@@ -118,8 +122,7 @@ namespace FeatureRecognitionAPI.Services
                             maxRadius = 4;
                             break;
                         case PossibleFeatureTypes.StdTubePunch:
-                            //TODO: Need to initialize punch list with base/cut size, needs to be returned as well
-                            // Cut size will be diameter returned 
+                            // Cut size will be diameter returned, just choose the higher priced base size for punches
                             break;
                         case PossibleFeatureTypes.SideOutlet:
                             break;
@@ -165,7 +168,6 @@ namespace FeatureRecognitionAPI.Services
                         runCost += tempCost;
                     }
 
-                    //TODO: Determine if well be using user subscription (Standard || +Plus) and apply discount 
                     int baseCost = 0;
                     double discount = 0.00;
                 }
@@ -198,5 +200,46 @@ namespace FeatureRecognitionAPI.Services
                 return 1;
         }
 
+        private async Task<(List<(double, double)>, List<(decimal, decimal)>, List<(decimal, decimal)>, List<(decimal, decimal)>, List<(decimal, decimal)>, List<(decimal, decimal)>)> GetPunchLists()
+        {
+            // Only took unique cut size with highest costs,
+            // which is smaller base size from original software list
+
+            var soPunchList = new List<(double, double)>()
+            {
+                // (SetupCost, RunCost)
+
+                (6.45, 4),   // 1/32 Cut
+                (6.45, 4),   // 3/64 Cut
+                (5.5, 4),    // 1/16 Cut
+                (11.75, 4),  // 5/64 Cut
+                (3.8, 4),    // 3/32 Cut
+                (3.8, 7),    // 7/64 Cut
+                (3.9, 7),    // 9/64 Cut
+                (5.05, 7),   // 11/64 Cut
+                (5.75, 7),   // 3/16 Cut
+                (4, 7),      // 7/32 Cut
+                (5.75, 7),   // 17/64 Cut
+                (5.95, 7),   // 21/64 Cut
+                (7.55, 7),   // 11/32 Cut
+                (4.55, 7),   // 23/64 Cut
+                (8, 7),      // 3/8 Cut
+                (8.25, 7),   // 25/64 Cut
+                (7.55, 7),   // 13/32 Cut
+                (8, 7),      // 27/64 Cut
+                (7.55, 7),   // 7/16 Cut
+                (8, 7),      // 29/64 Cut
+                (14.05, 7),  // 15/32 Cut
+                (8, 7),      // 31/64 Cut
+                (12.2, 7),   // 1/2 Cut
+                (14.05, 7),  // 37/64 Cut
+                (16, 7)      // 5/8 Cut
+            };
+
+            var hdsoPunchList = new List<(double, double)>()
+            {
+
+            };
+        }
     }
 }
