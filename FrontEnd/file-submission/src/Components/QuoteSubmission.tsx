@@ -79,7 +79,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                 FeatureType: "",
                 perimeter: 0,
                 diameter: 0,
-                multipleRadius: false,
+                multipleRadius: 1,
                 kissCut: false,
                 EntityList: [],
               },
@@ -273,7 +273,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                         <td colSpan={6} className="identical-text">
                           Number of identical dies: 
                           <input
-                            className="count-input"
+                            className="count-input-top"
                             type="number"
                             value={group.Count}
                             onChange={(e) => handleChange("Count", parseInt(e.target.value), groupIndex)}
@@ -352,11 +352,12 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               </td>
                               <td>
                                 <input
-                                  type="checkbox"
-                                  checked={feature.multipleRadius}
+                                  className="perimeter-input"
+                                  type="number"
+                                  value={feature.multipleRadius}
                                   onChange={(e) => handleChange(
                                     "multipleRadius",
-                                    e.target.checked,
+                                    parseFloat(e.target.value),
                                     groupIndex,
                                     featureIndex
                                   )} />
@@ -425,11 +426,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                               </td>
                               <td>{feature.diameter !== 0 ? feature.diameter.toFixed(3) : feature.perimeter.toFixed(3)}</td>
                               <td>
-                                {feature.multipleRadius ? (
-                                  <span className="checkmark">&#10003;</span>
-                                ) : (
-                                  <span className="crossmark">&#10005;</span>
-                                )}
+                                {feature.multipleRadius}
                               </td>
                               <td>
                                 {feature.kissCut ? (

@@ -36,7 +36,7 @@ public class Feature
     [JsonProperty]
     public bool kissCut;
     [JsonProperty]
-    public bool multipleRadius;
+    public int multipleRadius;
     [JsonProperty]
     public double perimeter;
     [JsonProperty]
@@ -75,7 +75,7 @@ public class Feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
      */
-    public Feature (List<Entity> entityList, bool kissCut, bool multipleRadius)
+    public Feature (List<Entity> entityList, bool kissCut, int multipleRadius)
     {
         EntityList = entityList;
         this.kissCut = kissCut;
@@ -100,6 +100,7 @@ public class Feature
     public Feature(List<Entity> EntityList)
     {
         this.count = 1;
+        this.multipleRadius = 1;
         this.EntityList = EntityList;
         this.baseEntityList = EntityList;
         this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
@@ -1648,10 +1649,21 @@ public class Feature
             {
                 for (int j = i + 1; j < arcList.Count; j++)
                 {
-                    if ((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius > Entity.EntityTolerance)
+                    if (Math.Abs((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius) < Entity.EntityTolerance)
                     {
-                        multipleRadius = true;
-                        return;
+                        arcList.Remove(arcList[j]);
+                        j--;
+                    }
+                }
+            }
+
+            for (int i = 0; i < arcList.Count; i++)
+            {
+                for (int j = i + 1; j < arcList.Count; j++)
+                {
+                    if (Math.Abs((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius) > Entity.EntityTolerance)
+                    {
+                        multipleRadius += 1;
                     }
                 }
             }
