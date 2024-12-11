@@ -29,26 +29,38 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
     groupIndex?: number,
     featureIndex?: number
   ) => {
-    setData((prev) =>
-      prev.map((group, gIdx) => {
-        if (gIdx === groupIndex) {
-          return {
-            ...group,
-            features: group.features.map((feature, fIdx) => {
-              if (fIdx === featureIndex) {
-                return {
-                  ...feature,
-                  [key]: value, // Update the specific field
-                };
-              }
-              return feature;
-            }),
-          };
-        }
-        return group;
-      })
-    );
+    if (groupIndex !== undefined) {
+      setData((prev) =>
+        prev.map((group, gIdx) => {
+          if (gIdx === groupIndex) {
+            if (key === "Count") {
+              return {
+                ...group,
+                Count: value,
+              };
+            }
+            return {
+              ...group,
+              features: group.features.map((feature, fIdx) => {
+                if (fIdx === featureIndex) {
+                  return {
+                    ...feature,
+                    [key]: value,
+                  };
+                }
+                return feature;
+              }),
+            };
+          }
+          return group;
+        })
+      );
+    } else {
+      setFormFields((prev) => ({ ...prev, [key]: value }));
+    }
   };
+  
+
   const backToForm = () => {
     setIsSubmitted(false);
   }
@@ -103,49 +115,26 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
 
   // Handle form submission
   const handleSubmit = async (event: React.FormEvent) => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
     event.preventDefault();
+  
+    const updatedData = data.map((group) => ({
+      ...group,
+      features: group.features.map((feature) =>
+        feature.FeatureType === "Punch"
+          ? { ...feature, FeatureType: feature.punchType }
+          : feature
+      ),
+    }));
 
-    const updatedData = data.map((item) => {
-      if (item.FeatureType === "Punch") {
-        return {
-          ...item,
-          FeatureType: item.punchType, // Set FeatureType to punchType value
-        };
-      }
-      return item;
-    });
-
-    const formData = new FormData();
-    const form = event.currentTarget as HTMLFormElement;
-    formData.append("ruleType", form.ruleType.value);
-    formData.append("ejecMethod", form.ejecMethod.value);
-    formData.append(
-      "features",
-      new Blob([JSON.stringify(updatedData)], { type: "application/json" })
-    );
-
-    var object: any = {};
-    formData.forEach((value, key) => {
-      if (value instanceof Blob && value.type === "application/json") {
-        const reader = new FileReader();
-        reader.onload = () => {
-          object[key] = JSON.parse(reader.result as string);
-        };
-        reader.readAsText(value);
-      } else {
-        object[key] = value;
-      }
-    });
-
-    // Wait for all FileReader operations to complete
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    var formJSON = JSON.stringify(object);
-
-    //display the form data
-    console.log(formJSON);
-
+    const formObject: any = {
+      ruleType: (event.target as HTMLFormElement).ruleType.value,
+      ejecMethod: (event.target as HTMLFormElement).ejecMethod.value,
+      featureGroups: updatedData,
+    };
+    
+    const formJSON = JSON.stringify(formObject);
+  
     try {
       const res = await fetch(
         "https://localhost:44373/api/Pricing/estimatePrice",
@@ -155,17 +144,22 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
           headers: new Headers({ "content-type": "application/json" }),
         }
       );
-
-      if (!res.ok)
+  
+      if (!res.ok) {
         throw new Error(`Server error: ${res.status} ${res.statusText}`);
-      setPriceJSON(await res.json()); // Store response in state
+      }
+  
+      const responseJSON = await res.json();
+      setPriceJSON(responseJSON);
     } catch (error) {
+      console.error("Error occurred during submission:", error);
       alert("An error occurred while submitting your quote. Please try again.");
     } finally {
       setIsSubmitted(true);
-      setIsLoading(false); // End loading
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="quote-container">
@@ -192,7 +186,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
               <div className="quote-form-label-and-select">
                 <div className="quote-form-label">
                   <label htmlFor="ruleType">Rule Type</label>
-                  <MdQuestionMark className="question-icon" />
+                  {/* <MdQuestionMark className="question-icon" /> */}
                 </div>
                 <select
                   id="ruleType"
@@ -240,7 +234,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
               <div className="quote-form-label-and-select">
                 <div className="quote-form-label">
                   <label htmlFor="ejecMethod">Ejection Method</label>
-                  <MdQuestionMark className="question-icon" />
+                  {/* <MdQuestionMark className="question-icon" /> */}
                 </div>
                 <select
                   id="ejecMethod"
@@ -276,7 +270,16 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                   {data.map((group, groupIndex) => (
                     <>
                       <tr key={`group-${groupIndex}`}>
-                        <td colSpan={6} className="identical-text">Number of identical dies: {group.Count}</td>
+                        <td colSpan={6} className="identical-text">
+                          Number of identical dies: 
+                          <input
+                            className="count-input"
+                            type="number"
+                            value={group.Count}
+                            onChange={(e) => handleChange("Count", parseInt(e.target.value), groupIndex)}
+                            required
+                          />
+                        </td>
                       </tr>
                       {group.features.map((feature, featureIndex) => (
                         <tr key={`${groupIndex}-${featureIndex}`}>
