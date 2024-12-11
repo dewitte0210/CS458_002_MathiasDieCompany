@@ -404,15 +404,16 @@ public class Feature
                             if (arcIndex == 2) break;
                         }
                         arcIndex = 0;
-                        //ArcList has 2 arcs, check entities touching both
-                        Entity[] touchingArc = new Entity[4];
+                        //ArcList has 2 arcs, check entities touching both (at least one line should be touching both arcs, so only 3 entities should be added )
+                        Entity[] touchingArc = new Entity[3];
                         int eIndex = 0;
                         //Find the two lines
                         for (int i = 0; i < baseEntityList.Count; i++)
                         {
                             if (baseEntityList[i] is Line && eIndex < 4)
                             {
-                                if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[arcIndex]))
+                                if ( arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0]) 
+                                    || arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
                                 {
                                     touchingArc[eIndex] = (Line)baseEntityList[i];
                                     eIndex++;
@@ -420,18 +421,18 @@ public class Feature
                             }
                             else if (baseEntityList[i] is Arc && eIndex < 4)
                             {
-                                if (!(arcList[arcIndex].Equals((Arc)baseEntityList[i]) && 
-                                    arcList[arcIndex].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[arcIndex])))
+                                //If not equal to arc at 0 and 1
+                                if ( !arcList[0].Equals((Arc)baseEntityList[i]) 
+                                    && !arcList[1].Equals((Arc)arcList[i])
+                                    //And if the arc intersects with the arc at 0 or at 1
+                                    &&  ( arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0]) 
+                                          || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1]) ) )
                                 {
                                     touchingArc[eIndex] = (Arc)baseEntityList[i];
                                     eIndex++;
                                 }
                             }
-                            if (eIndex == 2)
-                            {
-                                arcIndex++;
-                            }
-                            if (eIndex == 4)
+                            if (eIndex == 3)
                             {
                                 break;
                             }
