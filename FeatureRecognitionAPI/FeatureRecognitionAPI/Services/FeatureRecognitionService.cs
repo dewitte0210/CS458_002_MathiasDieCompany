@@ -137,7 +137,7 @@ namespace FeatureRecognitionAPI.Services
                 if (ex.Message == "Error: Issue with DWG File")
                     return (OperationStatus.CorruptFile, ex.Message);
 
-                return (OperationStatus.ExternalApiFailure, null);
+                return (OperationStatus.ExternalApiFailure, ex.ToString());
             }
         }
     }
