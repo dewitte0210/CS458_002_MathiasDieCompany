@@ -423,7 +423,7 @@ public class Feature
                             {
                                 //If not equal to arc at 0 and 1
                                 if ( !arcList[0].Equals((Arc)baseEntityList[i]) 
-                                    && !arcList[1].Equals((Arc)arcList[i])
+                                    && !arcList[1].Equals((Arc)baseEntityList[i])
                                     //And if the arc intersects with the arc at 0 or at 1
                                     &&  ( arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0]) 
                                           || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1]) ) )
