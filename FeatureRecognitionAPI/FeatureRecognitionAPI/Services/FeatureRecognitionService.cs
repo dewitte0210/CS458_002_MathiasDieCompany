@@ -28,7 +28,7 @@ namespace FeatureRecognitionAPI.Services
                     }
                     if (extBool)
                     {
-                        ext += fileName[i];
+                        ext += char.ToLower(fileName[i]);
                     }
                 }
 
