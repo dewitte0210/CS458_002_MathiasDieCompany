@@ -178,9 +178,9 @@ public class Feature
         else if (CheckGroup1C(out type)) {
             FeatureType = type;
         }
-        else if (CheckGroup5Base())
+        else if (CheckGroup6Base())
         {
-            FeatureType = PossibleFeatureTypes.Group5;
+            FeatureType = PossibleFeatureTypes.Group6;
         }
         //check two conditions possible to make Group1A (with no perimeter features)
         else if (numLines >= 4)
@@ -671,7 +671,7 @@ public class Feature
     #endregion
 
     #region group5base
-    public bool CheckGroup5Base()
+    public bool CheckGroup6Base()
     {
         if (numLines != 4 || numArcs != 4) { return false;  }
         int matchingPairs = 0;

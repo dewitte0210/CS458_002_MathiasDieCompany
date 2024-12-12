@@ -274,7 +274,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                     <th>Count</th>
                     <th>Group</th>
                     <th>Perimeter/Diameter</th>
-                    <th>Multiple Radius</th>
+                    <th>Multiple Radii</th>
                     <th>Kiss Cut</th>
                     <th>Actions</th>
                   </tr>
