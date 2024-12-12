@@ -252,6 +252,8 @@ namespace FeatureRecognitionAPI.Services
                 double perimeterCost = totalPerimeter * 0.46;    
                 totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost));
 
+                //TODO: implement Ejection method logic (CallPlugTime())
+
                 return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString("c"));
             }
             catch (Exception ex)
