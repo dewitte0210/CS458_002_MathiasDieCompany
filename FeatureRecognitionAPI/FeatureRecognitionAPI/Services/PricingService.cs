@@ -22,7 +22,7 @@ namespace FeatureRecognitionAPI.Services
         {
             try
             {
-                if (param.FeatureList.Count < 1)
+                if (param.FeatureGroups.Count < 1)
                     return (OperationStatus.BadRequest, "No features detected", null);
 
                 double totalEstimate = 0.00;
@@ -59,16 +59,15 @@ namespace FeatureRecognitionAPI.Services
                         ruleFactor = 1.3; break;
                 }
 
-                foreach (var tempfeature in param.FeatureList)
+                foreach (var feature in param.FeatureGroups.First().Features)
                 {
                     double setupCost = 0.00;
                     double runCost = 0.00;
                     double featureCost = 0.00;
                     double featureSetup = 0.00;
-                    var feature = tempfeature.Features.First();
                     int maxRadius = 0; // 1 for no max radius
                     bool isOverSized = feature.Perimeter > 20 ? true : false;
-                    int quantity = feature.Count * param.FeatureList.First().NumberUp;
+                    int quantity = feature.Count * param.FeatureGroups.First().NumberUp;
                     double tempCost = 0.00;
 
                     // Setup Cost = hour/part to setup * ShopRate $/hour

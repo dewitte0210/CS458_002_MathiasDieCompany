@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace FeatureRecognitionAPI.Models.Enums
 {
     public enum PossibleFeatureTypes
     {
-        [JsonProperty]
+        [EnumMember(Value = "Unknown")]
         Unknown,
+        [EnumMember(Value = "SideTubePunch")]
         StdTubePunch,
         SideOutlet,
         HDSideOutlet,

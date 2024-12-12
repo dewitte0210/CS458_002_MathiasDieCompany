@@ -11,7 +11,7 @@ namespace FeatureRecognitionAPI.Models.Dtos
 
         [JsonConverter(typeof(StringEnumConverter))]
         public EjectionMethodTypeEnum EjectionMethod { get; set; }
-        public List<DieDto> FeatureList { get; set; }
+        public List<DieDto> FeatureGroups { get; set; }
 
     }
 }
