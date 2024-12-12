@@ -60,10 +60,14 @@ namespace FeatureRecognitionAPI.Models
          */
         private double partialPerimterCalc()
         {
+            //Major axis value
+            double a = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            //Minor axis value
+            double b = MinorToMajorAxisRatio * a;
             //Return value for perimeter
             double sum = 0;
             //Num of lines that will trace the actual perimeter
-            int numLines;
+            int numLines = (int)Math.Ceiling(360 * (3.4064 * (a - 2) + 3.0258 * (b - 1)));
             //Increment value between each angle
             double angleIncrement;
             //Adjust for rotated ellipses
@@ -72,18 +76,12 @@ namespace FeatureRecognitionAPI.Models
                 double difference = (2 * Math.PI) - StartParameter;
                 double adjustedStart = 0;
                 double adjustedEnd = EndParameter + difference;
-                numLines = (int)Math.Round((adjustedEnd - adjustedStart) / (Math.PI / 180));
                 angleIncrement = adjustedEnd - adjustedStart / numLines;
             }
             else
             {
-                numLines = (int)Math.Round((EndParameter - StartParameter) / (Math.PI / 180));
                 angleIncrement = (EndParameter - StartParameter) / numLines;
             }
-            //Major axis value
-            double a = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
-            //Minor axis value
-            double b = MinorToMajorAxisRatio * a;
             for (int i = 0; i < numLines; i++)
             {
                 double ang1 = (i * angleIncrement) + StartParameter;

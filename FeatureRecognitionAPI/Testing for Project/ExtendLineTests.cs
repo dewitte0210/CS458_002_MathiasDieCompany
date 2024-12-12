@@ -16,7 +16,7 @@ namespace Testing_for_Project
             Line line1 = new(7,4,7,6);
             Line line2 = new(7, 8, 7, 10);
             List<Entity> testEntities = [line1, line2];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
@@ -34,7 +34,7 @@ namespace Testing_for_Project
             Line line3 = new(7, 12, 7, 14);
 
             List<Entity> testEntities = [line1, line2, line3];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
@@ -50,7 +50,7 @@ namespace Testing_for_Project
             Line line1 = new(4, 7, 6, 7);
             Line line2 = new(8, 7, 10, 7);
             List<Entity> testEntities = [line1, line2];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
@@ -67,7 +67,7 @@ namespace Testing_for_Project
             Line line2 = new(8, 7, 10, 7);
             Line line3 = new(12, 7, 14, 7);
             List<Entity> testEntities = [line1, line2, line3];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
@@ -86,7 +86,7 @@ namespace Testing_for_Project
             Line line4 = new(8, 4, 8, 7);
             Line line5 = new(8, 7, 10, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             // Checks for ExtendedEntityList
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 4);
@@ -133,7 +133,7 @@ namespace Testing_for_Project
             Line line9 = new(12, 7, 14, 7);
 
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 7);
             bool hasExtendedLine = false;
@@ -163,7 +163,7 @@ namespace Testing_for_Project
             Line line1 = new(0, 0, 4, 4);
             Line line2 = new(6, 6, 9, 9);
             List<Entity> testEntities = [line1, line2];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
@@ -179,7 +179,7 @@ namespace Testing_for_Project
             Line line2 = new(6, 6, 9, 9);
             Line line3 = new(12, 12, 18, 18);
             List<Entity> testEntities = [line1, line2, line3];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
@@ -194,7 +194,7 @@ namespace Testing_for_Project
             Line line1 = new(0, 3, 4, 4);
             Line line2 = new(1, 6, 10, 9);
             List<Entity> testEntities = [line1, line2];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 2);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line && testFeature.ExtendedEntityList[1] is Line);
@@ -210,7 +210,7 @@ namespace Testing_for_Project
             Arc arc1 = new Arc(1, 2, Math.Sqrt(8), 315, 45);
             Circle circle1 = new(0, 0, 2);
             List<Entity> testEntities = [arc1, circle1];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
             testFeature.extendAllEntities();
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 2);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Arc && testFeature.ExtendedEntityList[1] is Circle);
@@ -238,7 +238,7 @@ namespace Testing_for_Project
             Line line4 = new(8, 4, 8, 7);
             Line line5 = new(8, 7, 10, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
 
             testFeature.extendAllEntities();
 
@@ -351,7 +351,7 @@ namespace Testing_for_Project
 
             Line line9 = new(12, 7, 14, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
 
             testFeature.extendAllEntities();
 
@@ -435,7 +435,7 @@ namespace Testing_for_Project
 
             Line line9 = new(12, 7, 14, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
 
             testFeature.extendAllEntities();
 
@@ -514,7 +514,7 @@ namespace Testing_for_Project
 
             Line line5 = new(8, 7, 10, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
 
             testFeature.extendAllEntities();
 
@@ -552,7 +552,7 @@ namespace Testing_for_Project
 
             Line line9 = new(12, 7, 14, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
 
             testFeature.extendAllEntities();
 
@@ -609,7 +609,7 @@ namespace Testing_for_Project
 
             Line line9 = new(12, 7, 14, 7);
             List<Entity> testEntities = [line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12];
-            Feature testFeature = new(testEntities, false, false);
+            Feature testFeature = new(testEntities, false, 0);
 
             testFeature.extendAllEntities();
 
