@@ -27,11 +27,10 @@ namespace FeatureRecognitionAPI.Controllers
         {
             try
             {
+                var text = param.GetRawText();
                 var quoteSubmissionDto = JsonConvert.DeserializeObject<QuoteSubmissionDto>(param.GetRawText());
                 if (quoteSubmissionDto == null)
-                {
                     return BadRequest("Invalid payload.");
-                }
 
                 var (status, msg, output) = await _pricingService.EstimatePrice(quoteSubmissionDto);
 
