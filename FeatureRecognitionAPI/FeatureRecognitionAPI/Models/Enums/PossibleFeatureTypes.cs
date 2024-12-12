@@ -25,6 +25,7 @@ namespace FeatureRecognitionAPI.Models.Enums
         Group1C, // Triangles
         Group6,
         Group2A1, // Elipses
-        Group2A2 // Bowties
+        Group2A2, // Bowties
+        Group17
     }
 }

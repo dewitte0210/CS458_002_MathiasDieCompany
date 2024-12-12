@@ -253,7 +253,7 @@ namespace FeatureRecognitionAPI.Services
 
                 //TODO: implement Ejection method logic (CallPlugTime())
 
-                return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString("c"));
+                return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString());
             }
             catch (Exception ex)
             {

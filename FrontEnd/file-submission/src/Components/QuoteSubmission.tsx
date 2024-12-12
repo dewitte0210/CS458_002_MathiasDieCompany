@@ -12,15 +12,22 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
   jsonResponse,
   backToUpload,
 }) => {
+  // Sort the initial data
+  const sortedData = React.useMemo(() => {
+    return jsonResponse.map((group) => ({
+      ...group,
+      features: [...group.features].sort((a, b) => a.FeatureType.localeCompare(b.FeatureType)),
+    }));
+  }, [jsonResponse]);
   // Initialize state with the JSON response
-  const [data, setData] = useState(jsonResponse);
+  const [data, setData] = useState(sortedData);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formFields, setFormFields] = useState({
     ruleType: "",
     ejecMethod: "",
   });
-  const [priceJSON, setPriceJSON] = useState(null);
+  const [priceJSON, setPriceJSON] = useState<number | null>(null);
 
   // Handle input change
   const handleChange = (
@@ -150,7 +157,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
       }
   
       const responseJSON = await res.json();
-      setPriceJSON(responseJSON);
+      setPriceJSON(parseFloat(responseJSON));
     } catch (error) {
       console.error("Error occurred during submission:", error);
       alert("An error occurred while submitting your quote. Please try again.");
@@ -167,7 +174,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         <div className="loader"></div>
       ) : isSubmitted ? (
         <div className="submission-message">
-          <p>Your estimated price is: {priceJSON} </p>
+          <p>Your estimated price is: ${priceJSON?.toFixed(2)} </p>
           <div className="button-container">
             <button className="animated-button" onClick={backToForm}>
               <span>Back to Feature List</span>
