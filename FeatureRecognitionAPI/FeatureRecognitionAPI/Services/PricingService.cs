@@ -9,9 +9,12 @@ namespace FeatureRecognitionAPI.Services
 {
     public class PricingService : IPricingService
     {
+        // Change these as necessary
         private const double BASE_SHOP_RATE = 139.10;
         private const double DIE_CUTTING_SHOP_RATE = 126.45;
         private const double PLUG_RATE = 95.17;
+        private const double BASE = 130;
+        private const double DISCOUNT = 1;
 
         public PricingService() { }
 
@@ -25,6 +28,8 @@ namespace FeatureRecognitionAPI.Services
                 double totalEstimate = 0.00;
                 double totalPerimeter = 0.00;
                 double ruleFactor = 0.00;
+                double setupCostTotal = 0.00;
+                double totalFeatureCost = 0.00;
 
                 //Get Punch Lists
                 var (tubePunchList, soPunchList, hdsoPunchList, ftPunchList, swPunchList, retractList) = await GetPunchLists();
@@ -59,6 +64,7 @@ namespace FeatureRecognitionAPI.Services
                     double setupCost = 0.00;
                     double runCost = 0.00;
                     double featureCost = 0.00;
+                    double featureSetup = 0.00;
                     var feature = tempfeature.Features.First();
                     int maxRadius = 0; // 1 for no max radius
                     bool isOverSized = feature.Perimeter > 20 ? true : false;
@@ -133,7 +139,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var punchCost = quantity * runCost;
                             featureCost = punchCost + (quantity * setupCost);
-                            totalEstimate += featureCost;
+                            totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.SideOutlet:
                             //Get closest diameter from list
@@ -143,7 +149,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var soCost = quantity * runCost;
                             featureCost = soCost + (quantity * setupCost);
-                            totalEstimate += featureCost;
+                            totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.HDSideOutlet:
                             //Get closest diameter from list
@@ -153,7 +159,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var hdsoCost = quantity * runCost;
                             featureCost = hdsoCost + (quantity * setupCost);
-                            totalEstimate += featureCost;
+                            totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdFTPunch:
                             //Get closest diameter from list
@@ -163,7 +169,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var ftCost = quantity * runCost;
                             featureCost = ftCost + (quantity * setupCost);
-                            totalEstimate += featureCost;
+                            totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdSWPunch:
                             //Get closest diameter from list
@@ -173,7 +179,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var swCost = quantity * runCost;
                             featureCost = swCost + (quantity * setupCost);
-                            totalEstimate += featureCost;
+                            totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdRetractPins:
                             //Get closest diameter from list
@@ -183,7 +189,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var retractCost = quantity * runCost;
                             featureCost = retractCost + (quantity * setupCost);
-                            totalEstimate += featureCost;
+                            totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.Punch:
                             continue;
@@ -212,7 +218,39 @@ namespace FeatureRecognitionAPI.Services
                         tempCost = feature.Perimeter * .19;
                         runCost += (tempCost / 2);
                     }
+
+                    double costSub1 = runCost;
+                    double minCost = runCost * 0.25;
+                    double costSub2 = 0.00;
+                    for (int i = 0; i < quantity; i++)
+                    {
+                        if (costSub1 > minCost)
+                        {
+                            featureCost += costSub1;
+
+                            var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02);
+
+                            costSub2 = costSub1 * efficiencySlope;
+                            costSub1 = costSub2;
+                        }
+                        else
+                        {
+                            featureCost += minCost;
+                        }
+
+                        i++;
+                    }
+                    
+                    featureCost = featureCost * ruleFactor;
+                    featureSetup = featureCost * SetupDiscount(feature.Count);
+                    totalFeatureCost += featureCost;
+                    setupCostTotal += featureSetup;
+
+                    totalPerimeter += (feature.Perimeter * feature.Count);
                 }
+
+                double perimeterCost = totalPerimeter * 0.46;    
+                totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost));
 
                 return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString("c"));
             }
@@ -220,6 +258,21 @@ namespace FeatureRecognitionAPI.Services
             {
                 return (OperationStatus.ExternalApiFailure, ex.Message, null);
             }
+        }
+
+        private double SetupDiscount(int count)
+        {
+            return count switch
+            {
+                >= 7 => 0.25,
+                >= 6 => 0.46,
+                >= 5 => 0.63,
+                >= 4 => 0.76,
+                >= 3 => 0.86,
+                >= 2 => 0.92,
+                >= 1 => 1,
+                _ => 1,
+            };
         }
 
         private async Task<(List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>)> GetPunchLists()
