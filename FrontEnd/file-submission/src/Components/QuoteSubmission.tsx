@@ -14,10 +14,16 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
 }) => {
   // Sort the initial data
   const sortedData = React.useMemo(() => {
-    return jsonResponse.map((group) => ({
-      ...group,
-      features: [...group.features].sort((a, b) => a.FeatureType.localeCompare(b.FeatureType)),
-    }));
+    return jsonResponse.length > 0
+      ? [
+          {
+            ...jsonResponse[0],
+            features: [...jsonResponse[0].features].sort((a, b) =>
+              a.FeatureType.localeCompare(b.FeatureType)
+            ),
+          },
+        ]
+      : [];
   }, [jsonResponse]);
   // Initialize state with the JSON response
   const [data, setData] = useState(sortedData);
