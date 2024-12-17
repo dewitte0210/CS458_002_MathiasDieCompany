@@ -269,6 +269,28 @@ namespace Testing_for_Project
         }
         #endregion
 
+        #region CheckGroup3
+
+        [Test]
+        public void CheckGroup3()
+        {
+            Line line1 = new(1, 2, 2, 1);
+            Line line2 = new(1, 2, 1, 5);
+            Line line3 = new(1, 5, 2, 6);
+            Line line4 = new(2, 6, 5, 6);
+            Line line5 = new(5, 6, 6, 5);
+            Line line6 = new(6, 5, 6, 2);
+            Line line7 = new(6, 2, 5, 1);
+            Line line8 = new(5, 1, 2, 1);
+            List<Entity> eList = new List<Entity>() { line1, line2, line3, line4, line5, line6, line7, line8 };
+
+            Feature f = new(eList);
+
+          //  f.CheckGroup3();
+        }
+
+        #endregion
+
         #region CheckGroup5
         [Test]
         public void CheckGroup5_3LineCompartment_ReturnsTrue()

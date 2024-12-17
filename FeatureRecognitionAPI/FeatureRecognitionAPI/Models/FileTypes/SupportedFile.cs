@@ -407,7 +407,7 @@ namespace FeatureRecognitionAPI.Models
                         break;
                     else if (feature.CheckGroup1C(out possibleType)) break;
                     else if (feature.CheckGroup2A(out possibleType)) break;
-                    else if (feature.CheckGroup3()) break;
+                    else if (feature.CheckGroup3and4()) break;
                     //Commented lines are of the void return type
                     //else if (feature.CheckGroup4()) break;
                     //else if (feature.CheckGroup5()) break;

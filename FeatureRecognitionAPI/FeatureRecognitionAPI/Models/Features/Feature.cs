@@ -38,6 +38,8 @@ public class Feature
     [JsonProperty]
     public bool multipleRadius;
     [JsonProperty]
+    public bool roundedCorner;
+    [JsonProperty]
     public double perimeter;
     [JsonProperty]
     public double diameter;
@@ -291,13 +293,26 @@ public class Feature
 
         //gives the count of lines arcs circles and elipses
         CountEntities(baseEntityList, out lines, out arcs, out circles, out elipses);
-        type = PossibleFeatureTypes.Group1C;
 
         //Triange base shape needs 3 lines
-        if (lines != 3) return false;
+        if (lines != 3)
+        {
+            type = PossibleFeatureTypes.Unknown;
+            return false;
+        }
+
         //If there are 3 lines and zero arcs then it should be a triangle
-        else if (arcs == 0) return true;
-        else if (arcs > 3) return false;
+        else if (arcs == 0)
+        {
+            type = PossibleFeatureTypes.Group1C;
+            this.FeatureType = PossibleFeatureTypes.Group1C;
+            return true;
+        }
+        else if (arcs > 3)
+        {
+            type = PossibleFeatureTypes.Unknown;
+            return false;   
+        }
         //At this point arcs is between 1-3 and lines = 3
         else
         {
@@ -338,9 +353,12 @@ public class Feature
                         {
                             if (!touchingArc[0].IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
                             {
+                                type = PossibleFeatureTypes.Group1C;
+                                this.FeatureType = PossibleFeatureTypes.Group1C;
                                 return true;
                             }
                         }
+                        type = PossibleFeatureTypes.Unknown;
                         return false;
                     }
                 case 2:
@@ -385,8 +403,11 @@ public class Feature
                         }
                         if (touchingArc[0] is Line && touchingArc[1] is Line)
                         {
+                            type = PossibleFeatureTypes.Group1C;
+                            this.FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
                         }
+                        type = PossibleFeatureTypes.Unknown;
                         return false;
                     }
                 case 3:
@@ -412,7 +433,7 @@ public class Feature
                         {
                             if (baseEntityList[i] is Line && eIndex < 4)
                             {
-                                if ( arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0]) 
+                                if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0])
                                     || arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
                                 {
                                     touchingArc[eIndex] = (Line)baseEntityList[i];
@@ -422,11 +443,11 @@ public class Feature
                             else if (baseEntityList[i] is Arc && eIndex < 4)
                             {
                                 //If not equal to arc at 0 and 1
-                                if ( !arcList[0].Equals((Arc)baseEntityList[i]) 
+                                if (!arcList[0].Equals((Arc)baseEntityList[i])
                                     && !arcList[1].Equals((Arc)baseEntityList[i])
                                     //And if the arc intersects with the arc at 0 or at 1
-                                    &&  ( arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0]) 
-                                          || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1]) ) )
+                                    && (arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0])
+                                          || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1])))
                                 {
                                     touchingArc[eIndex] = (Arc)baseEntityList[i];
                                     eIndex++;
@@ -442,20 +463,25 @@ public class Feature
                         {
                             if (entity is Arc)
                             {
+                                type = PossibleFeatureTypes.Unknown;
                                 return false;
                             }
                         }
+                        this.FeatureType = PossibleFeatureTypes.Group1C;
+                        type = PossibleFeatureTypes.Group1C;
                         return true;
                     }
-                default: return false;
+                default:
+                    type = PossibleFeatureTypes.Unknown;
+                    return false;
             }
 
 
         }
 
-        //If somehow there is no decision made by this point then there is an error
+            //If somehow there is no decision made by this point then there is an error
 
-    }
+        }
 
     #endregion
 
@@ -653,11 +679,14 @@ public class Feature
     }
     #endregion
 
-    #region group3
-
-    public bool CheckGroup3()
+    #region Group3andGroup4
+    //Chamfered Corners 
+    public bool CheckGroup3and4()
     {
-
+        if (this.FeatureType == PossibleFeatureTypes.Group1A1 )
+        {
+            
+        }
         return false;
     }
 
