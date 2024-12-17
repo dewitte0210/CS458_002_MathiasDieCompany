@@ -721,10 +721,6 @@ public class Feature
     }
     #endregion
 
-    #region group3
-
-    public bool CheckGroup3()
-    {
 
     #region Group3andGroup4
     //Chamfered Corners 
