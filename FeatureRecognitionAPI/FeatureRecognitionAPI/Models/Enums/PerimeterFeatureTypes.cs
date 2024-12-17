@@ -8,5 +8,6 @@ namespace FeatureRecognitionAPI.Models.Enums
         Group4,
         Group5,
         Group6,
+        Group17
     }
 }

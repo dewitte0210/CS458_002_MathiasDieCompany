@@ -320,11 +320,11 @@ table tbody tr:nth-child(odd) {
 }
 
 .count-input {
-  width: 45.36px;
+  width: 50.36px;
 }
 
 .perimeter-input {
-  width: 150.04px;
+  width: 90.04px;
 }
 
 h3 {
@@ -389,7 +389,7 @@ h3 {
   background-color: aliceblue;
 }
 
-.count-input {
+.count-input-top {
   width: 8%;
   margin-left: 1%;
 }

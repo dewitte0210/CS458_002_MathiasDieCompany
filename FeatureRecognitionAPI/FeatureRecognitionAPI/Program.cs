@@ -19,14 +19,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FeatureRecognitionPolicy", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
-               //.WithMethods("POST", "GET", "PUT", "DELETE")
-               //.WithHeaders(HeaderNames.ContentType);
+        builder.WithOrigins("*")
+                .WithHeaders(HeaderNames.AccessControlAllowOrigin)
                .AllowAnyMethod() // Temporarily allow any method
-               .AllowAnyHeader() // Temporarily allow any header
-               .AllowCredentials(); // Allow credentials if needed
+               .AllowAnyHeader(); // Temporarily allow any header
+               //.AllowCredentials(); // Allow credentials if needed
+               //.WithMethods("POST", "GET", "PUT", "DELETE")
     });
 });
+
 
 var app = builder.Build();
 

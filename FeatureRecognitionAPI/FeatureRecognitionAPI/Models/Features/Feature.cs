@@ -21,6 +21,7 @@ using iText.Commons.Utils.Collections;
 using System.Web.Http.ModelBinding;
 using NHibernate.Type;
 using NHibernate.SqlCommand;
+using FeatureRecognitionAPI.Models.Dtos;
 
 public class Feature
 {
@@ -36,7 +37,7 @@ public class Feature
     [JsonProperty]
     public bool kissCut;
     [JsonProperty]
-    public bool multipleRadius;
+    public int multipleRadius;
     [JsonProperty]
     public bool roundedCorner;
     [JsonProperty]
@@ -77,7 +78,7 @@ public class Feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
      */
-    public Feature (List<Entity> entityList, bool kissCut, bool multipleRadius)
+    public Feature (List<Entity> entityList, bool kissCut, int multipleRadius)
     {
         EntityList = entityList;
         this.kissCut = kissCut;
@@ -102,6 +103,7 @@ public class Feature
     public Feature(List<Entity> EntityList)
     {
         this.count = 1;
+        this.multipleRadius = 1;
         this.EntityList = EntityList;
         this.baseEntityList = EntityList;
         this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
@@ -178,8 +180,12 @@ public class Feature
         else if (CheckGroup1C(out type)) {
             FeatureType = type;
         }
+        else if (CheckGroup6Base())
+        {
+            FeatureType = PossibleFeatureTypes.Group6;
+        }
         //check two conditions possible to make Group1A (with no perimeter features)
-        else if (numLines == 4)
+        else if (numLines >= 4)
         {
             if (numArcs == 0)
             {
@@ -191,15 +197,26 @@ public class Feature
         {
             FeatureType = type;
         }
-        else
+        else if (CheckGroup4())
+        {
+            FeatureType = PossibleFeatureTypes.Group4;
+        }
+        else if (CheckGroup5())
+        {
+            FeatureType = PossibleFeatureTypes.Group5;
+        }
+        else if (CheckGroup6())
+        {
+            FeatureType = PossibleFeatureTypes.Group6;
+        }
+        else if (CheckGroup17())
+        {
+            FeatureType = PossibleFeatureTypes.Group17;
+        }
+        else 
         {
             //Console.WriteLine("Error: Cannot assign feature type.");
         }
-
-        //Finally Add the perimeter features
-        CheckGroup4();
-        CheckGroup5();
-        CheckGroup6(); 
 
         //calculate and set the perimeter of the feature
         calcPerimeter();
@@ -679,6 +696,36 @@ public class Feature
     }
     #endregion
 
+    #region group5base
+    public bool CheckGroup6Base()
+    {
+        if (numLines != 4 || numArcs != 4) { return false;  }
+        int matchingPairs = 0;
+
+        for (int i = 0; i < EntityList.Count; i++)
+        {
+            for (int j = i + 1; j < EntityList.Count; j++)
+            {
+                if (EntityList[i] is Arc && EntityList[j] is Arc)
+                {
+                    if (Math.Abs((EntityList[i] as Arc).CentralAngle - (EntityList[j] as Arc).CentralAngle) < Entity.EntityTolerance)
+                    {
+                        matchingPairs++;
+                    }
+                }
+            }
+        }
+        if (matchingPairs == 2) { return true; }
+
+        return false;
+    }
+    #endregion
+
+    #region group3
+
+    public bool CheckGroup3()
+    {
+
     #region Group3andGroup4
     //Chamfered Corners 
     public bool CheckGroup3and4()
@@ -697,33 +744,23 @@ public class Feature
      * Checks the perimiterEntityList to detect if any of the features there belong to group 4,
      * then adds any we find to the perimiterFeature list 
      */
-    public void CheckGroup4()
+    public bool CheckGroup4()
     {
-        if(PerimeterEntityList == null) { return;  }
+        if (numLines != 2 || (numArcs != 2 && numArcs != 0)) { return false; }
 
-        foreach (List<Entity> feature in PerimeterEntityList)
+        Line tempLine = null;
+        foreach (Entity entity in EntityList)
         {
-            bool g4Detected = false;
-            Line tempLine = null;
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
-
-            if (lineCount != 2 || (arcCount != 2 && arcCount !=0)) { continue; }
-
-            foreach (Entity entity in feature)
+            if (entity is Line && tempLine == null)
             {
-                if (entity is Line && tempLine == null)
-                {
-                    tempLine = (entity as Line);  
-                } else if(entity is Line)
-                {
-                    g4Detected = tempLine.DoesIntersect(entity);
-                }
+                tempLine = (entity as Line);
             }
-            if (g4Detected)
+            else if (entity is Line)
             {
-                PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);
+                if (tempLine.DoesIntersect(entity)) { return true; }
             }
         }
+        return false;
     }
     #endregion
 
@@ -731,50 +768,54 @@ public class Feature
     /* Checks the perimiter entity list to detect if any of the features there belong to group 5, 
      * then adds any we find to the perimiterFeature list 
      */
-    internal void CheckGroup5()
+    internal bool CheckGroup5()
     {
-        if(PerimeterEntityList == null) { return; }
+        if (numLines < 2 || numLines > 3 || numCircles != 0 || numArcs > 2) { return false; }
 
-        foreach (List<Entity> feature in PerimeterEntityList)
+        foreach (Entity entity in EntityList)
         {
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
-            if (lineCount < 2 || lineCount > 3 || circCount != 0 || arcCount > 2) { continue; }
-            foreach (Entity entity in feature)
-            {
-                if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
-            }
-            
-            // If the feature is group5, add it to the list! 
-            if(HasTwoParalellLine(feature))
-            {
-                PerimeterFeatures.Add(PerimeterFeatureTypes.Group5);
-                
-            }
+            if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180)) { return false; }
         }
+
+        if (HasTwoParalellLine(EntityList))
+        {
+            return true;
+        }
+        return false;
     }
     #endregion
 
     #region Group6
     // Very simillar check to Group5, changes the entity count constraints
-    internal void CheckGroup6()
+    internal bool CheckGroup6()
     {
-        if (PerimeterEntityList == null){ return; }
-        
-        foreach (List<Entity> feature in PerimeterEntityList)
-        {
-            CountEntities(feature, out int lineCount, out int arcCount, out int circCount, out int ellipseCount);
-            if(lineCount < 2 || arcCount < 2 || arcCount > 4 || circCount != 0) { return; } 
-            foreach(Entity entity in feature)
-            {
-                if(entity is Arc && ((entity as Arc).CentralAngle != 90 || (entity as Arc).CentralAngle != 180)) { break; }
-            }
+        if (numLines < 2 || numCircles != 0 || numArcs < 2 || numArcs > 4) { return false; }
 
-            // If the feature is group6, add it to the list! 
-            if(HasTwoParalellLine(feature))
-            {
-                PerimeterFeatures.Add(PerimeterFeatureTypes.Group6);
-            }
+        foreach (Entity entity in EntityList)
+        {
+            if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180)) { return false; }
         }
+
+        if (HasTwoParalellLine(EntityList))
+        {
+            return true;
+        }
+        return false;
+    }
+    #endregion
+
+    #region Group17
+
+    internal bool CheckGroup17()
+    {
+        if (numLines != 2 || numCircles != 0 || numArcs != 1) { return false; }
+
+        foreach (Entity entity in EntityList)
+        {
+            if (entity is Arc && ((entity as Arc).CentralAngle <= 180)) { return false; }
+        }
+
+        return true;
     }
     #endregion
     #endregion
@@ -1621,7 +1662,10 @@ public class Feature
                     Line entityJ = (entities[j] as Line);
 
                     // Check for verticality
-                    if ((entityI.SlopeX == 0 && entityJ.SlopeX == 0) || (entityI.SlopeY == 0 && entityJ.SlopeY == 0))
+                    if ((Math.Abs(entityI.SlopeX) > Entity.EntityTolerance || Math.Abs(entityI.SlopeX) > 10000000) &&
+                       (Math.Abs(entityJ.SlopeX) > Entity.EntityTolerance || Math.Abs(entityJ.SlopeX) > 10000000) ||
+                       (Math.Abs(entityI.SlopeY) > Entity.EntityTolerance || Math.Abs(entityI.SlopeY) > 10000000) &&
+                       (Math.Abs(entityJ.SlopeY) > Entity.EntityTolerance || Math.Abs(entityJ.SlopeY) > 10000000))
                     {
                         return true;
                     }
@@ -1677,10 +1721,21 @@ public class Feature
             {
                 for (int j = i + 1; j < arcList.Count; j++)
                 {
-                    if ((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius > Entity.EntityTolerance)
+                    if (Math.Abs((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius) < Entity.EntityTolerance)
                     {
-                        multipleRadius = true;
-                        return;
+                        arcList.Remove(arcList[j]);
+                        j--;
+                    }
+                }
+            }
+
+            for (int i = 0; i < arcList.Count; i++)
+            {
+                for (int j = i + 1; j < arcList.Count; j++)
+                {
+                    if (Math.Abs((arcList[i] as Arc).Radius - (arcList[j] as Arc).Radius) > Entity.EntityTolerance)
+                    {
+                        multipleRadius += 1;
                     }
                 }
             }

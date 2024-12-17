@@ -73,6 +73,7 @@ namespace FeatureRecognitionAPI.Models
                     for (int j = 0; j < feature.PerimeterEntityList.Count(); j++)
                     {
                         Feature newFeat = new Feature(feature.PerimeterEntityList[j]);
+                        newFeat.DetectFeatures();
                         featureList.Add(newFeat);
                     }
                 }
