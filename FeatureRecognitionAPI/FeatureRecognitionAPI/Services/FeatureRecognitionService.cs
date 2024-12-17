@@ -52,6 +52,22 @@ namespace FeatureRecognitionAPI.Services
             return (OperationStatus.OK, null);
         }
 
+        /*
+        * Handles an uploaded file by performing feature detection based on its extension 
+        * and returning the results in JSON format for the frontend.
+        * 
+        * Supported file types: .dxf, .dwg
+        * 
+        * @param file The uploaded file as an IFormFile object.
+        * @return A tuple containing:
+        *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
+        *   - string: The resulting JSON string if successful; null otherwise.
+        *   
+        * Note: PDF support is currently commented out and will be implemented in the future.
+        * 
+        * Exceptions:
+        * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
+        */
         public async Task<(OperationStatus, string?)> UploadFile(IFormFile file)
         {
             try
@@ -84,21 +100,27 @@ namespace FeatureRecognitionAPI.Services
                 settings.Converters.Add(new StringEnumConverter());
                 switch (ext)
                 {
+                    // This is where all the operations on the file are run from
                     case ".dxf":
                         using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
+                            // Create the touching entity list
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                            // Set the feature groups
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
+                            // Set features for each feature group
                             for (int i = 0; i < featureGroups.Count; i++)
                             {
                                 features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
+                            // Create JSON that will be sent to the frontend
                             json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
                         break;
                     case ".dwg":
+                        // Works exactly the same as DXF above, just with a different file as the parser functions are different
                         using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
                             DWGFile dWGFile = new DWGFile(dwgStream.Name);
@@ -112,14 +134,15 @@ namespace FeatureRecognitionAPI.Services
                             json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
                         break;
-                    case ".pdf":
-                        using (var pdfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                            PDFFile pdfFile = new PDFFile(pdfStream.Name);
-                            var text = pdfFile.ExtractTextFromPDF();
-                            json = JsonConvert.SerializeObject(text);
-                        }
-                        break;
+                    // TODO: implement PDF support
+                    //case ".pdf":
+                    //    using (var pdfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    //    {
+                    //        PDFFile pdfFile = new PDFFile(pdfStream.Name);
+                    //        var text = pdfFile.ExtractTextFromPDF();
+                    //        json = JsonConvert.SerializeObject(text);
+                    //    }
+                    //    break;
                     default:
                         Console.WriteLine("ERROR detecting file extension");
                         return (OperationStatus.BadRequest, null);
