@@ -176,8 +176,7 @@ namespace FeatureRecognitionAPI.Models
                 features.Add(new Feature(entityList));
             }
 
-
-            //First iteration of loop (Declaring variables outside loop)
+            
             Point minPoint = new(0, 0);
             Point maxPoint = new(0,0);
             Point maxDiff = new(0,0);
@@ -188,7 +187,7 @@ namespace FeatureRecognitionAPI.Models
             Point tempMinPoint = new(0, 0);
             Point tempMaxPoint = new(0,0);
 
-            bool firstrun = true;
+            //bool firstrun = true;
             while (features.Count > 0)
             {
 
@@ -202,7 +201,7 @@ namespace FeatureRecognitionAPI.Models
                 for (int i = 0; i < features.Count; i++)
                 {
                     //If first run don't start at 0, otherwise reset max 
-                    if (firstrun) { i = 1; firstrun = false; }
+                    //if (firstrun) { i = 1; firstrun = false; }
                    
                     tempMinPoint = features[i].FindMinPoint();
                     tempMaxPoint = features[i].FindMaxPoint();
