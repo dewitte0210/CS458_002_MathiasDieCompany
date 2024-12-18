@@ -14,18 +14,12 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
 }) => {
   // Sort the initial data
   const sortedData = React.useMemo(() => {
-    return jsonResponse.length > 0
-      ? [
-          {
-            ...jsonResponse[0],
-            features: [...jsonResponse[0].features].sort((a, b) =>
-              a.FeatureType.localeCompare(b.FeatureType)
-            ),
-          },
-        ]
-      : [];
+    return jsonResponse.map((group) => ({
+      ...group,
+      features: [...group.features].sort((a, b) => a.FeatureType.localeCompare(b.FeatureType)),
+    }));
   }, [jsonResponse]);
-  // Initialize state with the JSON response
+  // Initialize states
   const [data, setData] = useState(sortedData);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -35,7 +29,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
   });
   const [priceJSON, setPriceJSON] = useState<number | null>(null);
 
-  // Handle input change
+  /*
+    Event handler for when the user changes a field in the form.
+    Updates the state with the new value.
+  */
   const handleChange = (
     key: string,
     value: any,
@@ -72,12 +69,18 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
       setFormFields((prev) => ({ ...prev, [key]: value }));
     }
   };
-  
 
+
+  /*
+    Event handler for when the user clicks the back button after submission.
+  */
   const backToForm = () => {
     setIsSubmitted(false);
   }
 
+  /*
+    Event handler for when the user adds a new feature.
+  */
   const handleAddFeature = (groupIndex: number) => {
     setData((prev) =>
       prev.map((group, idx) => {
@@ -104,6 +107,9 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
     );
   };
 
+  /*
+    Event handler for when the user deletes a feature.
+  */
   const handleDeleteFeature = (groupIndex: number, featureIndex: number) => {
     setData((prev) =>
       prev.map((group, idx) => {
@@ -126,11 +132,14 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
     );
   };
 
-  // Handle form submission
+  /*
+    Event handler for when the user submits the form.
+  */
   const handleSubmit = async (event: React.FormEvent) => {
-    setIsLoading(true);
+    setIsLoading(true); // Start loading
     event.preventDefault();
-  
+
+    // Update the feature type for punches
     const updatedData = data.map((group) => ({
       ...group,
       features: group.features.map((feature) =>
@@ -140,39 +149,42 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
       ),
     }));
 
+    // Build the form object
     const formObject: any = {
       ruleType: (event.target as HTMLFormElement).ruleType.value,
       ejecMethod: (event.target as HTMLFormElement).ejecMethod.value,
       featureGroups: updatedData,
     };
-    
+
+    // This is the JSON object that will be sent to the server
     const formJSON = JSON.stringify(formObject);
-  
+
+    // Send the form data to the server
     try {
       const res = await fetch(
         "https://localhost:44373/api/Pricing/estimatePrice",
         {
           method: "POST",
           body: formJSON,
-          headers: new Headers({ "content-type": "application/json" }),
+          headers: new Headers({ "content-type": "application/json" }), // Set content type to JSON
         }
       );
-  
+
       if (!res.ok) {
         throw new Error(`Server error: ${res.status} ${res.statusText}`);
       }
-  
+
       const responseJSON = await res.json();
-      setPriceJSON(parseFloat(responseJSON));
+      setPriceJSON(parseFloat(responseJSON)); // Store the price in state as a float
     } catch (error) {
       console.error("Error occurred during submission:", error);
       alert("An error occurred while submitting your quote. Please try again.");
     } finally {
-      setIsSubmitted(true);
-      setIsLoading(false);
+      setIsSubmitted(true); // Moves to next page
+      setIsLoading(false); // End loading
     }
   };
-  
+
 
   return (
     <div className="quote-container">
@@ -243,7 +255,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                   </option>
                 </select>
               </div>
-
               <div className="quote-form-label-and-select">
                 <div className="quote-form-label">
                   <label htmlFor="ejecMethod">Ejection Method</label>
@@ -280,11 +291,12 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                   </tr>
                 </thead>
                 <tbody>
+                  {/* Map the JSON data, nested loops */}
                   {data.map((group, groupIndex) => (
                     <>
                       <tr key={`group-${groupIndex}`}>
                         <td colSpan={6} className="identical-text">
-                          Number of identical dies: 
+                          Number of identical dies:
                           <input
                             className="count-input-top"
                             type="number"
@@ -296,6 +308,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                       </tr>
                       {group.features.map((feature, featureIndex) => (
                         <tr key={`${groupIndex}-${featureIndex}`}>
+                          {/* Different renders based on if it's a new feature or not */}
                           {feature.newFeature ? (
                             <>
                               <td>

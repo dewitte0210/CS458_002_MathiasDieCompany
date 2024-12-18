@@ -696,10 +696,17 @@ public class Feature
     }
     #endregion
 
-    #region group5base
+    #region Group6base
+
+    /*
+     * Checks the feature it is being called on to see if it is a group 6 base feature (trapeziod with radius corners).
+     * 
+     * @return True if it is Group 6, false if not
+     */
     public bool CheckGroup6Base()
     {
         if (numLines != 4 || numArcs != 4) { return false;  }
+        // Number of different matching central angles of corner features
         int matchingPairs = 0;
 
         for (int i = 0; i < EntityList.Count; i++)
@@ -737,8 +744,9 @@ public class Feature
 
     #region Group4
     /*
-     * Checks the perimiterEntityList to detect if any of the features there belong to group 4,
-     * then adds any we find to the perimiterFeature list 
+     * Checks the feature it is being called on to see if it is a group 4 feature.
+     * 
+     * @return True if it is Group 4, false if not
      */
     public bool CheckGroup4()
     {
@@ -761,8 +769,10 @@ public class Feature
     #endregion
 
     #region Group5
-    /* Checks the perimiter entity list to detect if any of the features there belong to group 5, 
-     * then adds any we find to the perimiterFeature list 
+    /*
+     * Checks the feature it is being called on to see if it is a group 5 feature.
+     * 
+     * @return True if it is Group 5, false if not
      */
     internal bool CheckGroup5()
     {
@@ -782,7 +792,11 @@ public class Feature
     #endregion
 
     #region Group6
-    // Very simillar check to Group5, changes the entity count constraints
+    /*
+     * Checks the feature it is being called on to see if it is a group 6 feature.
+     * 
+     * @return True if it is Group 6, false if not
+     */
     internal bool CheckGroup6()
     {
         if (numLines < 2 || numCircles != 0 || numArcs < 2 || numArcs > 4) { return false; }
@@ -802,6 +816,11 @@ public class Feature
 
     #region Group17
 
+    /*
+     * Checks the feature it is being called on to see if it is a group 17 feature.
+     * 
+     * @return True if it is Group 17, false if not
+     */
     internal bool CheckGroup17()
     {
         if (numLines != 2 || numCircles != 0 || numArcs != 1) { return false; }
@@ -1697,13 +1716,19 @@ public class Feature
         }
     }
 
+    /*
+     * Function that checks the number of unique radius lengths in a feature. 
+     * multipleRadius is initially set to 1, incremented for each unique radius found.
+    */
     public void checkMultipleRadius()
     {
+        // Only can be run on Group 1A2, 1C, and 2A2
         if (FeatureType == PossibleFeatureTypes.Group1A2 || FeatureType == PossibleFeatureTypes.Group1C || FeatureType == PossibleFeatureTypes.Group2A2)
         {
             // TODO: Add logic to check for multiple radii on bowtie features
             if (FeatureType == PossibleFeatureTypes.Group2A2) return;
 
+            // Create a new list containing only the arc entities
             List<Entity> arcList = new List<Entity>();
             foreach (Entity entity in baseEntityList)
             {
@@ -1713,6 +1738,7 @@ public class Feature
                 }
             }
 
+            // Remove duplicate radii arcs
             for (int i = 0; i < arcList.Count; i++)
             {
                 for (int j = i + 1; j < arcList.Count; j++)
@@ -1725,6 +1751,7 @@ public class Feature
                 }
             }
 
+            // Count the number of unique radii left in the list
             for (int i = 0; i < arcList.Count; i++)
             {
                 for (int j = i + 1; j < arcList.Count; j++)
