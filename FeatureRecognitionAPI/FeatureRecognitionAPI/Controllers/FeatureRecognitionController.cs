@@ -19,7 +19,6 @@ namespace FeatureRecognitionAPI.Controllers
             _featureRecognitionService = featureRecognitionService;
         }
 
-        // TODO: Create API endpoint to take a .dwg, .dxf file and return info on its extension
         [HttpGet("getFileExtension", Name = nameof(GetFileExtension))]
         public async Task<IActionResult> GetFileExtension([FromQuery] string fileName)
         {

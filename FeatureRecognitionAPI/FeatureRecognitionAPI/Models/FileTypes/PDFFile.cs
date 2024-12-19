@@ -57,7 +57,6 @@ namespace FeatureRecognitionAPI.Models
          */
         public bool findEntities()
         {
-            //TODO
             return false;
         }
 

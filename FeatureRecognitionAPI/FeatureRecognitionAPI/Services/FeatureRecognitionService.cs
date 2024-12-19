@@ -134,15 +134,6 @@ namespace FeatureRecognitionAPI.Services
                             json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
                         break;
-                    // TODO: implement PDF support
-                    //case ".pdf":
-                    //    using (var pdfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    //    {
-                    //        PDFFile pdfFile = new PDFFile(pdfStream.Name);
-                    //        var text = pdfFile.ExtractTextFromPDF();
-                    //        json = JsonConvert.SerializeObject(text);
-                    //    }
-                    //    break;
                     default:
                         Console.WriteLine("ERROR detecting file extension");
                         return (OperationStatus.BadRequest, null);
