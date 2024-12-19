@@ -52,7 +52,7 @@ as a baseline, values for each variable can be calculated as:
 \
 $dP$ then becomes:
 
-### $dp=3.4064da + 3.0258db$
+### $dP=3.4064da + 3.0258db$
 \
 \
 As for the number of lines at the unit ellipse, 360 is used which gives 4 decimal places of precision in the perimeter calculation.
