@@ -200,7 +200,7 @@ namespace FeatureRecognitionAPI.Services
                     {
                         if (maxRadius == 1)
                         {
-                            // TODO: setupCost = setupCost * 0.7 * Quantity of unique radius sizes;
+                            setupCost = setupCost * 0.7;
                             runCost = runCost * 1.1;
                         }
                     }
