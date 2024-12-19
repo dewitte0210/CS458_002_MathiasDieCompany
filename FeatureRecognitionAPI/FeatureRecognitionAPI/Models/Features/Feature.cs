@@ -542,6 +542,9 @@ public class Feature
         return false;
     }
 
+    /**
+     * Checks if a list of arcs forms an ellipse
+     */
     internal bool IsEllipse()
     {
         //Ensures the porgam will not crash if called in other circumstances
@@ -582,6 +585,10 @@ public class Feature
         return false;
     }
 
+    /**
+     * Given a list of entities that could be a form of a bowtie, this function ensures a bowtie is
+     * the feature
+     */
     internal bool IsBowtie()
     {
         //Sharp bowties with arcs
