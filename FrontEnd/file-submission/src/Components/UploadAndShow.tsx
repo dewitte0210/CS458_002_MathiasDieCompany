@@ -36,10 +36,12 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
 
     const formData = new FormData();
     formData.append("file", file);
-
+    
+    console.log(process.env);
+    console.log(process.env.REACT_APP_API_BASEURL);
     try {
       const res = await fetch(
-        "https://localhost:44373/api/FeatureRecognition/uploadFile",
+        `${process.env.REACT_APP_API_BASEURL}api/FeatureRecognition/uploadFile`,
         {
           method: "POST",
           body: formData,
