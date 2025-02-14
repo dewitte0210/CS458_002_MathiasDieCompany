@@ -1,4 +1,4 @@
-﻿export let  supportedFeatures = [
+﻿export let supportedFeatures = [
     {
         src: "/Grp1A.ico",
         alt: "Group1A",
@@ -25,7 +25,8 @@
         alt: "Group2A",
         description: "Group 2A",
         longDescription:
-            'Group 2A features are comprised of ruled ellipses and bowties (for lack of a better word) greater than 1/2" wide. Consultation is required for anything smaller! Many times, custom punches are favored over these ruled features.',
+            'Group 2A features are comprised of ruled ellipses and bowties (for lack of a better word) greater than 1/2" wide. Consultation is required for anything smaller! Many times, custom punches are favored over these ruled features. ' +
+            'Bowtie detection is not functioning at the moment',
     },
     {
         src: "/Grp3.ico",
@@ -39,7 +40,8 @@
         alt: "Group4",
         description: "Group 4",
         longDescription:
-            "Group 4 is comprised of common perimeter features like V and Corner notches.",
+            "Group 4 is comprised of common perimeter features like V and Corner notches. Only the V version of this" +
+            " is working as of right now",
     },
     {
         src: "/Grp5.ico",

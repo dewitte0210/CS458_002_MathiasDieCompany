@@ -29,7 +29,7 @@
 }
 
 .document-uploader {
-  border: 2px dashed #4282fe;
+  border: 2px solid #4282fe;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -159,16 +159,15 @@
   position: relative;
   display: inline-block;
   padding: 12px 48px;
-  border: none;
   font-size: 16px;
-  background: rgb(84, 114, 210);
+  background: rgb(255, 255, 255);
   background: linear-gradient(
     circle,
     rgba(84, 114, 210, 1) 0%,
     rgba(0, 95, 255, 1) 100%
   );
   font-weight: 600;
-  color: #ffffff;
+  color: #000000;
   cursor: pointer;
   transition: all 0.3s ease;
   box-sizing: border-box;
