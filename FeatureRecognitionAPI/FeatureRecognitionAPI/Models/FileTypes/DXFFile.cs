@@ -2,11 +2,9 @@
  * SupportedFile child that implements a DXF instance
  * I believe this will not require the use of Entities and can instead just read the data straight into features
  */
-using ACadSharp.IO;
 using ACadSharp;
+using ACadSharp.IO;
 using FeatureRecognitionAPI.Models.Enums;
-using System;
-using System.Reflection;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -193,12 +191,12 @@ namespace FeatureRecognitionAPI.Models
         private int ParseLine(string[] lines, int index)
         {
             //Variables used to create entity of type Line
-             double xStart = 0;
-             double yStart = 0;
-             double xEnd = 0;
-             double yEnd = 0;
+            double xStart = 0;
+            double yStart = 0;
+            double xEnd = 0;
+            double yEnd = 0;
 
-            bool startXFlag, startYFlag, endXFlag, endYFlag ;
+            bool startXFlag, startYFlag, endXFlag, endYFlag;
             startXFlag = startYFlag = endXFlag = endYFlag = false;
             //Index must be incremented along with i in order to keep maintain accurate indexing
             while (lines[index] != "  0")
@@ -252,11 +250,11 @@ namespace FeatureRecognitionAPI.Models
 
         private int ParseArc(string[] lines, int index)
         {
-             double xPoint = 0;
-             double yPoint = 0;
-             double radius = 0;
-             double startAngle = 0;
-             double endAngle = 0;
+            double xPoint = 0;
+            double yPoint = 0;
+            double radius = 0;
+            double startAngle = 0;
+            double endAngle = 0;
             bool xFlag, yFlag, rFlag, startFlag, endFlag;
             xFlag = yFlag = rFlag = startFlag = endFlag = false;
 
@@ -315,9 +313,9 @@ namespace FeatureRecognitionAPI.Models
 
         private int ParseCircle(string[] lines, int index)
         {
-             double xPoint = 0;
-             double yPoint = 0;
-             double radius = 0;
+            double xPoint = 0;
+            double yPoint = 0;
+            double radius = 0;
             bool xFlag, yFlag, rFlag;
             xFlag = yFlag = rFlag = false;
             while (lines[index] != "  0")
@@ -358,7 +356,7 @@ namespace FeatureRecognitionAPI.Models
             {
                 throw new Exception("Error: Issue with DXF File");
             }
-        } 
+        }
         #endregion
 
         //May need to be refactored depending on if c# handles this by copy or by reference

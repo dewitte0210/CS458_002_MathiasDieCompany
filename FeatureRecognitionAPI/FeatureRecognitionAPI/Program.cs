@@ -1,8 +1,5 @@
 using FeatureRecognitionAPI.Services;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Net.Http.Headers;
-using System.Net.Http.Formatting;
-using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +9,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IFeatureRecognitionService,  FeatureRecognitionService>();
+builder.Services.AddScoped<IFeatureRecognitionService, FeatureRecognitionService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 
 builder.Services.AddCors(options =>
@@ -23,8 +20,8 @@ builder.Services.AddCors(options =>
                 .WithHeaders(HeaderNames.AccessControlAllowOrigin)
                .AllowAnyMethod() // Temporarily allow any method
                .AllowAnyHeader(); // Temporarily allow any header
-               //.AllowCredentials(); // Allow credentials if needed
-               //.WithMethods("POST", "GET", "PUT", "DELETE")
+                                  //.AllowCredentials(); // Allow credentials if needed
+                                  //.WithMethods("POST", "GET", "PUT", "DELETE")
     });
 });
 

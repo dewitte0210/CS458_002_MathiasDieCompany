@@ -1,13 +1,6 @@
-using FeatureRecognitionAPI.Models;
-using NuGet.Frameworks;
-using DecimalMath;
-using Microsoft.AspNetCore.Rewrite;
-using System.Security.Policy;
-using ACadSharp.IO;
 using ACadSharp;
-using NHibernate.Criterion;
-using FeatureRecognitionAPI.Models.Enums;
-using NUnit.Framework.Constraints;
+using ACadSharp.IO;
+using FeatureRecognitionAPI.Models;
 
 namespace Testing_for_Project
 {
@@ -23,7 +16,7 @@ namespace Testing_for_Project
         {
             Line line1 = new Line(1.9724753611322341, 0.4071346127707478, 2.6124753611322347, 0.4071346127707472);
 
-            Assert.IsTrue( line1.hasPoint( new Point( 1.9724753611322341, 0.4071346127707478 ) ) );
+            Assert.IsTrue(line1.hasPoint(new Point(1.9724753611322341, 0.4071346127707478)));
             Assert.IsTrue(line1.hasPoint(new Point(2.6124753611322347, 0.4071346127707472)));
         }
         [Test]
@@ -106,7 +99,7 @@ namespace Testing_for_Project
             Assert.IsTrue(check2);
 
 
-            
+
         }
 
         #region TestingDXF&DWG
@@ -244,7 +237,7 @@ namespace Testing_for_Project
         public void TestDWGFileClassGoodInput()
         {
             //Set path to any filepath containing the 3rd example dxf file
-           // string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
+            // string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
 
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
@@ -295,7 +288,7 @@ namespace Testing_for_Project
             Assert.That(test5.StartPoint.Y, Is.EqualTo(1.0071346127707477));
             Assert.That(test5.EndPoint.X, Is.EqualTo(1.9724753611322341));
             Assert.That(test5.EndPoint.Y, Is.EqualTo(1.0071346127707477));
-            
+
 
             Assert.That(testList[5] is Arc);
             Arc test6 = (Arc)testList[5];
@@ -376,7 +369,7 @@ namespace Testing_for_Project
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dxf";
-           
+
             try
             {
                 DXFFile test = new DXFFile(path);
@@ -419,25 +412,25 @@ namespace Testing_for_Project
             {
                 DWGFile test = new DWGFile(path);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Assert.That(ex.Message, Is.EqualTo("Error with DWG File"));
             }
 
-        
+
         }
 
         #endregion
 
         [Test]
         //Test to verify that library returns the expected entity count
-       public void testingACadSharpLibrary()
+        public void testingACadSharpLibrary()
         {
 
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
-          
+
             DwgReader dwgReader = new DwgReader(path);
 
             CadDocument test = dwgReader.Read();

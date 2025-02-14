@@ -3,9 +3,6 @@
  * will require the use of entities by parsing the data into them
  * then features will be determined based off the entities
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
 using FeatureRecognitionAPI.Models.Enums;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
@@ -13,7 +10,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Data;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using NHibernate.Mapping;
+using System.Text;
 
 namespace FeatureRecognitionAPI.Models
 {

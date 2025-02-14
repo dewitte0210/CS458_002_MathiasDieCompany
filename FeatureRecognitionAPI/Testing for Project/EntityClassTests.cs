@@ -1,6 +1,4 @@
-﻿using NUnit;
-using FeatureRecognitionAPI.Models;
-using DecimalMath;
+﻿using FeatureRecognitionAPI.Models;
 
 namespace Testing_for_Project
 {
@@ -11,7 +9,7 @@ namespace Testing_for_Project
         public void IsInArcRange_HappyPath_ReturnTrue()
         {
             Arc testArc = new Arc(0, 0, 5, 0, 90);
-            Point testPoint = new Point(1,0);
+            Point testPoint = new Point(1, 0);
             bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.True);
         }
@@ -24,7 +22,7 @@ namespace Testing_for_Project
             bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.True);
         }
-       
+
         [Test]
         public void IsInArcRange_NotInRange_ReturnFalse()
         {
@@ -33,7 +31,7 @@ namespace Testing_for_Project
             bool result = testArc.IsInArcRange(testPoint);
             Assert.That(result, Is.False);
         }
-        [Test] 
+        [Test]
         public void IsInArcRange_StartGreaterThanEnd_ReturnTrue()
         {
             Arc testArc = new Arc(0, 0, 5, 270, 0);

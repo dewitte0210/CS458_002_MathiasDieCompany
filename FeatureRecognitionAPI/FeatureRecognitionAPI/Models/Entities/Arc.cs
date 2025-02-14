@@ -1,6 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-
-namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Arc object that extends Entity
@@ -9,12 +7,12 @@ namespace FeatureRecognitionAPI.Models
     public class Arc : Entity
     {
         public Point Center { get; set; }//Centeral point
-        public Point Start {  get; set; }//Start point
+        public Point Start { get; set; }//Start point
         public Point End { get; set; }//End point
-        public  double Radius { get; set; }//Radius value
-        public  double StartAngle { get; set; }//angle from centeral point to start point
-        public  double EndAngle { get; set; }//angle from centeral point to end point
-        public  double CentralAngle { get; }//angle of the arc
+        public double Radius { get; set; }//Radius value
+        public double StartAngle { get; set; }//angle from centeral point to start point
+        public double EndAngle { get; set; }//angle from centeral point to end point
+        public double CentralAngle { get; }//angle of the arc
 
         /**
          * Creates an arc and calculates the starting and ending coordinates as well
@@ -26,13 +24,13 @@ namespace FeatureRecognitionAPI.Models
          * @param startAngle the angle the arc starts at
          * @param endAngle the angle the arc ends at
          */
-        public Arc( double centerX,  double centerY,  double radius,  double startAngle,  double endAngle)
+        public Arc(double centerX, double centerY, double radius, double startAngle, double endAngle)
         {
             Center = new Point(centerX, centerY);
             this.Radius = radius;
             this.StartAngle = startAngle;
             this.EndAngle = endAngle;
-            Start = new (calcXCoord(centerX, radius, startAngle),calcYCoord(centerY, radius, startAngle));
+            Start = new(calcXCoord(centerX, radius, startAngle), calcYCoord(centerY, radius, startAngle));
             End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
             this.CentralAngle = calcCentralAngle(startAngle, endAngle);
             this.Length = (calcLength(radius, CentralAngle));
@@ -44,7 +42,7 @@ namespace FeatureRecognitionAPI.Models
          * @param degrees is the amount of degrees being converted
          * @return the radian value of degrees
          */
-        private  double degreesToRadians( double degrees)
+        private double degreesToRadians(double degrees)
         {
             return (degrees * Math.PI / 180);
         }
@@ -53,7 +51,7 @@ namespace FeatureRecognitionAPI.Models
          * Function to calculate the x coordinate given the center point, Radius
          * and an angle.
          */
-        private  double calcXCoord( double x,  double radius,  double angle)
+        private double calcXCoord(double x, double radius, double angle)
         {
             return (radius * Math.Cos(degreesToRadians(angle)) + x);
         }
@@ -62,7 +60,7 @@ namespace FeatureRecognitionAPI.Models
          * Function to calculate the y coordinate given the center point, Radius
          * and an angle.
          */
-        private  double calcYCoord( double y,  double radius,  double angle)
+        private double calcYCoord(double y, double radius, double angle)
         {
             return (radius * Math.Sin(degreesToRadians(angle)) + y);
         }
@@ -74,7 +72,7 @@ namespace FeatureRecognitionAPI.Models
          * @param endAngle the end angle of the arc being calculated
          * @return the calculated the length of the arc
          */
-        private double calcCentralAngle( double startAngle,  double endAngle) 
+        private double calcCentralAngle(double startAngle, double endAngle)
         {
             //The subtraction result would be negative, need to add 360 to get correct value
             if (endAngle < startAngle)
@@ -89,7 +87,7 @@ namespace FeatureRecognitionAPI.Models
          * @param centralAngle the central angle for the arc being calculated
          * @return the calculated length (partial circumference) of the arc
          */
-        private double calcLength( double radius,  double centralAngle)
+        private double calcLength(double radius, double centralAngle)
         {
             return (2 * Math.PI * radius * (centralAngle / 360));
         }
@@ -105,9 +103,9 @@ namespace FeatureRecognitionAPI.Models
             if (obj is Arc)
             {
                 //IDE Mapped everything to work with tolerance in one tab push :O
-                if (Math.Abs( ((Arc)obj).Length - this.Length) < EntityTolerance
-                    && Math.Abs( ((Arc)obj).Radius - this.Radius) < EntityTolerance
-                    && Math.Abs( ((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
+                if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
+                    && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
+                    && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
                     && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance
                     && ((Arc)obj).Start.Equals(this.Start) && ((Arc)obj).End.Equals(this.End))
                 {

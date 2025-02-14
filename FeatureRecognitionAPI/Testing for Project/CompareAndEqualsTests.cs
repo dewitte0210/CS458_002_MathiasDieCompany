@@ -1,12 +1,6 @@
 ﻿
 using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Features;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Testing_for_Project
 {
@@ -71,7 +65,7 @@ namespace Testing_for_Project
 
             Line line5 = new(arc5.Start.X, arc5.Start.Y, arc6.Start.X, arc6.Start.Y);
             Line line6 = new(arc5.End.X, arc5.End.Y, arc6.End.X, arc6.End.Y);
-            
+
             List<Entity> entities = new List<Entity>() { arc1, arc2, line1, line2 };
             List<Entity> entities3 = new List<Entity>() { arc5, arc6, line5, line6 };
 
@@ -95,7 +89,7 @@ namespace Testing_for_Project
             bool equals2 = f1.Compare(f3);
 
             Assert.That(equals1, Is.EqualTo(true));
-            Assert.That(equals2 , Is.EqualTo(false)); 
+            Assert.That(equals2, Is.EqualTo(false));
         }
 
         [Test]
@@ -143,7 +137,7 @@ namespace Testing_for_Project
             List<Feature> features3 = new List<Feature> { f1, f3, f3 };
             FeatureGroup fg3 = new(features3);
 
-           
+
             bool test1 = fg1.Equals(fg2);
             bool test2 = fg1.Equals(fg3);
             Assert.That(test1, Is.EqualTo(true));

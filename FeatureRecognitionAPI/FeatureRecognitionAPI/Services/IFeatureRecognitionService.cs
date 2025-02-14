@@ -1,6 +1,4 @@
-﻿using FeatureRecognitionAPI.Services;
-using FeatureRecognitionAPI.Models;
-using FeatureRecognitionAPI.Models.Enums;
+﻿using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Services
 {
