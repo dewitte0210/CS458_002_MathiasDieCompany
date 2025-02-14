@@ -219,5 +219,36 @@ namespace Testing_for_Project
             Assert.That(result, Is.True);
         }
         #endregion
+
+        #region IntersectLineWithEllipse
+        [Test]
+        public void IntersectLineWithEllipse_TwoIntersects_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(1, 1, 4, 1, 2.0 / 3.0, 0, 2 * Math.PI);
+            Line line1 = new Line(-4, -2, 4, 2);
+            Assert.That(ellipse1.DoesIntersect(line1), Is.True);
+        }
+        [Test]
+        public void IntersectLineWithEllipse_OneIntersect_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(1, 1, 4, 1, 2.0 / 3.0, 0, 2 * Math.PI);
+            Line line1 = new Line(4, -2, 4, 4);
+            Assert.That(ellipse1.DoesIntersect(line1), Is.True);
+        }
+        [Test]
+        public void IntersectLineWithEllipse_NoIntersects_ReturnsFalse()
+        {
+            Ellipse ellipse1 = new Ellipse(1, 1, 4, 1, 2.0 / 3.0, 0, 2 * Math.PI);
+            Line line1 = new Line(-6, 3, 5, 6);
+            Assert.That(ellipse1.DoesIntersect(line1), Is.False);
+        }
+        [Test]
+        public void IntersectLineWithEllipse_OneIntersectWithRotation_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(1, 1, 1, 4, 2.0 / 3.0, 0, 2 * Math.PI);
+            Line line1 = new Line(-2, 4, 2, 4);
+            Assert.That(ellipse1.DoesIntersect(line1), Is.True);
+        }
+        #endregion
     }
 }
