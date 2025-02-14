@@ -71,6 +71,28 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void TestIsInEllipseRange_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+            Point point1 = new Point(0, 2);
+            Assert.That(ellipse1.isInEllipseRange(point1), Is.True);
+        }
+        [Test]
+        public void TestIsInEllipseRangeForRotatedEllipse_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 0, 3, 2.0 / 3.0, 0, Math.PI);
+            Point point1 = new Point(-2, 0);
+            Assert.That(ellipse1.isInEllipseRange(point1), Is.True);
+        }
+        [Test]
+        public void TestIsInEllipseRange_ReturnsFalse()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+            Point point1 = new Point(0, -2);
+            Assert.That(ellipse1.isInEllipseRange(point1), Is.False);
+        }
+
+        [Test]
         public void TestPointEquals()
         {
             Point point1 = new Point(2, 3);

@@ -152,6 +152,77 @@ namespace FeatureRecognitionAPI.Models
             return sol;
         }
 
+        public Line vectorFromCenter(double angle)
+        {
+            double a = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            Point endPoint = PointOnEllipseGivenAngleInRadians(a, MinorToMajorAxisRatio * a, angle);
+            return new Line(Center.X, Center.Y, endPoint.X + Center.X, endPoint.Y + Center.Y);
+        }
+
+        /**
+         * Checks if a given point on the ellipse is in range of the parameter boundaries
+         */
+        internal bool isInEllipseRange(Point point)
+        {
+            double y = point.Y - Center.Y;
+            double x = point.X - Center.X;
+            double pointAngle;
+            if (x == 0)
+            {
+                pointAngle = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+            }
+            else if (y == 0)
+            {
+                pointAngle = x > 0 ? 0 : Math.PI;
+            }
+            else
+            {
+                pointAngle = Math.Atan2(y, x);
+                //Q2 and Q3
+                if (x < 0)
+                {
+                    pointAngle += Math.PI;
+                }
+                //Q4
+                else if (x > 0 && y < 0)
+                {
+                    pointAngle += 2 * Math.PI;
+                }
+            }
+            double ellipseY = MajorAxisEndPoint.Y - Center.Y;
+            double ellipseX = MajorAxisEndPoint.X - Center.X;
+            double ellipseRotation;
+            if (ellipseX == 0)
+            {
+                ellipseRotation = ellipseY > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+            }
+            else if (ellipseY == 0)
+            {
+                ellipseRotation = ellipseX > 0 ? 0 : Math.PI;
+            }
+            else
+            {
+                ellipseRotation = Math.Atan2(ellipseY, ellipseX);
+                //Q2 and Q3
+                if (ellipseX < 0)
+                {
+                    ellipseRotation += Math.PI;
+                }
+                //Q4
+                else if (ellipseX > 0 && ellipseY < 0)
+                {
+                    ellipseRotation += 2 * Math.PI;
+                }
+            }
+            //Adjusting for ellipse rotation
+            pointAngle -= ellipseRotation;
+            if (pointAngle < 0)
+            {
+                pointAngle += 2 * Math.PI;
+            }
+            return pointAngle >= Math.Round(StartParameter, 4) && pointAngle <= Math.Round(EndParameter, 4);
+        }
+
         public override bool Equals(object? obj)
         {
             if (obj is Ellipse)

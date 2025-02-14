@@ -40,17 +40,29 @@ namespace FeatureRecognitionAPI.Models
                     return IntersectArcWithArc((Arc)this, (Arc)other);
                 }
             }
-            else
+            else if (this is Ellipse)
+            {
+                if (other is Line)
+                {
+                    return IntersectLineWithEllipse((Line)other, (Ellipse)this);
+                }
+            }
+            else if (this is Line)
             {
                 if (other is Line)
                 {
                     return IntersectLineWithLine((Line)this, (Line)other);
+                }
+                else if (other is Ellipse)
+                {
+                    return IntersectLineWithEllipse((Line)this, (Ellipse)other);
                 }
                 else
                 {
                     return IntersectLineWithArc((Line)this, (Arc)other);
                 }
             }
+            return false;
         }
 
 
@@ -481,6 +493,131 @@ namespace FeatureRecognitionAPI.Models
 ;
         }
 
+        internal bool IntersectLineWithEllipse(Line line, Ellipse ellipse)
+        {
+            //Need to rotate the line around the origin for rotated ellipses
+            double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
+            double y = ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y;
+            double rotation;
+            if (x == 0)
+            {
+                rotation = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+            }
+            else if (y == 0)
+            {
+                rotation = x > 0 ? 0 : Math.PI;
+            }
+            else
+            {
+                rotation = Math.Atan2(y, x);
+                //Q2 and Q3
+                if (x < 0)
+                {
+                    rotation += Math.PI;
+                }
+                //Q4
+                else if (x > 0 && y < 0)
+                {
+                    rotation += 2 * Math.PI;
+                }
+            }
+            if (rotation > 0)
+            {
+                line = new Line(-1 * ((line.StartPoint.X * Math.Cos(rotation)) - (line.StartPoint.Y * Math.Sin(rotation))), -1 * ((line.StartPoint.Y * Math.Cos(rotation)) + (line.StartPoint.X * Math.Sin(rotation))), -1 * ((line.EndPoint.X * Math.Cos(rotation)) - (line.EndPoint.Y * Math.Sin(rotation))), -1 * ((line.EndPoint.Y * Math.Cos(rotation)) + (line.EndPoint.X * Math.Sin(rotation))));
+            }
+            //  Get line in the form Ax + By + C = 0 and moved so that ellipse center is the origin
+            double Al;
+            double Bl;
+            double Cl;
+            double slopel = 0;
+            double interceptl = 0;
+            bool isVertical = false;
+            //  This is to check for a vertical line, since it would crash the program
+            //  trying to divide by 0
+            if ((new Point(line.StartPoint.X, 0).Equals(new Point(line.EndPoint.X, 0))))
+            {
+                Al = 1;
+                Bl = 0;
+                Cl = -1 * (line.EndPoint.X - ellipse.Center.X);
+                isVertical = true;
+            }
+            else
+            {
+                slopel = (line.EndPoint.Y - line.StartPoint.Y) / (line.EndPoint.X - line.StartPoint.X);
+                interceptl = (line.EndPoint.Y - ellipse.Center.Y) - (slopel * (line.EndPoint.X - ellipse.Center.X));
+                // The slope of the line ends up being A in the general form
+                Al = slopel;
+                Cl = interceptl;
+                Bl = -1;
+                //  A cannot be negative in the general form
+                if (Al < 0)
+                {
+                    Al *= -1;
+                    Bl *= -1;
+                    Cl *= -1;
+                }
+            }
+
+            double major = Math.Sqrt(Math.Pow(ellipse.MajorAxisEndPoint.X - ellipse.Center.X, 2) + Math.Pow(ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y, 2));
+            double minor = major * ellipse.MinorToMajorAxisRatio;
+            //List of solutions from equations
+            List<Point> SolnCoords = new List<Point>();
+            //Vertical line case
+            if (isVertical && Cl <= Math.Round(major, intersectTolerance))
+            {
+                SolnCoords.Add(new Point(-1 * Cl, minor * Math.Sqrt(1 - (Math.Pow(Cl, 2) / Math.Pow(major, 2)))));
+                if (Cl < Math.Round(major, intersectTolerance))
+                {
+                    SolnCoords.Add(new Point(-1 * Cl, -1 * (minor * Math.Sqrt(1 - (Math.Pow(Cl, 2) / Math.Pow(major, 2))))));
+                }
+            }
+            else
+            {
+                double a = Math.Pow(Al, 2) + ((Math.Pow(Bl, 2) * Math.Pow(minor, 2)) / Math.Pow(major, 2));
+                double b = -2 * Al * Cl;
+                double c = Math.Pow(Cl, 2) - (Math.Pow(Bl, 2) * Math.Pow(minor, 2));
+                //List of x value solns
+                List<double> xSolns = QuadraticFormula(a, b, c);
+                bool firstSoln = false;
+                for (int i = 0; i < xSolns.Count; i++)
+                {
+                    double yValue;
+                    if (isVertical)
+                    {
+                        if (!firstSoln)
+                        {
+                            yValue = Math.Sqrt(Math.Pow(minor, 2) - ((Math.Pow(xSolns[i], 2) / Math.Pow(major, 2)) * Math.Pow(minor, 2)));
+                            SolnCoords.Add(new Point(xSolns[i], yValue));
+                            firstSoln = true;
+                        }
+                        else
+                        {
+                            yValue = -1 * (Math.Sqrt(Math.Pow(minor, 2) - ((Math.Pow(xSolns[i], 2) / Math.Pow(major, 2)) * Math.Pow(minor, 2))));
+                            SolnCoords.Add(new Point(xSolns[i], yValue));
+                        }
+                    }
+                    else
+                    {
+                        yValue = (((-1 * Al) * xSolns[i]) - Cl) / Bl;
+                        SolnCoords.Add(new Point(xSolns[i], yValue));
+                    }
+                }
+            }
+
+            if (SolnCoords.Count > 0)
+            {
+                for (int i = 0; i < SolnCoords.Count; i++)
+                {
+                    if (ellipse.isInEllipseRange(new Point(SolnCoords[i].X + ellipse.Center.X, SolnCoords[i].Y + ellipse.Center.Y))
+                        && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= (SolnCoords[i].X + ellipse.Center.X)
+                        && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= (SolnCoords[i].Y + ellipse.Center.Y)
+                        && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= (SolnCoords[i].X + ellipse.Center.X)
+                        && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= (SolnCoords[i].Y + ellipse.Center.Y)) { return true; }
+                }
+            }
+            return false;
+        }
+
         /**
          * Solves the quadratic formula
          * 
@@ -489,6 +626,7 @@ namespace FeatureRecognitionAPI.Models
         internal List<double> QuadraticFormula(double a, double b, double c)
         {
             List<double> solns = new List<double>();
+            if (a == 0) { return solns; }
             double insideSqrt = Math.Pow(b, 2) - (4 * a * c);
             //Two real solutions
             if (insideSqrt > 0)
