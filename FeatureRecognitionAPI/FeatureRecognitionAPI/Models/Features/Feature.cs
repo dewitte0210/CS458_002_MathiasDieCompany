@@ -579,46 +579,6 @@ public class Feature
      */
     internal bool IsBowtie()
     {
-        //Sharp bowties with arcs
-        if (numArcs == 2)
-        {
-            Arc arc1 = new Arc(0, 0, 0, 0, 0);
-            Arc arc2 = new Arc(0, 0, 0, 0, 0);
-            Line line = new Line(0, 0, 0, 0);
-            bool gotArc1 = false;
-            bool gotArc2 = false;
-            bool gotLine = false;
-            int index = 0;
-            //Get one of the 2 lines and arcs to run isArcConcave
-            while (!gotArc1 || !gotLine || !gotArc2)
-            {
-                //For some reason there was not a line and arc, return
-                if (index == baseEntityList.Count)
-                {
-                    return false;
-                }
-                if (baseEntityList[index] is Arc)
-                {
-                    if (!gotArc1)
-                    {
-                        arc1 = (Arc)baseEntityList[index];
-                        gotArc1 = true;
-                    }
-                    else
-                    {
-                        arc2 = (Arc)baseEntityList[index];
-                        gotArc2 = true;
-                    }
-                }
-                else if (baseEntityList[index] is Line)
-                {
-                    line = (Line)baseEntityList[index];
-                    gotLine = true;
-                }
-                index++;
-            }
-            return (IsArcConcave(arc1, line) && IsArcConcave(arc2, line));
-        }
         return false;
     }
 
