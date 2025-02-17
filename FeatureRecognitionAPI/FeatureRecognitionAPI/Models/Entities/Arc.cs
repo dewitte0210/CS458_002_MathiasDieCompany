@@ -8,12 +8,12 @@ namespace FeatureRecognitionAPI.Models
      */
     public class Arc : Entity
     {
-        public Point Center { get; set; }//Centeral point
+        public Point Center { get; set; }//central point
         public Point Start {  get; set; }//Start point
         public Point End { get; set; }//End point
         public  double Radius { get; set; }//Radius value
-        public  double StartAngle { get; set; }//angle from centeral point to start point
-        public  double EndAngle { get; set; }//angle from centeral point to end point
+        public  double StartAngle { get; set; }//angle from central point to start point
+        public  double EndAngle { get; set; }//angle from central point to end point
         public  double CentralAngle { get; }//angle of the arc
 
         /**
@@ -28,12 +28,12 @@ namespace FeatureRecognitionAPI.Models
          */
         public Arc( double centerX,  double centerY,  double radius,  double startAngle,  double endAngle)
         {
-            Center = new Point(centerX, centerY);
+            this.Center = new Point(centerX, centerY);
             this.Radius = radius;
             this.StartAngle = startAngle;
             this.EndAngle = endAngle;
-            Start = new (calcXCoord(centerX, radius, startAngle),calcYCoord(centerY, radius, startAngle));
-            End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
+            this.Start = new (calcXCoord(centerX, radius, startAngle),calcYCoord(centerY, radius, startAngle));
+            this.End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
             this.CentralAngle = calcCentralAngle(startAngle, endAngle);
             this.Length = (calcLength(radius, CentralAngle));
         }
@@ -83,9 +83,9 @@ namespace FeatureRecognitionAPI.Models
         }
 
         /**
-         * Fucntion to calculate the length of the arc for perimeter length checks
+         * Function to calculate the length of the arc for perimeter length checks
          * 
-         * @param radius the raduis value of the arc being calculated
+         * @param radius the radius value of the arc being calculated
          * @param centralAngle the central angle for the arc being calculated
          * @return the calculated length (partial circumference) of the arc
          */
@@ -184,5 +184,21 @@ namespace FeatureRecognitionAPI.Models
 
             return adjustedDegrees >= adjustedStart && adjustedDegrees <= adjustedEnd;
         }
+
+        //this function will (hopefully) be used as a helper function to merge segmented arcs together
+        // public int  GetHashCode()
+        // {
+        //     //we want to have:
+        //         //ellipse width
+        //         //ellipse height
+        //         //+ ellipse center x
+        //         //+ ellipse center y
+        //     
+        //
+        //     // return (arcCopy.getWidth() * 10000019 +
+        //     //         arcCopy.getHeight() * 10006721 +
+        //     //         arcCopy.getBounds2D().getCenterX() * 10010111 +
+        //     //         arcCopy.getBounds2D().getCenterY() * 10000379);
+        // } 
     }
 }

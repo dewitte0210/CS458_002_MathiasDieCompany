@@ -53,10 +53,6 @@ namespace FeatureRecognitionAPI.Models
         #endregion
 
         #region SpecialGettersAndSetters
-        public void setFeatureList(List<Feature> featureList)
-        {
-            this.featureList = featureList;
-        }
         
         public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
@@ -389,51 +385,11 @@ namespace FeatureRecognitionAPI.Models
         }
         #endregion
 
-        #region DetectFeatures
-
-
-        /*
-         * Author: Stephen Ice
-         * Runs feature detection on features in featureGroups, 
-         */
-        public void DetectFeatures()
-        {
-            foreach (FeatureGroup fGroup in featureGroups)
-            {
-                foreach (Feature feature in fGroup.GetFeatures())
-                {
-                    PossibleFeatureTypes possibleType = new PossibleFeatureTypes();
-                    if (feature.CheckGroup1B(feature.getNumCircles(), feature.getNumLines(), feature.getNumArcs(), out possibleType))
-                        break;
-                    else if (feature.CheckGroup1C(out possibleType)) break;
-                    else if (feature.CheckGroup2A(out possibleType)) break;
-                    else if (feature.CheckGroup3and4()) break;
-                    //Commented lines are of the void return type
-                    //else if (feature.CheckGroup4()) break;
-                    //else if (feature.CheckGroup5()) break;
-                    //else if (feature.CheckGroup6()) break;
-                        
-                }
-            }
-        }
 
         public void detectAllFeatures()
         {
             makeFeatureList(makeTouchingEntitiesList(entityList));
         }
-        public void detectAllFeatures(List<Entity> myEntityList)
-        {
-            List<List<Entity>> touchingEntities = makeTouchingEntitiesList(myEntityList);
-            featureList = makeFeatureList(touchingEntities);
-            foreach (Feature feature in featureList)
-            {
-                feature.extendAllEntities();
-                feature.seperateBaseEntities();
-                feature.seperatePerimeterEntities();
-                feature.DetectFeatures();
-            }
-        }
-        #endregion
         // Method to read the data from a file and fill the entityList with entities
         public abstract void readEntities();
     }

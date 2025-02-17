@@ -107,6 +107,7 @@ namespace FeatureRecognitionAPI.Services
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             // Create the touching entity list
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                            // touchingEntityList = condenseArcs(touchingEntityList); TODO: not implemented yet
                             // Set the feature groups
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
@@ -154,5 +155,10 @@ namespace FeatureRecognitionAPI.Services
                 return (OperationStatus.ExternalApiFailure, ex.ToString());
             }
         }
+        //not implemented yet
+        // private List<List<Entity>> condenseArcs(List<List<Entity>> entities)
+        // {
+        //     
+        // }    
     }
 }

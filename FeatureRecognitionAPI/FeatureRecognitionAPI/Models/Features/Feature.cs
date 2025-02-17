@@ -968,8 +968,6 @@ public class Feature
     /*
      * This is a recursive helper function to extend every line in ExtendedEntityList. It will loop through ExtendedEntityList,
      * previously set to EntityList, until it can find a Line to extend. Will recurss if extended. Base case is no more lines to extend
-     * Should be N^N runtime seeing as the nested for loops is N^2, then it is called recursively with N-1 every time.
-     * This makes it (((N!)^2) * N!) which is 
     */
     private void extendAllEntitiesHelper()
     {
