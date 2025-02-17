@@ -469,8 +469,7 @@ namespace FeatureRecognitionAPI.Models
             // The circles intersect. Do they intersect at the position of the arcs?
 
             // Find a and h.
-            double a = (Math.Pow(arc1.Radius, 2) - Math.Pow(arc2.Radius, 2) + Math.Pow(between.Length, 2)) /
-               (2 * between.Length);
+            double a = (Math.Pow(arc1.Radius, 2) - Math.Pow(arc2.Radius, 2) + Math.Pow(between.Length, 2)) / (2 * between.Length);
             double h = Math.Sqrt(Math.Pow(arc1.Radius, 2) - Math.Pow(a, 2));
 
             // Find P2.
