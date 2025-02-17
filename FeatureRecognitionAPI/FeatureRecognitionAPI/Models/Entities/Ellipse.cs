@@ -1,6 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-
-namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Ellipse object that extends Entity
@@ -15,8 +13,8 @@ namespace FeatureRecognitionAPI.Models
         public double EndParameter { get; set; }
         public bool IsFullEllipse { get; set; }
         private Ellipse() { }
-        public Ellipse(double centerX, double centerY, double majorAxisXValue, 
-            double majorAxisYValue, double minorToMajorAxisRatio, 
+        public Ellipse(double centerX, double centerY, double majorAxisXValue,
+            double majorAxisYValue, double minorToMajorAxisRatio,
             double startParameter, double endParameter)
         {
             Center = new Point(centerX, centerY);

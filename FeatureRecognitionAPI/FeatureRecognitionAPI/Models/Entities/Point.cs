@@ -27,9 +27,10 @@ namespace FeatureRecognitionAPI.Models
             this.intersect = point.intersect;
         }
 
-        public void setPoint(double x, double y) {
+        public void setPoint(double x, double y)
+        {
             X = x;
-            Y = y; 
+            Y = y;
         }
 
         public override bool Equals(object? obj)
