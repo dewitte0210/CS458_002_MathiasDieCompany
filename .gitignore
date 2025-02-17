@@ -405,3 +405,27 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/FeatureRecognitionAPI/FeatureRecognitionAPI/.vscode/launch.json
+/FeatureRecognitionAPI/.idea/config/applicationhost.config
+/FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/ChallengeExample-001.dxf
+/FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/ChallengeExample-002.dxf
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/encodings.xml
+/FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/Example-005.dxf
+/FeatureRecognitionAPI/FeatureRecognitionAPI/FeatureRecognitionAPI.sln
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/indexLayout.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/vcs.xml
+
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/projectSettingsUpdater.xml
+/modules.xml
+/.idea.FeatureRecognitionAPI.iml
+/contentModel.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/.gitignore
