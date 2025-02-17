@@ -29,7 +29,9 @@
 }
 
 .document-uploader {
-  border: 2px solid #4282fe;
+  border: 3px solid black;
+  background-color: #5472d2;
+  color: white;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -192,7 +194,7 @@
 }
 
 .animated-button:hover {
-  box-shadow: 0 0 0 5px #ffffff;
+  box-shadow: 0 0 0 3px #36454F;
   color: #000000;
   border: 3px solid #5472d2;
   animation: 0.18s ease-in-out;
