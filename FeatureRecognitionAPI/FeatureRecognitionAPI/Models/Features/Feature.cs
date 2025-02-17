@@ -493,7 +493,6 @@ public class Feature
     #region Group2A
     internal bool CheckGroup2A(out PossibleFeatureTypes type)
     {
-        //Testing commit
         if (numArcs >= 2 && numCircles == 0)
         {
             //Possible ellipse with arcs
