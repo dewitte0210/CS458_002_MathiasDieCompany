@@ -106,8 +106,8 @@ namespace FeatureRecognitionAPI.Services
                         {
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             // Create the touching entity list
-                            List<Entity> entities = condenseArcs(dXFFile.GetEntities()); 
-                            touchingEntityList = dXFFile.makeTouchingEntitiesList(entities);
+                            touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                            touchingEntityList = touchingEntityList.Select(list => condenseArcs(list)).ToList();
                             // Set the feature groups
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
@@ -155,7 +155,6 @@ namespace FeatureRecognitionAPI.Services
                 return (OperationStatus.ExternalApiFailure, ex.ToString());
             }
         }
-        //not implemented yet
         private List<Entity> condenseArcs(List<Entity> entities)
         {  
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
