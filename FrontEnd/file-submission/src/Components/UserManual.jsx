@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import styles from "./UserManual.module.css";
 
 /**
  * UserManual - Handles a user manual with key information on using the app
@@ -89,16 +90,16 @@ export default function UserManual (){
   });
 
   return (
-      <div className="fade-out-panel-container">
+      <div className={styles["fade-out-panel-container"]}>
         {/* Manual book icon */}
-        <button className="manual-button" ref={manualButtonRef} onClick={toggleManual}>
-          <i className="fas fa-book"></i>
+        <button className={styles["manual-button"]} ref={manualButtonRef} onClick={toggleManual}>
+          <i className={styles["fas fa-book"]}></i>
         </button>
 
         {/* Manual Panel */}
         {isManualVisible && (
             <div
-                className="manual-dialog-modern"
+                className={styles["manual-dialog-modern"]}
                 style={{
                   position: "absolute",
                   top: `${panelPosition.y}px`,
@@ -108,10 +109,10 @@ export default function UserManual (){
                 onMouseDown={handleMouseDown}
             >
               {/*Close*/}
-              <button className="close-button" onClick={toggleManual}>
+              <button className={styles["close-button"]} onClick={toggleManual}>
                 &times;
               </button>
-              <div className="manual-sidebar">
+              <div className={styles["manual-sidebar"]}>
                 <h3>User Manual</h3>
                 <ul>
                   <li onClick={() => setActiveSection("introduction")}>Introduction</li>
@@ -125,7 +126,7 @@ export default function UserManual (){
               </div>
               {/* Content inside manual */}
               {/* TODO: For better maintainability, possibly change this to be read from file */}
-              <div className="manual-content">
+              <div className={styles["manual-content"]}>
                 {activeSection === "introduction" && (
                     <div>
                       <h2>Introduction</h2>
