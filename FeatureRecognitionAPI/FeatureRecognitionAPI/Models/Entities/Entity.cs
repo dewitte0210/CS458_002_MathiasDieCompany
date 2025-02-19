@@ -10,7 +10,7 @@ namespace FeatureRecognitionAPI.Models
     /**
      * Abstract class that represents a generic entity in dxf or dwg files 
      */
-    public abstract class Entity {
+        public abstract class Entity {  
         public double Length { get; set; }//length of the entity
 
         public const double EntityTolerance = 0.00005;

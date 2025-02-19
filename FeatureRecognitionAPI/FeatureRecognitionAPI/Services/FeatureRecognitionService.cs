@@ -106,8 +106,8 @@ namespace FeatureRecognitionAPI.Services
                         {
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             // Create the touching entity list
-                            touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            // touchingEntityList = condenseArcs(touchingEntityList); TODO: not implemented yet
+                            List<Entity> entities = condenseArcs(dXFFile.GetEntities()); 
+                            touchingEntityList = dXFFile.makeTouchingEntitiesList(entities);
                             // Set the feature groups
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
@@ -156,9 +156,31 @@ namespace FeatureRecognitionAPI.Services
             }
         }
         //not implemented yet
-        // private List<List<Entity>> condenseArcs(List<List<Entity>> entities)
-        // {
-        //     
-        // }    
+        private List<Entity> condenseArcs(List<Entity> entities)
+        {  
+            List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
+
+            List<Arc> arcs = entities.OfType<Arc>().ToList();
+            arcs = arcs
+                .GroupBy(arc => arc.GetHashCode())
+                .Select(list => list.Aggregate((bigArc, smallArc) =>
+                {
+
+                    Point center = bigArc.Center;
+                    double radius = smallArc.Radius + bigArc.Radius;
+
+                    bool startAtSmallArcStart =
+                        Math.Abs(smallArc.StartAngle + smallArc.CentralAngle - bigArc.StartAngle) % 360 < Entity.EntityTolerance;
+
+                    double angleStart = startAtSmallArcStart ? smallArc.StartAngle : bigArc.StartAngle;
+                    double angleExtent = bigArc.CentralAngle + smallArc.CentralAngle;
+
+                    return new Arc(center.X, center.Y, radius, angleStart, angleExtent);
+                })).ToList();
+            
+            
+            returned.AddRange(arcs);
+            return returned;
+        }    
     }
 }
