@@ -19,7 +19,7 @@ namespace FeatureRecognitionAPI.Controllers
             _pricingService = pricingService;
         }
 
-        [HttpPost("estimatePrice", Name = nameof(EstimatePrice))]
+        [HttpPost("[action]")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

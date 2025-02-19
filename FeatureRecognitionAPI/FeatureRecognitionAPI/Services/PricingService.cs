@@ -15,7 +15,7 @@ namespace FeatureRecognitionAPI.Services
         private const double PLUG_RATE = 95.17;
         private const double BASE = 130;
         private const double DISCOUNT = 1;
-
+         
         public PricingService() { }
 
         public async Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param)
@@ -75,7 +75,7 @@ namespace FeatureRecognitionAPI.Services
                     // Difficulty Factor * mMain.ShopRate $/hr * hour/part * quantity of parts
                     switch (feature.FeatureType)
                     {
-                        case PossibleFeatureTypes.Group1A1: // Metered Rectangle
+                        case PossibleFeatureTypes.Group1A1: // Mitered Rectangle
                             setupCost = 0.22 * BASE_SHOP_RATE;
                             runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
                             maxRadius = 4;
@@ -278,6 +278,10 @@ namespace FeatureRecognitionAPI.Services
         {
             // Only took unique cut size with highest costs,
             // which is smaller base size from original software list
+            
+            // The first number is the size so below 1/32 = .031
+            // The second numbers is the cost 
+            // The third is the install (not sure what this means yet)
             var tubePunchList = new List<(double, double, double)>()
             {
                 (0.031, 6.45, 4),   // 1/32 Cut
