@@ -429,3 +429,10 @@ FodyWeavers.xsd
 /dataSources/
 /dataSources.local.xml
 /FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/.gitignore
+/.idea/.gitignore
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/shelf/Changes.xml
+/.idea/encodings.xml
+/.idea/indexLayout.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/projectSettingsUpdater.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/shelf/Changes/shelved.patch
+/.idea/vcs.xml
