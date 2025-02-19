@@ -405,3 +405,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/FeatureRecognitionAPI/.idea/config/applicationhost.config
+/FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/ChallengeExample-001.dxf
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/encodings.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/indexLayout.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/vcs.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/.gitignore

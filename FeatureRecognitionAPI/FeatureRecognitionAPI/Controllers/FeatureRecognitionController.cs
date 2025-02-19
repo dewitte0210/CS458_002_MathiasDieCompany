@@ -1,10 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using Microsoft.Extensions.Logging;
-using System.Web;
 
 namespace FeatureRecognitionAPI.Controllers
 {

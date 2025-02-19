@@ -4,7 +4,7 @@ namespace FeatureRecognitionAPI.Models.Enums
 {
     public enum PerimeterFeatureTypes
     {
-        [JsonProperty]         
+        [JsonProperty]
         Group4,
         Group5,
         Group6,

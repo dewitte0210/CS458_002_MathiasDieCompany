@@ -6,28 +6,15 @@
  * the first border and calculates feautrues only for that one 
  */
 using FeatureRecognitionAPI.Models;
-using iText.Layout.Splitting;
-using iText.StyledXmlParser.Node;
+using FeatureRecognitionAPI.Models.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NHibernate.Hql.Ast;
-using System;
-using System.IO;
-using System.Numerics;
-using FeatureRecognitionAPI.Models.Enums;
-using System.Security.Cryptography.Xml;
-using NHibernate.Action;
-using iText.Commons.Utils.Collections;
-using System.Web.Http.ModelBinding;
-using NHibernate.Type;
-using NHibernate.SqlCommand;
-using FeatureRecognitionAPI.Models.Dtos;
 
 public class Feature
 {
     [JsonProperty]
     public PossibleFeatureTypes FeatureType { get; set; }
-    
+
     // A list of all the perimeter features attached to this features.
     [JsonProperty]
     public List<PerimeterFeatureTypes> PerimeterFeatures { get; set; }
@@ -50,12 +37,12 @@ public class Feature
 
     internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
     internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
-                                           // contain entities that make up the base shape and possibly corner features
+                                          // contain entities that make up the base shape and possibly corner features
     internal List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
-                                                      // touching entities that make up a single perimeter feature for
-                                                      // the original feature
-                                                      //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
-                                                      // You will have to run detection for perimeter features for each index of this list
+                                                     // touching entities that make up a single perimeter feature for
+                                                     // the original feature
+                                                     //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
+                                                     // You will have to run detection for perimeter features for each index of this list
 
     private int numLines = 0;
     public int getNumLines() { return numLines; }
@@ -78,7 +65,7 @@ public class Feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
      */
-    public Feature (List<Entity> entityList, bool kissCut, int multipleRadius)
+    public Feature(List<Entity> entityList, bool kissCut, int multipleRadius)
     {
         EntityList = entityList;
         this.kissCut = kissCut;
@@ -111,7 +98,7 @@ public class Feature
         PerimeterEntityList = new List<List<Entity>>();
 
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
-        
+
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
@@ -177,7 +164,8 @@ public class Feature
         {
             FeatureType = type;
         }
-        else if (CheckGroup1C(out type)) {
+        else if (CheckGroup1C(out type))
+        {
             FeatureType = type;
         }
         else if (CheckGroup6Base())
@@ -213,7 +201,7 @@ public class Feature
         {
             FeatureType = PossibleFeatureTypes.Group17;
         }
-        else 
+        else
         {
             //Console.WriteLine("Error: Cannot assign feature type.");
         }
@@ -328,7 +316,7 @@ public class Feature
         else if (arcs > 3)
         {
             type = PossibleFeatureTypes.Unknown;
-            return false;   
+            return false;
         }
         //At this point arcs is between 1-3 and lines = 3
         else
@@ -496,9 +484,9 @@ public class Feature
 
         }
 
-            //If somehow there is no decision made by this point then there is an error
+        //If somehow there is no decision made by this point then there is an error
 
-        }
+    }
 
     #endregion
 
@@ -602,7 +590,8 @@ public class Feature
             bool gotLine = false;
             int index = 0;
             //Get one of the 2 lines and arcs to run isArcConcave
-            while (!gotArc1 || !gotLine || !gotArc2) {
+            while (!gotArc1 || !gotLine || !gotArc2)
+            {
                 //For some reason there was not a line and arc, return
                 if (index == baseEntityList.Count)
                 {
@@ -675,14 +664,14 @@ public class Feature
      */
     private bool IsArcConcave(Arc arc, Line line)
     {
-        double middleAngle; 
+        double middleAngle;
         if (arc.EndAngle - arc.StartAngle < 0)
         {
             middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle + 360) / 2);
         }
         else
         {
-             middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle) / 2);
+            middleAngle = arc.EndAngle - ((arc.EndAngle - arc.StartAngle) / 2);
         }
         if (middleAngle < 0)
         {
@@ -712,7 +701,7 @@ public class Feature
      */
     public bool CheckGroup6Base()
     {
-        if (numLines != 4 || numArcs != 4) { return false;  }
+        if (numLines != 4 || numArcs != 4) { return false; }
         // Number of different matching central angles of corner features
         int matchingPairs = 0;
 
@@ -740,9 +729,9 @@ public class Feature
     //Chamfered Corners 
     public bool CheckGroup3and4()
     {
-        if (this.FeatureType == PossibleFeatureTypes.Group1A1 )
+        if (this.FeatureType == PossibleFeatureTypes.Group1A1)
         {
-            
+
         }
         return false;
     }
@@ -851,7 +840,7 @@ public class Feature
     */
     public override bool Equals(object obj)
     {
-        if ((!(obj is Feature)) || (obj == null))
+        if (!(obj is Feature) || (obj == null))
         {
             return false;
         }
@@ -880,22 +869,22 @@ public class Feature
          * If there are the same number of arcs lines and circles, and permiters match, 
          * then check to see if all entities have a corresponding entity with matching values
          */
-        if ( ((Feature)obj).numLines == this.numLines
+        if (((Feature)obj).numLines == this.numLines
             && ((Feature)obj).numCircles == this.numCircles
             && ((Feature)obj).numArcs == this.numArcs
-            && Math.Abs( ((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance )
+            && Math.Abs(((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance)
         {
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
-            EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
-            ((Feature)obj).EntityList.Sort( (x, y) => x.Length.CompareTo(y.Length) );
+            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
 
             //For each entity in this.EntityList check for a corresponding entity obj.EntityList
             bool equalLists = true;
             foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance)) 
-                { 
+                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                {
                     equalLists = false;
                     break;
                 }
@@ -913,7 +902,7 @@ public class Feature
             return false;
         }
         else if (obj == this) return true;
-     
+
         if (((Feature)obj).numLines == this.numLines
             && ((Feature)obj).numCircles == this.numCircles
             && ((Feature)obj).numArcs == this.numArcs
@@ -978,7 +967,7 @@ public class Feature
         do
         {
             if (ExtendedEntityList[i] is Line)
-            { 
+            {
                 int j = 0;
                 do
                 {
@@ -1093,8 +1082,8 @@ public class Feature
         List<Entity> testedEntities = new List<Entity>();
 
         Entity head = ExtendedEntityList[0]; // default head is the first index of ExtendedEntityList
-        foreach(Entity entity in ExtendedEntityList)
-            // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
+        foreach (Entity entity in ExtendedEntityList)
+        // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
             if (entity.Length > head.Length)
             {
@@ -1104,7 +1093,7 @@ public class Feature
 
         curPath.Push(head); // pushes the head to the current path
         if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
-            // if it can find a path
+        // if it can find a path
         {
             baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
             baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
@@ -1154,7 +1143,7 @@ public class Feature
         //this point in the function means nothing is touching current entity
 
         if (curPath.Peek() == head)
-            //if the function of the head reaches this point it means it has not found a path back to the head
+        //if the function of the head reaches this point it means it has not found a path back to the head
         {
             foreach (Entity entity in ExtendedEntityList)
             {
@@ -1180,17 +1169,17 @@ public class Feature
      * @Param target is the entity that is trying to be reached
      * @Return the path from start to target. Null if no viable path
      */
-    private List<Entity> findPathFromStartToTargetInEntityList( Entity start, Entity target)
+    private List<Entity> findPathFromStartToTargetInEntityList(Entity start, Entity target)
     {
         if (EntityList.Contains(start) && EntityList.Contains(target))
         {
             Stack<Entity> path = new Stack<Entity>();
             path.Push(start);
-            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target)) 
+            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target))
             {
                 List<Entity> temp = path.ToList();
                 temp.Reverse();
-                return temp; 
+                return temp;
             }
             else { return null; }
         }
@@ -1245,7 +1234,7 @@ public class Feature
         // lists to pass to the helper function
         List<Entity> path = new List<Entity>();
 
-        foreach(Entity entity in baseEntityList) // removes all base entities from ExtendedEntityList
+        foreach (Entity entity in baseEntityList) // removes all base entities from ExtendedEntityList
         {
             ExtendedEntityList.Remove(entity);
         }
@@ -1266,58 +1255,58 @@ public class Feature
             path.Clear();
         }
     }
-/*
-    public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
-    {
-        if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
+    /*
+        public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
         {
-            if (curEntity is null) // means not at any entity currently
+            if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
             {
-                if (path.Count > 0)
+                if (curEntity is null) // means not at any entity currently
                 {
-                    PerimeterEntityList.Add(new List<Entity>(path)); // adds all perimeter feature paths besides last one
-                }
-                path.Clear();
-                path.Add(unusedEntities[0]);
-                unusedEntities.RemoveAt(0);
-                seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
-            }
-            else // means there is a current entity
-            {
-                bool intersected;
-                do
-                {
-                    intersected = false;
-                    foreach (Entity entity in unusedEntities)
+                    if (path.Count > 0)
                     {
-                        if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
-                        {
-                            path.Add(entity);
-                            unusedEntities.Remove(entity);
-                            intersected = true;
-                            seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last()); // reruns with touching entity now being current entity
-
-                            break;
-                        }
+                        PerimeterEntityList.Add(new List<Entity>(path)); // adds all perimeter feature paths besides last one
                     }
-                    
-                } while (intersected);
-
-                if (path.Count > 0)
-                {
-                    PerimeterEntityList.Add(new List<Entity>(path));
+                    path.Clear();
+                    path.Add(unusedEntities[0]);
+                    unusedEntities.RemoveAt(0);
+                    seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
                 }
-                seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
+                else // means there is a current entity
+                {
+                    bool intersected;
+                    do
+                    {
+                        intersected = false;
+                        foreach (Entity entity in unusedEntities)
+                        {
+                            if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
+                            {
+                                path.Add(entity);
+                                unusedEntities.Remove(entity);
+                                intersected = true;
+                                seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last()); // reruns with touching entity now being current entity
+
+                                break;
+                            }
+                        }
+
+                    } while (intersected);
+
+                    if (path.Count > 0)
+                    {
+                        PerimeterEntityList.Add(new List<Entity>(path));
+                    }
+                    seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
+                }
             }
         }
-    }
-*/
+    */
     /* Recursive function that adds all entities in unusedEntities that intersect curEntity into path
      * 
      * @Param path is the list of touching entities
      * @Param unusedEntities are all available entities to add
      * @Param curEntity is the current entity being checked
-     */ 
+     */
     public void getTouchingList(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
     {
         if (curEntity is null)
@@ -1332,7 +1321,7 @@ public class Feature
         {
             if (curEntity.DoesIntersect(unusedEntities[i]))
             {
-                touchingList.Add(unusedEntities[i]);    
+                touchingList.Add(unusedEntities[i]);
                 path.Add(unusedEntities[i]);
                 unusedEntities.Remove(unusedEntities[i]);
                 i--; // i needs to stay the same since everything to the right of the moved entity is shifted left once
@@ -1360,7 +1349,7 @@ public class Feature
     // Adds back all parents of extended lines that are not in baseEntityList back into ExtendedEntityList
     private void addBackParents()
     {
-        for(int i = 0; i < ExtendedEntityList.Count; i++) 
+        for (int i = 0; i < ExtendedEntityList.Count; i++)
         {
             if (ExtendedEntityList[i] is ExtendedLine && (!baseEntityList.Contains(ExtendedEntityList[i])))
             {
@@ -1420,7 +1409,7 @@ public class Feature
         }
         else if (EntityList[0] is Circle)
         {
-            maxX = ( ((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius );
+            maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
         }
 
         //Loop through list and see if there is a bigger X
@@ -1448,11 +1437,11 @@ public class Feature
                     maxX = ((Arc)EntityList[i]).End.X;
                 }
             }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius) > maxX ) 
+            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius) > maxX)
             {
-                    maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
+                maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
             }
-            
+
         }
 
         double maxY = 0;
@@ -1515,7 +1504,7 @@ public class Feature
             }
 
         }
-        return new Point( maxX, maxY );
+        return new Point(maxX, maxY);
     }
 
     public Point FindMinPoint()
