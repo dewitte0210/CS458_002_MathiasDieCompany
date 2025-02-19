@@ -4,11 +4,6 @@
  */
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
-using Remotion.Linq.Clauses.ResultOperators;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Numerics;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -26,7 +21,7 @@ namespace FeatureRecognitionAPI.Models
         public int GetTotalFeatureGroups()
         {
             int tmp = 0;
-            foreach(FeatureGroup fGroup in featureGroups)
+            foreach (FeatureGroup fGroup in featureGroups)
             {
                 tmp += fGroup.Count;
             }
@@ -57,7 +52,7 @@ namespace FeatureRecognitionAPI.Models
         {
             this.featureList = featureList;
         }
-        
+
         public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
             for (int i = 0; i < entities.Count(); i++)
@@ -167,7 +162,7 @@ namespace FeatureRecognitionAPI.Models
         public void SetFeatureGroups()
         {
             List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
-           // List<Feature> brokenFeatures = makeFeatureList(entities);
+            // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
             //Create features groups things in a way that breaks the logic here
@@ -176,48 +171,48 @@ namespace FeatureRecognitionAPI.Models
                 features.Add(new Feature(entityList));
             }
 
-            
+
             Point minPoint = new(0, 0);
-            Point maxPoint = new(0,0);
-            Point maxDiff = new(0,0);
+            Point maxPoint = new(0, 0);
+            Point maxDiff = new(0, 0);
             int maxDiffIndex = 0;
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
             Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0,0);
+            Point tempMaxPoint = new(0, 0);
 
             //bool firstrun = true;
             while (features.Count > 0)
             {
 
 
-                    //Set max values to zero before run, if its not the first one
-                    maxDiffIndex = 0;
-                    maxDiff.X = 0; maxDiff.Y = 0;
-                    maxPoint.X = 0; maxDiff.X = 0;
-                    minPoint.X = 0; minPoint.Y = 0;
+                //Set max values to zero before run, if its not the first one
+                maxDiffIndex = 0;
+                maxDiff.X = 0; maxDiff.Y = 0;
+                maxPoint.X = 0; maxDiff.X = 0;
+                minPoint.X = 0; minPoint.Y = 0;
 
                 for (int i = 0; i < features.Count; i++)
                 {
                     //If first run don't start at 0, otherwise reset max 
                     //if (firstrun) { i = 1; firstrun = false; }
-                   
+
                     tempMinPoint = features[i].FindMinPoint();
                     tempMaxPoint = features[i].FindMaxPoint();
                     tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);
                     tempDiff.Y = (tempMaxPoint.Y - tempMinPoint.Y);
-                    
+
 
 
                     if (tempDiff.X > maxDiff.X && tempDiff.Y > maxDiff.Y)
                     {
-                            maxPoint = tempMaxPoint;
-                            minPoint = tempMinPoint;
-                            maxDiff.X = tempDiff.X; maxDiff.Y = tempDiff.Y;
-                            maxDiffIndex = i;
+                        maxPoint = tempMaxPoint;
+                        minPoint = tempMinPoint;
+                        maxDiff.X = tempDiff.X; maxDiff.Y = tempDiff.Y;
+                        maxDiffIndex = i;
                     }
-                    
+
                 }
 
                 //Start the list
@@ -227,8 +222,8 @@ namespace FeatureRecognitionAPI.Models
 
                 features.RemoveAt(maxDiffIndex);
 
-                
-                
+
+
 
                 for (int i = 0; i < features.Count; i++)
                 {
@@ -412,7 +407,7 @@ namespace FeatureRecognitionAPI.Models
                     //else if (feature.CheckGroup4()) break;
                     //else if (feature.CheckGroup5()) break;
                     //else if (feature.CheckGroup6()) break;
-                        
+
                 }
             }
         }

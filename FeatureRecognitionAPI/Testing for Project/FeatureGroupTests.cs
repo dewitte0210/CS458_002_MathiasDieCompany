@@ -1,9 +1,4 @@
 ﻿using FeatureRecognitionAPI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Testing_for_Project
 {
@@ -24,9 +19,9 @@ namespace Testing_for_Project
             //Check that we have the correct number of feature groups (1 from example 1)
             Assert.That(dwgFile.GetFeatureGroupCount(), Is.EqualTo(1));
             //Check that the one feature group has a count of 2
-            Assert.That(dwgFile.GetTotalFeatureGroups(), Is.EqualTo(2)); 
+            Assert.That(dwgFile.GetTotalFeatureGroups(), Is.EqualTo(2));
         }
-        
+
         [Test]
         public void TestFeatureGroupExample2()
         {

@@ -7,7 +7,8 @@
         public double Value { get; set; }
         public int Weight { get; set; }
 
-        public Punch(string cut, string @base, double value, int weight ) {
+        public Punch(string cut, string @base, double value, int weight)
+        {
             Cut = cut;
             Base = @base;
             Value = value;

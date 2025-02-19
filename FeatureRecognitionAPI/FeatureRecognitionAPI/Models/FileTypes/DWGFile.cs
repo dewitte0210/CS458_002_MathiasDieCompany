@@ -1,14 +1,9 @@
 ﻿/*
  * Child class from SupportedFiles that handles DWG files.
  */
-using FeatureRecognitionAPI.Models.Enums;
 using ACadSharp;
-using System;
 using ACadSharp.IO;
-using CSMath;
-using iText.Barcodes.Qrcode;
-using ACadSharp.Header;
-using System.Security.Permissions;
+using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -59,7 +54,7 @@ namespace FeatureRecognitionAPI.Models
         public override void readEntities()
         {
             DwgReader reader = new DwgReader(_path);
-            
+
             CadDocument doc = reader.Read();
 
             _fileVersion = GetFileVersion(doc.Header.VersionString);
@@ -72,7 +67,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     case "LINE":
                         {
-                            Line lineEntity = 
+                            Line lineEntity =
                                 new Line(((ACadSharp.Entities.Line)entities[i]).StartPoint.X,
                                 ((ACadSharp.Entities.Line)entities[i]).StartPoint.Y,
                                 ((ACadSharp.Entities.Line)entities[i]).EndPoint.X,
@@ -87,10 +82,10 @@ namespace FeatureRecognitionAPI.Models
                                 ((ACadSharp.Entities.Arc)entities[i]).Center.Y,
                                 ((ACadSharp.Entities.Arc)entities[i]).Radius,
                                 //Start and end angle return radians, and must be converted to degrees
-                                (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180/Math.PI)),
-                                (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180/ Math.PI)));
+                                (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180 / Math.PI)),
+                                (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180 / Math.PI)));
                             entityList.Add(arcEntity);
-                            break; 
+                            break;
                         }
                     case "CIRCLE":
                         {
@@ -114,11 +109,11 @@ namespace FeatureRecognitionAPI.Models
                             entityList.Add(ellipseEntity);
                             break;
                         }
-                } 
+                }
             }
         }
         //Throws exeption if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
-         
+
         public FileVersion GetFileVersion(string version)
         {
 
@@ -153,7 +148,7 @@ namespace FeatureRecognitionAPI.Models
 
         public List<Entity> GetEntities()
         {
-            return  entityList;
+            return entityList;
         }
 
 
