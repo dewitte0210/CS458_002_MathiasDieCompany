@@ -162,11 +162,6 @@
   border: none;
   font-size: 16px;
   background: rgb(84, 114, 210);
-  background: linear-gradient(
-    circle,
-    rgba(84, 114, 210, 1) 0%,
-    rgba(0, 95, 255, 1) 100%
-  );
   font-weight: 600;
   color: #ffffff;
   cursor: pointer;

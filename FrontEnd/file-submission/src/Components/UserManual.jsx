@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import styles from "./UserManual.module.css";
+import "@fortawesome/fontawesome-free/css/all.min.css"
 
 /**
  * UserManual - Handles a user manual with key information on using the app
@@ -93,7 +94,7 @@ export default function UserManual (){
       <div className={styles["fade-out-panel-container"]}>
         {/* Manual book icon */}
         <button className={styles["manual-button"]} ref={manualButtonRef} onClick={toggleManual}>
-          <i className={`${styles["fas"]} ${styles["fa-book"]}`}></i>
+          <i className='fas fa-book'></i>
         </button>
 
         {/* Manual Panel */}
