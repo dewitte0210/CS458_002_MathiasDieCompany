@@ -93,7 +93,7 @@ export default function UserManual (){
       <div className={styles["fade-out-panel-container"]}>
         {/* Manual book icon */}
         <button className={styles["manual-button"]} ref={manualButtonRef} onClick={toggleManual}>
-          <i className={styles["fas fa-book"]}></i>
+          <i className={`${styles["fas"]} ${styles["fa-book"]}`}></i>
         </button>
 
         {/* Manual Panel */}
