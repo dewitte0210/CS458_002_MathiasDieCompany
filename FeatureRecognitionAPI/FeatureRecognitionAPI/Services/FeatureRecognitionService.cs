@@ -112,7 +112,7 @@ namespace FeatureRecognitionAPI.Services
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
                             for (int i = 0; i < featureGroups.Count; i++)
-                            {
+                             {
                                 features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
@@ -164,9 +164,8 @@ namespace FeatureRecognitionAPI.Services
                 .GroupBy(arc => arc.GetHashCode())
                 .Select(list => list.Aggregate((bigArc, smallArc) =>
                 {
-
                     Point center = bigArc.Center;
-                    double radius = smallArc.Radius + bigArc.Radius;
+                    double radius =  bigArc.Radius;
 
                     bool startAtSmallArcStart =
                         Math.Abs(smallArc.StartAngle + smallArc.CentralAngle - bigArc.StartAngle) % 360 < Entity.EntityTolerance;
@@ -174,11 +173,20 @@ namespace FeatureRecognitionAPI.Services
                     double angleStart = startAtSmallArcStart ? smallArc.StartAngle : bigArc.StartAngle;
                     double angleExtent = bigArc.CentralAngle + smallArc.CentralAngle;
 
-                    return new Arc(center.X, center.Y, radius, angleStart, angleExtent);
+                    return new Arc(center.X, center.Y, radius, angleStart, angleStart + angleExtent);
                 })).ToList();
-            
-            
-            returned.AddRange(arcs);
+
+            foreach (Arc arc in arcs)
+            {
+                if (Math.Abs(arc.CentralAngle - 360) <= Entity.EntityTolerance)
+                {
+                   returned.Add(new Circle(arc.Center.X, arc.Center.Y, arc.Radius)); 
+                }
+                else
+                {
+                    returned.Add(arc);
+                }
+            } 
             return returned;
         }    
     }
