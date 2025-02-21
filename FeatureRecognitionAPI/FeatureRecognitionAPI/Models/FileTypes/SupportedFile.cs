@@ -304,9 +304,6 @@ namespace FeatureRecognitionAPI.Models
 
                 for (int i = 0; i < features.Count; i++)
                 {
-                    //If first run don't start at 0, otherwise reset max 
-                    if (firstrun) { i = 1; firstrun = false; }
-
                     tempMinPoint = features[i].FindMinPoint();
                     tempMaxPoint = features[i].FindMaxPoint();
                     tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);

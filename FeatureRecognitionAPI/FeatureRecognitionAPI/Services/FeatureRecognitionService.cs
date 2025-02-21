@@ -8,7 +8,9 @@ namespace FeatureRecognitionAPI.Services
 {
     public class FeatureRecognitionService : IFeatureRecognitionService
     {
-        public FeatureRecognitionService() { }
+        public FeatureRecognitionService()
+        {
+        }
 
         public async Task<(OperationStatus, string?)> GetFileExtension(string fileName)
         {
@@ -22,6 +24,7 @@ namespace FeatureRecognitionAPI.Services
                     {
                         extBool = true;
                     }
+
                     if (extBool)
                     {
                         ext += char.ToLower(fileName[i]);
@@ -44,26 +47,27 @@ namespace FeatureRecognitionAPI.Services
                         return (OperationStatus.OK, null);
                 }
             }
+
             Console.WriteLine("ERROR File does not exist");
             return (OperationStatus.OK, null);
         }
 
         /*
-        * Handles an uploaded file by performing feature detection based on its extension 
-        * and returning the results in JSON format for the frontend.
-        * 
-        * Supported file types: .dxf, .dwg
-        * 
-        * @param file The uploaded file as an IFormFile object.
-        * @return A tuple containing:
-        *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
-        *   - string: The resulting JSON string if successful; null otherwise.
-        *   
-        * Note: PDF support is currently commented out and will be implemented in the future.
-        * 
-        * Exceptions:
-        * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
-        */
+         * Handles an uploaded file by performing feature detection based on its extension
+         * and returning the results in JSON format for the frontend.
+         *
+         * Supported file types: .dxf, .dwg
+         *
+         * @param file The uploaded file as an IFormFile object.
+         * @return A tuple containing:
+         *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
+         *   - string: The resulting JSON string if successful; null otherwise.
+         *
+         * Note: PDF support is currently commented out and will be implemented in the future.
+         *
+         * Exceptions:
+         * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
+         */
         public async Task<(OperationStatus, string?)> UploadFile(IFormFile file)
         {
             try
@@ -108,13 +112,15 @@ namespace FeatureRecognitionAPI.Services
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
                             for (int i = 0; i < featureGroups.Count; i++)
-                             {
+                            {
                                 features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
+
                             // Create JSON that will be sent to the frontend
                             json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
+
                         break;
                     case ".dwg":
                         // Works exactly the same as DXF above, just with a different file as the parser functions are different
@@ -128,8 +134,10 @@ namespace FeatureRecognitionAPI.Services
                                 features = dWGFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
+
                             json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
+
                         break;
                     default:
                         Console.WriteLine("ERROR detecting file extension");
@@ -137,7 +145,6 @@ namespace FeatureRecognitionAPI.Services
                 }
 
                 return (OperationStatus.OK, json);
-
             }
             catch (Exception ex)
             {
@@ -151,8 +158,9 @@ namespace FeatureRecognitionAPI.Services
                 return (OperationStatus.ExternalApiFailure, ex.ToString());
             }
         }
+
         private List<Entity> condenseArcs(List<Entity> entities)
-        {  
+        {
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
 
             List<Arc> arcs = entities.OfType<Arc>().ToList();
@@ -161,10 +169,11 @@ namespace FeatureRecognitionAPI.Services
                 .Select(list => list.Aggregate((bigArc, smallArc) =>
                 {
                     Point center = bigArc.Center;
-                    double radius =  bigArc.Radius;
+                    double radius = bigArc.Radius;
 
                     bool startAtSmallArcStart =
-                        Math.Abs(smallArc.StartAngle + smallArc.CentralAngle - bigArc.StartAngle) % 360 < Entity.EntityTolerance;
+                        Math.Abs(smallArc.StartAngle + smallArc.CentralAngle - bigArc.StartAngle) % 360 <
+                        Entity.EntityTolerance;
 
                     double angleStart = startAtSmallArcStart ? smallArc.StartAngle : bigArc.StartAngle;
                     double angleExtent = bigArc.CentralAngle + smallArc.CentralAngle;
@@ -176,14 +185,15 @@ namespace FeatureRecognitionAPI.Services
             {
                 if (Math.Abs(arc.CentralAngle - 360) <= Entity.EntityTolerance)
                 {
-                   returned.Add(new Circle(arc.Center.X, arc.Center.Y, arc.Radius)); 
+                    returned.Add(new Circle(arc.Center.X, arc.Center.Y, arc.Radius));
                 }
                 else
                 {
                     returned.Add(arc);
                 }
-            } 
+            }
+
             return returned;
-        }    
+        }
     }
 }
