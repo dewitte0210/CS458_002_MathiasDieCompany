@@ -102,6 +102,13 @@ namespace Testing_for_Project
             List<double> actual = test.QuadraticFormula(1, -7, 10);
             Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
         }
+
+        [Test]
+        public void TestVectorFromCenterWithArc()
+        {
+            Arc test = new Arc(1, 1, 2, 0, 180);
+            Assert.That(test.VectorFromCenter(Math.PI / 2).Equals(new Line(1, 1, 1, 3)));
+        }
         #endregion
 
         [Test]

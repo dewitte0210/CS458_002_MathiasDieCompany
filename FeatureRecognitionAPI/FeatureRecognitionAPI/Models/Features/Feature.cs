@@ -508,9 +508,9 @@ public class Feature
                 }
             }
             //Possible bowtie
-            else if (numLines == 2 && getBothLinesAndDetermineParallelization())
+            else if (numLines == 2)
             {
-                if (IsBowtie())
+                if (IsBowtie() && getBothLinesAndDetermineParallelization())
                 {
                     type = PossibleFeatureTypes.Group2A2;
                     return true;
@@ -579,6 +579,24 @@ public class Feature
      */
     internal bool IsBowtie()
     {
+
+        return false;
+    }
+
+    private bool DetermineConcavity(Entity entity)
+    {
+        Point minPoint = FindMinPoint();
+        Point maxPoint = FindMaxPoint();
+        double maxLength = Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
+        Line ray;
+        if (entity is Arc)
+        {
+            //ray = (entity as Arc).VectorFromCenter((entity as Arc).);
+        }
+        if (entity is Ellipse)
+        {
+
+        }
         return false;
     }
 

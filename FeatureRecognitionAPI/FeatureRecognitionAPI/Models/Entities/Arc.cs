@@ -182,5 +182,10 @@
 
             return adjustedDegrees >= adjustedStart && adjustedDegrees <= adjustedEnd;
         }
+
+        internal Line VectorFromCenter(double angle)
+        {
+            return new Line(Center.X, Center.Y, 2 * Math.Cos(angle) + Center.X, 2 * Math.Sin(angle) + Center.Y);
+        }
     }
 }

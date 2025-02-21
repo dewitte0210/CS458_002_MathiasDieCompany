@@ -407,5 +407,20 @@ namespace Testing_for_Project
             Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6));
         }
         #endregion
+
+        [Test]
+
+        public void TestSortedFeatureList()
+        {
+            Line line1 = new(4, 5, 4, 0);
+            Line line2 = new(0, 0, 0, 5);
+            Line line3 = new(4, 0, 2, -2);
+            Arc arc1 = new(2, 5, 2, 0, 180);
+            Line line4 = new(2, -2, 0, 0);
+            List<Entity> entities = new List<Entity>() { line1, line2, line3, arc1, line4 };
+            Feature testFeature = new(entities) { ExtendedEntityList = entities };
+            bool testBool = testFeature.seperateBaseEntities();
+            Assert.That(testBool, Is.True);
+        }
     }
 }
