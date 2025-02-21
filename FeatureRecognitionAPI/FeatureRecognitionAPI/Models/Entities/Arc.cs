@@ -1,7 +1,7 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
+namespace FeatureRecognitionAPI.Models
+using FeatureRecognitionAPI.Models.Enums;
 using iText.Pdfua.Checkers.Utils;
 
-namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Arc object that extends Entity
@@ -9,18 +9,18 @@ namespace FeatureRecognitionAPI.Models
      */
     public class Arc : Entity
     {
-        public Point Center { get; set; } //central point
-        public Point Start { get; set; } //Start point
-        public Point End { get; set; } //End point
-        public double Radius { get; set; } //Radius value
-        public double StartAngle { get; set; } //angle from central point to start point
-        public double EndAngle { get; set; } //angle from central point to end point
-        public double CentralAngle { get; } //angle of the arc
+        public Point Center { get; set; }//Centeral point
+        public Point Start { get; set; }//Start point
+        public Point End { get; set; }//End point
+        public double Radius { get; set; }//Radius value
+        public double StartAngle { get; set; }//angle from centeral point to start point
+        public double EndAngle { get; set; }//angle from centeral point to end point
+        public double CentralAngle { get; }//angle of the arc
 
         /**
          * Creates an arc and calculates the starting and ending coordinates as well
          * as the length of the arc. Makes it so Arc has no default constructor
-         *
+         * 
          * @param CenterX the x value of the center of the arc
          * @param CenterY the y value of the center of the arc
          * @param radius the radius value of the arc
@@ -29,19 +29,19 @@ namespace FeatureRecognitionAPI.Models
          */
         public Arc(double centerX, double centerY, double radius, double startAngle, double endAngle)
         {
-            this.Center = new Point(centerX, centerY);
+            Center = new Point(centerX, centerY);
             this.Radius = radius;
             this.StartAngle = startAngle;
             this.EndAngle = endAngle;
-            this.Start = new(calcXCoord(centerX, radius, startAngle), calcYCoord(centerY, radius, startAngle));
-            this.End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
+            Start = new(calcXCoord(centerX, radius, startAngle), calcYCoord(centerY, radius, startAngle));
+            End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
             this.CentralAngle = calcCentralAngle(startAngle, endAngle);
             this.Length = (calcLength(radius, CentralAngle));
         }
 
         /**
          * Function for calculating radians for cos and sin calculations.
-         *
+         * 
          * @param degrees is the amount of degrees being converted
          * @return the radian value of degrees
          */
@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
 
         /**
          * Function to calculate the central angle
-         *
+         * 
          * @param startAngle the start angle of the arc being calculated
          * @param endAngle the end angle of the arc being calculated
          * @return the calculated the length of the arc
@@ -97,7 +97,7 @@ namespace FeatureRecognitionAPI.Models
 
         /**
          * Overides .Equals function for the Arc object
-         *
+         * 
          * @param obj object being compared to this
          * @return true if the same arc, false if not
          */

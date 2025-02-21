@@ -1,12 +1,8 @@
 ﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
-using Newtonsoft.Json;
-using System.IO;
-using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
-using Newtonsoft.Json.Converters;
 using FeatureRecognitionAPI.Models.Features;
-using iText.Kernel.Pdf;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -20,7 +16,7 @@ namespace FeatureRecognitionAPI.Services
             {
                 string ext = "";
                 bool extBool = false;
-                for (int i = 0; i < fileName.Length;i++)
+                for (int i = 0; i < fileName.Length; i++)
                 {
                     if (fileName[i] == '.')
                     {
@@ -90,9 +86,9 @@ namespace FeatureRecognitionAPI.Services
                         await file.CopyToAsync(stream);
                     }
                 }
-                
+
                 string json = "";
-                
+
                 List<List<Entity>> touchingEntityList;
                 List<Feature> features;
                 List<FeatureGroup> featureGroups;
@@ -141,7 +137,7 @@ namespace FeatureRecognitionAPI.Services
                 }
 
                 return (OperationStatus.OK, json);
-                
+
             }
             catch (Exception ex)
             {

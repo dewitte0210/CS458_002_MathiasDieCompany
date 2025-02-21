@@ -1,9 +1,5 @@
 ﻿using FeatureRecognitionAPI.Models.Dtos;
-using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
-using Microsoft.AspNetCore.Mvc;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography.X509Certificates;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -239,7 +235,7 @@ namespace FeatureRecognitionAPI.Services
 
                         i++;
                     }
-                    
+
                     featureCost = featureCost * ruleFactor;
                     featureSetup = featureCost * SetupDiscount(feature.Count);
                     totalFeatureCost += featureCost;
@@ -248,7 +244,7 @@ namespace FeatureRecognitionAPI.Services
                     totalPerimeter += (feature.Perimeter * feature.Count);
                 }
 
-                double perimeterCost = totalPerimeter * 0.46;    
+                double perimeterCost = totalPerimeter * 0.46;
                 totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost));
 
                 return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString());

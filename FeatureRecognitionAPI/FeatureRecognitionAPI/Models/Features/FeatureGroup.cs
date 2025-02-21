@@ -1,6 +1,4 @@
-﻿using FeatureRecognitionAPI.Services;
-using Newtonsoft.Json;
-using System.Runtime.Intrinsics.Arm;
+﻿using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features
 {
@@ -13,13 +11,13 @@ namespace FeatureRecognitionAPI.Models.Features
         [JsonProperty]
         protected List<Feature> features;
         public List<List<Entity>> touchingEntities;
-        public FeatureGroup( List<Feature> features) 
+        public FeatureGroup(List<Feature> features)
         {
-           // this.count = count;
+            // this.count = count;
             this.features = features;
             touchingEntities = new List<List<Entity>>();
 
-            foreach ( Feature feature in features)
+            foreach (Feature feature in features)
             {
                 this.totalArcs += feature.getNumArcs();
                 this.totalLines += feature.getNumLines();
@@ -56,8 +54,8 @@ namespace FeatureRecognitionAPI.Models.Features
                     )
                 {
                     //Sort by perimiter
-                    features.Sort((x,y) => x.perimeter.CompareTo(y.perimeter));
-                    ((FeatureGroup)obj).features.Sort ((x,y) => x.perimeter.CompareTo((y.perimeter)));
+                    features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
+                    ((FeatureGroup)obj).features.Sort((x, y) => x.perimeter.CompareTo((y.perimeter)));
 
 
                     for (int i = 0; i < features.Count; i++)
@@ -65,8 +63,8 @@ namespace FeatureRecognitionAPI.Models.Features
                         //While this features @ i has same permiter as obj.features[j] check if any j = features[i]
                         int j = i;
                         bool checkPoint = false;
-                        while (j < features.Count 
-                            && Math.Abs( features[i].perimeter - ((FeatureGroup)obj).features[j].perimeter) < Entity.EntityTolerance) 
+                        while (j < features.Count
+                            && Math.Abs(features[i].perimeter - ((FeatureGroup)obj).features[j].perimeter) < Entity.EntityTolerance)
                         {
                             if (features[i].Equals(features[j]))
                             {

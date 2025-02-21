@@ -1,11 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-using System;
-using System.IO;
-using System.Numerics;
-using DecimalMath;
-using ACadSharp.Entities;
-
-namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models
 {
     public class Line : Entity
     {
@@ -15,9 +8,9 @@ namespace FeatureRecognitionAPI.Models
         public Point EndPoint { get; set; }
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
-        
+
         // Don't Delete. Called from ExtendedLine constructor
-        protected Line() 
+        protected Line()
         {
             StartPoint = new Point();
             EndPoint = new Point();
@@ -92,15 +85,15 @@ namespace FeatureRecognitionAPI.Models
         {
             double xSlopeDiff = this.SlopeX - line.SlopeX;
             double ySlopeDiff = this.SlopeY - line.SlopeY;
-            if(xSlopeDiff < Entity.EntityTolerance && ySlopeDiff < Entity.EntityTolerance)
+            if (xSlopeDiff < Entity.EntityTolerance && ySlopeDiff < Entity.EntityTolerance)
             {
                 return true;
             }
             return false;
         }
-        private bool withinTolerance( double value, double target)
+        private bool withinTolerance(double value, double target)
         {
-            return ((value  <= (target + TOLERANCE)) && (value >= (target - TOLERANCE)));
+            return ((value <= (target + TOLERANCE)) && (value >= (target - TOLERANCE)));
         }
         public bool isSameInfinateLine(Entity other)
         {
@@ -165,7 +158,7 @@ namespace FeatureRecognitionAPI.Models
         public override bool Equals(object? obj)
         {
             //If both lines have the same length , and the slopes are equal (within tight tollerance)
-            if (obj is Line && Math.Abs( ((Line)obj).Length - this.Length ) < EntityTolerance ) 
+            if (obj is Line && Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance)
             {
                 double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
                 double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
