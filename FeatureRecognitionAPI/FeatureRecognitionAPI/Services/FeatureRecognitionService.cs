@@ -107,7 +107,7 @@ namespace FeatureRecognitionAPI.Services
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             // Create the touching entity list
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            touchingEntityList = touchingEntityList.Select(list => condenseArcs(list)).ToList();
+                            touchingEntityList = touchingEntityList.Select(list => CondenseArcs(list)).ToList();
                             // Set the feature groups
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
@@ -159,28 +159,73 @@ namespace FeatureRecognitionAPI.Services
             }
         }
 
-        private List<Entity> condenseArcs(List<Entity> entities)
+        private List<Entity> CondenseArcs(List<Entity> entities)
         {
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
 
-            List<Arc> arcs = entities.OfType<Arc>().ToList();
-            arcs = arcs
-                .GroupBy(arc => arc.GetHashCode())
-                .Select(list => list.Aggregate((bigArc, smallArc) =>
+            List<IGrouping<int, Arc>> arcGroups = entities
+                .OfType<Arc>()
+                .GroupBy(arc => arc.GetHashCode()).ToList();
+
+            List<Arc> arcs = new List<Arc>();
+            foreach (var g in arcGroups)
+            {
+                List<Arc> group = g.ToList();
+                Arc initArc = group[0];
+                group.RemoveAt(0);
+
+                int idx = 0;
+                int failCount = 0;
+                while (group.Count > 0)
                 {
-                    Point center = bigArc.Center;
-                    double radius = bigArc.Radius;
+                    if (failCount > group.Count)
+                    {
+                        arcs.Add(initArc);
+                        group.RemoveAt(0);
+                        idx = 0;
+                        if (group.Count == 0)
+                        {
+                            break;
+                        }
 
-                    bool startAtSmallArcStart =
-                        Math.Abs(smallArc.StartAngle + smallArc.CentralAngle - bigArc.StartAngle) % 360 <
-                        Entity.EntityTolerance;
+                        initArc = group[0];
+                        failCount = 0;
+                    }
 
-                    double angleStart = startAtSmallArcStart ? smallArc.StartAngle : bigArc.StartAngle;
-                    double angleExtent = bigArc.CentralAngle + smallArc.CentralAngle;
+                    Arc otherArc = group[idx];
+                    if (initArc.ConnectsTo(otherArc))
+                    {
+                        Point center = initArc.Center;
+                        double radius = initArc.Radius;
 
-                    return new Arc(center.X, center.Y, radius, angleStart, angleStart + angleExtent);
-                })).ToList();
+                        bool startAtSmallArcStart =
+                            Math.Abs(otherArc.StartAngle + otherArc.CentralAngle - initArc.StartAngle) % 360 <
+                            Entity.EntityTolerance;
 
+                        double angleStart = startAtSmallArcStart ? otherArc.StartAngle : initArc.StartAngle;
+                        double angleExtent = otherArc.CentralAngle + initArc.CentralAngle;
+
+                        initArc = new Arc(center.X, center.Y, radius, angleStart, angleStart + angleExtent);
+                        group.RemoveAt(idx);
+                        failCount = 0;
+                    }
+                    else
+                    {
+                        failCount++;
+                    }
+
+                    if (group.Count == 0)
+                    {
+                        break;
+                    }
+
+                    idx = (idx + 1) % group.Count;
+                }
+
+                arcs.Add(initArc);
+            }
+
+            // Convert arcs to circles if necessary
             foreach (Arc arc in arcs)
             {
                 if (Math.Abs(arc.CentralAngle - 360) <= Entity.EntityTolerance)

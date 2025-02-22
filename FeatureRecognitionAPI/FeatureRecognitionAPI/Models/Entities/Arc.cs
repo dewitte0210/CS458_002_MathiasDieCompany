@@ -3,9 +3,9 @@ using Convert = System.Convert;
 using Math = System.Math;
 
 namespace FeatureRecognitionAPI.Models;
+
 using FeatureRecognitionAPI.Models.Enums;
 using iText.Pdfua.Checkers.Utils;
-
 
 /**
  * Class that represents a Arc object that extends Entity
@@ -13,18 +13,18 @@ using iText.Pdfua.Checkers.Utils;
  */
 public class Arc : Entity
 {
-    public Point Center { get; set; }//Centeral point
-    public Point Start { get; set; }//Start point
-    public Point End { get; set; }//End point
-    public double Radius { get; set; }//Radius value
-    public double StartAngle { get; set; }//angle from centeral point to start point
-    public double EndAngle { get; set; }//angle from centeral point to end point
-    public double CentralAngle { get; }//angle of the arc
+    public Point Center { get; set; } //Central point
+    public Point Start { get; set; } //Start point
+    public Point End { get; set; } //End point
+    public double Radius { get; set; } //Radius value
+    public double StartAngle { get; set; } //angle from central point to start point
+    public double EndAngle { get; set; } //angle from central point to end point
+    public double CentralAngle { get; } //angle of the arc
 
     /**
      * Creates an arc and calculates the starting and ending coordinates as well
      * as the length of the arc. Makes it so Arc has no default constructor
-     * 
+     *
      * @param CenterX the x value of the center of the arc
      * @param CenterY the y value of the center of the arc
      * @param radius the radius value of the arc
@@ -45,7 +45,7 @@ public class Arc : Entity
 
     /**
      * Function for calculating radians for cos and sin calculations.
-     * 
+     *
      * @param degrees is the amount of degrees being converted
      * @return the radian value of degrees
      */
@@ -74,7 +74,7 @@ public class Arc : Entity
 
     /**
      * Function to calculate the central angle
-     * 
+     *
      * @param startAngle the start angle of the arc being calculated
      * @param endAngle the end angle of the arc being calculated
      * @return the calculated the length of the arc
@@ -101,7 +101,7 @@ public class Arc : Entity
 
     /**
      * Overides .Equals function for the Arc object
-     * 
+     *
      * @param obj object being compared to this
      * @return true if the same arc, false if not
      */
@@ -206,5 +206,20 @@ public class Arc : Entity
             Center.Y * 10000379 +
             Radius * 10006721);
         //Note: this hash may not be robust enough
+    }
+
+    /**
+     * Return true if this and other should be combined into one larger arc.
+     */
+    public bool ConnectsTo(Arc other)
+    {
+        return !Equals(other) && 
+               GetHashCode() == other.GetHashCode() &&
+               (
+                   Start.Equals(other.Start) ||
+                   Start.Equals(other.End) ||
+                   End.Equals(other.Start) ||
+                   End.Equals(other.End)
+               );
     }
 }
