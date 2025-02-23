@@ -4,6 +4,7 @@ import DragDropZone from "./DragDropZone";
 import QuoteSubmission from "./QuoteSubmission";
 import ParentModal from "./SupportedFeaturesModal";
 import "bootstrap/dist/css/bootstrap.min.css";
+import VisualDisplay from "./VisualDisplay";
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -120,6 +121,8 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({ onFilesSelected }) => {
               backToUpload={backToUpload}
             />
           )}
+          {/*how do i fix this...*/}
+          <VisualDisplay jsonResponse={jsonResponse}/>
         </div>
       )}
     </div>
