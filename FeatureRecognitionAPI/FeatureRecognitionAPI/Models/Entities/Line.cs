@@ -222,7 +222,7 @@ namespace FeatureRecognitionAPI.Models
 
         public override double MaxY()
         {
-            return Math.Max(StartPoint.X, EndPoint.X);
+            return Math.Max(StartPoint.Y, EndPoint.Y);
         }
     }
 }
