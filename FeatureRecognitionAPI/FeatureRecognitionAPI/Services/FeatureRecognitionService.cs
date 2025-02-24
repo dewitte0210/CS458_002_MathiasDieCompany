@@ -1,6 +1,7 @@
 ﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using iText.Commons.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -96,7 +97,7 @@ namespace FeatureRecognitionAPI.Services
                 List<List<Entity>> touchingEntityList;
                 List<Feature> features;
                 List<FeatureGroup> featureGroups;
-                var settings = new JsonSerializerSettings();
+                var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
                 settings.Converters.Add(new StringEnumConverter());
                 switch (ext)
                 {
@@ -118,7 +119,7 @@ namespace FeatureRecognitionAPI.Services
                             }
 
                             // Create JSON that will be sent to the frontend
-                            json = JsonConvert.SerializeObject(featureGroups, settings);
+                            json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, featureGroups), settings);
                         }
 
                         break;

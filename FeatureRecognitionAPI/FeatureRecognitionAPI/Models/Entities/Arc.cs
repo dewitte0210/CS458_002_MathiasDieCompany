@@ -208,12 +208,35 @@ public class Arc : Entity
         //Note: this hash may not be robust enough
     }
 
+    //TODO: these calculations aren't completely robust,
+    //but they should be good enough for calculating the bounding box of the canvas on the front end
+    public override double MinX()
+    {
+        return Math.Min(Math.Min(Start.X, Center.X), End.X);
+    }
+
+    public override double MinY()
+    {
+        return Math.Min(Math.Min(Start.Y, Center.Y), End.Y);
+    }
+
+    public override double MaxX()
+    {
+        return Math.Max(Math.Max(Start.X, Center.X), End.X);
+    }
+
+    public override double MaxY()
+    {
+        return Math.Max(Math.Max(Start.Y, Center.Y), End.Y);
+    }
+
+
     /**
      * Return true if this and other should be combined into one larger arc.
      */
     public bool ConnectsTo(Arc other)
     {
-        return !Equals(other) && 
+        return !Equals(other) &&
                GetHashCode() == other.GetHashCode() &&
                (
                    Start.Equals(other.Start) ||
