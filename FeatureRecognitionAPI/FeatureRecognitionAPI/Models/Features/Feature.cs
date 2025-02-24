@@ -1380,260 +1380,31 @@ public class Feature
     }
     #endregion
 
-    #region MaxAndMinPoint
     public Point FindMaxPoint()
     {
-        double maxX = 0;
-        //Find the starting max 
-        if (EntityList[0] is Line)
+        double maxX = Double.MinValue;
+        double maxY = Double.MinValue;
+        foreach (Entity entity in EntityList)
         {
-            if (((Line)EntityList[0]).StartPoint.X > ((Line)EntityList[0]).EndPoint.X)
-            {
-                maxX = ((Line)EntityList[0]).StartPoint.X;
-            }
-            else
-            {
-                maxX = ((Line)EntityList[0]).EndPoint.X;
-            }
-        }
-        else if (EntityList[0] is Arc)
-        {
-            if (((Arc)EntityList[0]).Start.X > ((Arc)EntityList[0]).End.X)
-            {
-                maxX = ((Arc)EntityList[0]).Start.X;
-            }
-            else
-            {
-                maxX = ((Arc)EntityList[0]).End.X;
-            }
-        }
-        else if (EntityList[0] is Circle)
-        {
-            maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
+            maxX = Math.Max(maxX, entity.MaxX());
+            maxY = Math.Max(maxY, entity.MaxY());
         }
 
-        //Loop through list and see if there is a bigger X
-        for (int i = 1; i < EntityList.Count; i++)
-        {
-            if (EntityList[i] is Line)
-            {
-                if (((Line)EntityList[i]).StartPoint.X > maxX)
-                {
-                    maxX = ((Line)EntityList[i]).StartPoint.X;
-                }
-                if (((Line)EntityList[i]).EndPoint.X > maxX)
-                {
-                    maxX = ((Line)EntityList[i]).EndPoint.X;
-                }
-            }
-            else if (EntityList[i] is Arc)
-            {
-                if (((Arc)EntityList[i]).Start.X > maxX)
-                {
-                    maxX = ((Arc)EntityList[i]).Start.X;
-                }
-                if (((Arc)EntityList[i]).End.X > maxX)
-                {
-                    maxX = ((Arc)EntityList[i]).End.X;
-                }
-            }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius) > maxX)
-            {
-                maxX = (((Circle)EntityList[0]).Center.X + ((Circle)EntityList[0]).Radius);
-            }
-
-        }
-
-        double maxY = 0;
-        //Find the starting max Y
-        if (EntityList[0] is Line)
-        {
-            if (((Line)EntityList[0]).StartPoint.Y > ((Line)EntityList[0]).EndPoint.Y)
-            {
-                maxY = ((Line)EntityList[0]).StartPoint.Y;
-            }
-            else
-            {
-                maxY = ((Line)EntityList[0]).EndPoint.Y;
-            }
-        }
-        else if (EntityList[0] is Arc)
-        {
-            if (((Arc)EntityList[0]).Start.Y > ((Arc)EntityList[0]).End.Y)
-            {
-                maxY = ((Arc)EntityList[0]).Start.Y;
-            }
-            else
-            {
-                maxY = ((Arc)EntityList[0]).End.Y;
-            }
-        }
-        else if (EntityList[0] is Circle)
-        {
-            maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius);
-        }
-
-        //Loop through list and see if there is a bigger Y 
-        for (int i = 1; i < EntityList.Count; i++)
-        {
-            if (EntityList[i] is Line)
-            {
-                if (((Line)EntityList[i]).StartPoint.Y > maxY)
-                {
-                    maxY = ((Line)EntityList[i]).StartPoint.Y;
-                }
-                if (((Line)EntityList[i]).EndPoint.Y > maxY)
-                {
-                    maxY = ((Line)EntityList[i]).EndPoint.Y;
-                }
-            }
-            else if (EntityList[i] is Arc)
-            {
-                if (((Arc)EntityList[i]).Start.Y > maxY)
-                {
-                    maxY = ((Arc)EntityList[i]).Start.Y;
-                }
-                if (((Arc)EntityList[i]).End.Y > maxY)
-                {
-                    maxY = ((Arc)EntityList[i]).End.Y;
-                }
-            }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius) > maxY)
-            {
-                maxY = (((Circle)EntityList[0]).Center.Y + ((Circle)EntityList[0]).Radius);
-            }
-
-        }
         return new Point(maxX, maxY);
     }
 
     public Point FindMinPoint()
     {
-        double minX = 0;
-        //Find the starting min 
-        if (EntityList[0] is Line)
+        double minX = Double.MaxValue;
+        double minY = Double.MaxValue;
+        foreach (Entity entity in EntityList)
         {
-            if (((Line)EntityList[0]).StartPoint.X < ((Line)EntityList[0]).EndPoint.X)
-            {
-                minX = ((Line)EntityList[0]).StartPoint.X;
-            }
-            else
-            {
-                minX = ((Line)EntityList[0]).EndPoint.X;
-            }
-        }
-        else if (EntityList[0] is Arc)
-        {
-            if (((Arc)EntityList[0]).Start.X < ((Arc)EntityList[0]).End.X)
-            {
-                minX = ((Arc)EntityList[0]).Start.X;
-            }
-            else
-            {
-                minX = ((Arc)EntityList[0]).End.X;
-            }
-        }
-        else if (EntityList[0] is Circle)
-        {
-            minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius);
+            minX = Math.Min(minX, entity.MinX());
+            minY = Math.Min(minY, entity.MinY());
         }
 
-        //Loop through list and see if there is a smaller Y
-        for (int i = 1; i < EntityList.Count; i++)
-        {
-            if (EntityList[i] is Line)
-            {
-                if (((Line)EntityList[i]).StartPoint.X < minX)
-                {
-                    minX = ((Line)EntityList[i]).StartPoint.X;
-                }
-                if (((Line)EntityList[i]).EndPoint.X < minX)
-                {
-                    minX = ((Line)EntityList[i]).EndPoint.X;
-                }
-            }
-            else if (EntityList[i] is Arc)
-            {
-                if (((Arc)EntityList[i]).Start.X < minX)
-                {
-                    minX = ((Arc)EntityList[i]).Start.X;
-                }
-                if (((Arc)EntityList[i]).End.X < minX)
-                {
-                    minX = ((Arc)EntityList[i]).End.X;
-                }
-            }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius) > minX)
-            {
-                minX = (((Circle)EntityList[0]).Center.X - ((Circle)EntityList[0]).Radius);
-            }
-
-        }
-
-        double minY = 0;
-        //Find the starting minumum 
-        if (EntityList[0] is Line)
-        {
-            if (((Line)EntityList[0]).StartPoint.Y < ((Line)EntityList[0]).EndPoint.Y)
-            {
-                minY = ((Line)EntityList[0]).StartPoint.Y;
-            }
-            else
-            {
-                minY = ((Line)EntityList[0]).EndPoint.Y;
-            }
-        }
-        else if (EntityList[0] is Arc)
-        {
-            if (((Arc)EntityList[0]).Start.Y < ((Arc)EntityList[0]).End.Y)
-            {
-                minY = ((Arc)EntityList[0]).Start.Y;
-            }
-            else
-            {
-                minY = ((Arc)EntityList[0]).End.Y;
-            }
-        }
-        else if (EntityList[0] is Circle)
-        {
-            minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius);
-        }
-
-        //Loop through list and see if there is a smaller Y
-        for (int i = 1; i < EntityList.Count; i++)
-        {
-            if (EntityList[i] is Line)
-            {
-                if (((Line)EntityList[i]).StartPoint.Y < minY)
-                {
-                    minY = ((Line)EntityList[i]).StartPoint.Y;
-                }
-                if (((Line)EntityList[i]).EndPoint.Y < minY)
-                {
-                    minY = ((Line)EntityList[i]).EndPoint.Y;
-                }
-            }
-            else if (EntityList[i] is Arc)
-            {
-                if (((Arc)EntityList[i]).Start.Y < minY)
-                {
-                    minY = ((Arc)EntityList[i]).Start.Y;
-                }
-                if (((Arc)EntityList[i]).End.Y < minY)
-                {
-                    minY = ((Arc)EntityList[i]).End.Y;
-                }
-            }
-            else if (EntityList[i] is Circle && (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius) > minY)
-            {
-                minY = (((Circle)EntityList[0]).Center.Y - ((Circle)EntityList[0]).Radius);
-            }
-
-        }
         return new Point(minX, minY);
-
-    }
-    #endregion
+   }
 
     //Checks if the angles of all the arcs add up to 360
     internal bool DoAnglesAddTo360()

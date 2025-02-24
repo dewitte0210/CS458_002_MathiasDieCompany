@@ -645,5 +645,10 @@ namespace FeatureRecognitionAPI.Models
 
         //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
         public abstract bool Compare(object? obj);
+
+        public abstract double MinX();
+        public abstract double MinY();
+        public abstract double MaxX();
+        public abstract double MaxY();
     }
 }

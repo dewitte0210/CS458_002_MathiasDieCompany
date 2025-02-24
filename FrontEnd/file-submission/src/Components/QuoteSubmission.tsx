@@ -4,21 +4,21 @@ import {Button} from "react-bootstrap";
 import {MdQuestionMark} from "react-icons/md";
 
 interface QuoteSubmissionProps {
-    jsonResponse: any[];
+    featureGroups: any[];
     backToUpload: () => void;
 }
 
 const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
-                                                             jsonResponse,
+                                                             featureGroups,
                                                              backToUpload,
                                                          }) => {
     // Sort the initial data
     const sortedData = React.useMemo(() => {
-        return jsonResponse.map((group) => ({
+        return featureGroups.map((group) => ({
             ...group,
             features: [...group.features].sort((a, b) => a.FeatureType.localeCompare(b.FeatureType)),
         }));
-    }, [jsonResponse]);
+    }, [featureGroups]);
     // Initialize states
     const [data, setData] = useState(sortedData);
     const [isLoading, setIsLoading] = useState(false);

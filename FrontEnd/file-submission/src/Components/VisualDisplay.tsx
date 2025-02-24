@@ -3,15 +3,10 @@
 /**
  * Finds the maximum y-coordinate of all shapes, for scaling the canvas
  *
- * @param shapesData - The data representing the shapes to be drawn
+ * @param drawData - The data representing the shapes to be drawn
  * @returns {number} - The maximum y-coordinate of all shapes
  */
-function findMaxY(shapesData) {
-    let drawData = shapesData
-        .map((object) => {
-            return object.drawing;
-        })
-
+function findMaxY(drawData) {
     let maxY = 0;
     for (let i = 0; i < drawData.length; ++i) {
         let arr = drawData[i];
@@ -29,15 +24,10 @@ function findMaxY(shapesData) {
 /**
  * Finds the maximum x-coordinate of all shapes, for scaling the canvas
  *
- * @param shapesData - The data representing the shapes to be drawn
+ * @param drawData - The data representing the shapes to be drawn
  * @returns {number} - The maximum x-coordinate of all shapes
  */
-function findMaxX(shapesData) {
-    let drawData = shapesData
-        .map((object) => {
-            return object.drawing;
-        })
-
+function findMaxX(drawData) {
     let maxX = 0;
     for (let i = 0; i < drawData.length; ++i) {
         let arr = drawData[i];
@@ -55,15 +45,10 @@ function findMaxX(shapesData) {
 /**
  * Finds the minimum y-coordinate of all shapes, for scaling the canvas
  *
- * @param shapesData - The data representing the shapes to be drawn
+ * @param drawData - The data representing the shapes to be drawn
  * @returns {number} - The minimum y-coordinate of all shapes
  */
-function findMinY(shapesData) {
-    let drawData = shapesData
-        .map((object) => {
-            return object.drawing;
-        })
-
+function findMinY(drawData) {
     let minY = 0;
     for (let i = 0; i < drawData.length; ++i) {
         let arr = drawData[i];
@@ -81,15 +66,10 @@ function findMinY(shapesData) {
 /**
  * Finds the minimum x-coordinate of all shapes, for scaling the canvas
  *
- * @param shapesData - The data representing the shapes to be drawn
+ * @param drawData - The data representing the shapes to be drawn
  * @returns {number} - The minimum x-coordinate of all shapes
  */
-function findMinX(shapesData) {
-    let drawData = shapesData
-        .map((object) => {
-            return object.drawing;
-        })
-
+function findMinX(drawData) {
     let minX = 0;
     for (let i = 0; i < drawData.length; ++i) {
         let arr = drawData[i];
@@ -107,23 +87,24 @@ function findMinX(shapesData) {
 /**
  * Component to visualize the shapes on a canvas element
  *
- * @param shapesData - The data representing the shapes to be drawn
+ * @param drawData - The data representing the shapes to be drawn
  * @param kissCutSelections - The data representing the kiss cut selections
  * @returns {Element} - The canvas element with the shapes drawn on it
  */
 
 interface VisualDisplayProps {
-    jsonResponse: any[];
+    touchingEntities: any[];
 }
-const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
+
+const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
     // Reference to the canvas element
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    // useEffect hook is used to handle the drawing logic when the component mounts or when shapesData or scaleFactor changes
+    // useEffect hook is used to handle the drawing logic when the component mounts or when drawData or scaleFactor changes
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        
+
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
@@ -136,13 +117,14 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
             let padding = 0.1;
 
             // Calculate bounding box for all shapes
-            let minX = findMinX(jsonResponse) - padding;
-            let minY = findMinY(jsonResponse) - padding;
-            let maxX = findMaxX(jsonResponse) + padding;
-            let maxY = findMaxY(jsonResponse) + padding;
+            let minX = findMinX(touchingEntities) - padding;
+            let minY = findMinY(touchingEntities) - padding;
+            let maxX = findMaxX(touchingEntities) + padding;
+            let maxY = findMaxY(touchingEntities) + padding;
 
             // Calculate scaling factor to fit all shapes within the canvas
             const scaleFactor = Math.abs(600 / Math.max(maxX - minX, maxY - minY));
+            console.log("ScaleFactor", scaleFactor);
 
             // Set canvas dimensions based on the bounding box
             canvas.width = (maxX - minX) * scaleFactor;
@@ -165,23 +147,19 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
             let yOffset = Math.abs(Math.min(0, minY));
 
             // Iterate over each shape and draw it on the canvas
-            jsonResponse.forEach((object) => {
-                const drawArr = object.drawing;
-                drawArr.forEach((shape) => {
-                    if (shape.type.toLowerCase() === 'line2d') {
+            touchingEntities.forEach((object) => {
+                object.forEach((shape) => {
+                    if (shape["$type"].includes('Line')) {
                         drawLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (shape.type.toLowerCase() === 'arc2d') {
+                    } else if (shape["$type"].includes('Arc')) {
                         drawArc(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (
-                        shape.type.toLowerCase() === 'circle' ||
-                        shape.type.toLowerCase() === 'punch'
-                    ) {
+                    } else if ( shape["$type"].includes('Circle') === 'circle') {
                         drawCircle(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (shape.type.toLowerCase() === 'quadcurve2d') {
-                        drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (shape.type.toLowerCase() === 'cubiccurve2d') {
-                        drawCubicLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                    }
+                    } //else if (shape["$type"].includes() === 'quadcurve2d') {
+                    //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
+                    // } else if (shape["$type"].includes() === 'cubiccurve2d') {
+                    //     drawCubicLine(ctx, shape, scaleFactor, xOffset, yOffset);
+                    // }
                 });
             });
         };
@@ -189,8 +167,11 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
 
         const drawLine = (ctx, shape, scaleFactor, xOffset, yOffset) => {
             ctx.beginPath();
-            ctx.moveTo((shape.startX + xOffset) * scaleFactor, (shape.startY + yOffset) * scaleFactor);
-            ctx.lineTo((shape.endX + xOffset) * scaleFactor, (shape.endY + yOffset) * scaleFactor);
+            const startPoint = shape.StartPoint
+            const endPoint = shape.EndPoint
+            console.log((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
+            ctx.moveTo((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
+            ctx.lineTo((endPoint.X + xOffset) * scaleFactor, (endPoint.Y + yOffset) * scaleFactor);
 
             // Sets the color of the line based on whether it is a kiss cut (green) or not (black)
             ctx.strokeStyle = 'black';
@@ -210,7 +191,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
                 true
             );
             // Sets the color of the arc based on whether it is a kiss cut (green) or not (red)
-            ctx.strokeStyle ='black';
+            ctx.strokeStyle = 'black';
             ctx.setLineDash([]);
             ctx.lineWidth = 2;
             ctx.stroke();
@@ -226,8 +207,8 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
                 2 * Math.PI
             );
             // Sets the color of the circle based on whether it is a kiss cut (green) or not (blue)
-            ctx.strokeStyle =  'black';
-            ctx.setLineDash( []);
+            ctx.strokeStyle = 'black';
+            ctx.setLineDash([]);
             ctx.lineWidth = 2;
             ctx.stroke();
         };
@@ -245,8 +226,8 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
             const endY = (shape.endY + yOffset) * scaleFactor;
 
             ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
-            ctx.strokeStyle =  'purple';
-            ctx.setLineDash( []);
+            ctx.strokeStyle = 'purple';
+            ctx.setLineDash([]);
             ctx.lineWidth = 2; // Set line width
             ctx.stroke();
         };
@@ -268,12 +249,12 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({jsonResponse}) => {
 
             ctx.bezierCurveTo(ctrl1X, ctrl1Y, ctrl2X, ctrl2Y, endX, endY);
             ctx.strokeStyle = 'orange';
-            ctx.setLineDash( []);
+            ctx.setLineDash([]);
             ctx.lineWidth = 2; // Set line width
             ctx.stroke();
         };
         drawCanvas();
-    }, [jsonResponse]);
+    }, [touchingEntities]);
 
     // Return the canvas element
     return (
