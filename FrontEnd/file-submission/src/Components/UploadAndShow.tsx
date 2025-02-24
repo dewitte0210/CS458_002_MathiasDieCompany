@@ -126,7 +126,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                         minX = {jsonResponse["minX"]}
                         minY = {jsonResponse["minY"]}
                         maxX = {jsonResponse["maxX"]}
-                        maxY = {jsonResponse["maxX"]}
+                        maxY = {jsonResponse["maxY"]}
                         />
                     </div>
                 </div>
