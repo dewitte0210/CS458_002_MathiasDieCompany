@@ -44,15 +44,18 @@ public class Feature
                                                      //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
                                                      // You will have to run detection for perimeter features for each index of this list
 
-    private int numLines = 0;
     public int getNumLines() { return numLines; }
-    private int numArcs = 0;
     public int getNumArcs() { return numArcs; }
-    private int numCircles = 0;
     public int getNumCircles() { return numCircles; }
-    public int numEllipses = 0;
     public int getNumEllipses() { return numEllipses; }
 
+    private int numEllipses = 0;
+    private int numLines = 0;
+    private int numArcs = 0;
+    private int numCircles = 0;
+    private const double LOW_ANGLE_TOLERANCE = 359.9;
+    private const double HIGH_ANGLE_TOLERANCE = 360.09; 
+    
     #region Constructors
     /*
      * Constructor that passes in an entityList for the feature. Feature detection is expected to be
@@ -1634,7 +1637,7 @@ public class Feature
 
     }
     #endregion
-
+    
     //Checks if the angles of all the arcs add up to 360
     internal bool DoAnglesAddTo360()
     {
@@ -1646,7 +1649,8 @@ public class Feature
                 sumAngles += (entity as Arc).CentralAngle;
             }
         });
-        if (sumAngles > 359.9 && sumAngles < 360.09)
+        
+        if (sumAngles > LOW_ANGLE_TOLERANCE && sumAngles < HIGH_ANGLE_TOLERANCE)
         {
             return true;
         }
