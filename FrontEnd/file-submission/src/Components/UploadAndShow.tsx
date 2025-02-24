@@ -122,7 +122,12 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                                 backToUpload={backToUpload}
                             />
                         )}
-                        <VisualDisplay touchingEntities={jsonResponse["_touchingEntitiesList"]}/>
+                        <VisualDisplay touchingEntities={jsonResponse["_touchingEntitiesList"]}
+                        minX = {jsonResponse["minX"]}
+                        minY = {jsonResponse["minY"]}
+                        maxX = {jsonResponse["maxX"]}
+                        maxY = {jsonResponse["maxX"]}
+                        />
                     </div>
                 </div>
             )}

@@ -1,102 +1,14 @@
 ﻿import React, {useEffect, useRef} from 'react';
 
-/**
- * Finds the maximum y-coordinate of all shapes, for scaling the canvas
- *
- * @param drawData - The data representing the shapes to be drawn
- * @returns {number} - The maximum y-coordinate of all shapes
- */
-function findMaxY(drawData) {
-    let maxY = 0;
-    for (let i = 0; i < drawData.length; ++i) {
-        let arr = drawData[i];
-        for (let k = 0; k < arr.length; k++) {
-            let shape = arr[k];
-            if (shape.startY) maxY = Math.max(maxY, shape.startY);
-            if (shape.endY) maxY = Math.max(maxY, shape.endY);
-            if (shape.centerY) maxY = Math.max(maxY, shape.centerY);
-            if (shape.maxY) maxY = Math.max(maxY, shape.maxY);
-        }
-    }
-    return maxY;
-}
-
-/**
- * Finds the maximum x-coordinate of all shapes, for scaling the canvas
- *
- * @param drawData - The data representing the shapes to be drawn
- * @returns {number} - The maximum x-coordinate of all shapes
- */
-function findMaxX(drawData) {
-    let maxX = 0;
-    for (let i = 0; i < drawData.length; ++i) {
-        let arr = drawData[i];
-        for (let k = 0; k < arr.length; k++) {
-            let shape = arr[k];
-            if (shape.startX) maxX = Math.max(maxX, shape.startX);
-            if (shape.endX) maxX = Math.max(maxX, shape.endX);
-            if (shape.centerX) maxX = Math.max(maxX, shape.centerX);
-            if (shape.maxX) maxX = Math.max(maxX, shape.maxX);
-        }
-    }
-    return maxX;
-}
-
-/**
- * Finds the minimum y-coordinate of all shapes, for scaling the canvas
- *
- * @param drawData - The data representing the shapes to be drawn
- * @returns {number} - The minimum y-coordinate of all shapes
- */
-function findMinY(drawData) {
-    let minY = 0;
-    for (let i = 0; i < drawData.length; ++i) {
-        let arr = drawData[i];
-        for (let k = 0; k < arr.length; k++) {
-            let shape = arr[k];
-            if (shape.startY) minY = Math.min(minY, shape.startY);
-            if (shape.endY) minY = Math.min(minY, shape.endY);
-            if (shape.centerY) minY = Math.min(minY, shape.centerY);
-            if (shape.minY) minY = Math.min(minY, shape.minY);
-        }
-    }
-    return minY;
-}
-
-/**
- * Finds the minimum x-coordinate of all shapes, for scaling the canvas
- *
- * @param drawData - The data representing the shapes to be drawn
- * @returns {number} - The minimum x-coordinate of all shapes
- */
-function findMinX(drawData) {
-    let minX = 0;
-    for (let i = 0; i < drawData.length; ++i) {
-        let arr = drawData[i];
-        for (let k = 0; k < arr.length; k++) {
-            let shape = arr[k];
-            if (shape.startX) minX = Math.min(minX, shape.startX);
-            if (shape.endX) minX = Math.min(minX, shape.endX);
-            if (shape.centerX) minX = Math.min(minX, shape.centerX);
-            if (shape.minX) minX = Math.min(minX, shape.minX);
-        }
-    }
-    return minX;
-}
-
-/**
- * Component to visualize the shapes on a canvas element
- *
- * @param drawData - The data representing the shapes to be drawn
- * @param kissCutSelections - The data representing the kiss cut selections
- * @returns {Element} - The canvas element with the shapes drawn on it
- */
-
 interface VisualDisplayProps {
     touchingEntities: any[];
+    minX:number;
+    maxX:number;
+    minY:number;
+    maxY:number;
 }
 
-const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
+const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, maxX, minY, maxY}) => {
     // Reference to the canvas element
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -116,15 +28,15 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
             // Padding to ensure the shapes aren't clipped
             let padding = 0.1;
 
-            // Calculate bounding box for all shapes
-            let minX = findMinX(touchingEntities) - padding;
-            let minY = findMinY(touchingEntities) - padding;
-            let maxX = findMaxX(touchingEntities) + padding;
-            let maxY = findMaxY(touchingEntities) + padding;
+            minX -= padding;
+            minY -= padding;
+            maxX += padding;
+            maxY += padding;
+            
+            console.log(minX, minY, maxX, maxY);
 
             // Calculate scaling factor to fit all shapes within the canvas
             const scaleFactor = Math.abs(600 / Math.max(maxX - minX, maxY - minY));
-            console.log("ScaleFactor", scaleFactor);
 
             // Set canvas dimensions based on the bounding box
             canvas.width = (maxX - minX) * scaleFactor;
@@ -153,7 +65,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
                         drawLine(ctx, shape, scaleFactor, xOffset, yOffset);
                     } else if (shape["$type"].includes('Arc')) {
                         drawArc(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if ( shape["$type"].includes('Circle') === 'circle') {
+                    } else if ( shape["$type"].includes('Circle')) {
                         drawCircle(ctx, shape, scaleFactor, xOffset, yOffset);
                     } //else if (shape["$type"].includes() === 'quadcurve2d') {
                     //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
@@ -169,7 +81,6 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
             ctx.beginPath();
             const startPoint = shape.StartPoint
             const endPoint = shape.EndPoint
-            console.log((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
             ctx.moveTo((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
             ctx.lineTo((endPoint.X + xOffset) * scaleFactor, (endPoint.Y + yOffset) * scaleFactor);
 
@@ -182,12 +93,13 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
 
         const drawArc = (ctx, shape, scaleFactor, xOffset, yOffset) => {
             ctx.beginPath();
+            const center = shape.Center;
             ctx.arc(
-                (shape.centerX + xOffset) * scaleFactor,
-                (shape.centerY + yOffset) * scaleFactor,
-                shape.radius * scaleFactor,
-                -shape.angle,
-                -shape.rotation,
+                (center.X + xOffset) * scaleFactor,
+                (center.Y + yOffset) * scaleFactor,
+                shape.Radius * scaleFactor,
+                shape.EndAngle * (Math.PI / 180),
+                shape.StartAngle * (Math.PI / 180),
                 true
             );
             // Sets the color of the arc based on whether it is a kiss cut (green) or not (red)
@@ -199,10 +111,11 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities}) => {
 
         const drawCircle = (ctx, shape, scaleFactor, xOffset, yOffset) => {
             ctx.beginPath();
+            const center = shape.Center;
             ctx.arc(
-                (shape.centerX + xOffset) * scaleFactor,
-                (shape.centerY + yOffset) * scaleFactor,
-                shape.radius * scaleFactor,
+                (center.X + xOffset) * scaleFactor,
+                (center.Y + yOffset) * scaleFactor,
+                shape.Radius * scaleFactor,
                 0,
                 2 * Math.PI
             );
