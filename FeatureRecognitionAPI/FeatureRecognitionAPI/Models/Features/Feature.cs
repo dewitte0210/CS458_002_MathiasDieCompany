@@ -264,6 +264,7 @@ public class Feature
                 bool gotArc2 = false;
                 bool gotLine = false;
                 int index = 0;
+               
                 //Get one of the 2 lines and arcs to run isArcConcave
                 while (!gotArc1 || !gotLine || !gotArc2)
                 {

@@ -32,7 +32,7 @@ namespace FeatureRecognitionAPI.Controllers
                 if (quoteSubmissionDto == null)
                     return BadRequest("Invalid payload.");
 
-                var (status, msg, output) = await _pricingService.EstimatePrice(quoteSubmissionDto);
+                var (status, msg, output) =  _pricingService.EstimatePrice(quoteSubmissionDto);
 
                 if (status != OperationStatus.OK || output == null)
                     return BadRequest(msg);

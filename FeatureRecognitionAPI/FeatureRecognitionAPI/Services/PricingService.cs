@@ -4,6 +4,7 @@ using FeatureRecognitionAPI.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
+using FeatureRecognitionAPI.Models.Pricing;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -15,10 +16,22 @@ namespace FeatureRecognitionAPI.Services
         private const double PLUG_RATE = 95.17;
         private const double BASE = 130;
         private const double DISCOUNT = 1;
-         
-        public PricingService() { }
+        private readonly List<PunchPrice> _tubePunchList;
+        private readonly List<(double, double, double)> 
+            _soPunchList,
+            _hdsoPunchList,
+            _ftPunchList,
+            _swPunchList,
+            _retractList;
+        
+        public PricingService()
+        {
+                //Get Punch Lists
+                _tubePunchList = GetTubePunchList();
+               (_soPunchList, _hdsoPunchList, _ftPunchList, _swPunchList, _retractList) = GetPunchLists();
+        }
 
-        public async Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param)
+        public (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param)
         {
             try
             {
@@ -31,8 +44,6 @@ namespace FeatureRecognitionAPI.Services
                 double setupCostTotal = 0.00;
                 double totalFeatureCost = 0.00;
 
-                //Get Punch Lists
-                var (tubePunchList, soPunchList, hdsoPunchList, ftPunchList, swPunchList, retractList) = await GetPunchLists();
 
                 //Set rule factor based on rule type
                 switch (param.RuleType)
@@ -132,9 +143,9 @@ namespace FeatureRecognitionAPI.Services
                             break;
                         case PossibleFeatureTypes.StdTubePunch:
                             //Get closest diameter from list
-                            var tubePunch = tubePunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
-                            setupCost = tubePunch.Item2 * 1.2;
-                            runCost = tubePunch.Item3;
+                            var tubePunch = _tubePunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                            setupCost = tubePunch.SetupCost * 1.2;
+                            runCost = tubePunch.RunCost;
 
                             var punchCost = quantity * runCost;
                             featureCost = punchCost + (quantity * setupCost);
@@ -142,7 +153,7 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                         case PossibleFeatureTypes.SideOutlet:
                             //Get closest diameter from list
-                            var soPunch = soPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
+                            var soPunch = _soPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
                             setupCost = soPunch.Item2 * 1.2;
                             runCost = soPunch.Item3;
 
@@ -152,7 +163,7 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                         case PossibleFeatureTypes.HDSideOutlet:
                             //Get closest diameter from list
-                            var hdsoPunch = hdsoPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
+                            var hdsoPunch = _hdsoPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
                             setupCost = hdsoPunch.Item2 * 1.2;
                             runCost = hdsoPunch.Item3;
 
@@ -162,7 +173,7 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                         case PossibleFeatureTypes.StdFTPunch:
                             //Get closest diameter from list
-                            var ftPunch = ftPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
+                            var ftPunch = _ftPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
                             setupCost = ftPunch.Item2 * 1.2;
                             runCost = ftPunch.Item3;
 
@@ -172,7 +183,7 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                         case PossibleFeatureTypes.StdSWPunch:
                             //Get closest diameter from list
-                            var swPunch = swPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
+                            var swPunch = _swPunchList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
                             setupCost = swPunch.Item2 * 1.2;
                             runCost = swPunch.Item3;
 
@@ -182,7 +193,7 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                         case PossibleFeatureTypes.StdRetractPins:
                             //Get closest diameter from list
-                            var retract = retractList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
+                            var retract = _retractList.OrderBy(x => (x.Item1 - feature.Perimeter)).First();
                             setupCost = retract.Item2 * 1.2;
                             runCost = retract.Item3;
 
@@ -274,7 +285,149 @@ namespace FeatureRecognitionAPI.Services
             };
         }
 
-        private async Task<(List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>)> GetPunchLists()
+        private List<PunchPrice> GetTubePunchList()
+        {
+            var tubePunchList = new List<PunchPrice>()
+            {
+                new PunchPrice(3/32, 1/8, 4.5, 3),
+                new PunchPrice(3/32, 3/16, 4.5, 3),
+                new PunchPrice(7/64, 1/8, 4.5, 3),
+                new PunchPrice(7/64, 3/16, 3, 3),
+                new PunchPrice(1/8, 3/16, 3, 3),
+                new PunchPrice(9/64, 3/16, 3, 3),
+                new PunchPrice(9/64, 1/4, 3, 3),
+                new PunchPrice(5/32, 3/16, 3, 3),
+                new PunchPrice(5/32, 1/4, 3, 3),
+                new PunchPrice(11/64, 3/16, 3, 3),
+                new PunchPrice(3/16, 1/4, 3, 3),
+                new PunchPrice(13/64, 1/4, 3, 3 ),
+                new PunchPrice(13/64, 5/16, 3, 3),
+                new PunchPrice(7/32, 1/4, 3, 3),
+                new PunchPrice(7/32, 5/16, 3,3),
+                new PunchPrice(15/64, 1/4, 3,3),
+                new PunchPrice(1/4, 5/16, 3,3),
+                new PunchPrice(17/64, 5/16, 3, 3),
+                new PunchPrice(17/64, 3/8, 3, 3),            
+                new PunchPrice(9/32, 5/16, 3.25, 4),
+                new PunchPrice(19/64, 5/16, 3.25, 4),
+                new PunchPrice(5/16, 3/8, 3.25, 4),
+                new PunchPrice(21/64, 3/8, 3.25, 4),
+                new PunchPrice(21/64, 7/16, 3.25, 4),
+                new PunchPrice(11/32, 3/8, 3.25, 4),
+                new PunchPrice(11/32, 7/16, 3.25, 4),
+                new PunchPrice(23/64, 3/8, 3.25, 4),
+                new PunchPrice(3/8, 7/16, 3.25, 4), 
+                new PunchPrice(25/64, 7/16, 3.25, 4),
+                new PunchPrice(25/64, 1/2, 3.25, 4),
+                new PunchPrice(13/32, 7/16, 3.25, 4),
+                new PunchPrice(13/32, 1/2, 3.25, 4),
+                new PunchPrice(27/64, 7/16, 3.25, 4),
+                new PunchPrice(7/16, 1/2, 3.25, 4),
+                new PunchPrice(29/64, 1/2, 3.25, 4),
+                new PunchPrice(15/32, 1/2, 3.25, 4),
+                new PunchPrice(15/32, 9/16, 3.25, 4),
+                new PunchPrice(31/64, 1/2, 3.25, 4),
+                new PunchPrice(1/2, 9/16, 3.25, 4),
+                new PunchPrice(33/64, 9/16, 3.25, 4),
+                new PunchPrice(33/64, 5/8, 3.25, 4),
+                new PunchPrice(17/32, 9/16, 3.25, 4),
+                new PunchPrice(17/32, 5/8, 3.25, 4),
+                new PunchPrice(35/64, 9/16, 3.25, 4),
+                new PunchPrice(9/16, 5/8, 3.25,4),
+                new PunchPrice(37/64, 5/8, 3.5, 5),
+                new PunchPrice(19/32, 5/8, 3.5, 5),
+                new PunchPrice(19/32, 11/16, 3.5, 5),
+                new PunchPrice(39/64, 5/8, 3.5, 5),
+                new PunchPrice(5/8, 11/16, 3.5, 5),
+                new PunchPrice(41/64, 11/16, 3.5, 5),
+                new PunchPrice(21/32, 11/16, 3.5, 5),
+                new PunchPrice(21/32, 3/4, 3.5, 5),
+                new PunchPrice(43/64, 11/16, 3.5, 5),
+                new PunchPrice(11/16, 3/4, 3.5, 5),
+                new PunchPrice(45/64, 3/4, 3.5, 5),
+                new PunchPrice(45/64, 13/16, 3.5, 5),           
+                new PunchPrice(23/32, 3/4, 3.5, 5),   
+                new PunchPrice(23/32, 13/16, 3.5, 5),
+                new PunchPrice(47/64, 3/4, 3.5, 5),
+                new PunchPrice(3/4, 13/16, 3.5, 5),
+                new PunchPrice(49/64, 13/16, 3.5, 5),
+                new PunchPrice(25/32, 13/16, 3.5, 5),
+                new PunchPrice(25/32, 7/8, 3.5, 5),
+                new PunchPrice(51/64, 13/64, 3.5,5),
+                new PunchPrice(13/16, 7/8, 3.5,5),
+                new PunchPrice(53/64, 7/8, 3.5, 5),
+                new PunchPrice(53/64, 15/16, 3.5,5),
+                new PunchPrice(27/32, 7/8, 3.5, 5),
+                new PunchPrice(27/32, 15/16, 3.5, 5),
+                new PunchPrice(55/64, 7/8, 3.5,5),
+                new PunchPrice(7/8, 15/16, 4, 6),
+                new PunchPrice(57/64, 15/16, 4, 6),
+                new PunchPrice(57/64, 1, 4, 6),
+                new PunchPrice(29/32, 15/16, 4, 6),
+                new PunchPrice(29/32, 1, 4, 6),
+                new PunchPrice(59/64, 15/16, 4,6),
+                new PunchPrice(15/16, 1, 4, 6),
+                new PunchPrice(61/64, 1, 4, 6),
+                new PunchPrice(61/64, (1 + 1/16), 4, 6),
+                new PunchPrice(31/32, 1, 4, 6),
+                new PunchPrice(63/64, 1, 4, 6),
+                new PunchPrice(1, (1 + 1/16), 4, 6),
+                new PunchPrice((1 + 1/64), (1 + 1/16), 3.2, 35),
+                new PunchPrice( 1 + (1/64), 1 + (1/8), 3.1, 35),
+                new PunchPrice(1 + (1/32), 1 + (1/16), 3.1, 35),
+                new PunchPrice(1 + (1/32), 1 + (1/8), 3.1, 35),
+                new PunchPrice(1 + (3/64), 1 + (1/16), 3.1, 35),
+                new PunchPrice(1 + (1/16), 1 + (1/8), 3.1, 35),
+                new PunchPrice(1 + (5/64), 1 + (1/8), 3.1, 35),
+                new PunchPrice(1 + (3/32), 1 + (1/8), 3.1, 35),
+                new PunchPrice(1 + (3/32), 1 + (3/16), 3.25, 35),
+                new PunchPrice(1 + (7/64), 1 + (1/8), 3.1, 35),
+                new PunchPrice(1 + (1/8), 1 + (3/16), 3.25, 35),
+                new PunchPrice(1 + (9/64), 1 + (3/16), 3.25, 35),
+                new PunchPrice(1 + 9/64, 1 + (1/4), 3.25, 35),
+                new PunchPrice(1 + (5/32), 1 + (3/16), 3.25, 35) ,
+                new PunchPrice(1 + 5/32, 1 + (1/4), 3.25, 35),
+                new PunchPrice(1 + (11/64), 1 + (3/16), 3.25, 35),
+                new PunchPrice(1 + (3/16), 1 + (1/4), 3.25, 35),
+                new PunchPrice(1 + (13/64), 1 + (1/4), 3.25, 35),
+                new PunchPrice(1 + (7/32), 1 + (1/4), 3.25, 35),
+                new PunchPrice(1 + (15/64), 1 + (1/4), 3.25, 35),
+                new PunchPrice(1 + (1/4), 1 + (5/16), 3.3, 35),
+                new PunchPrice(1 + (17/64), 1 + (5/16), 3.3, 35),
+                new PunchPrice(1 + (9/32), 1 + (5/16), 3.3, 35),
+                new PunchPrice(1 + (9/32), 1 + (3/8), 3.3, 35),
+                new PunchPrice(1 + (19/64), 1 + (5/16), 3.3, 35),
+                new PunchPrice(1 + (5/16), 1 + (3/8), 3.3, 35),            
+                new PunchPrice(1 + (21/64), 1 + (3/8), 3.9, 35),
+                new PunchPrice(1 + (21/64), 1 + (7/16), 3.3, 35),
+                new PunchPrice(1 + (11/32), 1 + (3/8), 3.3, 35),
+                new PunchPrice(1 + (23/64), 1 + (3/8), 3.3, 35),
+                new PunchPrice(1 + (3/8), 1 + (7/16), 3.9, 35),
+                new PunchPrice(1 + (25/64), 1 + (7/16), 3.9, 35),
+                new PunchPrice(1 + (13/32), 1 + (7/16), 3.9, 35),
+                new PunchPrice(1 + (27/64), 1 + (7/16), 3.9, 35),
+                new PunchPrice(1 + (7/16), 1 + (1/2), 4.1, 35),
+                new PunchPrice(1 + (29/64), 1 + (1/2), 4.1, 35),
+                new PunchPrice(1 + (29/64), 1 + (9/16), 4.75, 35),
+                new PunchPrice(1 + (31/64), 1 + (1/2), 4.1, 35),
+                new PunchPrice(1 + (1/2), 1 + (9/16), 4.75, 35),
+                new PunchPrice(1 + (33/64), 1 + (9/16), 4.75, 35),
+                new PunchPrice(1 + (33/64), 1 + (5/8), 5.1, 35),
+                new PunchPrice(1 + (17/32), 1 + (9/16), 4.75, 35),
+                new PunchPrice(1 + (9/16), 1 + (5/8), 5.1, 35),
+                new PunchPrice(1 + (37/64), 1 + (5/8), 5.1, 35),
+                new PunchPrice(1 + (19/32), 1 + (5/8), 5.1, 35),
+                new PunchPrice(1 + (39/64), 1 + (5/8), 5.1, 35),
+                new PunchPrice(1 + (5/8), 1 + (11/16), 11.9, 35),
+                new PunchPrice(1 + (41/64), 1 + (3/4), 12.3, 35),
+                new PunchPrice(1 + (11/16), 1 + (3/4), 12.3, 35),
+                new PunchPrice(1 + (23/32), 1 + (3/4), 12.3, 35),            
+            }; 
+            
+            return tubePunchList;
+        }
+        
+        private (List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>) GetPunchLists()
         {
             // Only took unique cut size with highest costs,
             // which is smaller base size from original software list
@@ -282,95 +435,6 @@ namespace FeatureRecognitionAPI.Services
             // The first number is the size so below 1/32 = .031
             // The second numbers is the cost 
             // The third is the install (not sure what this means yet)
-            var tubePunchList = new List<(double, double, double)>()
-            {
-                (0.031, 6.45, 4),   // 1/32 Cut
-                (0.047, 6.45, 4),   // 3/64 Cut
-                (0.062, 5.5, 4),    // 1/16 Cut
-                (0.641, 3.5, 5),    // 41/64 Cut
-                (0.656, 3.5, 5),    // 21/32 Cut
-                (0.656, 3.5, 5),    // 21/32 Cut
-                (0.672, 3.5, 5),    // 43/64 Cut
-                (0.687, 3.5, 5),    // 11/16 Cut
-                (0.703, 3.5, 5),    // 45/64 Cut
-                (0.703, 3.5, 5),    // 45/64 Cut
-                (0.719, 3.5, 5),    // 23/32 Cut
-                (0.719, 3.5, 5),    // 23/32 Cut
-                (0.734, 3.5, 5),    // 47/64 Cut
-                (0.750, 3.5, 5),    // 3/4 Cut
-                (0.766, 3.5, 5),    // 49/64 Cut
-                (0.781, 3.5, 5),    // 25/32 Cut
-                (0.781, 3.5, 5),    // 25/32 Cut
-                (0.797, 3.5, 5),    // 51/64 Cut
-                (0.812, 3.5, 5),    // 13/16 Cut
-                (0.828, 3.5, 5),    // 53/64 Cut
-                (0.828, 3.5, 5),    // 53/64 Cut
-                (0.844, 3.5, 5),    // 27/32 Cut
-                (0.844, 3.5, 5),    // 27/32 Cut
-                (0.859, 3.5, 5),    // 55/64 Cut
-                (0.875, 4, 6),      // 7/8 Cut
-                (0.891, 4, 6),      // 57/64 Cut
-                (0.891, 4, 6),      // 57/64 Cut
-                (0.906, 4, 6),      // 29/32 Cut
-                (0.906, 4, 6),      // 29/32 Cut
-                (0.922, 4, 6),      // 59/64 Cut
-                (0.938, 4, 6),      // 15/16 Cut
-                (0.953, 4, 6),      // 61/64 Cut
-                (0.953, 4, 6),      // 61/64 Cut
-                (0.969, 4, 6),      // 31/32 Cut
-                (0.984, 4, 6),      // 63/64 Cut
-                (1.000, 4, 6),      // 1 Cut
-                (1.016, 3.1, 35),   // 1-1/64 Cut
-                (1.016, 3.1, 35),   // 1-1/64 Cut
-                (1.031, 3.1, 35),   // 1-1/32 Cut
-                (1.031, 3.1, 35),   // 1-1/32 Cut
-                (1.047, 3.1, 35),   // 1-3/64 Cut
-                (1.062, 3.1, 35),   // 1-1/16 Cut
-                (1.078, 3.1, 35),   // 1-5/64 Cut
-                (1.094, 3.1, 35),   // 1-3/32 Cut
-                (1.094, 3.25, 35),  // 1-3/32 Cut
-                (1.109, 3.1, 35),   // 1-7/64 Cut
-                (1.125, 3.25, 35),  // 1-1/8 Cut
-                (1.141, 3.25, 35),  // 1-9/64 Cut
-                (1.141, 3.25, 35),  // 1-9/64 Cut
-                (1.156, 3.25, 35),  // 1-5/32 Cut
-                (1.156, 3.25, 35),  // 1-5/32 Cut
-                (1.172, 3.25, 35),  // 1-11/64 Cut
-                (1.188, 3.25, 35),  // 1-3/16 Cut
-                (1.203, 3.25, 35),  // 1-13/64 Cut
-                (1.219, 3.25, 35),  // 1-7/32 Cut
-                (1.234, 3.25, 35),  // 1-15/64 Cut
-                (1.250, 3.3, 35),   // 1-1/4 Cut
-                (1.266, 3.3, 35),   // 1-17/64 Cut
-                (1.281, 3.3, 35),   // 1-9/32 Cut
-                (1.281, 3.3, 35),   // 1-9/32 Cut
-                (1.297, 3.3, 35),   // 1-19/64 Cut
-                (1.313, 3.3, 35),   // 1-5/16 Cut
-                (1.328, 3.9, 35),   // 1-21/64 Cut
-                (1.328, 3.3, 35),   // 1-21/64 Cut
-                (1.344, 3.3, 35),   // 1-11/32 Cut
-                (1.359, 3.3, 35),   // 1-23/64 Cut
-                (1.375, 3.9, 35),   // 1-3/8 Cut
-                (1.391, 3.9, 35),   // 1-25/64 Cut
-                (1.406, 3.9, 35),   // 1-13/32 Cut
-                (1.422, 3.9, 35),   // 1-27/64 Cut
-                (1.438, 4.1, 35),   // 1-7/16 Cut
-                (1.453, 4.1, 35),   // 1-29/64 Cut
-                (1.453, 4.75, 35),  // 1-29/64 Cut
-                (1.469, 4.1, 35),   // 1-31/64 Cut
-                (1.500, 4.75, 35),  // 1-1/2 Cut
-                (1.516, 4.75, 35),  // 1-33/64 Cut
-                (1.516, 5.1, 35),   // 1-33/64 Cut
-                (1.531, 4.75, 35),  // 1-17/32 Cut
-                (1.563, 5.1, 35),   // 1-9/16 Cut
-                (1.578, 5.1, 35),   // 1-37/64 Cut
-                (1.594, 5.1, 35),   // 1-19/32 Cut
-                (1.609, 5.1, 35),   // 1-39/64 Cut
-                (1.625, 11.9, 35),  // 1-5/8 Cut
-                (1.641, 12.3, 35),  // 1-41/64 Cut
-                (1.688, 12.3, 35),  // 1-11/16 Cut
-                (1.719, 12.3, 35)   // 1-23/32 Cut
-            };
 
             var soPunchList = new List<(double, double, double)>()
             {
@@ -544,7 +608,7 @@ namespace FeatureRecognitionAPI.Services
                 (.25, 11, 4) // 1/4 Square top
             };
 
-            return (tubePunchList, soPunchList, hdsoPunchList, ftPunchList, swPunchList, retractList);
+            return (soPunchList, hdsoPunchList, ftPunchList, swPunchList, retractList);
         }
     }
 }
