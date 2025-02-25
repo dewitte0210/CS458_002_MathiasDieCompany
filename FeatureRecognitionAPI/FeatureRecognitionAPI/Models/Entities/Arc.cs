@@ -1,11 +1,7 @@
-using FeatureRecognitionAPI.Models;
 using Convert = System.Convert;
 using Math = System.Math;
 
 namespace FeatureRecognitionAPI.Models;
-
-using FeatureRecognitionAPI.Models.Enums;
-using iText.Pdfua.Checkers.Utils;
 
 /**
  * Class that represents a Arc object that extends Entity
@@ -208,26 +204,26 @@ public class Arc : Entity
         //Note: this hash may not be robust enough
     }
 
-    //TODO: these calculations aren't completely robust,
-    //but they should be good enough for calculating the bounding box of the canvas on the front end
+    //Note: These calculations pretend that the arc is a circle because that's easier than calculating the actual bounds.
+    // So, these bounds are not real, but they are useful for calculating the frame for the visualization on the front end.
     public override double MinX()
     {
-        return Math.Min(Math.Min(Start.X, Center.X), End.X);
+        return Center.X - Radius;
     }
 
     public override double MinY()
     {
-        return Math.Min(Math.Min(Start.Y, Center.Y), End.Y);
+        return Center.Y - Radius;
     }
 
     public override double MaxX()
     {
-        return Math.Max(Math.Max(Start.X, Center.X), End.X);
+        return Center.X + Radius;
     }
 
     public override double MaxY()
     {
-        return Math.Max(Math.Max(Start.Y, Center.Y), End.Y);
+        return Center.Y + Radius;
     }
 
 
