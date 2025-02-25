@@ -179,17 +179,17 @@ namespace FeatureRecognitionAPI.Services
                 int failCount = 0;
                 while (group.Count > 0)
                 {
-                    if (failCount > group.Count)
+                    if (failCount >= group.Count)
                     {
                         arcs.Add(initArc);
-                        group.RemoveAt(0);
                         idx = 0;
-                        if (group.Count == 0)
+                        initArc = group[0];
+                        if (group.Count == 1)
                         {
+                            arcs.Add(initArc);
                             break;
                         }
 
-                        initArc = group[0];
                         failCount = 0;
                     }
 

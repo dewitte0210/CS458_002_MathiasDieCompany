@@ -292,7 +292,6 @@ namespace FeatureRecognitionAPI.Models
 
         public List<FeatureGroup> SetFeatureGroups(List<List<Entity>> entities)
         {
-            // List<Feature> brokenFeatures = getFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
             //Create features groups things in a way that breaks the logic here
@@ -313,7 +312,6 @@ namespace FeatureRecognitionAPI.Models
             Point tempMinPoint = new(0, 0);
             Point tempMaxPoint = new(0, 0);
 
-            bool firstrun = true;
             while (features.Count > 0)
             {
                 //Set max values to zero before run, if its not the first one
