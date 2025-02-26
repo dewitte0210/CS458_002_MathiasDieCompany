@@ -72,12 +72,17 @@
          * @param endAngle the end angle of the arc being calculated
          * @return the calculated the length of the arc
          */
-        private double calcCentralAngle(double startAngle, double endAngle)
+        internal double calcCentralAngle(double startAngle, double endAngle)
         {
-            //The subtraction result would be negative, need to add 360 to get correct value
-            if (endAngle < startAngle)
-                return endAngle - startAngle + 360;
-            return endAngle - startAngle;
+            // rotate start and end angles to start at 0
+            double difference = 360 - startAngle;
+            double adjustedStart = 0;
+            double adjustedEnd = endAngle + difference;
+            if (adjustedEnd >= 360) { adjustedEnd -= 360; }
+
+            double centerAngle = (adjustedEnd - adjustedStart) / 2;
+            if (centerAngle >= 360) { centerAngle -= 360; }
+            return centerAngle;
         }
 
         /**
