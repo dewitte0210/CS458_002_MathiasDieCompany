@@ -426,6 +426,105 @@ namespace FeatureRecognitionAPI.Services
             
             return tubePunchList;
         }
+
+        private List<PunchPrice> GetHdsoPunchList()
+        {
+            var hdsoPunchList = new List<PunchPrice>()
+            {
+                new PunchPrice(1/16.0, 5/16.0, 6.5, 9.0),   // 1/16 Cut
+                new PunchPrice(7/64.0, 5/16.0,6.5, 9.0),   // 7/64 Cut
+                new PunchPrice(1/8.0, 5/16.0,6.5, 9.0),   // 1/8 Cut
+                new PunchPrice(9/64.0,5/16.0, 6.5, 9.0),   // 9/64 Cut
+                new PunchPrice(5/32.0, 5/16.0,6.5, 9.0),   // 5/32 Cut
+                new PunchPrice(11/64.0, 5/16.0,6.5, 9.0),   // 11/64 Cut
+                new PunchPrice(3/16.0, 3/8.0,6.5, 9.0),   // 3/16 Cut
+                new PunchPrice(13/64.0, 3/8.0,6.5, 9.0),   // 13/64 Cut
+                new PunchPrice(7/32.0, 3/8.0,6.5, 9.0),   // 7/32 Cut
+                new PunchPrice(15/64.0, 3/8.0,6.5, 9.0),   // 15/64 Cut
+                new PunchPrice(1/4.0, 3/8.0,8.0, 9.0),      // 1/4 Cut
+                new PunchPrice(5/16.0, 1/2.0,8.0, 9.0),     // 5/16 Cut
+                new PunchPrice(3/8.0, 1/2.0,8.0, 9.0),     // 3/8 Cut
+                new PunchPrice(1/2.0, 5/8.0,8.0, 9.0)        // 1/2 Cut
+            };
+            return hdsoPunchList;
+        }
+
+        private List<PunchPrice> GetFtPunchList()
+        {
+            var ftPunchList = new List<PunchPrice>()
+            {
+                new PunchPrice(1/32.0, 1/8.0,8.5, 3),   // 1/32 Cut, 1/8 Base
+                new PunchPrice(1/32.0, 3/16.0,8.5, 3),   // 1/32 Cut, 3/16 Base
+                new PunchPrice(3/64.0, 1/8.0,8.5, 3),   // 3/64 Cut, 1/8 Base
+                new PunchPrice(1/16.0, 1/8.0,8.5, 3),   // 1/16 Cut, 1/8 Base
+                new PunchPrice(1/16.0, 3/16.0,8.5, 3),   // 1/16 Cut, 3/16 Base
+                new PunchPrice(5/64.0, 3/16.0,8.5, 3),   // 5/64 Cut, 3/16 Base
+                new PunchPrice(3/32.0, 1/16.0,4, 3),     // 3/32 Cut, 3/16 Base
+                new PunchPrice(7/64.0, 3/16.0,4, 3),     // 7/64 Cut, 3/16 Base
+                new PunchPrice(1/8.0, 3/16.0,4, 3),     // 1/8 Cut, 3/16 Base
+                new PunchPrice(1/8.0, 1/4.0,4, 3),     // 1/8 Cut, 1/4 Base
+                new PunchPrice(9/64.0, 1/4.0,4, 3),     // 9/64 Cut, 1/4 Base
+                new PunchPrice(5/32.0, 1/4.0,4, 3),     // 5/32 Cut, 1/4 Base
+                new PunchPrice(11/64.0, 1/4.0,4, 3),     // 11/64 Cut, 1/4 Base
+                new PunchPrice(3/16.0, 1/4.0,4, 3),     // 3/16 Cut, 1/4 Base
+                new PunchPrice(3/16.0, 5/16.0,4, 3),     // 3/16 Cut, 5/16 Base
+                new PunchPrice(13/64.0, 5/16.0,4, 3),     // 13/64 Cut, 5/16 Base
+                new PunchPrice(7/32.0, 5/16.0,4, 3),     // 7/32 Cut, 5/16 Base
+                new PunchPrice(15/64.0, 5/16.0,4, 3),     // 15/64 Cut, 5/16 Base
+                new PunchPrice(1/4.0, 5/16.0,4, 3),     // 1/4 Cut, 5/16 Base
+                new PunchPrice(1/4.0, 3/8.0,4, 3),     // 1/4 Cut, 3/8 Base
+                new PunchPrice(17/64.0,3/8.0 ,4, 3),     // 17/64 Cut, 3/8 Base
+                new PunchPrice(9/32.0, 3/8.0,4, 3),     // 9/32 Cut, 3/8 Base
+                new PunchPrice(19/64.0, 3/8.0,4, 3),     // 19/64 Cut, 3/8 Base
+                new PunchPrice(5/16.0, 3/8.0,4, 3),     // 5/16 Cut, 3/8 Base
+                new PunchPrice(5/16.0, 7/16.0,4, 3),     // 5/16 Cut, 7/16 Base
+                new PunchPrice(21/64.0, 7/16.0,4, 3),     // 21/64 Cut, 7/16 Base
+                new PunchPrice(11/32.0, 7/16.0,4, 3),     // 11/32 Cut, 7/16 Base
+                new PunchPrice(23/64.0, 7/16.0,4, 3),     // 23/64 Cut, 7/16 Base
+                new PunchPrice(3/8.0, 7/16.0,4, 3),     // 3/8 Cut, 7/16 Base
+                new PunchPrice(3/8.0, 1/2.0,4, 3),     // 3/8 Cut, 1/2 Base
+                new PunchPrice(25/64.0, 1/2.0,4, 3),     // 25/64 Cut, 1/2 Base
+                new PunchPrice(13/32.0, 1/2.0,4, 3),     // 13/32 Cut, 1/2 Base
+                new PunchPrice(27/64.0, 1/2.0,4, 3),     // 27/64 Cut, 1/2 Base
+                new PunchPrice(7/16.0, 1/2.0,4, 3),     // 7/16 Cut, 1/2 Base
+                new PunchPrice(7/16.0, 9/16.0,4, 3),     // 7/16 Cut, 9/16 Base
+                new PunchPrice(29/64.0, 9/16.0,4, 3),     // 29/64 Cut, 9/16 Base
+                new PunchPrice(15/32.0, 9/16.0,4, 3),     // 15/32 Cut, 9/16 Base
+                new PunchPrice(31/64.0, 9/16.0,4, 3),     // 31/64 Cut, 9/16 Base
+                new PunchPrice(1/2.0, 9/16.0,4, 3),     // 1/2 Cut, 9/16 Base
+                new PunchPrice(1/2.0, 5/8.0,4, 3),     // 1/2 Cut, 5/8 Base
+                new PunchPrice(33/64.0, 5/8.0,4, 3),     // 33/64 Cut, 5/8 Base
+                new PunchPrice(17/32.0, 5/8.0,4, 3),     // 17/32 Cut, 5/8 Base
+                new PunchPrice(35/64.0, 5/8.0,4, 3),     // 35/64 Cut, 5/8 Base
+                new PunchPrice(9/16.0, 11/16.0,4, 3),     // 9/16 Cut, 11/16 Base
+                new PunchPrice(37/64.0, 11/16.0,4, 3),     // 37/64 Cut, 11/16 Base
+                new PunchPrice(19/32.0, 11/16.0,4, 3),     // 19/32 Cut, 11/16 Base
+                new PunchPrice(39/64.0, 11/16.0,4, 3),     // 39/64 Cut, 11/16 Base
+                new PunchPrice(5/8.0, 3/4.0,4, 3),     // 5/8 Cut, 3/4 Base
+                new PunchPrice(41/64.0, 3/4.0,4, 3),     // 41/64 Cut, 3/4 Base
+                new PunchPrice(21/32.0, 3/4.0,4, 3),     // 21/32 Cut, 3/4 Base
+                new PunchPrice(11/16.0, 13/16.0,4, 3),     // 11/16 Cut, 13/16 Base
+                new PunchPrice(45/64.0, 13/16.0,4, 3),     // 45/64 Cut, 13/16 Base
+                new PunchPrice(23/32.0, 13/16.0,4, 3),     // 23/32 Cut, 13/16 Base
+                new PunchPrice(3/4.0, 7/8.0,4, 3),     // 3/4 Cut, 7/8 Base
+                new PunchPrice(49/64.0, 7/8.0,4, 3),     // 49/64 Cut, 7/8 Base
+                new PunchPrice(25/32.0, 7/8.0,4, 3),     // 25/32 Cut, 7/8 Base
+                new PunchPrice(13/16.0, 15/16.0,6, 3),     // 13/16 Cut, 15/16 Base
+                new PunchPrice(53/64.0, 15/16.0,6, 3),     // 53/64 Cut, 15/16 Base
+                new PunchPrice(27/32.0, 15/16.0,6, 3),     // 27/32 Cut, 15/16 Base
+                new PunchPrice(7/8.0, 1.0,6, 3),     // 7/8 Cut, 1 Base
+                new PunchPrice(57/64.0, 1.0,6, 3),     // 57/64 Cut, 1 Base
+                new PunchPrice(29/32.0, 1.0,6, 3),     // 29/32 Cut, 1 Base
+                new PunchPrice(15/16.0, 1.0 + (1/16.0),6, 3),     // 15/16 Cut, 1-1/16 Base
+                new PunchPrice(1.0, 1.0 + (1/8.0),6, 3),     // 1 Cut, 1-1/8 Base
+                new PunchPrice(1.0 + (1/64.0), 1.0 + (1/8.0),15, 3),    // 1-1/64 Cut, 1-1/8 Base
+                new PunchPrice(1.0 + (1/32.0), 1.0 + (1/8.0),15, 3),    // 1-1/32 Cut, 1-1/8 Base
+                new PunchPrice(1.0 + (1/8.0), 1.0 + (1/4.0),15, 3),    // 1-1/8 Cut, 1-1/4 Base
+                new PunchPrice(1.0 + (3/16.0), 1.0 + (5/16.0),15, 3),    // 1-3/16 Cut, 1-5/16 Base
+                new PunchPrice(1.0 + (3/8.0), 1.0 + (1/2.0),15, 3)     // 1-3/8 Cut, 1-1/2 Base
+            };
+            return ftPunchList;
+        }
         
         private (List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>, List<(double, double, double)>) GetPunchLists()
         {
@@ -436,7 +535,7 @@ namespace FeatureRecognitionAPI.Services
             // The second numbers is the cost 
             // The third is the install (not sure what this means yet)
 
-            var soPunchList = new List<(double, double, double)>()
+            var soPunchList = new List<(double, double, double)>() //done
             {
                 // (Cut size as a decimal, SetupCost, RunCost)
 
@@ -477,8 +576,7 @@ namespace FeatureRecognitionAPI.Services
                 (0.609, 14.05, 7),  // 39/64 Cut
                 (0.625, 16, 7)      // 5/8 Cut
             };
-
-            var hdsoPunchList = new List<(double, double, double)>()
+            var hdsoPunchList = new List<(double, double, double)>() //done
             {
                 (0.062, 6.5, 9),   // 1/16 Cut
                 (0.109, 6.5, 9),   // 7/64 Cut
@@ -496,7 +594,7 @@ namespace FeatureRecognitionAPI.Services
                 (0.5, 8, 9)        // 1/2 Cut
             };
 
-            var ftPunchList = new List<(double, double, double)>()
+            var ftPunchList = new List<(double, double, double)>() // working
             {
                 (0.031, 8.5, 3),   // 1/32 Cut, 1/8 Base
                 (0.031, 8.5, 3),   // 1/32 Cut, 3/16 Base
@@ -569,7 +667,7 @@ namespace FeatureRecognitionAPI.Services
                 (1.375, 15, 3)     // 1-3/8 Cut, 1-1/2 Base
             };
 
-            var swPunchList = new List<(double, double, double)>()
+            var swPunchList = new List<(double, double, double)>() //done
             {
                 (0.078, 7.8, 3),   // 5/64 Cut
                 (0.094, 7.1, 3),   // 3/32 Cut
@@ -602,7 +700,7 @@ namespace FeatureRecognitionAPI.Services
                 (0.516, 8, 3)      // 33/64 Cut
             };
 
-            var retractList = new List<(double, double, double)>()
+            var retractList = new List<(double, double, double)>() //done
             {
                 (0.125, 8, 4), // 1/8th Square/Dome top
                 (.25, 11, 4) // 1/4 Square top
