@@ -275,7 +275,7 @@ public class Arc : Entity
                 angle += CentralAngle;
             }
 
-            double rads = -angle * (Math.PI / 180);
+            double rads = angle * (Math.PI / 180);
             double xe = Math.Cos(rads);
             double ye = Math.Sin(rads);
             x1 = Math.Min(x1, xe);
