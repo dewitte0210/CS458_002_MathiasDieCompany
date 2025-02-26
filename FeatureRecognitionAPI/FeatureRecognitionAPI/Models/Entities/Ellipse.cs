@@ -237,5 +237,26 @@
             }
             return false;
         }
+        
+        //TODO: don't know how to calculate this so I'll just leave it for now
+        public override double MinX()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double MinY()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double MaxX()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double MaxY()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

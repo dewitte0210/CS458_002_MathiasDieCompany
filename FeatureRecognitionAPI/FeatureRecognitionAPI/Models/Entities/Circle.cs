@@ -70,6 +70,26 @@
             }
             else return false;
         }
+        
+        public override double MinX()
+        {
+            return Center.X - Radius;
+        }
+
+        public override double MinY()
+        {
+            return Center.Y - Radius;
+        }
+
+        public override double MaxX()
+        {
+            return Center.X + Radius;
+        }
+
+        public override double MaxY()
+        {
+            return Center.Y + Radius;
+        }
 
     }
 }
