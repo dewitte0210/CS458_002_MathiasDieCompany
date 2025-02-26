@@ -204,28 +204,164 @@ public class Arc : Entity
         //Note: this hash may not be robust enough
     }
 
-    //Note: These calculations pretend that the arc is a circle because that's easier than calculating the actual bounds.
-    // So, these bounds are not real, but they are useful for calculating the frame for the visualization on the front end.
     public override double MinX()
     {
-        return Center.X - Radius;
+        Rect bounds = GetBounds();
+        return bounds.x;
     }
-
+    
     public override double MinY()
     {
-        return Center.Y - Radius;
+        Rect bounds = GetBounds();
+        return bounds.y;
     }
-
+    
     public override double MaxX()
     {
-        return Center.X + Radius;
-    }
-
+    
+        Rect bounds = GetBounds();
+        return bounds.x + bounds.width;
+}
+    
     public override double MaxY()
     {
-        return Center.Y + Radius;
+        Rect bounds = GetBounds();
+        return bounds.y + bounds.height;
     }
 
+    public readonly struct Rect
+    {
+        public Rect(double x, double y, double width, double height)
+        {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        public double x { get; init; }
+        public double y { get; init; }
+        public double width { get; init; }
+        public double height { get; init; }
+    }
+
+    //This function and its helper methods are adapted from the Java.awt library.
+    // Note: comments which appeared in the original source code will be labelled as //**
+    public Rect GetBounds()
+    {
+        double x1, y1, x2, y2; //these numbers are coordinates relative to the unit circle
+        x1 = y1 = 1.0;
+        x2 = y2 = -1.0;
+        double angle = 0.0;
+        for (int i = 0; i < 6; i++)
+        {
+            if (i < 4)
+            {
+                //** 0-3 are the four quadrants
+                angle += 90.0;
+                if (!containsAngle(angle))
+                {
+                    continue;
+                }
+            }
+            else if (i == 4)
+            {
+                //** 4 is start angle
+                angle = StartAngle;
+            }
+            else
+            {
+                //** 5 is end angle
+                angle += CentralAngle;
+            }
+
+            double rads = -angle * (Math.PI / 180);
+            double xe = Math.Cos(rads);
+            double ye = Math.Sin(rads);
+            x1 = Math.Min(x1, xe);
+            y1 = Math.Min(y1, ye);
+            x2 = Math.Max(x2, xe);
+            y2 = Math.Max(y2, ye);
+        }
+
+        double width = (x2 - x1) *  Radius;
+        double height = (y2 - y1) * Radius;
+
+        double x  = Center.X  + x1  * Radius;
+        double y = Center.Y + y1 * Radius;
+        return new Rect(x, y, width, height);
+    }
+
+    public bool containsAngle(double angle)
+    {
+        double angExt = CentralAngle;
+        bool backwards = (angExt < 0.0);
+        if (backwards)
+        {
+            angExt = -angExt;
+        }
+
+        if (angExt >= 360.0)
+        {
+            return true;
+        }
+
+        angle = NormalizeDegrees(angle) - NormalizeDegrees(StartAngle);
+        if (backwards)
+        {
+            angle = -angle;
+        }
+
+        if (angle < 0.0)
+        {
+            angle += 360.0;
+        }
+
+
+        return (angle >= 0.0) && (angle < angExt);
+    }
+
+
+    /*
+     * ** Normalizes the specified angle into the range -180 to 180.
+     */
+    static double NormalizeDegrees(double angle)
+    {
+        if (angle > 180.0)
+        {
+            if (angle <= (180.0 + 360.0))
+            {
+                angle -= 360.0;
+            }
+            else
+            {
+                angle = Math.IEEERemainder(angle, 360.0);
+                //** IEEEremainder can return -180 here for some input values...
+                if (angle == -180.0)
+                {
+                    angle = 180.0;
+                }
+            }
+        }
+        else if (angle <= -180.0)
+        {
+            if (angle > (-180.0 - 360.0))
+            {
+                angle += 360.0;
+            }
+            else
+            {
+                angle = Math.IEEERemainder(angle, 360.0);
+                //** IEEEremainder can return -180 here for some input values...
+                if (angle == -180.0)
+                {
+                    angle = 180.0;
+                }
+            }
+        }
+
+        return angle;
+    }
 
     /**
      * Return true if this and other should be combined into one larger arc.

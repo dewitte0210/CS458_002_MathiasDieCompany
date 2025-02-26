@@ -7,11 +7,9 @@ namespace FeatureRecognitionAPI.Models.Features;
  */
 public class JsonPackage
 {
-    [JsonProperty]
-    private readonly List<List<Entity>> _touchingEntitiesList;
+    [JsonProperty] private readonly List<List<Entity>> _touchingEntitiesList;
 
-    [JsonProperty]
-    private readonly List<FeatureGroup> _featureGroups;
+    [JsonProperty] private readonly List<FeatureGroup> _featureGroups;
 
     [JsonProperty] private readonly double minX;
     [JsonProperty] private readonly double minY;
@@ -25,7 +23,7 @@ public class JsonPackage
 
         var tempMinX = Double.MaxValue;
         var tempMinY = Double.MaxValue;
-        
+
         var tempMaxX = Double.MinValue;
         var tempMaxY = Double.MinValue;
 
@@ -37,7 +35,7 @@ public class JsonPackage
                 tempMinY = Math.Min(tempMinY, item.MinY());
                 tempMaxX = Math.Max(tempMaxX, item.MaxX());
                 tempMaxY = Math.Max(tempMaxY, item.MaxY());
-            } 
+            }
         }
 
         minX = tempMinX;
@@ -45,5 +43,4 @@ public class JsonPackage
         maxX = tempMaxX;
         maxY = tempMaxY;
     }
-
 }

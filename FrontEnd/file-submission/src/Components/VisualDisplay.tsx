@@ -32,8 +32,6 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             minY -= padding;
             maxX += padding;
             maxY += padding;
-            
-            console.log(minX, minY, maxX, maxY);
 
             // Calculate scaling factor to fit all shapes within the canvas
             const scaleFactor = Math.abs(600 / Math.max(maxX - minX, maxY - minY));
