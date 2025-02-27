@@ -10,6 +10,8 @@ namespace FeatureRecognitionAPI.Models
         public Point EndPoint { get; set; }
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
+        
+        public bool KissCut { get; set; }
 
         // Don't Delete. Called from ExtendedLine constructor
         protected Line()
@@ -60,6 +62,7 @@ namespace FeatureRecognitionAPI.Models
 
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
+            KissCut = false;
 
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
@@ -73,6 +76,7 @@ namespace FeatureRecognitionAPI.Models
 
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
+            KissCut = false;
 
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
