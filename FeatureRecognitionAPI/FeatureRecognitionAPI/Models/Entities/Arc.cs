@@ -198,6 +198,11 @@ public class Arc : Entity
         return adjustedDegrees >= adjustedStart && adjustedDegrees <= adjustedEnd;
     }
 
+    internal Line VectorFromCenter(double angle)
+    {
+        return new Line(Center.X, Center.Y, 2 * Math.Cos(angle) + Center.X, 2 * Math.Sin(angle) + Center.Y);
+    }
+
     public int GetHashCode()
     {
         //hash is built using ellipse center and arc radius
