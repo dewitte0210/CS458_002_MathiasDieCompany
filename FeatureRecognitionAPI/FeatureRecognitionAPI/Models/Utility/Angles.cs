@@ -174,6 +174,7 @@ namespace FeatureRecognitionAPI.Models.Utility
             if (side != Side.UNKNOWN && side != targetSide)
             {
                 returnAngle.SetToOpposite();
+                side = targetSide;
             }
 
             return new Angle(returnAngle, side);
