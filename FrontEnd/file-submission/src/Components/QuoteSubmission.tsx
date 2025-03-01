@@ -490,16 +490,6 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                             </div>
                         </div>
                     </form>
-                    <div className="button-container">
-                        <button form="quote-form" type="submit" className="animated-button">
-                            <span>Confirm</span>
-                            <span></span>
-                        </button>
-                        <button className="animated-button" onClick={backToUpload}>
-                            <span>Go Back</span>
-                            <span></span>
-                        </button>
-                    </div>
                 </>
             )}
         </div>
