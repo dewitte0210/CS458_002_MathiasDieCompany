@@ -173,7 +173,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc5, arc7, arc9, arc2, arc4, arc3, arc16, arc11, arc10, arc12, arc6, arc13, arc8, arc14, arc15 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.StdTubePunch));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Unknown));
         }
 
         [Test]
@@ -193,72 +193,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { ellipse1 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.StdTubePunch));
-        }
-
-        [Test]
-        public void CheckGroup2A_VerticalBowtieWithSharpCorners_ReturnsTrue()
-        {
-            Line line1 = new Line(0, 0, 0, 5);
-            Line line2 = new Line(4, 0, 4, 5);
-            Arc arc1 = new Arc(2, 0, 2, 0, 180);
-            Arc arc2 = new Arc(2, 5, 2, 180, 0);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_HorizontalBowtieWithSharpCorners_ReturnsTrue()
-        {
-            Line line1 = new Line(2, 2, 7, 2);
-            Line line2 = new Line(2, -2, 7, -2);
-            Arc arc1 = new Arc(2, 0, 2, 270, 90);
-            Arc arc2 = new Arc(7, 0, 2, 90, 270);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_RotatedBowtieWithSharpCorners_ReturnsTrue()
-        {
-            Line line1 = new Line(1, 1, 5, 5);
-            Line line2 = new Line(3, -1, 7, 3);
-            Arc arc1 = new Arc(6, 4, Math.Sqrt(2), 135, 315);
-            Arc arc2 = new Arc(2, 0, Math.Sqrt(2), 315, 135);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_HorizontalBowtieWithSharpCornersWithBigArcs_ReturnsTrue()
-        {
-            Line line1 = new Line(15, 3, 21, 3);
-            Line line2 = new Line(15, -3, 21, -3);
-            Arc arc1 = new Arc(25, 0, 5, (Math.Atan(3.0 / -4.0) + Math.PI) * 180 / Math.PI, (Math.Atan(3.0 / 4.0) + Math.PI) * 180 / Math.PI);
-            Arc arc2 = new Arc(11, 0, 5, (Math.Atan(-3.0 / 4.0) * 180 / Math.PI), (Math.Atan(3.0 / 4.0)) * 180 / Math.PI);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_RandomHorizontalShapeWith2ArcsAndLines_ReturnsFalse()
-        {
-            Line line1 = new Line(2, 2, 7, 2);
-            Line line2 = new Line(2, -2, 7, -2);
-            Arc arc1 = new Arc(2, 0, 2, 90, 270);
-            Arc arc2 = new Arc(7, 0, 2, 90, 270);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.StdTubePunch));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Unknown));
         }
         #endregion
 

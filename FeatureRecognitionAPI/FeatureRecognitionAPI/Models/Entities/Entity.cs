@@ -260,8 +260,8 @@ namespace FeatureRecognitionAPI.Models
             //  Checks if the line passes through or touches the circle the arc represents
             double numerator = Math.Abs(a * arc.Center.X + b * arc.Center.Y + c);
             double distance = numerator / Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
-            if (arc.Radius >= distance)
-            {
+            /*if (arc.Radius >= distance)
+            {*/
                 //  Will hold the solution values of the quadratic equation
                 List<double> solns = new();
 
@@ -298,12 +298,12 @@ namespace FeatureRecognitionAPI.Models
                         //Solution x value
                         double x = solns[i];
                         //Solution y value
-                        double y = slope * solns[i] + intercept;
+                        double y = ((-1 * a) * solns[i] - c) / b;
 
                         if (arc.IsInArcRange(new Point(x, y)) && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= x && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= y && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= x && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= y) { return true; };
                     }
                 }
-            }
+            //}
             return false;
         }
 

@@ -614,7 +614,20 @@ public class Feature
         int tempConvexCount = 0;
         for (int i = 0; i < baseEntityList.Count; i++)
         {
-            if ((baseEntityList[i] is Line) || (baseEntityList[i] is Circle)) { continue; }
+            // If a line is hit, concavity must be recorded
+            if (baseEntityList[i] is Line)
+            {
+                if (tempConcaveCount > 0)
+                {
+                    concaveCount++;
+                    tempConcaveCount = 0;
+                }
+                else if (tempConvexCount > 0)
+                {
+                    convexCount++;
+                    tempConvexCount = 0;
+                }
+            }
             else
             {
                 if (DetermineConcavity(baseEntityList[i], i))
@@ -639,6 +652,9 @@ public class Feature
                 }
             }
         }
+        // Anything leftover gets added
+        if (tempConcaveCount > 0) { concaveCount++; }
+        else if (tempConvexCount > 0) { convexCount++; }
         return concaveCount == 2 && convexCount == 4;
     }
 
@@ -653,14 +669,15 @@ public class Feature
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        double maxLength = Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
+        //double maxLength = Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
+        double maxLength = 100; //TODO DELETE AND UNCOMMENT LINE ABOVE!!!!!!!!!
         Line ray;
 
         int numIntersections = 0;
         int numEndPointIntersections = 0;
         //  Finds the middle angle of the curve and calculates the ray
         if (entity is Arc arc) 
-        { ray = arc.VectorFromCenter(arc.calcCentralAngle(arc.StartAngle, arc.EndAngle)); }
+        { ray = arc.VectorFromCenter(arc.degreesToRadians(arc.AngleInMiddle())); }
         else
         { ray = (entity as Ellipse).vectorFromCenter(((entity as Ellipse).EndParameter - (entity as Ellipse).StartParameter) / 2); }
 
@@ -674,7 +691,7 @@ public class Feature
         //  per actual intersection
         for (int i = 0; i < baseEntityList.Count; i++)
         {
-            if (baseEntityList[i].DoesIntersect(ray) && i != index)
+            if (baseEntityList[i].DoesIntersect(ray))
             {
                 numIntersections++;
                 if (baseEntityList[i] is Line)
@@ -745,8 +762,7 @@ public class Feature
             index++;
         }
 
-        return (Math.Abs(line1.SlopeX - (line2.SlopeX)) < Entity.EntityTolerance) &&
-               (Math.Abs(line1.SlopeY - (line2.SlopeY)) < Entity.EntityTolerance);
+        return line1.isParallel(line2);
     }
 
     /**

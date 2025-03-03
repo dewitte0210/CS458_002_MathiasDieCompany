@@ -45,7 +45,7 @@ public class Arc : Entity
      * @param degrees is the amount of degrees being converted
      * @return the radian value of degrees
      */
-    private double degreesToRadians(double degrees)
+    internal double degreesToRadians(double degrees)
     {
         return (degrees * Math.PI / 180);
     }
@@ -77,15 +77,10 @@ public class Arc : Entity
          */
         internal double calcCentralAngle(double startAngle, double endAngle)
         {
-            // rotate start and end angles to start at 0
-            double difference = 360 - startAngle;
-            double adjustedStart = 0;
-            double adjustedEnd = endAngle + difference;
-            if (adjustedEnd >= 360) { adjustedEnd -= 360; }
-
-            double centerAngle = (adjustedEnd - adjustedStart) / 2;
-            if (centerAngle >= 360) { centerAngle -= 360; }
-            return centerAngle;
+            //The subtraction result would be negative, need to add 360 to get correct value
+            if (endAngle < startAngle)
+                return endAngle - startAngle + 360;
+            return endAngle - startAngle;
         }
 
     /**
@@ -166,17 +161,6 @@ public class Arc : Entity
         {
             double tan = Math.Atan2(y, x);
             degrees = tan * (180 / Math.PI);
-            //Q2 and Q3
-            if (x < 0)
-            {
-                // y < 0? Q3 else Q2
-                degrees = y < 0 ? degrees += 360 : Math.Abs(degrees + 180);
-            }
-            //Q4
-            else if (x > 0 && y < 0)
-            {
-                degrees = 360 + degrees;
-            }
         }
 
         // rotate start and end angles to start at 0
@@ -200,7 +184,19 @@ public class Arc : Entity
 
     internal Line VectorFromCenter(double angle)
     {
-        return new Line(Center.X, Center.Y, 2 * Math.Cos(angle) + Center.X, 2 * Math.Sin(angle) + Center.Y);
+        return new Line(Center.X, Center.Y, Radius * Math.Cos(angle) + Center.X, Radius * Math.Sin(angle) + Center.Y);
+    }
+
+    internal double AngleInMiddle()
+    {
+        // rotate start and end angles to start at 0
+        double difference = 360 - StartAngle;
+        double adjustedStart = 0;
+        double adjustedEnd = EndAngle + difference;
+        if (adjustedEnd >= 360) { adjustedEnd -= 360; }
+        double middleAngle = ((adjustedEnd - adjustedStart) / 2) + StartAngle;
+        if (middleAngle >= 360) { middleAngle -= 360; }
+        return middleAngle;
     }
 
     public int GetHashCode()
