@@ -7,6 +7,39 @@
   max-height: 100%;
 }
 
+
+
+.vertical-line {
+  border-right: 3px solid black;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.table-and-visual{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:16px;
+
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.table-data{
+  padding-right: 32px;
+  border-right:4px solid black;
+}
+
+.visual{
+}
+
+.response-container{
+  
+}
+
 .upload-container {
   align-items: center;
   justify-content: center;
@@ -276,6 +309,11 @@ label {
 .features-table {
   max-height: 55vh;
   overflow-y: auto;
+  text-align:center; 
+}
+
+.quote-form{
+  
 }
 
 table {

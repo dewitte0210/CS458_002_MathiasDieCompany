@@ -115,19 +115,33 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
             ) : (
                 // Show retrieved data
                 <div className="response-container">
-                    <div>
-                        {jsonResponse && ( // Conditionally render the JSON response
-                            <QuoteSubmission
-                                featureGroups={jsonResponse["_featureGroups"]}
-                                backToUpload={backToUpload}
+                    <div className="table-and-visual">
+                        <div className="table-data">
+                            {jsonResponse && ( // Conditionally render the JSON response
+                                <QuoteSubmission
+                                    featureGroups={jsonResponse["_featureGroups"]}
+                                    backToUpload={backToUpload}
+                                />
+                            )}
+                            <div className="button-container">
+                                <button form="quote-form" type="submit" className="animated-button">
+                                    <span>Confirm</span>
+                                    <span></span>
+                                </button>
+                                <button className="animated-button" onClick={backToUpload}>
+                                    <span>Go Back</span>
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="visual">
+                            <VisualDisplay touchingEntities={jsonResponse["_touchingEntitiesList"]}
+                                           minX = {jsonResponse["minX"]}
+                                           minY = {jsonResponse["minY"]}
+                                           maxX = {jsonResponse["maxX"]}
+                                           maxY = {jsonResponse["maxY"]}
                             />
-                        )}
-                        <VisualDisplay touchingEntities={jsonResponse["_touchingEntitiesList"]}
-                        minX = {jsonResponse["minX"]}
-                        minY = {jsonResponse["minY"]}
-                        maxX = {jsonResponse["maxX"]}
-                        maxY = {jsonResponse["maxY"]}
-                        />
+                        </div>
                     </div>
                 </div>
             )}

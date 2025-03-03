@@ -34,7 +34,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             maxY += padding;
 
             // Calculate scaling factor to fit all shapes within the canvas
-            const scaleFactor = Math.abs(600 / Math.max(maxX - minX, maxY - minY));
+            const scaleFactor = Math.abs(400 / Math.max(maxX - minX, maxY - minY));
 
             // Set canvas dimensions based on the bounding box
             canvas.width = (maxX - minX) * scaleFactor;
@@ -47,9 +47,6 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             // Flip y-axis (canvas coordinates vs. typical 2D Cartesian coordinates)
             ctx.setTransform(1, 0, 0, -1, 0, canvas.height);
 
-            // Outline the canvas with a dashed border for clarity
-            ctx.setLineDash([5, 10]);
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
             ctx.setLineDash([]); // Reset to solid lines
 
             // Calculate offsets to shift shapes into the visible area
