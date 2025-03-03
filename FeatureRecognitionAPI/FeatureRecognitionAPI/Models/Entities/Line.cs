@@ -29,35 +29,8 @@ namespace FeatureRecognitionAPI.Models
 
         public Line(double startX, double startY, double endX, double endY)
         {
-            Point point1 = new Point(startX, startY);
-            Point point2 = new Point(endX, endY);
-            double xDiff = point1.X - point2.X;
-            double yDiff = point1.Y - point2.Y;
-            if (xDiff > Entity.EntityTolerance)
-            {
-                StartPoint = point1;
-                EndPoint = point2;
-            }
-            //if the difference falls between +/- entityTolerance it is equals
-            else if (Entity.EntityTolerance > xDiff && xDiff > (0 - Entity.EntityTolerance))
-            {
-                if (yDiff > Entity.EntityTolerance)
-                {
-                    StartPoint = point1;
-                    EndPoint = point2;
-                }
-                else
-                {
-                    StartPoint = point2;
-                    EndPoint = point1;
-                }
-            }
-            else
-            {
-                StartPoint = point2;
-                EndPoint = point1;
-            }
-
+            StartPoint = new Point(startX, startY);
+            EndPoint = new Point(endX, endY);
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
@@ -85,14 +58,13 @@ namespace FeatureRecognitionAPI.Models
 
         public bool isParallel(Line line)
         {
-            double xSlopeDiff = this.SlopeX - line.SlopeX;
-            double ySlopeDiff = this.SlopeY - line.SlopeY;
-            if (xSlopeDiff < Entity.EntityTolerance && ySlopeDiff < Entity.EntityTolerance)
-            {
-                return true;
-            }
-
-            return false;
+            // Vertical line case
+            if (Math.Abs(this.SlopeX) < Entity.EntityTolerance && Math.Abs(line.SlopeX) < Entity.EntityTolerance) { return true; }
+            // Horizontal line case
+            if (Math.Abs(this.SlopeY) < Entity.EntityTolerance && Math.Abs(line.SlopeY) < Entity.EntityTolerance) { return true; }
+            // One line is vertical while the other is not
+            if (Math.Abs(this.SlopeX) < Entity.EntityTolerance || Math.Abs(line.SlopeX) < Entity.EntityTolerance) { return false; }
+            return Math.Round(this.SlopeY / this.SlopeX, 4).Equals(Math.Round(line.SlopeY / line.SlopeX, 4));
         }
 
         private bool withinTolerance(double value, double target)
@@ -125,9 +97,9 @@ namespace FeatureRecognitionAPI.Models
                 double ThisYintercept = this.StartPoint.Y - ((this.SlopeY / this.SlopeX) * this.StartPoint.X);
                 double OtherYintercept = lineOther.StartPoint.Y -
                                          ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.StartPoint.X);
-                if ((withinTolerance((Math.Abs((this.SlopeY / this.SlopeX))),
-                        (Math.Abs((lineOther.SlopeY / lineOther.SlopeX))))) &&
-                    (withinTolerance(ThisYintercept, OtherYintercept)))
+                if (withinTolerance(Math.Abs(this.SlopeY / this.SlopeX),
+                        Math.Abs(lineOther.SlopeY / lineOther.SlopeX)) &&
+                    withinTolerance(ThisYintercept, OtherYintercept))
                 {
                     return true;
                 }

@@ -98,7 +98,7 @@
          * @PAram b - Minor axis value
          * @Param angle - angle of coordinate desired
          */
-        private Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
+        internal Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
         {
             double x1;
             double y1;
@@ -146,7 +146,7 @@
                     }
                     break;
             }
-            Point sol = new Point(x1, y1);
+            Point sol = new Point(x1 + Center.X, y1 + Center.Y);
             return sol;
         }
 
