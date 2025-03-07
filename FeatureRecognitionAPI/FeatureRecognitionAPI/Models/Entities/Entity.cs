@@ -11,9 +11,15 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity
     {
         public double Length { get; set; }//length of the entity
-
+        public List<Entity> adjList { get; set; }
         public const double EntityTolerance = 0.00005;
-        public Entity() { }//Enables the use of a default constructor
+
+        //Enables the use of a default constructor
+        public Entity()
+        {
+            adjList = new List<Entity>();
+            
+        }
 
         private const int intersectTolerance = 4;//Precision for x and y intersect values to
                                                  //account for inaccurate calculated values
