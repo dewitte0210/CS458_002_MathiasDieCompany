@@ -1,12 +1,13 @@
 import * as React from "react";
 import {useState} from "react";
 import {Button} from "react-bootstrap";
-import {MdQuestionMark} from "react-icons/md";
+import {translate} from "../translator";
 
 interface QuoteSubmissionProps {
     featureGroups: any[];
     backToUpload: () => void;
 }
+
 
 const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                              featureGroups,
@@ -338,19 +339,17 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                                 <option disabled selected value="">
                                                                     Select Feature Type
                                                                 </option>
-                                                                <option value="Group1A1">Group1A1</option>
-                                                                <option value="Group1A2">Group1A2</option>
-                                                                <option value="Group1B1">Group1B1</option>
-                                                                <option value="Group1B2">Group1B2</option>
-                                                                <option value="Group1C">Group1C</option>
-                                                                <option value="Group2A">Group2A</option>
-                                                                <option value="Group3">Group3</option>
-                                                                <option value="Group4">Group4</option>
-                                                                <option value="Group5">Group5</option>
-                                                                <option value="Group6">Group6</option>
-                                                                <option value="HDSideOutlet">
-                                                                    HD Side Outlet
-                                                                </option>
+                                                                <option value="Group1A1" label={translate("Group1A1")}></option>
+                                                                <option value="Group1A2" label={translate("Group1A2")}></option>
+                                                                <option value="Group1B1" label={translate("Group1B1")}></option>
+                                                                <option value="Group1B2" label={translate("Group1B2")}></option>
+                                                                <option value="Group1C" label={translate("Group1C")}></option>
+                                                                <option value="Group2A" label={translate("Group2A")}></option>
+                                                                <option value="Group3" label={translate("Group3")}></option>
+                                                                <option value="Group4" label={translate("Group4")}></option>
+                                                                <option value="Group5" label={translate("Group5")}></option>
+                                                                <option value="Group6" label={translate("Group6")}></option>
+                                                                <option value="HDSideOutlet"> HD Side Outlet </option>
                                                                 <option value="Punch">Punch</option>
                                                                 <option value="SideOutlet">Side Outlet</option>
                                                                 <option value="SideTubePunch">
