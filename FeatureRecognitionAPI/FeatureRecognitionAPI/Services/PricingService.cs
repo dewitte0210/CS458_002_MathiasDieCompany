@@ -18,9 +18,13 @@ namespace FeatureRecognitionAPI.Services
         private const double DISCOUNT = 1;
         private readonly List<PunchPrice> _tubePunchList, _soPunchList, _hdsoPunchList,
             _ftPunchList, _swPunchList, _retractList;
+        private readonly List<FeaturePrice> _featurePriceList;
         
         public PricingService()
         {
+                //Get Feature Price Data
+                _featurePriceList = GetFeaturePriceList();
+                
                 //Get Punch Lists
                 _tubePunchList = GetTubePunchList();
                 _soPunchList = GetSoPunchList();
@@ -83,61 +87,43 @@ namespace FeatureRecognitionAPI.Services
                     // Setup Cost = hour/part to setup * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
                     // Difficulty Factor * mMain.ShopRate $/hr * hour/part * quantity of parts
+                    // For punches, there should be a checkbox that denotes if the height of the punch is .918 instead
+                    // of .937
+                    /*
+                        Setupcost = 0.22 * mMain.Shoprate
+                        RunCost = 1 * mMain.Shoprate * 0.04 * 4
+                        Descript = "Radius/Mitered Rectangle - Group 1A" 
+                    */
+                    
+                    FeaturePrice featureData =
+                        _featurePriceList.Find(element => element.Type == feature.FeatureType);
+                    
+                    // If the current feature is a Punch featureData will be null and we must use punch pricing rules
+                    if (featureData != null)
+                    {
+                        setupCost = featureData.SetupRate * BASE_SHOP_RATE;
+                        runCost = featureData.DifficultyFactor * BASE_SHOP_RATE * featureData.RunRate * featureData.Quantity;
+                    }
+                    
                     switch (feature.FeatureType)
                     {
-                        case PossibleFeatureTypes.Group1A1: // Mitered Rectangle
-                            setupCost = 0.22 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
-                            maxRadius = 4;
-                            break;
-                        case PossibleFeatureTypes.Group1A2: // Radius Corner Rectangle
-                            setupCost = 0.22 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
-                            maxRadius = 4;
-                            break;
-                        case PossibleFeatureTypes.Group1B1: // Circle
-                            setupCost = 0.3 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.042 * 4;
-                            maxRadius = 1;
-                            break;
-                        case PossibleFeatureTypes.Group1B2: // Rounded Rectangle
-                            setupCost = 0.3 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.042 * 4;
-                            maxRadius = 1;
-                            break;
-                        case PossibleFeatureTypes.Group1C: // Triangles
-                            setupCost = 0.32 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.045 * 6;
-                            maxRadius = 3;
-                            break;
                         case PossibleFeatureTypes.Group2A1: // Elipses
-                            setupCost = 0.9 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.045 * 6;
-                            maxRadius = 1;
-                            break;
                         case PossibleFeatureTypes.Group2A2: // Bowties
-                            setupCost = 0.9 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.045 * 6;
+                        case PossibleFeatureTypes.Group1B1: // Circle
+                        case PossibleFeatureTypes.Group1B2: // Rounded Rectangle
                             maxRadius = 1;
-                            break;
-                        case PossibleFeatureTypes.Group3: // Corner Chamfer
-                            setupCost = 0.14 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 2;
-                            maxRadius = 2;
-                            break;
-                        case PossibleFeatureTypes.Group4: // V-Notch & Corner Notch
-                            setupCost = 0.25 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 3;
-                            maxRadius = 3;
                             break;
                         case PossibleFeatureTypes.Group5: // Mitered Notches
-                            setupCost = 0.25 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
+                        case PossibleFeatureTypes.Group3: // Corner Chamfer
                             maxRadius = 2;
                             break;
+                        case PossibleFeatureTypes.Group1C: // Triangles
+                        case PossibleFeatureTypes.Group4: // V-Notch & Corner Notch
+                            maxRadius = 3;
+                            break;
+                        case PossibleFeatureTypes.Group1A1: // Mitered Rectangle
+                        case PossibleFeatureTypes.Group1A2: // Radius Corner Rectangle
                         case PossibleFeatureTypes.Group6: // Radius Notches
-                            setupCost = 0.33 * BASE_SHOP_RATE;
-                            runCost = 1 * BASE_SHOP_RATE * 0.04 * 4;
                             maxRadius = 4;
                             break;
                         case PossibleFeatureTypes.StdTubePunch:
@@ -165,7 +151,7 @@ namespace FeatureRecognitionAPI.Services
                             var hdsoPunch = _hdsoPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = hdsoPunch.SetupCost * 1.2;
                             runCost = hdsoPunch.RunCost;
-
+                            
                             var hdsoCost = quantity * runCost;
                             featureCost = hdsoCost + (quantity * setupCost);
                             totalFeatureCost += featureCost;
@@ -191,7 +177,6 @@ namespace FeatureRecognitionAPI.Services
                             totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdRetractPins:
-                            
                             //Get closest diameter from list
                             var retract = _retractList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = retract.SetupCost * 1.2;
@@ -203,8 +188,6 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                         case PossibleFeatureTypes.Punch:
                             continue;
-                        default:
-                            break;
                     }
 
                     if (feature.MultipleRadius)
@@ -285,6 +268,25 @@ namespace FeatureRecognitionAPI.Services
             };
         }
 
+        private List<FeaturePrice> GetFeaturePriceList()
+        {
+           var features = new List<FeaturePrice>()
+           {
+               new FeaturePrice(PossibleFeatureTypes.Group1A1,  0.22, 0.04, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1A2, 0.22, 0.04, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1B1, 0.3, 0.042, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1B2, 0.3, 0.042, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1C, 0.32, 0.045, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group2A1, 0.9, 0.045, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group2A2, 0.9, 0.045, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group3, 0.14, 0.04, 1, 2),
+               new FeaturePrice(PossibleFeatureTypes.Group4, 0.25, 0.04, 1, 3),
+               new FeaturePrice(PossibleFeatureTypes.Group5, 0.25, 0.04, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group6, 0.33, 0.04, 1, 4),
+           };
+           return features;
+        }
+        
         private List<PunchPrice> GetTubePunchList()
         {
             var tubePunchList = new List<PunchPrice>()
@@ -641,7 +643,7 @@ namespace FeatureRecognitionAPI.Services
                 new PunchPrice(1/8.0, 1/4.0, 8, 4),
                 new PunchPrice(1/4.0, 3/8.0, 11, 4),
             };
-            
+             
             return retractList;
         }
         
