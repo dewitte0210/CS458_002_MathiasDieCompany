@@ -118,6 +118,50 @@ namespace FeatureRecognitionAPI.Models
 
         #region MakeTouchingEntities
 
+        public void GroupFeatureEntities(List<Entity> entities)
+        {
+            List<int> listMap = Enumerable.Repeat(-1, entities.Count).ToList(); // parallel list to entities mapping them to an index in featureList. Initializes a value of -1
+            featureList.Add(new Feature(new List<Entity>()));
+            
+            featureList[0].EntityList.Add(entities[0]); // starts the mapping with the first entity in entities list as a new list in features
+            listMap[0] = 0;
+            
+            for (int i = 0; i < entities.Count(); i++)
+            {
+                for (int j = i+1; j < entities.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                {
+                    if (i != j && entities[i].DoesIntersect(entities[j])) // if i==j they are checking the same object and would return true for intersecting
+                    {
+                        // adds each entity to their AdjList. This should not happen twice because of the j=i+1
+                        entities[i].AdjList.Add(entities[j]);
+                        entities[j].AdjList.Add(entities[i]);
+
+                        if (listMap[i] != -1) // means entities[i] is already mapped to a feature
+                        {
+                            featureList[i].EntityList.Add(entities[j]);
+                            listMap[j] = listMap[i];
+                        }
+                        else // entities[i] is not mapped to a feature
+                        {
+                            // creates a new feature, adds it to featureList with entities i and j being in its EntityList
+                            featureList.Add(new Feature(new List<Entity>()));
+                            int index = featureList.Count - 1;
+                            featureList[index].EntityList.Add(entities[i]);
+                            featureList[index].EntityList.Add(entities[j]);
+                            // maps i and j to the index of that new feature in featureList
+                            listMap[i] = index;
+                            listMap[j] = index;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void GroupFeatureEntities()
+        {
+            GroupFeatureEntities(entityList);
+        }
+        
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
          * @Param entityList - the list of entites in the file
