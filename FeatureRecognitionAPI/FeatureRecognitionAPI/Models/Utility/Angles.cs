@@ -145,7 +145,7 @@ namespace FeatureRecognitionAPI.Models.Utility
         }
 
         // may not handle all cases yet, to be tested
-        public static Angle GetAngle(Line a, Line b, Side targetSide = Side.INTERIOR)
+        public static Angle GetAngle(Line a, Line b, Side targetSide = Side.INTERIOR, Orientation ori = Orientation.COUNTERCLOCKWISE)
         {
             double cross = CrossProduct(a, b);
             double dot = DotProduct(a, b);
@@ -156,25 +156,38 @@ namespace FeatureRecognitionAPI.Models.Utility
 
             double angle = Math.Acos(cos_theta) * (180 / Math.PI);
 
-            if (cross < 0)
-            {
-                angle = 360 - angle;
-            }
-
-            if (cross > 0)
+            if (cross >= 0)
             {
                 side = Side.INTERIOR;
             }
             else if (cross < 0)
             {
                 side = Side.EXTERIOR;
+                angle = 360 - angle;
             }
 
+            //initially calculates interior angle
+            //return opposite if wanting exterior
             Degrees returnAngle = new Degrees(Math.Abs(180 - angle));
+
+            //prefer 0 degrees interior over 360 for opposite facing parallel lines
+            //since it can return 0 or 360 depending on orientation
+            if ((returnAngle.angle == 360 || returnAngle.angle == 0) && ori == Orientation.CLOCKWISE)
+            {
+                returnAngle.SetToOpposite();
+            }
+
             if (side != Side.UNKNOWN && side != targetSide)
             {
                 returnAngle.SetToOpposite();
                 side = targetSide;
+            }
+
+            //default orientation is assumed to be counterclockwise
+            //flip the angle if it is not
+            if (ori == Orientation.CLOCKWISE)
+            {
+                returnAngle.SetToOpposite();
             }
 
             return new Angle(returnAngle, side);
@@ -304,15 +317,3 @@ namespace FeatureRecognitionAPI.Models.Utility
     //        Console.Write("end");
     //    }
 
-//cases to test
-// touching lines
-//	good!
-// reversed
-//	negative angle
-// 180 touching
-//	good!
-// parallel touching
-//	good!
-// seperated for each
-//clockwise for each
-//obtuse angles
