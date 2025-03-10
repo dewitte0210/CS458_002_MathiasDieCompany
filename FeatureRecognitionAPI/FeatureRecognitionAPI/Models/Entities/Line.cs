@@ -196,5 +196,10 @@ namespace FeatureRecognitionAPI.Models
         {
             return Math.Max(StartPoint.Y, EndPoint.Y);
         }
+
+        public Point GetDelta()
+        {
+            return new Point(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y);
+        }
     }
 }
