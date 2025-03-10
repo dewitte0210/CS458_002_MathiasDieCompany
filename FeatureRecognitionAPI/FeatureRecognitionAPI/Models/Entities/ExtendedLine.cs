@@ -1,11 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-using System;
-using System.IO;
-using System.Numerics;
-using DecimalMath;
-using NHibernate.SqlCommand;
-
-namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models
 {
     public class ExtendedLine : Line
     {
@@ -13,7 +6,7 @@ namespace FeatureRecognitionAPI.Models
         public Line Parent1 { get; set; }
         public Line Parent2 { get; set; }
 
-        public ExtendedLine() 
+        public ExtendedLine()
         {
         }
         //runs into issues if more than one perimeter feature is on a line
@@ -49,12 +42,12 @@ namespace FeatureRecognitionAPI.Models
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
         }
-/*
-        public ExtendedLine(ExtendedLine obj)
-        {
-            if (obj.Parent1 is ExtendedLine) { }
-            this.Parent1 = obj.Parent1;
-        }*/
+        /*
+                public ExtendedLine(ExtendedLine obj)
+                {
+                    if (obj.Parent1 is ExtendedLine) { }
+                    this.Parent1 = obj.Parent1;
+                }*/
 
         //Function that calculates StartPoint and EndPoint based off parents
         public void calcPoints()

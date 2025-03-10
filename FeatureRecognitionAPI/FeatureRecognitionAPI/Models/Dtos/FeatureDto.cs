@@ -1,6 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models.Enums;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace FeatureRecognitionAPI.Models.Dtos
 {

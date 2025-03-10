@@ -3,7 +3,6 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace FeatureRecognitionAPI.Controllers

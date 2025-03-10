@@ -1,6 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-
-namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Ellipse object that extends Entity
@@ -10,20 +8,51 @@ namespace FeatureRecognitionAPI.Models
     {
         public Point Center { get; set; }
         public Point MajorAxisEndPoint { get; set; }
+        public double MajorAxis { get; set; }
+        public double MinorAxis { get; set; }
         public double MinorToMajorAxisRatio { get; set; }
         public double StartParameter { get; set; }
         public double EndParameter { get; set; }
+        public double Rotation { get; set; }
+        public Point StartPoint { get; set; }
+        public Point EndPoint { get; set; }
         public bool IsFullEllipse { get; set; }
         private Ellipse() { }
-        public Ellipse(double centerX, double centerY, double majorAxisXValue, 
-            double majorAxisYValue, double minorToMajorAxisRatio, 
+        public Ellipse(double centerX, double centerY, double majorAxisXValue,
+            double majorAxisYValue, double minorToMajorAxisRatio,
             double startParameter, double endParameter)
         {
             Center = new Point(centerX, centerY);
             MajorAxisEndPoint = new Point(majorAxisXValue, majorAxisYValue);
+            MajorAxis = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            MinorAxis = MajorAxis * minorToMajorAxisRatio;
             this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
             this.StartParameter = startParameter;
             this.EndParameter = endParameter;
+            Rotation = Math.Atan2(MajorAxisEndPoint.Y - Center.Y, MajorAxisEndPoint.X - Center.X);
+            StartPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, StartParameter);
+            EndPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, EndParameter);
+            if (Rotation > 0)
+            {
+                StartPoint.X = StartPoint.X - Center.X;
+                StartPoint.Y = StartPoint.Y - Center.Y;
+                EndPoint.X = EndPoint.X - Center.X;
+                EndPoint.Y = EndPoint.Y - Center.Y;
+
+                //Rotate around the origin
+                double temp = StartPoint.X;
+                StartPoint.X = -1 * ((StartPoint.X * Math.Cos(Rotation)) - (StartPoint.Y * Math.Sin(Rotation)));
+                StartPoint.Y = -1 * ((StartPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+                temp = EndPoint.X;
+                EndPoint.X = -1 * ((EndPoint.X * Math.Cos(Rotation)) - (EndPoint.Y * Math.Sin(Rotation)));
+                EndPoint.Y = -1 * ((EndPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+
+                //Translate back
+                StartPoint.X = StartPoint.X + Center.X;
+                StartPoint.Y = StartPoint.Y + Center.Y;
+                EndPoint.X = EndPoint.X + Center.X;
+                EndPoint.Y = EndPoint.Y + Center.Y;
+            }
             if (startParameter == 0 && endParameter == 2 * Math.PI)
             {
                 this.IsFullEllipse = true;
@@ -100,7 +129,7 @@ namespace FeatureRecognitionAPI.Models
          * @PAram b - Minor axis value
          * @Param angle - angle of coordinate desired
          */
-        private Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
+        internal Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
         {
             double x1;
             double y1;
@@ -148,8 +177,79 @@ namespace FeatureRecognitionAPI.Models
                     }
                     break;
             }
-            Point sol = new Point(x1, y1);
+            Point sol = new Point(x1 + Center.X, y1 + Center.Y);
             return sol;
+        }
+
+        public Line vectorFromCenter(double angle)
+        {
+            double a = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            Point endPoint = PointOnEllipseGivenAngleInRadians(a, MinorToMajorAxisRatio * a, angle);
+            return new Line(Center.X, Center.Y, endPoint.X + Center.X, endPoint.Y + Center.Y);
+        }
+
+        /**
+         * Checks if a given point on the ellipse is in range of the parameter boundaries
+         */
+        internal bool isInEllipseRange(Point point)
+        {
+            double y = point.Y - Center.Y;
+            double x = point.X - Center.X;
+            double pointAngle;
+            if (x == 0)
+            {
+                pointAngle = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+            }
+            else if (y == 0)
+            {
+                pointAngle = x > 0 ? 0 : Math.PI;
+            }
+            else
+            {
+                pointAngle = Math.Atan2(y, x);
+                //Q2 and Q3
+                if (x < 0)
+                {
+                    pointAngle += Math.PI;
+                }
+                //Q4
+                else if (x > 0 && y < 0)
+                {
+                    pointAngle += 2 * Math.PI;
+                }
+            }
+            double ellipseY = MajorAxisEndPoint.Y - Center.Y;
+            double ellipseX = MajorAxisEndPoint.X - Center.X;
+            double ellipseRotation;
+            if (ellipseX == 0)
+            {
+                ellipseRotation = ellipseY > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
+            }
+            else if (ellipseY == 0)
+            {
+                ellipseRotation = ellipseX > 0 ? 0 : Math.PI;
+            }
+            else
+            {
+                ellipseRotation = Math.Atan2(ellipseY, ellipseX);
+                //Q2 and Q3
+                if (ellipseX < 0)
+                {
+                    ellipseRotation += Math.PI;
+                }
+                //Q4
+                else if (ellipseX > 0 && ellipseY < 0)
+                {
+                    ellipseRotation += 2 * Math.PI;
+                }
+            }
+            //Adjusting for ellipse rotation
+            pointAngle -= ellipseRotation;
+            if (pointAngle < 0)
+            {
+                pointAngle += 2 * Math.PI;
+            }
+            return pointAngle >= Math.Round(StartParameter, 4) && pointAngle <= Math.Round(EndParameter, 4);
         }
 
         public override bool Equals(object? obj)
@@ -167,6 +267,27 @@ namespace FeatureRecognitionAPI.Models
 
             }
             return false;
+        }
+        
+        //TODO: don't know how to calculate this so I'll just leave it for now
+        public override double MinX()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double MinY()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double MaxX()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double MaxY()
+        {
+            throw new NotImplementedException();
         }
     }
 }

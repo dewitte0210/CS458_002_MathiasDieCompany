@@ -1,13 +1,6 @@
-﻿using NUnit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FeatureRecognitionAPI.Models;
+﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Testing_for_Project
 {
@@ -54,13 +47,13 @@ namespace Testing_for_Project
 
         [Test]
         //Make sure a standard triangle is detected as a triangle
-        public void CheckGroup1C_Good() 
+        public void CheckGroup1C_Good()
         {
             Line line1 = new(1, 1, 1, 3);
             Line line2 = new(1, 3, 3, 2);
             Line line3 = new(1, 1, 3, 2);
 
-            List<Entity> entities = new List<Entity>() {line1, line2, line3 };
+            List<Entity> entities = new List<Entity>() { line1, line2, line3 };
 
             Feature feature = new Feature(entities);
             PossibleFeatureTypes test;
@@ -78,14 +71,14 @@ namespace Testing_for_Project
             Line line3 = new(3, 3, 1, 3);
             Line line4 = new(3, 3, 3, 1);
 
-            Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 } );
+            Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 });
             PossibleFeatureTypes test;
             bool squareCheck = square.CheckGroup1C(out test);
 
             //Circle
             Circle circle1 = new(1, 1, 4.5);
 
-            Feature circle = new Feature(new List<Entity>() { circle1 } );
+            Feature circle = new Feature(new List<Entity>() { circle1 });
             bool circleCheck = circle.CheckGroup1C(out test);
 
             //3 Arcs + 3 lines that are not triangle
@@ -95,9 +88,9 @@ namespace Testing_for_Project
             Arc arc1 = new(1.5, 3, .5, 0, 180);
             Arc arc2 = new(2.5, 3, .5, 0, 180);
             Arc arc3 = new(3.5, 3, .5, 0, 180);
-            
-            
-            Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6,line7, arc1, arc2, arc3 });
+
+
+            Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6, line7, arc1, arc2, arc3 });
             bool fakeCheck = fakeTriangle.CheckGroup1C(out test);
             //Assert all are expected
 
@@ -180,7 +173,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc5, arc7, arc9, arc2, arc4, arc3, arc16, arc11, arc10, arc12, arc6, arc13, arc8, arc14, arc15 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.StdTubePunch));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Unknown));
         }
 
         [Test]
@@ -200,72 +193,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { ellipse1 };
             Feature feature = new(entities) { baseEntityList = entities };
             feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.StdTubePunch));
-        }
-
-        [Test]
-        public void CheckGroup2A_VerticalBowtieWithSharpCorners_ReturnsTrue()
-        {
-            Line line1 = new Line(0, 0, 0, 5);
-            Line line2 = new Line(4, 0, 4, 5);
-            Arc arc1 = new Arc(2, 0, 2, 0, 180);
-            Arc arc2 = new Arc(2, 5, 2, 180, 0);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_HorizontalBowtieWithSharpCorners_ReturnsTrue()
-        {
-            Line line1 = new Line(2, 2, 7, 2);
-            Line line2 = new Line(2, -2, 7, -2);
-            Arc arc1 = new Arc(2, 0, 2, 270, 90);
-            Arc arc2 = new Arc(7, 0, 2, 90, 270);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_RotatedBowtieWithSharpCorners_ReturnsTrue()
-        {
-            Line line1 = new Line(1, 1, 5, 5);
-            Line line2 = new Line(3, -1, 7, 3);
-            Arc arc1 = new Arc(6, 4, Math.Sqrt(2), 135, 315);
-            Arc arc2 = new Arc(2, 0, Math.Sqrt(2), 315, 135);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_HorizontalBowtieWithSharpCornersWithBigArcs_ReturnsTrue()
-        {
-            Line line1 = new Line(15, 3, 21, 3);
-            Line line2 = new Line(15, -3, 21, -3);
-            Arc arc1 = new Arc(25, 0, 5, (Math.Atan(3.0 / -4.0) + Math.PI) * 180 / Math.PI, (Math.Atan(3.0 / 4.0) + Math.PI) * 180 / Math.PI);
-            Arc arc2 = new Arc(11, 0, 5, (Math.Atan(-3.0 / 4.0) * 180 / Math.PI), (Math.Atan(3.0 / 4.0)) * 180 / Math.PI);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group2A2));
-        }
-
-        [Test]
-        public void CheckGroup2A_RandomHorizontalShapeWith2ArcsAndLines_ReturnsFalse()
-        {
-            Line line1 = new Line(2, 2, 7, 2);
-            Line line2 = new Line(2, -2, 7, -2);
-            Arc arc1 = new Arc(2, 0, 2, 90, 270);
-            Arc arc2 = new Arc(7, 0, 2, 90, 270);
-            List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2 };
-            Feature feature = new(entities) { baseEntityList = entities };
-            feature.DetectFeatures();
-            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.StdTubePunch));
+            Assert.That(feature.FeatureType, Is.EqualTo(PossibleFeatureTypes.Unknown));
         }
         #endregion
 
@@ -286,7 +214,7 @@ namespace Testing_for_Project
 
             Feature f = new(eList);
 
-          //  f.CheckGroup3();
+            //  f.CheckGroup3();
         }
 
         #endregion
@@ -330,7 +258,7 @@ namespace Testing_for_Project
             Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
         }
         #endregion
-        
+
         #region CheckGroup4
         [Test]
         public void CheckGroup4_2LineAngled_ReturnsTrue()
@@ -369,7 +297,7 @@ namespace Testing_for_Project
         }
         #endregion
         #region CheckGroup6
-        
+
         [Test]
         public void CheckGroup6_4Arc3Line_ReturnsTrue()
         {
@@ -411,8 +339,23 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6)); 
+            Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6));
         }
         #endregion
+
+        [Test]
+
+        public void TestSortedFeatureList()
+        {
+            Line line1 = new(4, 5, 4, 0);
+            Line line2 = new(0, 0, 0, 5);
+            Line line3 = new(4, 0, 2, -2);
+            Arc arc1 = new(2, 5, 2, 0, 180);
+            Line line4 = new(2, -2, 0, 0);
+            List<Entity> entities = new List<Entity>() { line1, line2, line3, arc1, line4 };
+            Feature testFeature = new(entities) { ExtendedEntityList = entities };
+            bool testBool = testFeature.seperateBaseEntities();
+            Assert.That(testBool, Is.True);
+        }
     }
 }

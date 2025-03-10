@@ -1,18 +1,17 @@
 ﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
-using Newtonsoft.Json;
-using System.IO;
-using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
-using Newtonsoft.Json.Converters;
 using FeatureRecognitionAPI.Models.Features;
-using iText.Kernel.Pdf;
+using iText.Commons.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace FeatureRecognitionAPI.Services
 {
     public class FeatureRecognitionService : IFeatureRecognitionService
     {
-        public FeatureRecognitionService() { }
+        public FeatureRecognitionService()
+        {
+        }
 
         public async Task<(OperationStatus, string?)> GetFileExtension(string fileName)
         {
@@ -20,12 +19,13 @@ namespace FeatureRecognitionAPI.Services
             {
                 string ext = "";
                 bool extBool = false;
-                for (int i = 0; i < fileName.Length;i++)
+                for (int i = 0; i < fileName.Length; i++)
                 {
                     if (fileName[i] == '.')
                     {
                         extBool = true;
                     }
+
                     if (extBool)
                     {
                         ext += char.ToLower(fileName[i]);
@@ -48,26 +48,27 @@ namespace FeatureRecognitionAPI.Services
                         return (OperationStatus.OK, null);
                 }
             }
+
             Console.WriteLine("ERROR File does not exist");
             return (OperationStatus.OK, null);
         }
 
         /*
-        * Handles an uploaded file by performing feature detection based on its extension 
-        * and returning the results in JSON format for the frontend.
-        * 
-        * Supported file types: .dxf, .dwg
-        * 
-        * @param file The uploaded file as an IFormFile object.
-        * @return A tuple containing:
-        *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
-        *   - string: The resulting JSON string if successful; null otherwise.
-        *   
-        * Note: PDF support is currently commented out and will be implemented in the future.
-        * 
-        * Exceptions:
-        * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
-        */
+         * Handles an uploaded file by performing feature detection based on its extension
+         * and returning the results in JSON format for the frontend.
+         *
+         * Supported file types: .dxf, .dwg
+         *
+         * @param file The uploaded file as an IFormFile object.
+         * @return A tuple containing:
+         *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
+         *   - string: The resulting JSON string if successful; null otherwise.
+         *
+         * Note: PDF support is currently commented out and will be implemented in the future.
+         *
+         * Exceptions:
+         * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
+         */
         public async Task<(OperationStatus, string?)> UploadFile(IFormFile file)
         {
             try
@@ -90,13 +91,13 @@ namespace FeatureRecognitionAPI.Services
                         await file.CopyToAsync(stream);
                     }
                 }
-                
+
                 string json = "";
-                
+
                 List<List<Entity>> touchingEntityList;
                 List<Feature> features;
                 List<FeatureGroup> featureGroups;
-                var settings = new JsonSerializerSettings();
+                var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
                 settings.Converters.Add(new StringEnumConverter());
                 switch (ext)
                 {
@@ -107,6 +108,7 @@ namespace FeatureRecognitionAPI.Services
                             DXFFile dXFFile = new DXFFile(dxfStream.Name);
                             // Create the touching entity list
                             touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
+                            touchingEntityList = touchingEntityList.Select(list => CondenseArcs(list)).ToList();
                             // Set the feature groups
                             featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
                             // Set features for each feature group
@@ -115,9 +117,11 @@ namespace FeatureRecognitionAPI.Services
                                 features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
+
                             // Create JSON that will be sent to the frontend
-                            json = JsonConvert.SerializeObject(featureGroups, settings);
+                            json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, featureGroups), settings);
                         }
+
                         break;
                     case ".dwg":
                         // Works exactly the same as DXF above, just with a different file as the parser functions are different
@@ -131,8 +135,10 @@ namespace FeatureRecognitionAPI.Services
                                 features = dWGFile.makeFeatureList(featureGroups[i].touchingEntities);
                                 featureGroups[i].setFeatureList(features);
                             }
+
                             json = JsonConvert.SerializeObject(featureGroups, settings);
                         }
+
                         break;
                     default:
                         Console.WriteLine("ERROR detecting file extension");
@@ -140,7 +146,6 @@ namespace FeatureRecognitionAPI.Services
                 }
 
                 return (OperationStatus.OK, json);
-                
             }
             catch (Exception ex)
             {
@@ -153,6 +158,88 @@ namespace FeatureRecognitionAPI.Services
 
                 return (OperationStatus.ExternalApiFailure, ex.ToString());
             }
+        }
+
+        private List<Entity> CondenseArcs(List<Entity> entities)
+        {
+            List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
+
+            List<IGrouping<int, Arc>> arcGroups = entities
+                .OfType<Arc>()
+                .GroupBy(arc => arc.GetHashCode()).ToList();
+
+            List<Arc> arcs = new List<Arc>();
+            foreach (var g in arcGroups)
+            {
+                List<Arc> group = g.ToList();
+                Arc initArc = group[0];
+                group.RemoveAt(0);
+
+                int idx = 0;
+                int failCount = 0;
+                while (group.Count > 0)
+                {
+                    if (failCount >= group.Count)
+                    {
+                        arcs.Add(initArc);
+                        idx = 0;
+                        initArc = group[0];
+                        if (group.Count == 1)
+                        {
+                            arcs.Add(initArc);
+                            break;
+                        }
+
+                        failCount = 0;
+                    }
+
+                    Arc otherArc = group[idx];
+                    if (initArc.ConnectsTo(otherArc))
+                    {
+                        Point center = initArc.Center;
+                        double radius = initArc.Radius;
+
+                        bool startAtSmallArcStart =
+                            Math.Abs(otherArc.StartAngle + otherArc.CentralAngle - initArc.StartAngle) % 360 <
+                            Entity.EntityTolerance;
+
+                        double angleStart = startAtSmallArcStart ? otherArc.StartAngle : initArc.StartAngle;
+                        double angleExtent = otherArc.CentralAngle + initArc.CentralAngle;
+
+                        initArc = new Arc(center.X, center.Y, radius, angleStart, angleStart + angleExtent);
+                        group.RemoveAt(idx);
+                        failCount = 0;
+                    }
+                    else
+                    {
+                        failCount++;
+                    }
+
+                    if (group.Count == 0)
+                    {
+                        break;
+                    }
+
+                    idx = (idx + 1) % group.Count;
+                }
+
+                arcs.Add(initArc);
+            }
+
+            // Convert arcs to circles if necessary
+            foreach (Arc arc in arcs)
+            {
+                if (Math.Abs(arc.CentralAngle - 360) <= Entity.EntityTolerance)
+                {
+                    returned.Add(new Circle(arc.Center.X, arc.Center.Y, arc.Radius));
+                }
+                else
+                {
+                    returned.Add(arc);
+                }
+            }
+
+            return returned;
         }
     }
 }

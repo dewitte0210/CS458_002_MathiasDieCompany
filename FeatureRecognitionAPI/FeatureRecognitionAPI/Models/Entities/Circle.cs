@@ -1,6 +1,4 @@
-﻿using FeatureRecognitionAPI.Models.Enums;
-
-namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Circle object that extends Entity
@@ -9,7 +7,7 @@ namespace FeatureRecognitionAPI.Models
     public class Circle : Entity
     {
         public Point Center { get; set; }//Center point of circle
-        public  double Radius { get; set; }//Radius of circle
+        public double Radius { get; set; }//Radius of circle
 
         /**
          * Constructor that takes an x, y and radius value
@@ -20,7 +18,7 @@ namespace FeatureRecognitionAPI.Models
          * @param CenterY y coordinate of central point
          * @param radius value of the radius of this circle
          */
-        public Circle( double centerX,  double centerY,  double radius)
+        public Circle(double centerX, double centerY, double radius)
         {
             Center = new Point(centerX, centerY);
             this.Radius = radius;
@@ -32,7 +30,7 @@ namespace FeatureRecognitionAPI.Models
          * 
          * @param radius is the radius value that is used to calculate the perimeter
          */
-        private  double calcPerimeter( double radius)
+        private double calcPerimeter(double radius)
         {
             return 2 * Math.PI * radius;
         }
@@ -49,7 +47,7 @@ namespace FeatureRecognitionAPI.Models
 
             if (obj is Circle)
             {
-                if ( Math.Abs( ((Circle)obj).Radius - this.Radius ) < EntityTolerance ) 
+                if (Math.Abs(((Circle)obj).Radius - this.Radius) < EntityTolerance)
                 {
                     return true;
                 }
@@ -71,6 +69,26 @@ namespace FeatureRecognitionAPI.Models
                 else return false;
             }
             else return false;
+        }
+        
+        public override double MinX()
+        {
+            return Center.X - Radius;
+        }
+
+        public override double MinY()
+        {
+            return Center.Y - Radius;
+        }
+
+        public override double MaxX()
+        {
+            return Center.X + Radius;
+        }
+
+        public override double MaxY()
+        {
+            return Center.Y + Radius;
         }
 
     }

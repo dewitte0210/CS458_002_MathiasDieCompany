@@ -7,6 +7,39 @@
   max-height: 100%;
 }
 
+
+
+.vertical-line {
+  border-right: 3px solid black;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.table-and-visual{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:16px;
+
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.table-data{
+  padding-right: 32px;
+  border-right:4px solid black;
+}
+
+.visual{
+}
+
+.response-container{
+  
+}
+
 .upload-container {
   align-items: center;
   justify-content: center;
@@ -29,7 +62,9 @@
 }
 
 .document-uploader {
-  border: 2px dashed #4282fe;
+  border: 3px solid black;
+  background-color: #5472d2;
+  color: white;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -159,11 +194,10 @@
   position: relative;
   display: inline-block;
   padding: 12px 48px;
-  border: none;
   font-size: 16px;
   background: rgb(84, 114, 210);
   font-weight: 600;
-  color: #ffffff;
+  color: #000000;
   cursor: pointer;
   transition: all 0.3s ease;
   box-sizing: border-box;
@@ -188,7 +222,7 @@
 }
 
 .animated-button:hover {
-  box-shadow: 0 0 0 5px #ffffff;
+  box-shadow: 0 0 0 3px #36454F;
   color: #000000;
   border: 3px solid #5472d2;
   animation: 0.18s ease-in-out;
@@ -275,6 +309,11 @@ label {
 .features-table {
   max-height: 55vh;
   overflow-y: auto;
+  text-align:center; 
+}
+
+.quote-form{
+  
 }
 
 table {

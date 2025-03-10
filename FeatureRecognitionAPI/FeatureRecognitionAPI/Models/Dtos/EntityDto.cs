@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace FeatureRecognitionAPI.Models.Dtos
+﻿namespace FeatureRecognitionAPI.Models.Dtos
 {
     public class EntityDto
     {

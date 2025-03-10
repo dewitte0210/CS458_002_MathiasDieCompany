@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CSMath.Geometry;
-using FeatureRecognitionAPI.Models;
+﻿using FeatureRecognitionAPI.Models;
 
 namespace Testing_for_Project
 {
@@ -12,8 +6,9 @@ namespace Testing_for_Project
     {
         #region ExtendingLines
         [Test]
-        public void ExtendVerticalLines() {
-            Line line1 = new(7,4,7,6);
+        public void ExtendVerticalLines()
+        {
+            Line line1 = new(7, 4, 7, 6);
             Line line2 = new(7, 8, 7, 10);
             List<Entity> testEntities = [line1, line2];
             Feature testFeature = new(testEntities, false, 0);
@@ -41,7 +36,7 @@ namespace Testing_for_Project
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
 
             Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 4)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point (7, 14)));
+            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 14)));
         }
 
         [Test]
@@ -226,7 +221,7 @@ namespace Testing_for_Project
         [Test]
         public void SeperateBaseEntitiesWithOnePerimeterFeature() // Horizontal lines
         {
-         // Extend Lines
+            // Extend Lines
             // Added lines to make the feature a closed shape
             Line line6 = new(4, 7, 4, 3);
             Line line7 = new(4, 3, 10, 3);
@@ -255,7 +250,7 @@ namespace Testing_for_Project
                     Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
                     // Checks correct parent values
                     Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
-                    Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));         
+                    Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));
 
                     hasExtendedLine = true;
                 }
@@ -273,7 +268,7 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.EntityList.Equals(testEntities));
             Assert.IsTrue(testFeature.EntityList.Count == 8);
 
-         // Seperate base entities
+            // Seperate base entities
             testFeature.seperateBaseEntities();
 
             // Make sure these still pass
@@ -310,7 +305,7 @@ namespace Testing_for_Project
 
             // Checks for baseEntityList
             hasExtendedLine = false;
-            foreach(Entity entity in  testFeature.baseEntityList) 
+            foreach (Entity entity in testFeature.baseEntityList)
             {
                 Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
                 if (entity is ExtendedLine)
@@ -673,7 +668,7 @@ namespace Testing_for_Project
                         }
                     }
                 }
-            
+
                 Assert.IsTrue(equalLists);//base entity list and normal entity list is the same (only works for example 1)
                 Feature testFeature = new Feature(feature.baseEntityList);
                 testFeature.DetectFeatures();
@@ -719,8 +714,8 @@ namespace Testing_for_Project
         [Test]
         public void doesChildPassAsParent()
         {
-                ExtendedLine child = new ExtendedLine();
-                Assert.IsTrue(child is Line);
+            ExtendedLine child = new ExtendedLine();
+            Assert.IsTrue(child is Line);
         }
 
         // This is to test that all entities in the perimeter list are in EntityList and have not been changed
@@ -744,7 +739,7 @@ namespace Testing_for_Project
             foreach (Feature feature in featureList)
             {
                 if (feature.PerimeterEntityList.Count == 2)
-                    {
+                {
                     oneFeatureWithTwoPerimeterFeatures = true;
                     count++;
                     Assert.IsTrue(count == 1); // there should be only 1 feature with two perimeter features
@@ -764,7 +759,7 @@ namespace Testing_for_Project
                     }
 
                     Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
-                } 
+                }
                 else
                 {
                     Assert.IsTrue(feature.PerimeterEntityList.Count == 0); // if the feature does not have 2 perimeter features, it should have none
@@ -794,7 +789,7 @@ namespace Testing_for_Project
             Assert.IsTrue(featureList.Count == 6);
             foreach (Feature feature in featureList)
             {
-                totalFeatures += feature.count; 
+                totalFeatures += feature.count;
                 if (feature.PerimeterEntityList.Count != 0)
                 {
                     Assert.IsTrue(feature.PerimeterEntityList.Count == 1);
