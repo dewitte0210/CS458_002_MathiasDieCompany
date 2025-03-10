@@ -669,8 +669,7 @@ public class Feature
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        //double maxLength = Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
-        double maxLength = 100; //TODO DELETE AND UNCOMMENT LINE ABOVE!!!!!!!!!
+        double maxLength = 2 * Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
         Line ray;
 
         int numIntersections = 0;
