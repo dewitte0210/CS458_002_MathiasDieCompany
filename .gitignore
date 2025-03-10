@@ -414,6 +414,12 @@ FodyWeavers.xsd
 /FeatureRecognitionAPI/FeatureRecognitionAPI/FeatureRecognitionAPI.sln
 /FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/indexLayout.xml
 /FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/vcs.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/.gitignore
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/shelf/Changes.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/projectSettingsUpdater.xml
+/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/shelf/Changes/shelved.patch
+/FeatureRecognitionAPI/.idea/
+/.idea/
 
 # Default ignored files
 /shelf/
@@ -421,18 +427,14 @@ FodyWeavers.xsd
 # Rider ignored files
 /projectSettingsUpdater.xml
 /modules.xml
-/.idea.FeatureRecognitionAPI.iml
 /contentModel.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/.gitignore
-/.idea/.gitignore
-/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/shelf/Changes.xml
-/.idea/encodings.xml
-/.idea/indexLayout.xml
-/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/projectSettingsUpdater.xml
-/FeatureRecognitionAPI/.idea/.idea.FeatureRecognitionAPI/.idea/shelf/Changes/shelved.patch
-/.idea/vcs.xml
+
+/FrontEnd/.vscode
+
+# Upload Destination
+/FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/
