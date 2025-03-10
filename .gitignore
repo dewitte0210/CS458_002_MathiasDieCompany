@@ -440,4 +440,4 @@ FodyWeavers.xsd
 /FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/
 
 # Run config stuff
-FeatureRecognitionAPI/FeatureRecognitionAPI/Properties/launchSettings.json
+/FeatureRecognitionAPI/FeatureRecognitionAPI/Properties/launchSettings.json
