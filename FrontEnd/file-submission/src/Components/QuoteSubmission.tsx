@@ -344,7 +344,8 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                                 <option value="Group1B1" label={translate("Group1B1")}></option>
                                                                 <option value="Group1B2" label={translate("Group1B2")}></option>
                                                                 <option value="Group1C" label={translate("Group1C")}></option>
-                                                                <option value="Group2A" label={translate("Group2A")}></option>
+                                                                <option value="Group2A1" label={translate("Group2A1")}></option>
+                                                                <option value="Group2A2" label={translate("Group2A2")}></option>
                                                                 <option value="Group3" label={translate("Group3")}></option>
                                                                 <option value="Group4" label={translate("Group4")}></option>
                                                                 <option value="Group5" label={translate("Group5")}></option>
