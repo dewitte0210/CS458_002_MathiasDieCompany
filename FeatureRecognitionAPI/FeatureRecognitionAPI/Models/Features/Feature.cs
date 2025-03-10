@@ -679,7 +679,12 @@ public class Feature
         if (entity is Arc arc) 
         { ray = arc.VectorFromCenter(arc.degreesToRadians(arc.AngleInMiddle())); }
         else
-        { ray = (entity as Ellipse).vectorFromCenter(((entity as Ellipse).EndParameter - (entity as Ellipse).StartParameter) / 2); }
+        {
+            Ellipse tempEntity = entity as Ellipse;
+            double startAngle = tempEntity.StartParameter + Math.Atan2(tempEntity.MajorAxisEndPoint.Y - tempEntity.Center.Y, tempEntity.MajorAxisEndPoint.X - tempEntity.Center.X);
+            double endAngle = tempEntity.EndParameter + Math.Atan2(tempEntity.MajorAxisEndPoint.Y - tempEntity.Center.Y, tempEntity.MajorAxisEndPoint.X - tempEntity.Center.X);
+            ray = (entity as Ellipse).vectorFromCenter((endAngle - startAngle) / 2);
+        }
 
         //  Entends the ray
         Point unitVector = new Point((ray.EndPoint.X - ray.StartPoint.X) / ray.Length, (ray.EndPoint.Y - ray.StartPoint.Y) / ray.Length);
@@ -714,7 +719,7 @@ public class Feature
                 {
                     Ellipse currEntity = (baseEntityList[i] as Ellipse);
                     double major = Math.Sqrt(Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.X - (baseEntityList[i] as Ellipse).Center.X, 2) + Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.Y - (baseEntityList[i] as Ellipse).Center.Y, 2));
-                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.PointOnEllipseGivenAngleInRadians(major, major * currEntity.MinorToMajorAxisRatio, currEntity.StartParameter)) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.PointOnEllipseGivenAngleInRadians(major, major * currEntity.MinorToMajorAxisRatio, currEntity.EndParameter)))
+                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
                     {
                         numEndPointIntersections++;
                     }

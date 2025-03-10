@@ -42,6 +42,8 @@ namespace Testing_for_Project
             Assert.That(circle1.Center.Y, Is.EqualTo(0.7124999999999999));
             Assert.That(circle1.Radius, Is.EqualTo(0.2577228596164672));
         }
+
+        #region EllipseClass
         [Test]
         public void TestFullEllipseClass()
         {
@@ -84,6 +86,13 @@ namespace Testing_for_Project
             Point point1 = new Point(0, -2);
             Assert.That(ellipse1.isInEllipseRange(point1), Is.False);
         }
+        [Test]
+        public void TestPointOnEllipseGivenAngleInRadians_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+
+        }
+        #endregion
 
         [Test]
         public void TestPointEquals()
