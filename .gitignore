@@ -438,6 +438,3 @@ FodyWeavers.xsd
 
 # Upload Destination
 /FeatureRecognitionAPI/FeatureRecognitionAPI/ExampleFiles/
-
-# Run config stuff
-/FeatureRecognitionAPI/FeatureRecognitionAPI/Properties/launchSettings.json
