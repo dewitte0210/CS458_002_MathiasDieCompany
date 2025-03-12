@@ -23,7 +23,7 @@
             double startParameter, double endParameter)
         {
             Center = new Point(centerX, centerY);
-            MajorAxisEndPoint = new Point(majorAxisXValue, majorAxisYValue);
+            MajorAxisEndPoint = new Point(majorAxisXValue + Center.X, majorAxisYValue + Center.Y);
             MajorAxis = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
             MinorAxis = MajorAxis * minorToMajorAxisRatio;
             this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
@@ -269,24 +269,39 @@
             return false;
         }
         
-        //TODO: don't know how to calculate this so I'll just leave it for now
         public override double MinX()
         {
+            if (Rotation == 0 || Rotation == Math.PI)
+            {
+                return Math.Min(PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, 0).X, PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, Math.PI).X);
+            }
             throw new NotImplementedException();
         }
 
         public override double MinY()
         {
+            if (Rotation == 0 || Rotation == Math.PI)
+            {
+                return Math.Min(PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, Math.PI / 2).Y, PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, 3 * Math.PI / 2).Y);
+            }
             throw new NotImplementedException();
         }
 
         public override double MaxX()
         {
+            if (Rotation == 0 || Rotation == Math.PI)
+            {
+                return Math.Max(PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, 0).X, PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, Math.PI).X);
+            }
             throw new NotImplementedException();
         }
 
         public override double MaxY()
         {
+            if (Rotation == 0 || Rotation == Math.PI)
+            {
+                return Math.Max(PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, Math.PI / 2).Y, PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, 3 * Math.PI / 2).Y);
+            }
             throw new NotImplementedException();
         }
     }
