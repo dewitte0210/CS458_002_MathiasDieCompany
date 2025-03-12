@@ -57,7 +57,7 @@ namespace FeatureRecognitionAPI.Models
 
             CadDocument doc = reader.Read();
 
-            _fileVersion = GetFileVersion(doc.Header.VersionString);
+            _fileVersion = GetFileVersion();
 
             CadObjectCollection<ACadSharp.Entities.Entity> entities = doc.Entities;
 
@@ -114,8 +114,11 @@ namespace FeatureRecognitionAPI.Models
         }
         //Throws exeption if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
 
-        public FileVersion GetFileVersion(string version)
+        public override FileVersion GetFileVersion()
         {
+            DwgReader reader = new DwgReader(_path);
+            CadDocument doc = reader.Read();
+            string version = doc.Header.VersionString;
 
             switch (version)
             {
@@ -142,8 +145,6 @@ namespace FeatureRecognitionAPI.Models
                 default:
                     return FileVersion.Unknown;
             }
-
-
         }
 
         public List<Entity> GetEntities()

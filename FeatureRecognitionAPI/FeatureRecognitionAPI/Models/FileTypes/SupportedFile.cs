@@ -411,5 +411,7 @@ namespace FeatureRecognitionAPI.Models
         }
         // Method to read the data from a file and fill the entityList with entities
         public abstract void readEntities();
+
+        public abstract FileVersion GetFileVersion();
     }
 }
