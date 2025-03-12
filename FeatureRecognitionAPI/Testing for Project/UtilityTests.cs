@@ -5,28 +5,28 @@ using FeatureRecognitionAPI.Models.Utility;
 
 namespace Testing_for_Project
 {
-	class UtilityTests
-	{
+    class UtilityTests
+    {
 
-		#region Angles
+        #region Angles
 
-		[Test]
-		public void TestCounterclockwiseTouchingSmall()
-		{
-			Line line1 = new(0, 0, 5, 0);
-			Line line2 = new(5, 0, 0, 5);
-			Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+        [Test]
+        public void TestCounterclockwiseTouchingSmall()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(5, 0, 0, 5);
+            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
             Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
 
             Assert.That(interior.angle, Is.EqualTo(45));
             Assert.That(exterior.angle, Is.EqualTo(315));
         }
 
-		[Test]
-		public void TestCounterclockwiseTouchingLarge()
-		{
-			Line line1 = new(0, 0, 5, 0);
-			Line line2 = new(5, 0, 10, -5);
+        [Test]
+        public void TestCounterclockwiseTouchingLarge()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(5, 0, 10, -5);
             Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
             Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
 
@@ -47,10 +47,10 @@ namespace Testing_for_Project
         }
 
         [Test]
-		public void TestClockwiseTouchingLarge()
-		{
-			Line line1 = new(0, 0, -5, 0);
-			Line line2 = new(-5, 0, -10, -5);
+        public void TestClockwiseTouchingLarge()
+        {
+            Line line1 = new(0, 0, -5, 0);
+            Line line2 = new(-5, 0, -10, -5);
             Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
             Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
 
@@ -166,6 +166,7 @@ namespace Testing_for_Project
 
             Assert.That(interior.angle, Is.EqualTo(0));
             Assert.That(exterior.angle, Is.EqualTo(360));
+            Assert.IsTrue(Angles.IsParallel(line1, line2));
         }
 
         [Test]
@@ -178,6 +179,7 @@ namespace Testing_for_Project
 
             Assert.That(interior.angle, Is.EqualTo(0));
             Assert.That(exterior.angle, Is.EqualTo(360));
+            Assert.IsTrue(Angles.IsParallel(line1, line2));
         }
 
         [Test]
@@ -190,6 +192,7 @@ namespace Testing_for_Project
 
             Assert.That(interior.angle, Is.EqualTo(180));
             Assert.That(exterior.angle, Is.EqualTo(180));
+            Assert.IsTrue(Angles.IsParallel(line1, line2));
         }
 
         [Test]
@@ -202,6 +205,44 @@ namespace Testing_for_Project
 
             Assert.That(interior.angle, Is.EqualTo(180));
             Assert.That(exterior.angle, Is.EqualTo(180));
+            Assert.IsTrue(Angles.IsParallel(line1, line2));
+        }
+
+        //perpendicular
+        [Test]
+        public void TestCounterclockwiseTouchingPerpendicular()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(5, 0, 5, 5);
+
+            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+        }
+
+        [Test]
+        public void TestClockwiseTouchingPerpendicular()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(5, 0, 5, -5);
+
+            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+        }
+
+        [Test]
+        public void TestCounterclockwiseSeperatedPerpendicular()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(10, 0, 10, 5);
+
+            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+        }
+
+        [Test]
+        public void TestClockwiseSeperatedPerpendicular()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(10, 0, 10, -5);
+
+            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
         }
 
         #endregion

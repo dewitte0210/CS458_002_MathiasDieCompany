@@ -56,6 +56,7 @@ namespace FeatureRecognitionAPI.Models
             return (StartPoint.Equals(point) || EndPoint.Equals(point));
         }
 
+        [Obsolete("Line isParallel is deprecated, please use Angles isParallel in Utility.")]
         public bool isParallel(Line line)
         {
             // Vertical line case
@@ -108,6 +109,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        [Obsolete("Line isPerpendicular is deprecated, please use Angles isPerpendicular in Utility.")]
         public bool isPerpendicular(Entity other)
         {
             if (other is Line)

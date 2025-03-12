@@ -57,6 +57,11 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        public override FileVersion GetFileVersion()
+        {
+            return FileVersion.Unknown;
+        }
+
         public override void readEntities()
         {
             throw new NotImplementedException();

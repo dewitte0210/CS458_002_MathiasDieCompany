@@ -53,7 +53,7 @@ namespace FeatureRecognitionAPI.Models.Utility
             {
                 return new Radians(angle * Math.PI / 180);
             }
-            
+
         }
 
         public class Radians(double angle)
@@ -193,6 +193,60 @@ namespace FeatureRecognitionAPI.Models.Utility
             return new Angle(returnAngle, side);
         }
 
+        public static bool IsPerpendicular(Line a, Line b, bool exact = false)
+        {
+            const double TOLERANCE = 0.00005;
+            double angle = GetAngle(a, b).GetDegrees().angle;
+
+            if (exact)
+            {
+                if (angle == 90 || angle == 270)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (angle > 90 - TOLERANCE && angle < 90 + TOLERANCE)
+                {
+                    return true;
+                }
+                if (angle > 270 - TOLERANCE && angle < 270 + TOLERANCE)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool IsParallel(Line a, Line b, bool exact = false)
+        {
+            const double TOLERANCE = 0.00005;
+            double angle = GetAngle(a, b).GetDegrees().angle;
+
+            if (exact)
+            {
+                if (angle == 0 || angle == 180)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (angle > 0 - TOLERANCE && angle < 0 + TOLERANCE)
+                {
+                    return true;
+                }
+                if (angle > 180 - TOLERANCE && angle < 180 + TOLERANCE)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
         /// <summary>
         /// Checks if a polygon is closed.
         /// The polygon must be entirely made of lines.
@@ -281,39 +335,39 @@ namespace FeatureRecognitionAPI.Models.Utility
     }
 }
 
-    //    static void Main(string[] args)
-    //    {
-    //        //counterclockwise
-    //        List<Line> ll = new List<Line>();
-    //        ll.Add(new Line(new Point(0, 0), new Point(5, 0)));
-    //        ll.Add(new Line(new Point(5, 0), new Point(3, 3)));
-    //        ll.Add(new Line(new Point(3, 3), new Point(0, 0)));
+//    static void Main(string[] args)
+//    {
+//        //counterclockwise
+//        List<Line> ll = new List<Line>();
+//        ll.Add(new Line(new Point(0, 0), new Point(5, 0)));
+//        ll.Add(new Line(new Point(5, 0), new Point(3, 3)));
+//        ll.Add(new Line(new Point(3, 3), new Point(0, 0)));
 
-    //        Polygon poly = new Polygon(ll);
-    //        Angle ang = getMinorAngle(ll[0], ll[1]);
-    //        Console.WriteLine(ang.getDegrees());
+//        Polygon poly = new Polygon(ll);
+//        Angle ang = getMinorAngle(ll[0], ll[1]);
+//        Console.WriteLine(ang.getDegrees());
 
-    //        //clockwise
-    //        List<Line> llc = new List<Line>();
-    //        llc.Add(new Line(new Point(0, 0), new Point(3, 3)));
-    //        llc.Add(new Line(new Point(3, 3), new Point(5, 0)));
-    //        llc.Add(new Line(new Point(5, 0), new Point(0, 0)));
+//        //clockwise
+//        List<Line> llc = new List<Line>();
+//        llc.Add(new Line(new Point(0, 0), new Point(3, 3)));
+//        llc.Add(new Line(new Point(3, 3), new Point(5, 0)));
+//        llc.Add(new Line(new Point(5, 0), new Point(0, 0)));
 
-    //        Console.WriteLine(getMinorAngle(llc[0], llc[1]).getDegrees());
+//        Console.WriteLine(getMinorAngle(llc[0], llc[1]).getDegrees());
 
-    //        //180
-    //        Line l1 = new Line(new Point(0, 0), new Point(0, 9));
-    //        Line l2 = new Line(new Point(0, 9), new Point(0, 0));
-    //        Console.WriteLine(getMinorAngle(l1, l2).getDegrees());
+//        //180
+//        Line l1 = new Line(new Point(0, 0), new Point(0, 9));
+//        Line l2 = new Line(new Point(0, 9), new Point(0, 0));
+//        Console.WriteLine(getMinorAngle(l1, l2).getDegrees());
 
-    //        //parallel
-    //        Console.WriteLine(getMinorAngle(l1, l1).getDegrees());
+//        //parallel
+//        Console.WriteLine(getMinorAngle(l1, l1).getDegrees());
 
-    //        //seperated
-    //        Line l3 = new Line(new Point(0, 0), new Point(0, 9));
-    //        Line l4 = new Line(new Point(5, 5), new Point(15, 15));
-    //        Console.WriteLine(getMinorAngle(l3, l4).getDegrees());
+//        //seperated
+//        Line l3 = new Line(new Point(0, 0), new Point(0, 9));
+//        Line l4 = new Line(new Point(5, 5), new Point(15, 15));
+//        Console.WriteLine(getMinorAngle(l3, l4).getDegrees());
 
-    //        Console.Write("end");
-    //    }
+//        Console.Write("end");
+//    }
 
