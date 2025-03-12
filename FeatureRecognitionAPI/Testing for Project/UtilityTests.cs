@@ -1,7 +1,7 @@
 ﻿using ACadSharp;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models;
-using FeatureRecognitionAPI.Models.Utility;
+using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 namespace Testing_for_Project
 {
@@ -15,11 +15,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 0, 5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(45));
-            Assert.That(exterior.angle, Is.EqualTo(315));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(45));
+                Assert.That(exterior.angle, Is.EqualTo(315));
+            });
         }
 
         [Test]
@@ -27,11 +30,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 10, -5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(225));
-            Assert.That(exterior.angle, Is.EqualTo(135));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(225));
+                Assert.That(exterior.angle, Is.EqualTo(135));
+            });
         }
 
         [Test]
@@ -39,11 +45,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, -5, 0);
             Line line2 = new(-5, 0, 0, 5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(45));
-            Assert.That(exterior.angle, Is.EqualTo(315));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(45));
+                Assert.That(exterior.angle, Is.EqualTo(315));
+            });
         }
 
         [Test]
@@ -51,11 +60,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, -5, 0);
             Line line2 = new(-5, 0, -10, -5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(225));
-            Assert.That(exterior.angle, Is.EqualTo(135));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(225));
+                Assert.That(exterior.angle, Is.EqualTo(135));
+            });
         }
 
         [Test]
@@ -63,11 +75,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 0, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(0));
-            Assert.That(exterior.angle, Is.EqualTo(360));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(0));
+                Assert.That(exterior.angle, Is.EqualTo(360));
+            });
         }
 
         [Test]
@@ -75,11 +90,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 0, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(0));
-            Assert.That(exterior.angle, Is.EqualTo(360));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(0));
+                Assert.That(exterior.angle, Is.EqualTo(360));
+            });
         }
 
         [Test]
@@ -87,11 +105,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 10, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(180));
-            Assert.That(exterior.angle, Is.EqualTo(180));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(180));
+                Assert.That(exterior.angle, Is.EqualTo(180));
+            });
         }
 
         [Test]
@@ -99,11 +120,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, -5, 0);
             Line line2 = new(-5, 0, -10, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(180));
-            Assert.That(exterior.angle, Is.EqualTo(180));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(180));
+                Assert.That(exterior.angle, Is.EqualTo(180));
+            });
         }
 
         //-----------------------------------------
@@ -113,11 +137,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 5, 0, 10);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(45));
-            Assert.That(exterior.angle, Is.EqualTo(315));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(45));
+                Assert.That(exterior.angle, Is.EqualTo(315));
+            });
         }
 
         [Test]
@@ -125,11 +152,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(10, 0, 15, -5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(225));
-            Assert.That(exterior.angle, Is.EqualTo(135));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(225));
+                Assert.That(exterior.angle, Is.EqualTo(135));
+            });
         }
 
         [Test]
@@ -137,11 +167,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, -5, 0);
             Line line2 = new(-5, 5, 0, 10);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(45));
-            Assert.That(exterior.angle, Is.EqualTo(315));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(45));
+                Assert.That(exterior.angle, Is.EqualTo(315));
+            });
         }
 
         [Test]
@@ -149,11 +182,14 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, -5, 0);
             Line line2 = new(-5, 5, -10, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(225));
-            Assert.That(exterior.angle, Is.EqualTo(135));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(225));
+                Assert.That(exterior.angle, Is.EqualTo(135));
+            });
         }
 
         [Test]
@@ -161,12 +197,15 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(10, 0, 5, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(0));
-            Assert.That(exterior.angle, Is.EqualTo(360));
-            Assert.IsTrue(Angles.IsParallel(line1, line2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(0));
+                Assert.That(exterior.angle, Is.EqualTo(360));
+                Assert.That(IsParallel(line1, line2), Is.True);
+            });
         }
 
         [Test]
@@ -174,12 +213,15 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(10, 0, 5, 0);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(0));
-            Assert.That(exterior.angle, Is.EqualTo(360));
-            Assert.IsTrue(Angles.IsParallel(line1, line2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(0));
+                Assert.That(exterior.angle, Is.EqualTo(360));
+                Assert.That(IsParallel(line1, line2), Is.True);
+            });
         }
 
         [Test]
@@ -187,12 +229,15 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 5, 10, 5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.COUNTERCLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(180));
-            Assert.That(exterior.angle, Is.EqualTo(180));
-            Assert.IsTrue(Angles.IsParallel(line1, line2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(180));
+                Assert.That(exterior.angle, Is.EqualTo(180));
+                Assert.That(IsParallel(line1, line2), Is.True);
+            });
         }
 
         [Test]
@@ -200,12 +245,15 @@ namespace Testing_for_Project
         {
             Line line1 = new(0, 0, -5, 0);
             Line line2 = new(-5, 5, -10, 5);
-            Angles.Degrees interior = Angles.GetAngle(line1, line2, Angles.Side.INTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
-            Angles.Degrees exterior = Angles.GetAngle(line1, line2, Angles.Side.EXTERIOR, Angles.Orientation.CLOCKWISE).GetDegrees();
+            Degrees interior = GetAngle(line1, line2, Side.INTERIOR, Orientation.CLOCKWISE).GetDegrees();
+            Degrees exterior = GetAngle(line1, line2, Side.EXTERIOR, Orientation.CLOCKWISE).GetDegrees();
 
-            Assert.That(interior.angle, Is.EqualTo(180));
-            Assert.That(exterior.angle, Is.EqualTo(180));
-            Assert.IsTrue(Angles.IsParallel(line1, line2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(interior.angle, Is.EqualTo(180));
+                Assert.That(exterior.angle, Is.EqualTo(180));
+                Assert.That(IsParallel(line1, line2), Is.True);
+            });
         }
 
         //perpendicular
@@ -215,7 +263,7 @@ namespace Testing_for_Project
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 5, 5);
 
-            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+            Assert.That(IsPerpendicular(line1, line2), Is.True);
         }
 
         [Test]
@@ -224,7 +272,7 @@ namespace Testing_for_Project
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(5, 0, 5, -5);
 
-            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+            Assert.That(IsPerpendicular(line1, line2), Is.True);
         }
 
         [Test]
@@ -233,7 +281,7 @@ namespace Testing_for_Project
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(10, 0, 10, 5);
 
-            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+            Assert.That(IsPerpendicular(line1, line2), Is.True);
         }
 
         [Test]
@@ -242,7 +290,7 @@ namespace Testing_for_Project
             Line line1 = new(0, 0, 5, 0);
             Line line2 = new(10, 0, 10, -5);
 
-            Assert.IsTrue(Angles.IsPerpendicular(line1, line2));
+            Assert.That(IsPerpendicular(line1, line2), Is.True);
         }
 
         #endregion

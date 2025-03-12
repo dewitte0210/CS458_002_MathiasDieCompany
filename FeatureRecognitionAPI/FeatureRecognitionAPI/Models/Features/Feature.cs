@@ -30,9 +30,10 @@ public class Feature
 
     internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
 
-    internal List<Entity> baseEntityList; // what the list is sorted into from extendedEntityList which should only
-
+    // what the list is sorted into from extendedEntityList which should only
     // contain entities that make up the base shape and possibly corner features
+    internal List<Entity> baseEntityList;
+
     internal List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
     // touching entities that make up a single perimeter feature for
     // the original feature
@@ -849,14 +850,37 @@ public class Feature
     #endregion
 
 
-    #region Group3andGroup4
+    #region Group3
 
     //Chamfered Corners 
-    public bool CheckGroup3and4()
+    public bool CheckGroup3()
     {
-        if (this.FeatureType == PossibleFeatureTypes.Group1A1)
-        {
-        }
+        int numPossibleChamfers = 0;
+        int numConfirmedChamfers = 0;
+
+        List<Line> possibleChamferList;
+        List<Line> confirmerdChamferList;
+
+        /*   chamfer detection
+			given 3 lines...
+				if the two matching angles are equal and less than 90
+				and the angle between edge 1 and 3 are less than 180
+				it is a possible chamfer
+
+			if a shape has multiple possible chamfers
+			2-3 chamfers
+				if an edge is a possible chamfer, if there are any lines parallel to it,
+				those should also be a possible chamfer
+			4 corners
+				have the user select a base chamfer
+				or just use the count as it is and visualize from 4 shortest
+	   */
+
+        
+
+        //if (this.FeatureType == PossibleFeatureTypes.Group1A1)
+        //{
+        //}
 
         return false;
     }

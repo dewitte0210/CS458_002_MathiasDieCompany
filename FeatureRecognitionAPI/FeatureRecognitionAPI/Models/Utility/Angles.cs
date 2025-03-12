@@ -11,7 +11,7 @@ namespace FeatureRecognitionAPI.Models.Utility
     /// Angles contains classes and functions for calculating angles
     /// Not to be used directly, use Angle class, Side and Orientation enums, etc
     /// </summary>
-    class Angles
+    public static class Angles
     {
         /// <summary>
         /// The side an angle lies in relation to the rest of the shape
@@ -168,7 +168,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
             //initially calculates interior angle
             //return opposite if wanting exterior
-            Degrees returnAngle = new Degrees(Math.Abs(180 - angle));
+            Degrees returnAngle = new(Math.Abs(180 - angle));
 
             //prefer 0 degrees interior over 360 for opposite facing parallel lines
             //since it can return 0 or 360 depending on orientation
@@ -319,7 +319,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
         public class Polygon
         {
-            List<Line> lineList;
+            public List<Line> lineList;
 
             public double area;
             public Orientation orientation;

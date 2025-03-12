@@ -2,6 +2,13 @@
 
 namespace FeatureRecognitionAPI.Models
 {
+    public enum ChamferTypeEnum
+    {
+        NONE,
+        POSSIBLE,
+        CONFIRMED
+    }
+
     public class Line : Entity
     {
         private const double TOLERANCE = 0.00005;
@@ -11,11 +18,14 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
 
+        public ChamferTypeEnum ChamferType { get; set; }
+
         // Don't Delete. Called from ExtendedLine constructor
         protected Line()
         {
             StartPoint = new Point();
             EndPoint = new Point();
+            ChamferType = ChamferTypeEnum.NONE;
         }
 
         public Line(Line line)
@@ -25,6 +35,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = line.SlopeY;
             SlopeX = line.SlopeX;
             Length = line.Length;
+            ChamferType = ChamferTypeEnum.NONE;
         }
 
         public Line(double startX, double startY, double endX, double endY)
@@ -33,6 +44,7 @@ namespace FeatureRecognitionAPI.Models
             EndPoint = new Point(endX, endY);
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
+            ChamferType = ChamferTypeEnum.NONE;
 
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
@@ -46,6 +58,7 @@ namespace FeatureRecognitionAPI.Models
 
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
+            ChamferType = ChamferTypeEnum.NONE;
 
             // Distance Calculation
             this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
