@@ -283,6 +283,19 @@ namespace FeatureRecognitionAPI.Services
                new FeaturePrice(PossibleFeatureTypes.Group4, 0.25, 0.04, 1, 3),
                new FeaturePrice(PossibleFeatureTypes.Group5, 0.25, 0.04, 1, 4),
                new FeaturePrice(PossibleFeatureTypes.Group6, 0.33, 0.04, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group7, 0.5, 0.08, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group8, 0.6, 0.042, 1, 8),
+               new FeaturePrice(PossibleFeatureTypes.Group9, 0.25, 0.035, 0.75, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group10, 0.63, 0.06, 1, 12),
+               new FeaturePrice(PossibleFeatureTypes.Group11, 0.3333, 0.04, 1, 7),
+               new FeaturePrice(PossibleFeatureTypes.Group12, 0.3, 0.04, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group13, 0.6, 0.035, 1,8),
+               new FeaturePrice(PossibleFeatureTypes.Group14, 0.2, 0.023,1,4),
+               new FeaturePrice(PossibleFeatureTypes.Group17, 0.58, 0.04, 1, 8),
+               new FeaturePrice(PossibleFeatureTypes.GroupS1, 0.19, 0.019, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.GroupS2, 0.2, 0.018, 1, 8),
+               new FeaturePrice(PossibleFeatureTypes.GroupS3, 0.21, 0.017, 1, 10),
+               new FeaturePrice(PossibleFeatureTypes.GroupS4, 0.22, 0.016, 1, 12),
            };
            return features;
         }

@@ -25,6 +25,19 @@ namespace FeatureRecognitionAPI.Models.Enums
         Group6,
         Group2A1, // Elipses
         Group2A2, // Bowties
-        Group17
+        Group7,
+        Group8,
+        Group9,
+        Group10,
+        Group11,
+        Group12,
+        Group13,
+        Group14,
+        Group17,
+        GroupS1,
+        GroupS2,
+        GroupS3,
+        GroupS4
     }
+    // Group 15 and 16 don't seem to have prices
 }
