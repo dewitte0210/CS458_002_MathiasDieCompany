@@ -175,6 +175,12 @@ namespace FeatureRecognitionAPI.Services
                 Arc initArc = group[0];
                 group.RemoveAt(0);
 
+                if (group.Count == 0)
+                {
+                    arcs.Add(initArc);
+                    continue;
+                }
+
                 int idx = 0;
                 int failCount = 0;
                 while (group.Count > 0)
@@ -184,7 +190,8 @@ namespace FeatureRecognitionAPI.Services
                         arcs.Add(initArc);
                         idx = 0;
                         initArc = group[0];
-                        if (group.Count == 1)
+                        group.RemoveAt(0);
+                        if (group.Count == 0)
                         {
                             arcs.Add(initArc);
                             break;
@@ -217,13 +224,12 @@ namespace FeatureRecognitionAPI.Services
 
                     if (group.Count == 0)
                     {
+                        arcs.Add(initArc);
                         break;
                     }
 
                     idx = (idx + 1) % group.Count;
                 }
-
-                arcs.Add(initArc);
             }
 
             // Convert arcs to circles if necessary
