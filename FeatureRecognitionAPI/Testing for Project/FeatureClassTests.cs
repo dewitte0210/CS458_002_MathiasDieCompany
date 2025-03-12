@@ -112,7 +112,7 @@ namespace Testing_for_Project
 
             example3.SetFeatureGroups();
 
-            List<FeatureGroup> fGroups = example3.GetFeatureGroups();
+            List<FeatureGroup> fGroups = example3.FeatureGroups;
 
             List<Feature> fList = fGroups[0].GetFeatures();
 

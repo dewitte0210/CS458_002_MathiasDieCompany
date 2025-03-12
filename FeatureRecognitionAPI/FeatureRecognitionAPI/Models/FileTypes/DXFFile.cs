@@ -15,7 +15,7 @@ namespace FeatureRecognitionAPI.Models
         public DXFFile() { }
         public DXFFile(string path) : base(path)
         {
-            fileType = SupportedExtensions.dxf;
+            FileType = SupportedExtensions.dxf;
 
             if (File.Exists(path))
             {
@@ -113,7 +113,7 @@ namespace FeatureRecognitionAPI.Models
         //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
         {
-            DxfReader reader = new DxfReader(path);
+            DxfReader reader = new DxfReader(Path);
 
             CadDocument doc = reader.Read();
 
@@ -130,7 +130,7 @@ namespace FeatureRecognitionAPI.Models
                                 ((ACadSharp.Entities.Line)entities[i]).StartPoint.Y,
                                 ((ACadSharp.Entities.Line)entities[i]).EndPoint.X,
                                 ((ACadSharp.Entities.Line)entities[i]).EndPoint.Y);
-                            entityList.Add(lineEntity);
+                            EntityList.Add(lineEntity);
                             break;
                         }
                     case "ARC":
@@ -142,7 +142,7 @@ namespace FeatureRecognitionAPI.Models
                                 //Start and end angle return radians, and must be converted to degrees
                                 (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180 / Math.PI)),
                                 (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180 / Math.PI)));
-                            entityList.Add(arcEntity);
+                            EntityList.Add(arcEntity);
                             break;
                         }
                     case "CIRCLE":
@@ -151,7 +151,7 @@ namespace FeatureRecognitionAPI.Models
                                 new Circle(((ACadSharp.Entities.Circle)entities[i]).Center.X,
                                 ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
                                 ((ACadSharp.Entities.Circle)entities[i]).Radius);
-                            entityList.Add(circleEntity);
+                            EntityList.Add(circleEntity);
                             break;
                         }
                     case "ELLIPSE":
@@ -164,7 +164,7 @@ namespace FeatureRecognitionAPI.Models
                                 ((ACadSharp.Entities.Ellipse)entities[i]).RadiusRatio,
                                 ((ACadSharp.Entities.Ellipse)entities[i]).StartParameter,
                                 ((ACadSharp.Entities.Ellipse)entities[i]).EndParameter);
-                            entityList.Add(ellipseEntity);
+                            EntityList.Add(ellipseEntity);
                             break;
                         }
                 }
@@ -239,7 +239,7 @@ namespace FeatureRecognitionAPI.Models
             if (startYFlag && startXFlag && endXFlag && endYFlag)
             {
                 Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
-                entityList.Add(lineEntity);
+                EntityList.Add(lineEntity);
                 return index;
             }
             else
@@ -302,7 +302,7 @@ namespace FeatureRecognitionAPI.Models
             if (xFlag && yFlag && rFlag && startFlag && endFlag)
             {
                 Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
-                entityList.Add(arcEntity);
+                EntityList.Add(arcEntity);
                 return index;
             }
             else
@@ -349,7 +349,7 @@ namespace FeatureRecognitionAPI.Models
             if (xFlag && yFlag && rFlag)
             {
                 Circle circleEntity = new Circle(xPoint, yPoint, radius);
-                entityList.Add(circleEntity);
+                EntityList.Add(circleEntity);
                 return index;
             }
             else
@@ -362,12 +362,12 @@ namespace FeatureRecognitionAPI.Models
         //May need to be refactored depending on if c# handles this by copy or by reference
         public List<Entity> GetEntities()
         {
-            return entityList;
+            return EntityList;
         }
 
         public void SetEntities(List<Entity> entities)
         {
-            entityList = entities;
+            EntityList = entities;
         }
 
 

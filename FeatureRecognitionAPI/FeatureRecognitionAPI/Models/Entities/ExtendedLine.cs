@@ -11,7 +11,7 @@
         }
         //runs into issues if more than one perimeter feature is on a line
         //would show up as an ExtendedLine being a parent
-        //this would also throw an error when trying to find a path because the parent would not be in EntityList
+        //this would also throw an error when trying to find a Path because the parent would not be in EntityList
         public ExtendedLine(Line parent1, Line parent2) // calls line's default constructor to initialize StartPsoint and EndPoint
         {
             /*if(Parent1 is ExtendedLine)

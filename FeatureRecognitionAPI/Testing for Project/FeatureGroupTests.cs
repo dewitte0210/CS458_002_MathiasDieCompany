@@ -1,9 +1,20 @@
 ﻿using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Features;
 
 namespace Testing_for_Project
 {
     internal class FeatureGroupTests
     {
+        public int GetTotalFeatureGroups(SupportedFile file)
+        {
+            int tmp = 0;
+            foreach (FeatureGroup fGroup in file.FeatureGroups)
+            {
+                tmp += fGroup.Count;
+            }
+
+            return tmp;
+        }
         [Test]
 
         public void TestFeatureGroupExample1()
@@ -17,9 +28,9 @@ namespace Testing_for_Project
             dwgFile.SetFeatureGroups();
 
             //Check that we have the correct number of feature groups (1 from example 1)
-            Assert.That(dwgFile.GetFeatureGroupCount(), Is.EqualTo(1));
+            Assert.That(dwgFile.FeatureGroups.Count, Is.EqualTo(1));
             //Check that the one feature group has a count of 2
-            Assert.That(dwgFile.GetTotalFeatureGroups(), Is.EqualTo(2));
+            Assert.That(GetTotalFeatureGroups(dwgFile), Is.EqualTo(2));
         }
 
         [Test]
@@ -34,9 +45,9 @@ namespace Testing_for_Project
             dxfFile.SetFeatureGroups();
 
             //Check that we have the correct number of feature groups (1 from example 2)
-            Assert.That(dxfFile.GetFeatureGroupCount(), Is.EqualTo(1));
+            Assert.That(dxfFile.FeatureGroups.Count, Is.EqualTo(1));
             //Check that the one feature group has a count of 6
-            Assert.That(dxfFile.GetTotalFeatureGroups(), Is.EqualTo(6));
+            Assert.That(GetTotalFeatureGroups(dxfFile), Is.EqualTo(6));
         }
 
         [Test]
@@ -51,9 +62,9 @@ namespace Testing_for_Project
             dxfFile.SetFeatureGroups();
 
             //Check that we have the correct number of feature groups (1 from example 3)
-            Assert.That(dxfFile.GetFeatureGroupCount(), Is.EqualTo(1));
+            Assert.That(dxfFile.FeatureGroups.Count, Is.EqualTo(1));
             //Check that the one feature group has a count of 2
-            Assert.That(dxfFile.GetTotalFeatureGroups(), Is.EqualTo(2));
+            Assert.That(GetTotalFeatureGroups(dxfFile), Is.EqualTo(2));
         }
 
         [Test]
@@ -68,9 +79,9 @@ namespace Testing_for_Project
             dxfFile.SetFeatureGroups();
 
             //Check that we have the correct number of feature groups (1 from example 3)
-            Assert.That(dxfFile.GetFeatureGroupCount(), Is.EqualTo(1));
+            Assert.That(dxfFile.FeatureGroups.Count, Is.EqualTo(1));
             //Check that the one feature group has a count of 2
-            Assert.That(dxfFile.GetTotalFeatureGroups(), Is.EqualTo(1));
+            Assert.That(GetTotalFeatureGroups(dxfFile), Is.EqualTo(1));
         }
     }
 }

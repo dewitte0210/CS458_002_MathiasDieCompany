@@ -13,10 +13,10 @@ namespace FeatureRecognitionAPI.Models
         private string _path;
         public DWGFile(string path) : base(path)
         {
-            fileType = SupportedExtensions.dwg;
+            FileType = SupportedExtensions.dwg;
             _path = path;
 
-            entityList = new List<Entity>();
+            EntityList = new List<Entity>();
             if (File.Exists(path))
             {
                 try
@@ -40,7 +40,7 @@ namespace FeatureRecognitionAPI.Models
         }
 
         /*
-         * Finds all entities withing the file and stores them in entityList
+         * Finds all entities withing the file and stores them in EntityList
          * Returns false if some error occurs, otherwise returns true
          */
         public bool findEntities()
@@ -72,7 +72,7 @@ namespace FeatureRecognitionAPI.Models
                                 ((ACadSharp.Entities.Line)entities[i]).StartPoint.Y,
                                 ((ACadSharp.Entities.Line)entities[i]).EndPoint.X,
                                 ((ACadSharp.Entities.Line)entities[i]).EndPoint.Y);
-                            entityList.Add(lineEntity);
+                            EntityList.Add(lineEntity);
                             break;
                         }
                     case "ARC":
@@ -84,7 +84,7 @@ namespace FeatureRecognitionAPI.Models
                                 //Start and end angle return radians, and must be converted to degrees
                                 (((ACadSharp.Entities.Arc)entities[i]).StartAngle * (180 / Math.PI)),
                                 (((ACadSharp.Entities.Arc)entities[i]).EndAngle * (180 / Math.PI)));
-                            entityList.Add(arcEntity);
+                            EntityList.Add(arcEntity);
                             break;
                         }
                     case "CIRCLE":
@@ -93,7 +93,7 @@ namespace FeatureRecognitionAPI.Models
                                 new Circle(((ACadSharp.Entities.Circle)entities[i]).Center.X,
                                 ((ACadSharp.Entities.Circle)entities[i]).Center.Y,
                                 ((ACadSharp.Entities.Circle)entities[i]).Radius);
-                            entityList.Add(circleEntity);
+                            EntityList.Add(circleEntity);
                             break;
                         }
                     case "ELLIPSE":
@@ -106,7 +106,7 @@ namespace FeatureRecognitionAPI.Models
                                 ((ACadSharp.Entities.Ellipse)entities[i]).RadiusRatio,
                                 ((ACadSharp.Entities.Ellipse)entities[i]).StartParameter,
                                 ((ACadSharp.Entities.Ellipse)entities[i]).EndParameter);
-                            entityList.Add(ellipseEntity);
+                            EntityList.Add(ellipseEntity);
                             break;
                         }
                 }
@@ -148,7 +148,7 @@ namespace FeatureRecognitionAPI.Models
 
         public List<Entity> GetEntities()
         {
-            return entityList;
+            return EntityList;
         }
 
 

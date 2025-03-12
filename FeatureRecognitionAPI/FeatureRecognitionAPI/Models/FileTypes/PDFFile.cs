@@ -18,12 +18,12 @@ namespace FeatureRecognitionAPI.Models
     {
         public PDFFile(string path) : base(path)
         {
-            fileType = SupportedExtensions.pdf;
+            FileType = SupportedExtensions.pdf;
         }
 
         public string ExtractTextFromPDF()
         {
-            PdfReader reader = new PdfReader(path);
+            PdfReader reader = new PdfReader(Path);
             PdfDocument pdfDoc = new PdfDocument(reader);
             StringBuilder text = new StringBuilder();
 
@@ -49,7 +49,7 @@ namespace FeatureRecognitionAPI.Models
         }
 
         /*
-         * Finds all entities withing the file and stores them in entityList
+         * Finds all entities withing the file and stores them in EntityList
          * Returns false if some error occurs, otherwise returns true
          */
         public bool findEntities()
@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
             if (type == EventType.RENDER_PATH)
             {
                 PathRenderInfo renderInfo = (PathRenderInfo)data;
-                // Analyze the path to detect lines and arcs
+                // Analyze the Path to detect lines and arcs
                 foreach (Subpath subpath in renderInfo.GetPath().GetSubpaths())
                 {
                     foreach (IPathSegment segment in subpath.GetSegments())

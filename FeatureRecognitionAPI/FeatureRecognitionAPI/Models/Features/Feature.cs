@@ -54,12 +54,12 @@ public class Feature
     #region Constructors
 
     /*
-     * Constructor that passes in an entityList for the feature. Feature detection is expected to be
+     * Constructor that passes in an EntityList for the feature. Feature detection is expected to be
      * called on a feature using this constructor. This was mostly used for testing when wanting to
      * avoid feature detection in the constructor. Could probably be deleted at this point since
      * feature detection was moved out of the constructors.
      *
-     * @Param entityList is the entityList being passed into the feature. could be a base feature,
+     * @Param EntityList is the EntityList being passed into the feature. could be a base feature,
      * that includes perimeter features, or just the list for a perimeter feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
@@ -78,7 +78,7 @@ public class Feature
     }
 
     /*
-     * Constructor that is expected to be used the most as it just passes in the entityList for the
+     * Constructor that is expected to be used the most as it just passes in the EntityList for the
      * feature and detection, along with all other fields will be calculated based off this list in
      * a seperate function
      *
@@ -107,9 +107,9 @@ public class Feature
     #region FeatureDetection
 
     /*
-     * Counts the Lines, Arcs, and Circles in the entityList.
+     * Counts the Lines, Arcs, and Circles in the EntityList.
      *
-     * @Param entityList is the list that is being looped through. Note that it is passed by reference
+     * @Param EntityList is the list that is being looped through. Note that it is passed by reference
      * and any changes to the list in this function will change the list in the scope of wherever this
      * function was called from
      * @Param numLines is the counted number of lines. The out keyword means that the value is returned
@@ -1267,9 +1267,9 @@ public class Feature
             }
         }
 
-        curPath.Push(head); // pushes the head to the current path
+        curPath.Push(head); // pushes the head to the current Path
         if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
-            // if it can find a path
+            // if it can find a Path
         {
             baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
             baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
@@ -1282,10 +1282,10 @@ public class Feature
     /*
      * recursive helper function to find a closed shape with extended lines
      *
-     * @Param path is the current path that has been taken
+     * @Param Path is the current Path that has been taken
      * @Param testedEnttiies is a list of enties that have been visited
      * @Param head is the target entity that is trying to loop back through
-     * @Return true if a path has been found
+     * @Return true if a Path has been found
      */
     private bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
@@ -1297,7 +1297,7 @@ public class Feature
             if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) &&
                 !testedEntities.Contains(curPath.Peek()))
             {
-                return true; //path found
+                return true; //Path found
             }
         }
 
@@ -1312,7 +1312,7 @@ public class Feature
                     // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated path
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
                     {
                         return true;
                     }
@@ -1322,14 +1322,14 @@ public class Feature
         //this point in the function means nothing is touching current entity
 
         if (curPath.Peek() == head)
-            //if the function of the head reaches this point it means it has not found a path back to the head
+            //if the function of the head reaches this point it means it has not found a Path back to the head
         {
             foreach (Entity entity in ExtendedEntityList)
             {
                 if (!testedEntities
                         .Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {
-                    curPath.Clear(); //clears path and adds the new head to it
+                    curPath.Clear(); //clears Path and adds the new head to it
                     curPath.Push(entity);
                     return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
@@ -1337,7 +1337,7 @@ public class Feature
         }
 
         curPath.Pop();
-        return false; //nothing is touching this entity so it is popped off of path
+        return false; //nothing is touching this entity so it is popped off of Path
     }
 
     #endregion
@@ -1345,11 +1345,11 @@ public class Feature
     #region PerimeterFeatureFunctions
 
     /*
-     * function that finds a path from start to target in Entity list
+     * function that finds a Path from start to target in Entity list
      *
      * @Param start is the entity that this algorithm starts
      * @Param target is the entity that is trying to be reached
-     * @Return the path from start to target. Null if no viable path
+     * @Return the Path from start to target. Null if no viable Path
      */
     private List<Entity> findPathFromStartToTargetInEntityList(Entity start, Entity target)
     {
@@ -1375,13 +1375,13 @@ public class Feature
     }
 
     /*
-     * Helper function to find the path from head to traget. Contains the actual logic for this task
+     * Helper function to find the Path from head to traget. Contains the actual logic for this task
      *
-     * @Param path is the current path taken
+     * @Param Path is the current Path taken
      * @Param visitedEntities contains all visited entities
      * @Param head is the starting node
      * @Param target is the entity trying to be reached
-     * @Return true if path is found
+     * @Return true if Path is found
      */
     private bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities,
         Entity head, Entity target)
@@ -1402,7 +1402,7 @@ public class Feature
                     // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated path
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
                     {
                         return true;
                     }
@@ -1414,17 +1414,17 @@ public class Feature
         if (curPath.Peek() == head)
         {
             return false;
-        } // if the current entity is the head it means nothing is touching it and there is no path
+        } // if the current entity is the head it means nothing is touching it and there is no Path
 
-        curPath.Pop(); // nothing is touching this entity so it is popped off of path
+        curPath.Pop(); // nothing is touching this entity so it is popped off of Path
         return false; // returns false so the previous recursive call can check the next touching entity
     }
 
     /*
-     * Function that uses finds the path from the two parents of all extended lines and adds the path as a group of
+     * Function that uses finds the Path from the two parents of all extended lines and adds the Path as a group of
      * entities at new index in PerimeterEntityList
      *
-     * @Return true if a valid path is found and seperated successfully
+     * @Return true if a valid Path is found and seperated successfully
      */
     public void seperatePerimeterEntities()
     {
@@ -1441,7 +1441,7 @@ public class Feature
 
         List<Entity> unusedEntities = new List<Entity>(ExtendedEntityList);
 
-        //seperatePerimeterEntitiesHelper(path, unusedEntities, null);
+        //seperatePerimeterEntitiesHelper(Path, unusedEntities, null);
 
         while (unusedEntities.Count > 0)
         {
@@ -1456,20 +1456,20 @@ public class Feature
     }
 
     /*
-        public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+        public void seperatePerimeterEntitiesHelper(List<Entity> Path, List<Entity> unusedEntities, Entity curEntity)
         {
             if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
             {
                 if (curEntity is null) // means not at any entity currently
                 {
-                    if (path.Count > 0)
+                    if (Path.Count > 0)
                     {
-                        PerimeterEntityList.Add(new List<Entity>(path)); // adds all perimeter feature paths besides last one
+                        PerimeterEntityList.Add(new List<Entity>(Path)); // adds all perimeter feature paths besides last one
                     }
-                    path.Clear();
-                    path.Add(unusedEntities[0]);
+                    Path.Clear();
+                    Path.Add(unusedEntities[0]);
                     unusedEntities.RemoveAt(0);
-                    seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
+                    seperatePerimeterEntitiesHelper(Path, unusedEntities, Path.Last());
                 }
                 else // means there is a current entity
                 {
@@ -1481,10 +1481,10 @@ public class Feature
                         {
                             if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
                             {
-                                path.Add(entity);
+                                Path.Add(entity);
                                 unusedEntities.Remove(entity);
                                 intersected = true;
-                                seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last()); // reruns with touching entity now being current entity
+                                seperatePerimeterEntitiesHelper(Path, unusedEntities, Path.Last()); // reruns with touching entity now being current entity
 
                                 break;
                             }
@@ -1492,18 +1492,18 @@ public class Feature
 
                     } while (intersected);
 
-                    if (path.Count > 0)
+                    if (Path.Count > 0)
                     {
-                        PerimeterEntityList.Add(new List<Entity>(path));
+                        PerimeterEntityList.Add(new List<Entity>(Path));
                     }
-                    seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
+                    seperatePerimeterEntitiesHelper(Path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
                 }
             }
         }
     */
-    /* Recursive function that adds all entities in unusedEntities that intersect curEntity into path
+    /* Recursive function that adds all entities in unusedEntities that intersect curEntity into Path
      *
-     * @Param path is the list of touching entities
+     * @Param Path is the list of touching entities
      * @Param unusedEntities are all available entities to add
      * @Param curEntity is the current entity being checked
      */
@@ -1519,7 +1519,7 @@ public class Feature
         List<Entity> touchingList = new List<Entity>();
         for (int i = 0;
              i < unusedEntities.Count;
-             i++) // adds all entities in unusedEntities that touch curEntitty to path and touchinglist and removes them from unusedEntities
+             i++) // adds all entities in unusedEntities that touch curEntitty to Path and touchinglist and removes them from unusedEntities
         {
             if (curEntity.DoesIntersect(unusedEntities[i]))
             {

@@ -8,67 +8,34 @@ using FeatureRecognitionAPI.Models.Features;
 
 namespace FeatureRecognitionAPI.Models
 {
-    abstract public class SupportedFile
+    public abstract class SupportedFile
     {
-        protected string path { get; set; }
-        protected SupportedExtensions fileType { get; set; }
-        protected List<Feature> featureList;
-        protected List<Entity> entityList;
-        protected List<FeatureGroup> featureGroups { get; }
-
-        //These functions below exist for testing purposes
-
-        #region testingFunctions
-
-        public int GetFeatureGroupCount()
-        {
-            return featureGroups.Count;
-        }
-
-        public int GetTotalFeatureGroups()
-        {
-            int tmp = 0;
-            foreach (FeatureGroup fGroup in featureGroups)
-            {
-                tmp += fGroup.Count;
-            }
-
-            return tmp;
-        }
-
-        public List<FeatureGroup> GetFeatureGroups()
-        {
-            return featureGroups;
-        }
-
-        #endregion
-
+        protected string Path { get; set; }
+        protected SupportedExtensions FileType { get; set; }
+        internal List<Feature> FeatureList { get; set; }
+        protected List<Entity> EntityList;
+        internal List<FeatureGroup> FeatureGroups { get; }
+        
         #region Constructors
 
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
         {
-            entityList = new List<Entity>();
-            featureList = new List<Feature>();
+            EntityList = new List<Entity>();
+            FeatureList = new List<Feature>();
         }
 
-        public SupportedFile(string path)
+        protected SupportedFile(string path)
         {
-            this.path = path;
-            entityList = new List<Entity>();
-            featureList = new List<Feature>();
-            featureGroups = new List<FeatureGroup>();
+            this.Path = path;
+            EntityList = new List<Entity>();
+            FeatureList = new List<Feature>();
+            FeatureGroups = new List<FeatureGroup>();
         }
 
         #endregion
 
         #region SpecialGettersAndSetters
-
-        public void setFeatureList(List<Feature> featureList)
-        {
-            this.featureList = featureList;
-        }
-
         public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
             for (int i = 0; i < entities.Count(); i++)
@@ -78,77 +45,73 @@ namespace FeatureRecognitionAPI.Models
                 feature.seperateBaseEntities();
                 feature.seperatePerimeterEntities();
                 feature.DetectFeatures();
-                featureList.Add(feature);
+                FeatureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
                 {
                     for (int j = 0; j < feature.PerimeterEntityList.Count(); j++)
                     {
                         Feature newFeat = new Feature(feature.PerimeterEntityList[j]);
                         newFeat.DetectFeatures();
-                        featureList.Add(newFeat);
+                        FeatureList.Add(newFeat);
                     }
                 }
             }
 
 
             // Group identical features together
-            for (int i = 0; i < featureList.Count(); i++)
+            for (int i = 0; i < FeatureList.Count(); i++)
             {
-                for (int j = i + 1; j < featureList.Count(); j++)
+                for (int j = i + 1; j < FeatureList.Count(); j++)
                 {
-                    if (featureList[i].Equals(featureList[j]))
+                    if (FeatureList[i].Equals(FeatureList[j]))
                     {
-                        featureList[i].count += featureList[j].count;
-                        featureList.RemoveAt(j);
+                        FeatureList[i].count += FeatureList[j].count;
+                        FeatureList.RemoveAt(j);
                         j--;
                     }
                 }
             }
 
 
-            return featureList;
+            return FeatureList;
         }
-
-        public List<Feature> getFeatureList()
-        {
-            return featureList;
-        }
-
         #endregion
 
         #region MakeTouchingEntities
 
-        public void GroupFeatureEntities(List<Entity> entities)
+        // This function takes in a list of entities and creates features based on groups of touching entities
+        // it also constructs each entity's AdjList (Adjacency List)
+        public void GroupFeatureEntities()
         {
-            List<int> listMap = Enumerable.Repeat(-1, entities.Count).ToList(); // parallel list to entities mapping them to an index in featureList. Initializes a value of -1
-            featureList.Add(new Feature(new List<Entity>()));
+            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
+            FeatureList.Add(new Feature(new List<Entity>()));
             
-            featureList[0].EntityList.Add(entities[0]); // starts the mapping with the first entity in entities list as a new list in features
+            FeatureList[0].EntityList.Add(EntityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
             listMap[0] = 0;
             
-            for (int i = 0; i < entities.Count(); i++)
+            for (int i = 0; i < EntityList.Count(); i++)
             {
-                for (int j = i+1; j < entities.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 {
-                    if (i != j && entities[i].DoesIntersect(entities[j])) // if i==j they are checking the same object and would return true for intersecting
+                    if (i != j && EntityList[i].DoesIntersect(EntityList[j])) // if i==j they are checking the same object and would return true for intersecting
                     {
                         // adds each entity to their AdjList. This should not happen twice because of the j=i+1
-                        entities[i].AdjList.Add(entities[j]);
-                        entities[j].AdjList.Add(entities[i]);
+                        EntityList[i].AdjList.Add(EntityList[j]);
+                        EntityList[j].AdjList.Add(EntityList[i]);
 
-                        if (listMap[i] != -1) // means entities[i] is already mapped to a feature
+                        if (listMap[i] != -1) // means EntityList[i] is already mapped to a feature
                         {
-                            featureList[i].EntityList.Add(entities[j]);
+                            FeatureList[i].EntityList.Add(EntityList[j]);
                             listMap[j] = listMap[i];
                         }
-                        else // entities[i] is not mapped to a feature
+                        else // EntityList[i] is not mapped to a feature
                         {
-                            // creates a new feature, adds it to featureList with entities i and j being in its EntityList
-                            featureList.Add(new Feature(new List<Entity>()));
-                            int index = featureList.Count - 1;
-                            featureList[index].EntityList.Add(entities[i]);
-                            featureList[index].EntityList.Add(entities[j]);
-                            // maps i and j to the index of that new feature in featureList
+                            // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
+                            FeatureList.Add(new Feature(new List<Entity>()));
+                            int index = FeatureList.Count - 1;
+                            FeatureList[index].EntityList.Add(EntityList[i]);
+                            FeatureList[index].EntityList.Add(EntityList[j]);
+                            // maps i and j to the index of that new feature in FeatureList
                             listMap[i] = index;
                             listMap[j] = index;
                         }
@@ -156,15 +119,10 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
-
-        public void GroupFeatureEntities()
-        {
-            GroupFeatureEntities(entityList);
-        }
         
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
-         * @Param entityList - the list of entites in the file
+         * @Param EntityList - the list of entites in the file
          */
         public List<List<Entity>> makeTouchingEntitiesList(List<Entity> entityList)
         {
@@ -230,7 +188,7 @@ namespace FeatureRecognitionAPI.Models
          */
         public void SetFeatureGroups()
         {
-            List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
+            List<List<Entity>> entities = makeTouchingEntitiesList(EntityList);
             // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
@@ -309,7 +267,7 @@ namespace FeatureRecognitionAPI.Models
                 FeatureGroup newfGroup = new FeatureGroup(featureGroupList);
                 if (featureGroupList.Count > 0)
                 {
-                    foreach (FeatureGroup fGroup in featureGroups)
+                    foreach (FeatureGroup fGroup in FeatureGroups)
                     {
                         if (fGroup.Equals(newfGroup))
                         {
@@ -323,13 +281,13 @@ namespace FeatureRecognitionAPI.Models
                     if (!added)
                     {
                         newfGroup.Count++;
-                        featureGroups.Add(newfGroup);
+                        FeatureGroups.Add(newfGroup);
                     }
                 }
                 else
                 {
                     newfGroup.Count++;
-                    featureGroups.Add(newfGroup);
+                    FeatureGroups.Add(newfGroup);
                 }
             }
         }
@@ -408,7 +366,7 @@ namespace FeatureRecognitionAPI.Models
                     }
                 }
 
-                //featureGroupList should now contain all features that fall inside of bigFeature
+                //featureGroupList should now contain all features that fall inside bigFeature
                 bool added = false;
                 FeatureGroup newfGroup = new FeatureGroup(featureGroupList);
                 for (int i = 0; i < featureGroupList.Count; i++)
@@ -419,7 +377,7 @@ namespace FeatureRecognitionAPI.Models
 
                 if (featureGroupList.Count > 0)
                 {
-                    foreach (FeatureGroup fGroup in featureGroups)
+                    foreach (FeatureGroup fGroup in FeatureGroups)
                     {
                         if (fGroup.Equals(newfGroup))
                         {
@@ -433,17 +391,17 @@ namespace FeatureRecognitionAPI.Models
                     if (!added)
                     {
                         newfGroup.Count++;
-                        featureGroups.Add(newfGroup);
+                        FeatureGroups.Add(newfGroup);
                     }
                 }
                 else
                 {
                     newfGroup.Count++;
-                    featureGroups.Add(newfGroup);
+                    FeatureGroups.Add(newfGroup);
                 }
             }
 
-            return featureGroups;
+            return FeatureGroups;
         }
 
         #endregion
@@ -451,9 +409,9 @@ namespace FeatureRecognitionAPI.Models
 
         public void detectAllFeatures()
         {
-            makeFeatureList(makeTouchingEntitiesList(entityList));
+            makeFeatureList(makeTouchingEntitiesList(EntityList));
         }
-        // Method to read the data from a file and fill the entityList with entities
+        // Method to read the data from a file and fill the EntityList with entities
         public abstract void readEntities();
     }
 }
