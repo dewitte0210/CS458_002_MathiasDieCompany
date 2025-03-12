@@ -8,9 +8,14 @@
     {
         public Point Center { get; set; }
         public Point MajorAxisEndPoint { get; set; }
+        public double MajorAxis { get; set; }
+        public double MinorAxis { get; set; }
         public double MinorToMajorAxisRatio { get; set; }
         public double StartParameter { get; set; }
         public double EndParameter { get; set; }
+        public double Rotation { get; set; }
+        public Point StartPoint { get; set; }
+        public Point EndPoint { get; set; }
         public bool IsFullEllipse { get; set; }
         private Ellipse() { }
         public Ellipse(double centerX, double centerY, double majorAxisXValue,
@@ -19,9 +24,35 @@
         {
             Center = new Point(centerX, centerY);
             MajorAxisEndPoint = new Point(majorAxisXValue, majorAxisYValue);
+            MajorAxis = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            MinorAxis = MajorAxis * minorToMajorAxisRatio;
             this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
             this.StartParameter = startParameter;
             this.EndParameter = endParameter;
+            Rotation = Math.Atan2(MajorAxisEndPoint.Y - Center.Y, MajorAxisEndPoint.X - Center.X);
+            StartPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, StartParameter);
+            EndPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, EndParameter);
+            if (Rotation > 0)
+            {
+                StartPoint.X = StartPoint.X - Center.X;
+                StartPoint.Y = StartPoint.Y - Center.Y;
+                EndPoint.X = EndPoint.X - Center.X;
+                EndPoint.Y = EndPoint.Y - Center.Y;
+
+                //Rotate around the origin
+                double temp = StartPoint.X;
+                StartPoint.X = -1 * ((StartPoint.X * Math.Cos(Rotation)) - (StartPoint.Y * Math.Sin(Rotation)));
+                StartPoint.Y = -1 * ((StartPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+                temp = EndPoint.X;
+                EndPoint.X = -1 * ((EndPoint.X * Math.Cos(Rotation)) - (EndPoint.Y * Math.Sin(Rotation)));
+                EndPoint.Y = -1 * ((EndPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+
+                //Translate back
+                StartPoint.X = StartPoint.X + Center.X;
+                StartPoint.Y = StartPoint.Y + Center.Y;
+                EndPoint.X = EndPoint.X + Center.X;
+                EndPoint.Y = EndPoint.Y + Center.Y;
+            }
             if (startParameter == 0 && endParameter == 2 * Math.PI)
             {
                 this.IsFullEllipse = true;
