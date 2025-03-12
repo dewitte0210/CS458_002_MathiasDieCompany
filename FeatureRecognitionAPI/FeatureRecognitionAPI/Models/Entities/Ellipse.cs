@@ -1,4 +1,6 @@
-﻿namespace FeatureRecognitionAPI.Models
+﻿using FeatureRecognitionAPI.Models.Utility;
+
+namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Ellipse object that extends Entity
@@ -255,6 +257,11 @@
         }
 
         public override double MaxY()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public override void Transform(Matrix3 transform)
         {
             throw new NotImplementedException();
         }

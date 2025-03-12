@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -200,6 +201,11 @@ namespace FeatureRecognitionAPI.Models
         public Point GetDelta()
         {
             return new Point(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y);
+        }
+        
+        public override void Transform(Matrix3 transform)
+        {
+            throw new NotImplementedException();
         }
     }
 }

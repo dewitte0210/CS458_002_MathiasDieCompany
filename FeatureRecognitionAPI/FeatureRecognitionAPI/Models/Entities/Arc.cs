@@ -1,3 +1,4 @@
+using FeatureRecognitionAPI.Models.Utility;
 using Convert = System.Convert;
 using Math = System.Math;
 
@@ -382,5 +383,10 @@ public class Arc : Entity
                    End.Equals(other.Start) ||
                    End.Equals(other.End)
                );
+    }
+
+    public override void Transform(Matrix3 transform)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using DecimalMath;
 using System.Runtime.CompilerServices;
+using CSMath;
+using FeatureRecognitionAPI.Models.Utility;
 
 [assembly: InternalsVisibleTo("Testing_for_Project")]
 
@@ -871,5 +873,7 @@ namespace FeatureRecognitionAPI.Models
         public abstract double MinY();
         public abstract double MaxX();
         public abstract double MaxY();
+
+        public abstract void Transform(Matrix3 transform);
     }
 }
