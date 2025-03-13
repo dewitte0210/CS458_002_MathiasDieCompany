@@ -387,21 +387,23 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-        //TODO: arc has the right rotation and placement but the wrong size :(
             Point transformedBoundary1 = transform * new Point(MinX(), MinY());
             Point transformedBoundary2 = transform * new Point(MaxX(), MinY());
             Point transformedBoundary3 = transform * new Point(MinX(), MaxY());
             Point transformedBoundary4 = transform * new Point(MaxX(), MaxY());
-            
-            double minX = Math.Min(transformedBoundary1.X, Math.Min(transformedBoundary2.X, Math.Min(transformedBoundary3.X, transformedBoundary4.X)));
-            double maxX = Math.Max(transformedBoundary1.X, Math.Max(transformedBoundary2.X, Math.Max(transformedBoundary3.X, transformedBoundary4.X)));
 
-            double newWidth = maxX - minX;
-        
             Point newCenter = transform * Center;
+            
+            double a = Point.Distance(newCenter, transformedBoundary1);
+            double b = Point.Distance(newCenter, transformedBoundary2);
+            double c = Point.Distance(newCenter, transformedBoundary3);
+            double d = Point.Distance(newCenter, transformedBoundary4);
 
-            double rotation = Angles.ToDegrees(Math.Asin(transform.GetUnderlyingMatrix().m01));
+            double newWidth = Math.Max(a, Math.Max(b, Math.Max(c, d)));
 
-            return new Arc(newCenter.X, newCenter.Y, newWidth / 2, StartAngle + rotation, EndAngle + rotation);
+            double rotation = Angles.ToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+
+            //divide by sqrt(2) because newWidth is distance from center to bounding box corner, not arc edge
+            return new Arc(newCenter.X, newCenter.Y, newWidth / Math.Sqrt(2), StartAngle - rotation, EndAngle - rotation);
     }
 }

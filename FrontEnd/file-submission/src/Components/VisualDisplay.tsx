@@ -48,8 +48,10 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             // Flip y-axis (canvas coordinates vs. typical 2D Cartesian coordinates)
             ctx.setTransform(1, 0, 0, -1, 0, canvas.height);
 
-            ctx.setLineDash([5, 10]);
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            // Dashed border, useful for debugging
+            // ctx.setLineDash([5, 10]);
+            // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            
             ctx.setLineDash([]); // Reset to solid lines
 
             // Calculate offsets to shift shapes into the visible area
