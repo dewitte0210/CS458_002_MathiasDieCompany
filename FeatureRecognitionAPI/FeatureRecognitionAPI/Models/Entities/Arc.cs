@@ -387,8 +387,21 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-        //TODO: temp
-        return this;
-        // throw new NotImplementedException();
+        //TODO: arc has the right rotation and placement but the wrong size :(
+            Point transformedBoundary1 = transform * new Point(MinX(), MinY());
+            Point transformedBoundary2 = transform * new Point(MaxX(), MinY());
+            Point transformedBoundary3 = transform * new Point(MinX(), MaxY());
+            Point transformedBoundary4 = transform * new Point(MaxX(), MaxY());
+            
+            double minX = Math.Min(transformedBoundary1.X, Math.Min(transformedBoundary2.X, Math.Min(transformedBoundary3.X, transformedBoundary4.X)));
+            double maxX = Math.Max(transformedBoundary1.X, Math.Max(transformedBoundary2.X, Math.Max(transformedBoundary3.X, transformedBoundary4.X)));
+
+            double newWidth = maxX - minX;
+        
+            Point newCenter = transform * Center;
+
+            double rotation = Angles.ToDegrees(Math.Asin(transform.GetUnderlyingMatrix().m01));
+
+            return new Arc(newCenter.X, newCenter.Y, newWidth / 2, StartAngle + rotation, EndAngle + rotation);
     }
 }

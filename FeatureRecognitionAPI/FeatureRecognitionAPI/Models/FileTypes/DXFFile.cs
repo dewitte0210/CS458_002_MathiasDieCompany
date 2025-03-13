@@ -140,9 +140,9 @@ namespace FeatureRecognitionAPI.Models
                 {
                     Block block = insert.Block.BlockEntity;
                     Matrix3 blockTranslate = Matrix3.Translate(block.BasePoint.X, block.BasePoint.Y);
+                    
                     Matrix3 insertTranslate = Matrix3.Translate(insert.InsertPoint.X, insert.InsertPoint.Y);
                     Matrix3 insertScale = Matrix3.Scale(insert.XScale, insert.YScale);
-
                     Matrix3 insertRotate = Matrix3.Rotate(insert.Rotation);
 
                     Matrix3 finalTransform = insertScale * blockTranslate * insertTranslate * insertRotate;

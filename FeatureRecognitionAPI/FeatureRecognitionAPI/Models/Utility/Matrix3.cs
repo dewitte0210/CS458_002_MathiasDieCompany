@@ -37,8 +37,8 @@ public class Matrix3
 
    public static Matrix3 Rotate(double radians)
     {
-        float sinTheta = (float)Math.Sin(radians);
-        float cosTheta = (float)Math.Cos(radians);
+        double sinTheta = Math.Sin(radians);
+        double cosTheta = Math.Cos(radians);
         return new Matrix3(
             cosTheta, -sinTheta, 0.0f,
             sinTheta, cosTheta, 0.0f,
