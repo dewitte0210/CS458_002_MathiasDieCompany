@@ -40,9 +40,9 @@ public class Matrix3
         double sinTheta = Math.Sin(radians);
         double cosTheta = Math.Cos(radians);
         return new Matrix3(
-            cosTheta, -sinTheta, 0.0f,
-            sinTheta, cosTheta, 0.0f,
-            0.0f, 0.0f, 1.0f
+            cosTheta, -sinTheta, 0.0,
+            sinTheta, cosTheta, 0.0,
+            0.0, 0.0, 1.0
         );
     }
 

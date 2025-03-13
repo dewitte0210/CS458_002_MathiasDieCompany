@@ -118,42 +118,17 @@ namespace FeatureRecognitionAPI.Models
 
         }
 
-        //Ignore commented lines for Console.WriteLine* these were used in initial testing and writing (may be removed later)
-        //Could be further modularlized by breaking internals of switch statements into helper functions (Future todo?)
         public override void readEntities()
         {
             DxfReader reader = new DxfReader(path);
-
             CadDocument doc = reader.Read();
-
-            CadObjectCollection<ACadSharp.Entities.Entity> entities = doc.Entities;
-
-            entityList.AddRange(UnwrapInserts(doc.Entities));
-        }
-
-        List<Entity> UnwrapInserts(CadObjectCollection<ACadSharp.Entities.Entity> entities)
-        {
+            
             List<Entity> returned = new List<Entity>();
-            foreach (ACadSharp.Entities.Entity entity in entities)
+            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
             {
                 if (entity is Insert insert)
                 {
-                    Block block = insert.Block.BlockEntity;
-                    Matrix3 blockTranslate = Matrix3.Translate(block.BasePoint.X, block.BasePoint.Y);
-                    
-                    Matrix3 insertTranslate = Matrix3.Translate(insert.InsertPoint.X, insert.InsertPoint.Y);
-                    Matrix3 insertScale = Matrix3.Scale(insert.XScale, insert.YScale);
-                    Matrix3 insertRotate = Matrix3.Rotate(insert.Rotation);
-
-                    Matrix3 finalTransform = insertScale * blockTranslate * insertTranslate * insertRotate;
-                    foreach (ACadSharp.Entities.Entity cadObject in insert.Block.Entities)
-                    {
-                        Entity? castedEntity = CadObjectToInternalEntity(cadObject);
-                        if (!(castedEntity is null))
-                        {
-                            returned.Add(castedEntity.Transform(finalTransform));
-                        }
-                    }
+                    returned.AddRange(UnwrapInsert(insert));
                 }
                 else
                 {
@@ -165,10 +140,34 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-        return returned;
-    }
+            entityList.AddRange(returned);
+        }
 
-        internal Entity? CadObjectToInternalEntity(ACadSharp.Entities.Entity cadEntity)
+        private static List<Entity> UnwrapInsert(Insert insert)
+        {
+            List<Entity> returned = new List<Entity>();
+            
+            Block block = insert.Block.BlockEntity;
+            Matrix3 blockTranslate = Matrix3.Translate(block.BasePoint.X, block.BasePoint.Y);
+                    
+            Matrix3 insertTranslate = Matrix3.Translate(insert.InsertPoint.X, insert.InsertPoint.Y);
+            Matrix3 insertScale = Matrix3.Scale(insert.XScale, insert.YScale);
+            Matrix3 insertRotate = Matrix3.Rotate(insert.Rotation);
+
+            Matrix3 finalTransform = insertScale * blockTranslate * insertTranslate * insertRotate;
+            foreach (ACadSharp.Entities.Entity cadObject in insert.Block.Entities)
+            {
+                Entity? castedEntity = CadObjectToInternalEntity(cadObject);
+                if (!(castedEntity is null))
+                {
+                    returned.Add(castedEntity.Transform(finalTransform));
+                }
+            }
+
+            return returned;
+        }
+
+        internal static Entity? CadObjectToInternalEntity(ACadSharp.Entities.Entity cadEntity)
         {
             switch (cadEntity)
             {
@@ -388,7 +387,7 @@ namespace FeatureRecognitionAPI.Models
             #endregion
 
             //May need to be refactored depending on if c# handles this by copy or by reference
-            public List<Entity> GetEntities()
+            public override List<Entity> GetEntities()
             {
                 return entityList;
             }

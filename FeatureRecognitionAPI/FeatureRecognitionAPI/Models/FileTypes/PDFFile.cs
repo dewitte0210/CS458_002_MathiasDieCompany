@@ -61,6 +61,11 @@ namespace FeatureRecognitionAPI.Models
         {
             throw new NotImplementedException();
         }
+        
+        public override List<Entity> GetEntities()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class RenderListener : IEventListener
