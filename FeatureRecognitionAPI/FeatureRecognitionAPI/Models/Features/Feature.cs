@@ -187,27 +187,20 @@ public class Feature
         {
             FeatureType = type;
         }
-        else if (CheckGroup4())
-        {
-            FeatureType = PossibleFeatureTypes.Group4;
-        }
-        else if (CheckGroup5())
-        {
-            FeatureType = PossibleFeatureTypes.Group5;
-        }
-        else if (CheckGroup6())
-        {
-            FeatureType = PossibleFeatureTypes.Group6;
-        }
         else if (CheckGroup17())
         {
             FeatureType = PossibleFeatureTypes.Group17;
         }
         else
         {
-            //Console.WriteLine("Error: Cannot assign feature type.");
+            Console.WriteLine("Error: Cannot assign feature type.");
         }
-
+        
+        // Perimeter Feature Detection
+        CheckGroup4();
+        CheckGroup5();
+        CheckGroup6Perimeter();
+            
         //calculate and set the perimeter of the feature
         calcPerimeter();
 
@@ -669,8 +662,7 @@ public class Feature
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        //double maxLength = Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
-        double maxLength = 100; //TODO DELETE AND UNCOMMENT LINE ABOVE!!!!!!!!!
+        double maxLength = 2 * Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
         Line ray;
 
         int numIntersections = 0;
@@ -679,7 +671,12 @@ public class Feature
         if (entity is Arc arc) 
         { ray = arc.VectorFromCenter(arc.degreesToRadians(arc.AngleInMiddle())); }
         else
-        { ray = (entity as Ellipse).vectorFromCenter(((entity as Ellipse).EndParameter - (entity as Ellipse).StartParameter) / 2); }
+        {
+            Ellipse tempEntity = entity as Ellipse;
+            double startAngle = tempEntity.StartParameter + Math.Atan2(tempEntity.MajorAxisEndPoint.Y - tempEntity.Center.Y, tempEntity.MajorAxisEndPoint.X - tempEntity.Center.X);
+            double endAngle = tempEntity.EndParameter + Math.Atan2(tempEntity.MajorAxisEndPoint.Y - tempEntity.Center.Y, tempEntity.MajorAxisEndPoint.X - tempEntity.Center.X);
+            ray = (entity as Ellipse).vectorFromCenter((endAngle - startAngle) / 2);
+        }
 
         //  Entends the ray
         Point unitVector = new Point((ray.EndPoint.X - ray.StartPoint.X) / ray.Length, (ray.EndPoint.Y - ray.StartPoint.Y) / ray.Length);
@@ -714,7 +711,7 @@ public class Feature
                 {
                     Ellipse currEntity = (baseEntityList[i] as Ellipse);
                     double major = Math.Sqrt(Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.X - (baseEntityList[i] as Ellipse).Center.X, 2) + Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.Y - (baseEntityList[i] as Ellipse).Center.Y, 2));
-                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.PointOnEllipseGivenAngleInRadians(major, major * currEntity.MinorToMajorAxisRatio, currEntity.StartParameter)) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.PointOnEllipseGivenAngleInRadians(major, major * currEntity.MinorToMajorAxisRatio, currEntity.EndParameter)))
+                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
                     {
                         numEndPointIntersections++;
                     }
@@ -848,116 +845,91 @@ public class Feature
 
     #endregion
 
-
-    #region Group3andGroup4
-
-    //Chamfered Corners 
-    public bool CheckGroup3and4()
-    {
-        if (this.FeatureType == PossibleFeatureTypes.Group1A1)
-        {
-        }
-
-        return false;
-    }
-
-    #endregion
-
     #region Group4
-
     /*
      * Checks the feature it is being called on to see if it is a group 4 feature.
      *
      * @return True if it is Group 4, false if not
      */
-    public bool CheckGroup4()
+    public void CheckGroup4()
     {
         if (numLines != 2 || (numArcs != 2 && numArcs != 0))
         {
-            return false;
+            return;
         }
 
-        Line tempLine = null;
-        foreach (Entity entity in EntityList)
+        foreach (List<Entity> entityList in PerimeterEntityList)
         {
-            if (entity is Line && tempLine == null)
+            Line tempLine = null;
+            foreach (Entity entity in entityList)
             {
-                tempLine = (entity as Line);
-            }
-            else if (entity is Line)
-            {
-                if (tempLine.DoesIntersect(entity))
+                if (entity is Line && tempLine == null)
                 {
-                    return true;
+                    tempLine = (entity as Line);
+                }
+                else if (entity is Line)
+                {
+                    if (tempLine.DoesIntersect(entity))
+                    {
+                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);     
+                    }
                 }
             }
         }
-
-        return false;
     }
 
     #endregion
 
     #region Group5
-
-    /*
-     * Checks the feature it is being called on to see if it is a group 5 feature.
-     *
-     * @return True if it is Group 5, false if not
-     */
-    internal bool CheckGroup5()
+    /// <summary>
+    /// Checks the feature it is being called on to see if it is a group 5 feature.
+    /// </summary>
+    internal void CheckGroup5()
     {
         if (numLines < 2 || numLines > 3 || numCircles != 0 || numArcs > 2)
         {
-            return false;
+            return;
         }
 
         foreach (Entity entity in EntityList)
         {
             if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
             {
-                return false;
+                return;
             }
         }
 
         if (HasTwoParalellLine(EntityList))
         {
-            return true;
+            PerimeterFeatures.Add(PerimeterFeatureTypes.Group5); 
         }
-
-        return false;
     }
 
     #endregion
 
     #region Group6
-
-    /*
-     * Checks the feature it is being called on to see if it is a group 6 feature.
-     *
-     * @return True if it is Group 6, false if not
-     */
-    internal bool CheckGroup6()
+    /// <summary>
+    /// Checks the feature it is being called on to see if it contains a group 6 feature
+    /// </summary>
+    internal void CheckGroup6Perimeter()
     {
         if (numLines < 2 || numCircles != 0 || numArcs < 2 || numArcs > 4)
         {
-            return false;
+            return;
         }
 
         foreach (Entity entity in EntityList)
         {
             if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
             {
-                return false;
+                return;
             }
         }
 
         if (HasTwoParalellLine(EntityList))
         {
-            return true;
+            PerimeterFeatures.Add(PerimeterFeatureTypes.Group6); 
         }
-
-        return false;
     }
 
     #endregion

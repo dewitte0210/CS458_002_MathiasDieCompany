@@ -39,8 +39,7 @@
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+            this.Length = Point.Distance(StartPoint, EndPoint);
         }
         /*
                 public ExtendedLine(ExtendedLine obj)
