@@ -385,8 +385,10 @@ public class Arc : Entity
                );
     }
 
-    public override void Transform(Matrix3 transform)
+    public override Arc Transform(Matrix3 transform)
     {
-        throw new NotImplementedException();
+        //TODO: temp
+        return this;
+        // throw new NotImplementedException();
     }
 }

@@ -93,9 +93,11 @@ namespace FeatureRecognitionAPI.Models
             return Center.Y + Radius;
         }
 
-        public override void Transform(Matrix3 transform)
+        public override Circle Transform(Matrix3 transform)
         {
-            throw new NotImplementedException();
+            //TODO: temp
+            return this;
+            // throw new NotImplementedException();
         }
     }
 }

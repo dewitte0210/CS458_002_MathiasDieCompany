@@ -874,6 +874,6 @@ namespace FeatureRecognitionAPI.Models
         public abstract double MaxX();
         public abstract double MaxY();
 
-        public abstract void Transform(Matrix3 transform);
+        public abstract Entity Transform(Matrix3 transform);
     }
 }

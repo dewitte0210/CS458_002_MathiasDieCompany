@@ -39,6 +39,17 @@ namespace FeatureRecognitionAPI.Models
             this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
         }
 
+        public Line(Point startPoint, Point endPoint)
+        {
+            StartPoint = new Point(startPoint);
+            EndPoint = new Point(endPoint);
+            
+            SlopeY = EndPoint.Y - StartPoint.Y;
+            SlopeX = EndPoint.X - StartPoint.X;
+            
+            Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+        }
+
         //constructor with extendedline parameter
         public Line(double startX, double startY, double endX, double endY, bool extendedLine)
         {
@@ -203,9 +214,11 @@ namespace FeatureRecognitionAPI.Models
             return new Point(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y);
         }
         
-        public override void Transform(Matrix3 transform)
+        public override Line Transform(Matrix3 transform)
         {
-            throw new NotImplementedException();
+            Point newStart = transform * StartPoint; 
+            Point newEnd =  transform * EndPoint;
+            return new Line(newStart, newEnd);
         }
     }
 }

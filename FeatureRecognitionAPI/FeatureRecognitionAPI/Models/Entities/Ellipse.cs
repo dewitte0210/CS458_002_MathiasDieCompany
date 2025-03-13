@@ -261,9 +261,9 @@ namespace FeatureRecognitionAPI.Models
             throw new NotImplementedException();
         }
         
-        public override void Transform(Matrix3 transform)
+        public override Ellipse Transform(Matrix3 transform)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Ellipses within insert blocks are not yet supported.");
         }
     }
 }

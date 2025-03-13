@@ -3,6 +3,7 @@
  * I believe this will not require the use of Entities and can instead just read the data straight into features
  */
 using ACadSharp;
+using ACadSharp.Blocks;
 using ACadSharp.Entities;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models.Enums;
@@ -137,12 +138,20 @@ namespace FeatureRecognitionAPI.Models
             {
                 if (entity is Insert insert)
                 {
+                    Block block = insert.Block.BlockEntity;
+                    Matrix3 blockTranslate = Matrix3.Translate(block.BasePoint.X, block.BasePoint.Y);
+                    Matrix3 insertTranslate = Matrix3.Translate(insert.InsertPoint.X, insert.InsertPoint.Y);
+                    Matrix3 insertScale = Matrix3.Scale(insert.XScale, insert.YScale);
+
+                    Matrix3 insertRotate = Matrix3.Rotate(insert.Rotation);
+
+                    Matrix3 finalTransform = insertScale * blockTranslate * insertTranslate * insertRotate;
                     foreach (ACadSharp.Entities.Entity cadObject in insert.Block.Entities)
                     {
                         Entity? castedEntity = CadObjectToInternalEntity(cadObject);
                         if (!(castedEntity is null))
                         {
-                        returned.Add(castedEntity);
+                            returned.Add(castedEntity.Transform(finalTransform));
                         }
                     }
                 }
