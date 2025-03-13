@@ -95,9 +95,10 @@ namespace FeatureRecognitionAPI.Models
 
         public override Circle Transform(Matrix3 transform)
         {
-            //TODO: temp
-            return this;
-            // throw new NotImplementedException();
+            Point newCenter = transform * Center;
+            Point newRadiusPoint = transform * new Point(Center.X + Radius, Center.Y + Radius);
+            double dist = Point.Distance(newCenter, newRadiusPoint);
+            return new Circle(newCenter.X, newCenter.Y, dist);
         }
     }
 }

@@ -35,9 +35,9 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
+            this.Length = Point.Distance(StartPoint, EndPoint);
         }
+
 
         public Line(Point startPoint, Point endPoint)
         {
@@ -47,7 +47,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
             
-            Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+            this.Length = Point.Distance(StartPoint, EndPoint);
         }
 
         //constructor with extendedline parameter
@@ -59,8 +59,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+            Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
         }
 
         public bool hasPoint(Point point)
