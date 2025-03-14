@@ -72,7 +72,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
             public Degrees ToDegrees()
             {
-                return new Degrees(angle * 180 / Math.PI);
+                return new Degrees(Angles.ToDegrees(angle));
             }
 
         }
@@ -132,6 +132,16 @@ namespace FeatureRecognitionAPI.Models.Utility
         public static double DotProduct(Point a, Point b)
         {
             return a.X * b.X + a.Y * b.Y;
+        }
+
+        public static double ToDegrees(double radians)
+        {
+            return radians * 180 / Math.PI;
+        }
+        
+        public static double ToRadians(double degrees)
+        {
+            return degrees *  Math.PI / 180;
         }
 
         /// <summary>
