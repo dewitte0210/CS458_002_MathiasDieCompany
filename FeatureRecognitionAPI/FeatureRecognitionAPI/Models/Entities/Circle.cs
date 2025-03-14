@@ -1,4 +1,6 @@
-﻿namespace FeatureRecognitionAPI.Models
+﻿using FeatureRecognitionAPI.Models.Utility;
+
+namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Circle object that extends Entity
@@ -91,5 +93,12 @@
             return Center.Y + Radius;
         }
 
+        public override Circle Transform(Matrix3 transform)
+        {
+            Point newCenter = transform * Center;
+            Point newRadiusPoint = transform * new Point(Center.X + Radius, Center.Y + Radius);
+            double dist = Point.Distance(newCenter, newRadiusPoint);
+            return new Circle(newCenter.X, newCenter.Y, dist);
+        }
     }
 }
