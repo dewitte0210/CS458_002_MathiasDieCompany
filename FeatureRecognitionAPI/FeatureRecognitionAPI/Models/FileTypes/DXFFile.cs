@@ -21,6 +21,8 @@ namespace FeatureRecognitionAPI.Models
         {
         }
 
+        public DXFFile(List<Entity> entities) : base(entities) {}
+
         public DXFFile(string path) : base(path)
         {
             FileType = SupportedExtensions.dxf;

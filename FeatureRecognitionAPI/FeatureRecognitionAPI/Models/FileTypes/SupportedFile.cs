@@ -33,6 +33,11 @@ namespace FeatureRecognitionAPI.Models
             FeatureGroups = new List<FeatureGroup>();
         }
 
+        public SupportedFile(List<Entity> entityList)
+        {
+            EntityList = entityList;
+            FeatureList = new List<Feature>();
+        }
         #endregion
 
         #region SpecialGettersAndSetters
@@ -89,7 +94,7 @@ namespace FeatureRecognitionAPI.Models
             FeatureList[0].EntityList.Add(EntityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
             listMap[0] = 0;
             
-            for (int i = 0; i < EntityList.Count(); i++)
+            for (int i = 0; i < EntityList.Count()-1; i++)
             {
                 int count = 0;
                 for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
@@ -109,7 +114,7 @@ namespace FeatureRecognitionAPI.Models
                         
                         if (listMap[i] != -1) // means EntityList[i] is already mapped to a feature
                         {
-                            FeatureList[i].EntityList.Add(EntityList[j]);
+                            FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
                             listMap[j] = listMap[i];
                         }
                         else // EntityList[i] is not mapped to a feature
@@ -210,12 +215,12 @@ namespace FeatureRecognitionAPI.Models
             Point minPoint = new(0, 0);
             Point maxPoint = new(0, 0);
             Point maxDiff = new(0, 0);
-            int maxDiffIndex = 0;
+            int maxDiffIndex;
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0, 0);
+            Point tempMinPoint;
+            Point tempMaxPoint;
 
             //bool firstrun = true;
             while (features.Count > 0)
@@ -247,7 +252,7 @@ namespace FeatureRecognitionAPI.Models
                     }
                 }
 
-                //Start the list
+                // Start the list
                 List<Feature> featureGroupList = new List<Feature>();
                 Feature bigFeature = features[maxDiffIndex];
                 featureGroupList.Add(bigFeature);
@@ -319,8 +324,8 @@ namespace FeatureRecognitionAPI.Models
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0, 0);
+            Point tempMinPoint;
+            Point tempMaxPoint;
 
             while (features.Count > 0)
             {
