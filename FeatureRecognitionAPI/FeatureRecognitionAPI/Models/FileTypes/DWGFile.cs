@@ -146,7 +146,7 @@ namespace FeatureRecognitionAPI.Models
 
         }
 
-        public List<Entity> GetEntities()
+        public override List<Entity> GetEntities()
         {
             return EntityList;
         }
