@@ -232,16 +232,6 @@
             else
             {
                 ellipseRotation = Math.Atan2(ellipseY, ellipseX);
-                //Q2 and Q3
-                if (ellipseX < 0)
-                {
-                    ellipseRotation += Math.PI;
-                }
-                //Q4
-                else if (ellipseX > 0 && ellipseY < 0)
-                {
-                    ellipseRotation += 2 * Math.PI;
-                }
             }
             //Adjusting for ellipse rotation
             pointAngle -= ellipseRotation;

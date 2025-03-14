@@ -244,7 +244,7 @@ public class Feature
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if (numArcs == 2 && numLines == 2 && getBothLinesAndDetermineParallelization())
+        else if (numArcs == 2 && numLines == 2 && IsSubshapeRectangle())
         {
             if (DoAnglesAddTo360())
             {
@@ -512,10 +512,10 @@ public class Feature
 
     internal bool CheckGroup2A(out PossibleFeatureTypes type)
     {
-        if (numArcs >= 2 && numCircles == 0)
+        if ((numArcs >= 2 || numEllipses >= 2) && numCircles == 0)
         {
             //Possible ellipse with arcs
-            if (numArcs > 2 && numLines == 0)
+            if (numArcs > 2 && numLines == 0 && numEllipses == 0)
             {
                 if (DoAnglesAddTo360())
                 {
@@ -529,7 +529,7 @@ public class Feature
             //Possible bowtie
             else if (numLines == 2)
             {
-                if (IsBowtie() && getBothLinesAndDetermineParallelization())
+                if (IsBowtie() && IsSubshapeRectangle())
                 {
                     type = PossibleFeatureTypes.Group2A2;
                     return true;
@@ -638,6 +638,11 @@ public class Feature
                         convexCount++;
                         tempConvexCount = 0;
                     }
+                    // Checks that the angles of connecting curves are the same
+                    if (i != 0 && tempConcaveCount > 0)
+                    {
+                        if (!IsSmoothCurve(baseEntityList[i - 1], baseEntityList[i])) { return false; }
+                    }
                     tempConcaveCount++;
                 }
                 //  If previous curve was concave, there is a switch in concavity
@@ -647,6 +652,11 @@ public class Feature
                     {
                         concaveCount++;
                         tempConcaveCount = 0;
+                    }
+                    // Checks that the angles of connecting curves are the same
+                    if (i != 0 && tempConvexCount > 0)
+                    {
+                        if (!IsSmoothCurve(baseEntityList[i - 1], baseEntityList[i])) { return false; }
                     }
                     tempConvexCount++;
                 }
@@ -730,20 +740,50 @@ public class Feature
         return (numIntersections - (numEndPointIntersections / 2)) % 2 == 0;
     }
 
-    /**
-     * Retrieves 2 lines from the base entity list to determine parallelization
-     */
-    private bool getBothLinesAndDetermineParallelization()
+    private bool IsSmoothCurve(Entity entity1, Entity entity2)
     {
-        Line line1 = new Line(0, 0, 0, 0);
-        Line line2 = new Line(0, 0, 0, 0);
+        if (!(entity1 is Arc || entity1 is Ellipse) || !(entity2 is Arc || entity2 is Ellipse)) { return true; }
+        if (entity1 is Arc && entity2 is Arc)
+        {
+            Arc arc1 = (Arc)entity1;
+            Arc arc2 = (Arc)entity2;
+            return Math.Abs(Math.Round(arc1.EndAngle, 4) - (Math.Round(arc2.StartAngle, 4))) < 1.0;
+        }
+        else if (entity1 is Arc && entity2 is Ellipse)
+        {
+            Arc arc = (Arc)entity1;
+            Ellipse ellipse = (Ellipse)entity2;
+            return Math.Abs(Math.Round(arc.EndAngle * Math.PI / 180, 4) - (Math.Round(ellipse.StartParameter + ellipse.Rotation, 4))) < 1.0;
+        }
+        else if (entity1 is Ellipse && entity2 is Arc)
+        {
+            Ellipse ellipse = (Ellipse)entity1;
+            Arc arc = (Arc)entity2;
+            return Math.Abs(Math.Round(ellipse.EndParameter + ellipse.Rotation, 4) - (Math.Round(arc.StartAngle * Math.PI / 180, 4))) < 1.0;
+        }
+        else
+        {
+            Ellipse ellipse1 = (Ellipse)entity1;
+            Ellipse ellipse2 = (Ellipse)entity2;
+            return Math.Abs(Math.Round(ellipse1.EndParameter + ellipse1.Rotation, 4) - (Math.Round(ellipse2.StartParameter + ellipse2.Rotation, 4))) < 1.0;
+        }
+    }
+
+    /**
+     * Retrieves 2 lines from the base entity list and determines if there is a
+     * rectangle that forms if the two lines are connected
+     */
+    internal bool IsSubshapeRectangle()
+    {
+        Line baseLine1 = new Line(0, 0, 0, 0);
+        Line baseLine2 = new Line(0, 0, 0, 0);
         bool gotLine1 = false;
         bool gotLine2 = false;
         int index = 0;
-        //Get one of the 2 lines and arcs to run isArcConcave
+        //Retreive 2 lines for check
         while (!gotLine1 || !gotLine2)
         {
-            //For some reason there was not a line and arc, return
+            //For some reason there were not 2 lines -> return
             if (index == baseEntityList.Count)
             {
                 return false;
@@ -753,12 +793,12 @@ public class Feature
             {
                 if (!gotLine1)
                 {
-                    line1 = (Line)baseEntityList[index];
+                    baseLine1 = (Line)baseEntityList[index];
                     gotLine1 = true;
                 }
                 else
                 {
-                    line2 = (Line)baseEntityList[index];
+                    baseLine2 = (Line)baseEntityList[index];
                     gotLine2 = true;
                 }
             }
@@ -766,7 +806,47 @@ public class Feature
             index++;
         }
 
-        return line1.isParallel(line2);
+        // Temp variables for correct line check since 4 lines can be formed from the baseLine endpoints
+        Line tempLine1 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
+        Line tempLine2 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
+        Line tempLine3 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
+        Line tempLine4 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
+        // Variables for final quadrilateral lines
+        Line newLine1;
+        Line newLine2;
+        // Checks the lengths of each line to ensure the right line is used to form the quadrilateral
+        if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) < Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        {
+            newLine1 = tempLine1;
+            newLine2 = tempLine2;
+        }
+        else if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) > Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        {
+            newLine1 = tempLine3;
+            newLine2 = tempLine4;
+        }
+        else
+        {
+            if (Math.Round(tempLine1.Length, 4) < Math.Round(tempLine2.Length, 4))
+            {
+                newLine1 = tempLine1;
+            }
+            else
+            {
+                newLine1 = tempLine2;
+            }
+            if (Math.Round(tempLine3.Length, 4) < Math.Round(tempLine4.Length, 4))
+            {
+                newLine2 = tempLine3;
+            }
+            else
+            {
+                newLine2 = tempLine4;
+            }
+        }
+        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4)) 
+            && newLine1.isPerpendicular(baseLine1) && newLine1.isPerpendicular(baseLine2) 
+            && newLine2.isPerpendicular(baseLine1) && newLine2.isPerpendicular(baseLine2);
     }
 
     /**
