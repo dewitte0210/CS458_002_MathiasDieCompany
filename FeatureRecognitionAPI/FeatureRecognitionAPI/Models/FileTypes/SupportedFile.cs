@@ -1,21 +1,55 @@
 ﻿/*
- * Abstract class to be inherrited by every File child class
- * - DWG, DXF, PDF
+ * Abstract class to be inherited by every File child class
+ * - DWG, DXF
  */
 
+using ACadSharp;
+using ACadSharp.Blocks;
+using ACadSharp.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models
 {
     public abstract class SupportedFile
     {
-        protected string Path { get; set; }
-        protected SupportedExtensions FileType { get; set; }
-        internal List<Feature> FeatureList { get; set; }
-        protected List<Entity> EntityList;
-        internal List<FeatureGroup> FeatureGroups { get; }
-        
+
+        protected string path { get; set; }
+        protected SupportedExtensions fileType { get; set; }
+        protected List<Feature> featureList;
+        protected List<Entity> entityList;
+        protected List<FeatureGroup> featureGroups { get; }
+        protected FileVersion _fileVersion;
+
+        //These functions below exist for testing purposes
+
+        #region testingFunctions
+
+        public int GetFeatureGroupCount()
+        {
+            return featureGroups.Count;
+        }
+
+        public int GetTotalFeatureGroups()
+        {
+            int tmp = 0;
+            foreach (FeatureGroup fGroup in featureGroups)
+            {
+                tmp += fGroup.Count;
+            }
+
+            return tmp;
+        }
+
+        public List<FeatureGroup> GetFeatureGroups()
+        {
+            return featureGroups;
+        }
+
+        #endregion
+
+
         #region Constructors
 
         //protected keyword for nested enum is about granting 
@@ -411,8 +445,82 @@ namespace FeatureRecognitionAPI.Models
         {
             makeFeatureList(makeTouchingEntitiesList(EntityList));
         }
-        // Method to read the data from a file and fill the EntityList with entities
-        public abstract void readEntities();
+       
+        protected void ReadEntities(CadDocument doc)
+        {
+            List<Entity> returned = new List<Entity>();
+            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
+            {
+                if (entity is Insert insert)
+                {
+                    returned.AddRange(UnwrapInsert(insert));
+                }
+                else
+                {
+                    Entity? castedEntity = CadObjectToInternalEntity(entity);
+                    if (!(castedEntity is null))
+                    {
+                        returned.Add(castedEntity);
+                    }
+                }
+            }
+
+            entityList.AddRange(returned);
+        }
+        private static List<Entity> UnwrapInsert(Insert insert)
+        {
+            List<Entity> returned = new List<Entity>();
+            
+            Block block = insert.Block.BlockEntity;
+            Matrix3 blockTranslate = Matrix3.Translate(block.BasePoint.X, block.BasePoint.Y);
+                    
+            Matrix3 insertTranslate = Matrix3.Translate(insert.InsertPoint.X, insert.InsertPoint.Y);
+            Matrix3 insertScale = Matrix3.Scale(insert.XScale, insert.YScale);
+            Matrix3 insertRotate = Matrix3.Rotate(insert.Rotation);
+
+            Matrix3 finalTransform = insertScale * blockTranslate * insertTranslate * insertRotate;
+            foreach (ACadSharp.Entities.Entity cadObject in insert.Block.Entities)
+            {
+                Entity? castedEntity = CadObjectToInternalEntity(cadObject);
+                if (!(castedEntity is null))
+                {
+                    returned.Add(castedEntity.Transform(finalTransform));
+                }
+            }
+
+            return returned;
+        }
+        
+        internal static Entity? CadObjectToInternalEntity(ACadSharp.Entities.Entity cadEntity)
+        {
+            switch (cadEntity)
+            {
+                case ACadSharp.Entities.Line line:
+                {
+                    return new Line(line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
+                }
+                case ACadSharp.Entities.Arc arc:
+                {
+                    return new Arc(arc.Center.X, arc.Center.Y, arc.Radius,
+                        arc.StartAngle * (180 / Math.PI), arc.EndAngle * (180 / Math.PI));
+                }
+                case ACadSharp.Entities.Circle circle:
+                {
+                    return new Circle(circle.Center.X, circle.Center.Y, circle.Radius);
+                }
+                case ACadSharp.Entities.Ellipse ellipse:
+                {
+                    return new Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.EndPoint.X,
+                        ellipse.EndPoint.Y,
+                        ellipse.RadiusRatio, ellipse.StartParameter, ellipse.EndParameter);
+                }
+            }
+
+            return null;
+        }
+        
+        public abstract void ParseFile();
+
         public abstract List<Entity> GetEntities();
     }
 }
