@@ -42,6 +42,8 @@ namespace Testing_for_Project
             Assert.That(circle1.Center.Y, Is.EqualTo(0.7124999999999999));
             Assert.That(circle1.Radius, Is.EqualTo(0.2577228596164672));
         }
+
+        #region EllipseClass
         [Test]
         public void TestFullEllipseClass()
         {
@@ -84,6 +86,13 @@ namespace Testing_for_Project
             Point point1 = new Point(0, -2);
             Assert.That(ellipse1.isInEllipseRange(point1), Is.False);
         }
+        [Test]
+        public void TestPointOnEllipseGivenAngleInRadians_ReturnsTrue()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
+
+        }
+        #endregion
 
         [Test]
         public void TestPointEquals()
@@ -101,6 +110,13 @@ namespace Testing_for_Project
             List<double> solutions2 = new List<double>() { 5, 2 };
             List<double> actual = test.QuadraticFormula(1, -7, 10);
             Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
+        }
+
+        [Test]
+        public void TestVectorFromCenterWithArc()
+        {
+            Arc test = new Arc(1, 1, 2, 0, 180);
+            Assert.That(test.VectorFromCenter(Math.PI / 2).Equals(new Line(1, 1, 1, 3)));
         }
         #endregion
 
@@ -128,7 +144,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDXFFileClassGoodInput()
         {
-            //Set path to any filepath containing the 3rd example dxf file
+            //Set Path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
@@ -258,8 +274,8 @@ namespace Testing_for_Project
         [Test]
         public void TestDWGFileClassGoodInput()
         {
-            //Set path to any filepath containing the 3rd example dxf file
-            // string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
+            //Set Path to any filepath containing the 3rd example dxf file
+            // string Path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
 
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
@@ -407,7 +423,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDWGCorrupt()
         {
-            //string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
+            //string Path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
@@ -424,7 +440,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDWGUnsupportedVersion()
         {
-            //string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\WrongVersion.dwg";
+            //string Path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\WrongVersion.dwg";
 
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");

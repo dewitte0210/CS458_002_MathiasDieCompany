@@ -1,3 +1,4 @@
+using FeatureRecognitionAPI.Models.Utility;
 using Convert = System.Convert;
 using Math = System.Math;
 
@@ -45,7 +46,7 @@ public class Arc : Entity
      * @param degrees is the amount of degrees being converted
      * @return the radian value of degrees
      */
-    private double degreesToRadians(double degrees)
+    internal double degreesToRadians(double degrees)
     {
         return (degrees * Math.PI / 180);
     }
@@ -68,20 +69,20 @@ public class Arc : Entity
         return (radius * Math.Sin(degreesToRadians(angle)) + y);
     }
 
-    /**
-     * Function to calculate the central angle
-     *
-     * @param startAngle the start angle of the arc being calculated
-     * @param endAngle the end angle of the arc being calculated
-     * @return the calculated the length of the arc
-     */
-    private double calcCentralAngle(double startAngle, double endAngle)
-    {
-        //The subtraction result would be negative, need to add 360 to get correct value
-        if (endAngle < startAngle)
-            return endAngle - startAngle + 360;
-        return endAngle - startAngle;
-    }
+        /**
+         * Function to calculate the central angle
+         * 
+         * @param startAngle the start angle of the arc being calculated
+         * @param endAngle the end angle of the arc being calculated
+         * @return the calculated the length of the arc
+         */
+        internal double calcCentralAngle(double startAngle, double endAngle)
+        {
+            //The subtraction result would be negative, need to add 360 to get correct value
+            if (endAngle < startAngle)
+                return endAngle - startAngle + 360;
+            return endAngle - startAngle;
+        }
 
     /**
      * Function to calculate the length of the arc for perimeter length checks
@@ -161,17 +162,6 @@ public class Arc : Entity
         {
             double tan = Math.Atan2(y, x);
             degrees = tan * (180 / Math.PI);
-            //Q2 and Q3
-            if (x < 0)
-            {
-                // y < 0? Q3 else Q2
-                degrees = y < 0 ? degrees += 360 : Math.Abs(degrees + 180);
-            }
-            //Q4
-            else if (x > 0 && y < 0)
-            {
-                degrees = 360 + degrees;
-            }
         }
 
         // rotate start and end angles to start at 0
@@ -191,6 +181,23 @@ public class Arc : Entity
         }
 
         return adjustedDegrees >= adjustedStart && adjustedDegrees <= adjustedEnd;
+    }
+
+    internal Line VectorFromCenter(double angle)
+    {
+        return new Line(Center.X, Center.Y, Radius * Math.Cos(angle) + Center.X, Radius * Math.Sin(angle) + Center.Y);
+    }
+
+    internal double AngleInMiddle()
+    {
+        // rotate start and end angles to start at 0
+        double difference = 360 - StartAngle;
+        double adjustedStart = 0;
+        double adjustedEnd = EndAngle + difference;
+        if (adjustedEnd >= 360) { adjustedEnd -= 360; }
+        double middleAngle = ((adjustedEnd - adjustedStart) / 2) + StartAngle;
+        if (middleAngle >= 360) { middleAngle -= 360; }
+        return middleAngle;
     }
 
     public int GetHashCode()
@@ -275,7 +282,7 @@ public class Arc : Entity
                 angle += CentralAngle;
             }
 
-            double rads = -angle * (Math.PI / 180);
+            double rads = angle * (Math.PI / 180);
             double xe = Math.Cos(rads);
             double ye = Math.Sin(rads);
             x1 = Math.Min(x1, xe);
@@ -376,5 +383,27 @@ public class Arc : Entity
                    End.Equals(other.Start) ||
                    End.Equals(other.End)
                );
+    }
+
+    public override Arc Transform(Matrix3 transform)
+    {
+            Point transformedBoundary1 = transform * new Point(MinX(), MinY());
+            Point transformedBoundary2 = transform * new Point(MaxX(), MinY());
+            Point transformedBoundary3 = transform * new Point(MinX(), MaxY());
+            Point transformedBoundary4 = transform * new Point(MaxX(), MaxY());
+
+            Point newCenter = transform * Center;
+            
+            double a = Point.Distance(newCenter, transformedBoundary1);
+            double b = Point.Distance(newCenter, transformedBoundary2);
+            double c = Point.Distance(newCenter, transformedBoundary3);
+            double d = Point.Distance(newCenter, transformedBoundary4);
+
+            double newWidth = Math.Max(a, Math.Max(b, Math.Max(c, d)));
+
+            double rotation = Angles.ToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+
+            //divide by sqrt(2) because newWidth is distance from center to bounding box corner, not arc edge
+            return new Arc(newCenter.X, newCenter.Y, newWidth / Math.Sqrt(2), StartAngle - rotation, EndAngle - rotation);
     }
 }

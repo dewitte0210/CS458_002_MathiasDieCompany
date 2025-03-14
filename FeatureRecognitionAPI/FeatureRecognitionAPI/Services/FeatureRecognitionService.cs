@@ -92,51 +92,21 @@ namespace FeatureRecognitionAPI.Services
                     }
                 }
 
-                string json = "";
 
-                List<List<Entity>> touchingEntityList;
-                List<Feature> features;
-                List<FeatureGroup> featureGroups;
-                var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
-                settings.Converters.Add(new StringEnumConverter());
+                SupportedFile supportedFile;
                 switch (ext)
                 {
-                    // This is where all the operations on the file are run from
                     case ".dxf":
                         using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
-                            DXFFile dXFFile = new DXFFile(dxfStream.Name);
-                            // Create the touching entity list
-                            touchingEntityList = dXFFile.makeTouchingEntitiesList(dXFFile.GetEntities());
-                            touchingEntityList = touchingEntityList.Select(list => CondenseArcs(list)).ToList();
-                            // Set the feature groups
-                            featureGroups = dXFFile.SetFeatureGroups(touchingEntityList);
-                            // Set features for each feature group
-                            for (int i = 0; i < featureGroups.Count; i++)
-                            {
-                                features = dXFFile.makeFeatureList(featureGroups[i].touchingEntities);
-                                featureGroups[i].setFeatureList(features);
-                            }
-
-                            // Create JSON that will be sent to the frontend
-                            json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, featureGroups), settings);
+                             supportedFile = new DXFFile(dxfStream.Name);
                         }
 
                         break;
                     case ".dwg":
-                        // Works exactly the same as DXF above, just with a different file as the parser functions are different
                         using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
-                            DWGFile dWGFile = new DWGFile(dwgStream.Name);
-                            touchingEntityList = dWGFile.makeTouchingEntitiesList(dWGFile.GetEntities());
-                            featureGroups = dWGFile.SetFeatureGroups(touchingEntityList);
-                            for (int i = 0; i < featureGroups.Count; i++)
-                            {
-                                features = dWGFile.makeFeatureList(featureGroups[i].touchingEntities);
-                                featureGroups[i].setFeatureList(features);
-                            }
-
-                            json = JsonConvert.SerializeObject(featureGroups, settings);
+                             supportedFile = new DWGFile(dwgStream.Name);
                         }
 
                         break;
@@ -144,6 +114,27 @@ namespace FeatureRecognitionAPI.Services
                         Console.WriteLine("ERROR detecting file extension");
                         return (OperationStatus.BadRequest, null);
                 }
+
+                
+                // Create the touching entity list
+                List<List<Entity>> touchingEntityList = supportedFile.makeTouchingEntitiesList(supportedFile.GetEntities());
+                touchingEntityList = touchingEntityList.Select(list => CondenseArcs(list)).ToList();
+                
+                // Set the feature groups
+                List<FeatureGroup> featureGroups = supportedFile.SetFeatureGroups(touchingEntityList);
+                
+                // Set features for each feature group
+                List<Feature> features;
+                for (int i = 0; i < featureGroups.Count; i++)
+                {
+                    features = supportedFile.makeFeatureList(featureGroups[i].touchingEntities);
+                    featureGroups[i].setFeatureList(features);
+                }
+
+                // Create JSON that will be sent to the frontend
+                var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
+                settings.Converters.Add(new StringEnumConverter());
+                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, featureGroups), settings);
 
                 return (OperationStatus.OK, json);
             }
@@ -160,7 +151,7 @@ namespace FeatureRecognitionAPI.Services
             }
         }
 
-        private List<Entity> CondenseArcs(List<Entity> entities)
+        private static List<Entity> CondenseArcs(List<Entity> entities)
         {
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
 
@@ -175,6 +166,12 @@ namespace FeatureRecognitionAPI.Services
                 Arc initArc = group[0];
                 group.RemoveAt(0);
 
+                if (group.Count == 0)
+                {
+                    arcs.Add(initArc);
+                    continue;
+                }
+
                 int idx = 0;
                 int failCount = 0;
                 while (group.Count > 0)
@@ -184,7 +181,8 @@ namespace FeatureRecognitionAPI.Services
                         arcs.Add(initArc);
                         idx = 0;
                         initArc = group[0];
-                        if (group.Count == 1)
+                        group.RemoveAt(0);
+                        if (group.Count == 0)
                         {
                             arcs.Add(initArc);
                             break;
@@ -217,13 +215,12 @@ namespace FeatureRecognitionAPI.Services
 
                     if (group.Count == 0)
                     {
+                        arcs.Add(initArc);
                         break;
                     }
 
                     idx = (idx + 1) % group.Count;
                 }
-
-                arcs.Add(initArc);
             }
 
             // Convert arcs to circles if necessary
