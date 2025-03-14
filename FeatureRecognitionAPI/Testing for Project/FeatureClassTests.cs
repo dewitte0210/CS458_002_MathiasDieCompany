@@ -344,6 +344,32 @@ namespace Testing_for_Project
         #endregion
 
         [Test]
+        public void TestIsSubshapeRectangle_ReturnsTrue()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(0, 4, 5, 4);
+            Arc arc1 = new(0, 2, 2, 90, 270);
+            Arc arc2 = new(5, 2, 2, 270, 90);
+            List<Entity> entities = new List<Entity>() { line1, line2, arc1, arc2 };
+            Feature testFeature = new(entities) { baseEntityList = entities };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.IsSubshapeRectangle(), Is.True);
+        }
+
+        [Test]
+        public void TestIsSubshapeRectangle_ReturnsFalse()
+        {
+            Line line1 = new(0, 0, 5, 0);
+            Line line2 = new(2, 4, 7, 4);
+            Arc arc1 = new(0, 2, 2, 90, 270);
+            Arc arc2 = new(5, 2, 2, 270, 90);
+            List<Entity> entities = new List<Entity>() { line1, line2, arc1, arc2 };
+            Feature testFeature = new(entities) { baseEntityList = entities };
+            testFeature.DetectFeatures();
+            Assert.That(testFeature.IsSubshapeRectangle(), Is.False);
+        }
+
+        [Test]
 
         public void TestSortedFeatureList()
         {
