@@ -34,44 +34,32 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 		public class Degrees(double angle)
 		{
-			public double angle = angle;
+			public readonly double angle = angle;
 
 			public Degrees GetOppositeAngle()
 			{
 				return new Degrees(360 - angle);
 			}
 
-			public void SetToOpposite()
-			{
-				angle = 360 - angle;
-			}
-
 			public Radians ToRadians()
 			{
 				return new Radians(angle * Math.PI / 180);
 			}
-
 		}
 
 		public class Radians(double angle)
 		{
-			public double angle = angle;
+			public readonly double angle = angle;
 
 			public Radians GetOppositeAngle()
 			{
 				return new Radians((2 * Math.PI) - angle);
 			}
 
-			public void SetToOpposite()
-			{
-				angle = (2 * Math.PI) - angle;
-			}
-
 			public Degrees ToDegrees()
 			{
 				return new Degrees(angle * 180 / Math.PI);
 			}
-
 		}
 
 		/// <summary>
@@ -116,21 +104,18 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 				if (obj is Angle ObjA)
 				{
-                    if (this.side != Side.UNKNOWN && ObjA.side != Side.UNKNOWN)
+                    if (side != Side.UNKNOWN && ObjA.side != Side.UNKNOWN)
 					{
 						if (ObjA.side == this.side && ObjA.angle == this.angle)
 						{
 							return true;
 						}
-						//sides are opposite
-						if (ObjA.side != this.side)
-						{
-							if (ObjA.angle.GetOppositeAngle() == this.angle)
-							{
-								return true;
-							}
-						}
-					}
+                        //sides are opposite
+                        if (ObjA.side != this.side && ObjA.angle.GetOppositeAngle() == angle)
+                        {
+                            return true;
+                        }
+                    }
 				}
 				return false;
 			}
@@ -197,12 +182,12 @@ namespace FeatureRecognitionAPI.Models.Utility
 			//since it can return 0 or 360 depending on orientation
 			if ((returnAngle.angle == 360 || returnAngle.angle == 0) && ori == Orientation.CLOCKWISE)
 			{
-				returnAngle.SetToOpposite();
+				returnAngle = returnAngle.GetOppositeAngle();
 			}
 
 			if (side != Side.UNKNOWN && side != targetSide)
 			{
-				returnAngle.SetToOpposite();
+				returnAngle = returnAngle.GetOppositeAngle();
 				side = targetSide;
 			}
 
@@ -210,7 +195,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 			//flip the angle if it is not
 			if (ori == Orientation.CLOCKWISE)
 			{
-				returnAngle.SetToOpposite();
+				returnAngle = returnAngle.GetOppositeAngle();
 			}
 
 			return new Angle(returnAngle, side);
@@ -339,58 +324,5 @@ namespace FeatureRecognitionAPI.Models.Utility
 				return Orientation.UNKNOWN;
 			}
 		}
-
-		public class Polygon
-		{
-			public List<Line> lineList;
-
-			public double area;
-			public Orientation orientation;
-
-			public Polygon(List<Line> newLineList)
-			{
-				lineList = newLineList;
-
-				area = Math.Abs(GetShoelaceArea(lineList));
-				orientation = GetOrientation(lineList);
-			}
-		}
 	}
 }
-
-//    static void Main(string[] args)
-//    {
-//        //counterclockwise
-//        List<Line> ll = new List<Line>();
-//        ll.Add(new Line(new Point(0, 0), new Point(5, 0)));
-//        ll.Add(new Line(new Point(5, 0), new Point(3, 3)));
-//        ll.Add(new Line(new Point(3, 3), new Point(0, 0)));
-
-//        Polygon poly = new Polygon(ll);
-//        Angle ang = getMinorAngle(ll[0], ll[1]);
-//        Console.WriteLine(ang.getDegrees());
-
-//        //clockwise
-//        List<Line> llc = new List<Line>();
-//        llc.Add(new Line(new Point(0, 0), new Point(3, 3)));
-//        llc.Add(new Line(new Point(3, 3), new Point(5, 0)));
-//        llc.Add(new Line(new Point(5, 0), new Point(0, 0)));
-
-//        Console.WriteLine(getMinorAngle(llc[0], llc[1]).getDegrees());
-
-//        //180
-//        Line l1 = new Line(new Point(0, 0), new Point(0, 9));
-//        Line l2 = new Line(new Point(0, 9), new Point(0, 0));
-//        Console.WriteLine(getMinorAngle(l1, l2).getDegrees());
-
-//        //parallel
-//        Console.WriteLine(getMinorAngle(l1, l1).getDegrees());
-
-//        //seperated
-//        Line l3 = new Line(new Point(0, 0), new Point(0, 9));
-//        Line l4 = new Line(new Point(5, 5), new Point(15, 15));
-//        Console.WriteLine(getMinorAngle(l3, l4).getDegrees());
-
-//        Console.Write("end");
-//    }
-
