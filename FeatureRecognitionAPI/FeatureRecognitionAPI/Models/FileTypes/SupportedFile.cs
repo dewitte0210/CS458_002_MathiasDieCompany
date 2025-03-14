@@ -91,6 +91,7 @@ namespace FeatureRecognitionAPI.Models
             
             for (int i = 0; i < EntityList.Count(); i++)
             {
+                int count = 0;
                 for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 {
                     if (i != j && EntityList[i].DoesIntersect(EntityList[j])) // if i==j they are checking the same object and would return true for intersecting
@@ -98,7 +99,14 @@ namespace FeatureRecognitionAPI.Models
                         // adds each entity to their AdjList. This should not happen twice because of the j=i+1
                         EntityList[i].AdjList.Add(EntityList[j]);
                         EntityList[j].AdjList.Add(EntityList[i]);
-
+                        
+                        // Check to flag an entity as Kisscut
+                        count++;
+                        if (count == 4 && EntityList[i] is Line tempLine)
+                        {
+                            // TODO: tempLine.Kisscut = True;
+                        }
+                        
                         if (listMap[i] != -1) // means EntityList[i] is already mapped to a feature
                         {
                             FeatureList[i].EntityList.Add(EntityList[j]);
