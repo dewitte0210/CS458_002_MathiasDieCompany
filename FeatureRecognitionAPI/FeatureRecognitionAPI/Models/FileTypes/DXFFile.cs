@@ -14,7 +14,7 @@ namespace FeatureRecognitionAPI.Models
 
         public DXFFile(string path) : base(path)
         {
-            fileType = SupportedExtensions.dxf;
+            FileType = SupportedExtensions.dxf;
 
             if (File.Exists(path))
             {
@@ -64,12 +64,14 @@ namespace FeatureRecognitionAPI.Models
 
         public override void ParseFile()
         {
-            DxfReader reader = new DxfReader(path);
+            DxfReader reader = new DxfReader(Path);
+
             CadDocument doc = reader.Read();
 
             _lines = File.ReadAllLines(path);
             _fileVersion = GetFileVersion();
             ReadEntities(doc);
+
         }
 
         //May need to be refactored depending on if c# handles this by copy or by reference

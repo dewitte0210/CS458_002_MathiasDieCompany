@@ -54,12 +54,12 @@ public class Feature
     #region Constructors
 
     /*
-     * Constructor that passes in an entityList for the feature. Feature detection is expected to be
+     * Constructor that passes in an EntityList for the feature. Feature detection is expected to be
      * called on a feature using this constructor. This was mostly used for testing when wanting to
      * avoid feature detection in the constructor. Could probably be deleted at this point since
      * feature detection was moved out of the constructors.
      *
-     * @Param entityList is the entityList being passed into the feature. could be a base feature,
+     * @Param EntityList is the EntityList being passed into the feature. could be a base feature,
      * that includes perimeter features, or just the list for a perimeter feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
@@ -78,7 +78,7 @@ public class Feature
     }
 
     /*
-     * Constructor that is expected to be used the most as it just passes in the entityList for the
+     * Constructor that is expected to be used the most as it just passes in the EntityList for the
      * feature and detection, along with all other fields will be calculated based off this list in
      * a seperate function
      *
@@ -107,9 +107,9 @@ public class Feature
     #region FeatureDetection
 
     /*
-     * Counts the Lines, Arcs, and Circles in the entityList.
+     * Counts the Lines, Arcs, and Circles in the EntityList.
      *
-     * @Param entityList is the list that is being looped through. Note that it is passed by reference
+     * @Param EntityList is the list that is being looped through. Note that it is passed by reference
      * and any changes to the list in this function will change the list in the scope of wherever this
      * function was called from
      * @Param numLines is the counted number of lines. The out keyword means that the value is returned
@@ -237,7 +237,7 @@ public class Feature
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if (numArcs == 2 && numLines == 2 && getBothLinesAndDetermineParallelization())
+        else if (numArcs == 2 && numLines == 2 && IsSubshapeRectangle())
         {
             if (DoAnglesAddTo360())
             {
@@ -505,10 +505,10 @@ public class Feature
 
     internal bool CheckGroup2A(out PossibleFeatureTypes type)
     {
-        if (numArcs >= 2 && numCircles == 0)
+        if ((numArcs >= 2 || numEllipses >= 2) && numCircles == 0)
         {
             //Possible ellipse with arcs
-            if (numArcs > 2 && numLines == 0)
+            if (numArcs > 2 && numLines == 0 && numEllipses == 0)
             {
                 if (DoAnglesAddTo360())
                 {
@@ -522,7 +522,7 @@ public class Feature
             //Possible bowtie
             else if (numLines == 2)
             {
-                if (IsBowtie() && getBothLinesAndDetermineParallelization())
+                if (IsBowtie() && IsSubshapeRectangle())
                 {
                     type = PossibleFeatureTypes.Group2A2;
                     return true;
@@ -631,6 +631,11 @@ public class Feature
                         convexCount++;
                         tempConvexCount = 0;
                     }
+                    // Checks that the angles of connecting curves are the same
+                    if (i != 0 && tempConcaveCount > 0)
+                    {
+                        if (!IsSmoothCurve(baseEntityList[i - 1], baseEntityList[i])) { return false; }
+                    }
                     tempConcaveCount++;
                 }
                 //  If previous curve was concave, there is a switch in concavity
@@ -640,6 +645,11 @@ public class Feature
                     {
                         concaveCount++;
                         tempConcaveCount = 0;
+                    }
+                    // Checks that the angles of connecting curves are the same
+                    if (i != 0 && tempConvexCount > 0)
+                    {
+                        if (!IsSmoothCurve(baseEntityList[i - 1], baseEntityList[i])) { return false; }
                     }
                     tempConvexCount++;
                 }
@@ -723,20 +733,50 @@ public class Feature
         return (numIntersections - (numEndPointIntersections / 2)) % 2 == 0;
     }
 
-    /**
-     * Retrieves 2 lines from the base entity list to determine parallelization
-     */
-    private bool getBothLinesAndDetermineParallelization()
+    private bool IsSmoothCurve(Entity entity1, Entity entity2)
     {
-        Line line1 = new Line(0, 0, 0, 0);
-        Line line2 = new Line(0, 0, 0, 0);
+        if (!(entity1 is Arc || entity1 is Ellipse) || !(entity2 is Arc || entity2 is Ellipse)) { return true; }
+        if (entity1 is Arc && entity2 is Arc)
+        {
+            Arc arc1 = (Arc)entity1;
+            Arc arc2 = (Arc)entity2;
+            return Math.Abs(Math.Round(arc1.EndAngle, 4) - (Math.Round(arc2.StartAngle, 4))) < 1.0;
+        }
+        else if (entity1 is Arc && entity2 is Ellipse)
+        {
+            Arc arc = (Arc)entity1;
+            Ellipse ellipse = (Ellipse)entity2;
+            return Math.Abs(Math.Round(arc.EndAngle * Math.PI / 180, 4) - (Math.Round(ellipse.StartParameter + ellipse.Rotation, 4))) < 1.0;
+        }
+        else if (entity1 is Ellipse && entity2 is Arc)
+        {
+            Ellipse ellipse = (Ellipse)entity1;
+            Arc arc = (Arc)entity2;
+            return Math.Abs(Math.Round(ellipse.EndParameter + ellipse.Rotation, 4) - (Math.Round(arc.StartAngle * Math.PI / 180, 4))) < 1.0;
+        }
+        else
+        {
+            Ellipse ellipse1 = (Ellipse)entity1;
+            Ellipse ellipse2 = (Ellipse)entity2;
+            return Math.Abs(Math.Round(ellipse1.EndParameter + ellipse1.Rotation, 4) - (Math.Round(ellipse2.StartParameter + ellipse2.Rotation, 4))) < 1.0;
+        }
+    }
+
+    /**
+     * Retrieves 2 lines from the base entity list and determines if there is a
+     * rectangle that forms if the two lines are connected
+     */
+    internal bool IsSubshapeRectangle()
+    {
+        Line baseLine1 = new Line(0, 0, 0, 0);
+        Line baseLine2 = new Line(0, 0, 0, 0);
         bool gotLine1 = false;
         bool gotLine2 = false;
         int index = 0;
-        //Get one of the 2 lines and arcs to run isArcConcave
+        //Retreive 2 lines for check
         while (!gotLine1 || !gotLine2)
         {
-            //For some reason there was not a line and arc, return
+            //For some reason there were not 2 lines -> return
             if (index == baseEntityList.Count)
             {
                 return false;
@@ -746,12 +786,12 @@ public class Feature
             {
                 if (!gotLine1)
                 {
-                    line1 = (Line)baseEntityList[index];
+                    baseLine1 = (Line)baseEntityList[index];
                     gotLine1 = true;
                 }
                 else
                 {
-                    line2 = (Line)baseEntityList[index];
+                    baseLine2 = (Line)baseEntityList[index];
                     gotLine2 = true;
                 }
             }
@@ -759,7 +799,47 @@ public class Feature
             index++;
         }
 
-        return line1.isParallel(line2);
+        // Temp variables for correct line check since 4 lines can be formed from the baseLine endpoints
+        Line tempLine1 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
+        Line tempLine2 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
+        Line tempLine3 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
+        Line tempLine4 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
+        // Variables for final quadrilateral lines
+        Line newLine1;
+        Line newLine2;
+        // Checks the lengths of each line to ensure the right line is used to form the quadrilateral
+        if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) < Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        {
+            newLine1 = tempLine1;
+            newLine2 = tempLine2;
+        }
+        else if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) > Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        {
+            newLine1 = tempLine3;
+            newLine2 = tempLine4;
+        }
+        else
+        {
+            if (Math.Round(tempLine1.Length, 4) < Math.Round(tempLine2.Length, 4))
+            {
+                newLine1 = tempLine1;
+            }
+            else
+            {
+                newLine1 = tempLine2;
+            }
+            if (Math.Round(tempLine3.Length, 4) < Math.Round(tempLine4.Length, 4))
+            {
+                newLine2 = tempLine3;
+            }
+            else
+            {
+                newLine2 = tempLine4;
+            }
+        }
+        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4)) 
+            && newLine1.isPerpendicular(baseLine1) && newLine1.isPerpendicular(baseLine2) 
+            && newLine2.isPerpendicular(baseLine1) && newLine2.isPerpendicular(baseLine2);
     }
 
     /**
@@ -1235,9 +1315,9 @@ public class Feature
             }
         }
 
-        curPath.Push(head); // pushes the head to the current path
+        curPath.Push(head); // pushes the head to the current Path
         if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
-            // if it can find a path
+            // if it can find a Path
         {
             baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
             baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
@@ -1250,10 +1330,10 @@ public class Feature
     /*
      * recursive helper function to find a closed shape with extended lines
      *
-     * @Param path is the current path that has been taken
+     * @Param Path is the current Path that has been taken
      * @Param testedEnttiies is a list of enties that have been visited
      * @Param head is the target entity that is trying to loop back through
-     * @Return true if a path has been found
+     * @Return true if a Path has been found
      */
     private bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
@@ -1265,7 +1345,7 @@ public class Feature
             if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) &&
                 !testedEntities.Contains(curPath.Peek()))
             {
-                return true; //path found
+                return true; //Path found
             }
         }
 
@@ -1280,7 +1360,7 @@ public class Feature
                     // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated path
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
                     {
                         return true;
                     }
@@ -1290,14 +1370,14 @@ public class Feature
         //this point in the function means nothing is touching current entity
 
         if (curPath.Peek() == head)
-            //if the function of the head reaches this point it means it has not found a path back to the head
+            //if the function of the head reaches this point it means it has not found a Path back to the head
         {
             foreach (Entity entity in ExtendedEntityList)
             {
                 if (!testedEntities
                         .Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {
-                    curPath.Clear(); //clears path and adds the new head to it
+                    curPath.Clear(); //clears Path and adds the new head to it
                     curPath.Push(entity);
                     return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
@@ -1305,7 +1385,7 @@ public class Feature
         }
 
         curPath.Pop();
-        return false; //nothing is touching this entity so it is popped off of path
+        return false; //nothing is touching this entity so it is popped off of Path
     }
 
     #endregion
@@ -1313,11 +1393,11 @@ public class Feature
     #region PerimeterFeatureFunctions
 
     /*
-     * function that finds a path from start to target in Entity list
+     * function that finds a Path from start to target in Entity list
      *
      * @Param start is the entity that this algorithm starts
      * @Param target is the entity that is trying to be reached
-     * @Return the path from start to target. Null if no viable path
+     * @Return the Path from start to target. Null if no viable Path
      */
     private List<Entity> findPathFromStartToTargetInEntityList(Entity start, Entity target)
     {
@@ -1343,13 +1423,13 @@ public class Feature
     }
 
     /*
-     * Helper function to find the path from head to traget. Contains the actual logic for this task
+     * Helper function to find the Path from head to traget. Contains the actual logic for this task
      *
-     * @Param path is the current path taken
+     * @Param Path is the current Path taken
      * @Param visitedEntities contains all visited entities
      * @Param head is the starting node
      * @Param target is the entity trying to be reached
-     * @Return true if path is found
+     * @Return true if Path is found
      */
     private bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities,
         Entity head, Entity target)
@@ -1370,7 +1450,7 @@ public class Feature
                     // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated path
+                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
                     {
                         return true;
                     }
@@ -1382,17 +1462,17 @@ public class Feature
         if (curPath.Peek() == head)
         {
             return false;
-        } // if the current entity is the head it means nothing is touching it and there is no path
+        } // if the current entity is the head it means nothing is touching it and there is no Path
 
-        curPath.Pop(); // nothing is touching this entity so it is popped off of path
+        curPath.Pop(); // nothing is touching this entity so it is popped off of Path
         return false; // returns false so the previous recursive call can check the next touching entity
     }
 
     /*
-     * Function that uses finds the path from the two parents of all extended lines and adds the path as a group of
+     * Function that uses finds the Path from the two parents of all extended lines and adds the Path as a group of
      * entities at new index in PerimeterEntityList
      *
-     * @Return true if a valid path is found and seperated successfully
+     * @Return true if a valid Path is found and seperated successfully
      */
     public void seperatePerimeterEntities()
     {
@@ -1409,7 +1489,7 @@ public class Feature
 
         List<Entity> unusedEntities = new List<Entity>(ExtendedEntityList);
 
-        //seperatePerimeterEntitiesHelper(path, unusedEntities, null);
+        //seperatePerimeterEntitiesHelper(Path, unusedEntities, null);
 
         while (unusedEntities.Count > 0)
         {
@@ -1424,20 +1504,20 @@ public class Feature
     }
 
     /*
-        public void seperatePerimeterEntitiesHelper(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+        public void seperatePerimeterEntitiesHelper(List<Entity> Path, List<Entity> unusedEntities, Entity curEntity)
         {
             if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
             {
                 if (curEntity is null) // means not at any entity currently
                 {
-                    if (path.Count > 0)
+                    if (Path.Count > 0)
                     {
-                        PerimeterEntityList.Add(new List<Entity>(path)); // adds all perimeter feature paths besides last one
+                        PerimeterEntityList.Add(new List<Entity>(Path)); // adds all perimeter feature paths besides last one
                     }
-                    path.Clear();
-                    path.Add(unusedEntities[0]);
+                    Path.Clear();
+                    Path.Add(unusedEntities[0]);
                     unusedEntities.RemoveAt(0);
-                    seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last());
+                    seperatePerimeterEntitiesHelper(Path, unusedEntities, Path.Last());
                 }
                 else // means there is a current entity
                 {
@@ -1449,10 +1529,10 @@ public class Feature
                         {
                             if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
                             {
-                                path.Add(entity);
+                                Path.Add(entity);
                                 unusedEntities.Remove(entity);
                                 intersected = true;
-                                seperatePerimeterEntitiesHelper(path, unusedEntities, path.Last()); // reruns with touching entity now being current entity
+                                seperatePerimeterEntitiesHelper(Path, unusedEntities, Path.Last()); // reruns with touching entity now being current entity
 
                                 break;
                             }
@@ -1460,18 +1540,18 @@ public class Feature
 
                     } while (intersected);
 
-                    if (path.Count > 0)
+                    if (Path.Count > 0)
                     {
-                        PerimeterEntityList.Add(new List<Entity>(path));
+                        PerimeterEntityList.Add(new List<Entity>(Path));
                     }
-                    seperatePerimeterEntitiesHelper(path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
+                    seperatePerimeterEntitiesHelper(Path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
                 }
             }
         }
     */
-    /* Recursive function that adds all entities in unusedEntities that intersect curEntity into path
+    /* Recursive function that adds all entities in unusedEntities that intersect curEntity into Path
      *
-     * @Param path is the list of touching entities
+     * @Param Path is the list of touching entities
      * @Param unusedEntities are all available entities to add
      * @Param curEntity is the current entity being checked
      */
@@ -1487,7 +1567,7 @@ public class Feature
         List<Entity> touchingList = new List<Entity>();
         for (int i = 0;
              i < unusedEntities.Count;
-             i++) // adds all entities in unusedEntities that touch curEntitty to path and touchinglist and removes them from unusedEntities
+             i++) // adds all entities in unusedEntities that touch curEntitty to Path and touchinglist and removes them from unusedEntities
         {
             if (curEntity.DoesIntersect(unusedEntities[i]))
             {

@@ -144,7 +144,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDXFFileClassGoodInput()
         {
-            //Set path to any filepath containing the 3rd example dxf file
+            //Set Path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
@@ -274,8 +274,8 @@ namespace Testing_for_Project
         [Test]
         public void TestDWGFileClassGoodInput()
         {
-            //Set path to any filepath containing the 3rd example dxf file
-            // string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
+            //Set Path to any filepath containing the 3rd example dxf file
+            // string Path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\Example-001.dwg";
 
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
@@ -423,7 +423,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDWGCorrupt()
         {
-            //string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
+            //string Path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\CorruptExample-001.dwg";
@@ -440,7 +440,7 @@ namespace Testing_for_Project
         [Test]
         public void TestDWGUnsupportedVersion()
         {
-            //string path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\WrongVersion.dwg";
+            //string Path = "C:\\Users\\ice-haskinss0550\\Source\\Repos\\CS458_002_MathiasDieCompany\\FeatureRecognitionAPI\\FeatureRecognitionAPI\\ExampleFiles\\CorruptExamples\\WrongVersion.dwg";
 
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
