@@ -23,7 +23,7 @@ namespace FeatureRecognitionAPI.Models
 
         public DXFFile(string path) : base(path)
         {
-            fileType = SupportedExtensions.dxf;
+            FileType = SupportedExtensions.dxf;
 
             if (File.Exists(path))
             {
@@ -120,7 +120,8 @@ namespace FeatureRecognitionAPI.Models
 
         public override void readEntities()
         {
-            DxfReader reader = new DxfReader(path);
+            DxfReader reader = new DxfReader(Path);
+
             CadDocument doc = reader.Read();
             
             List<Entity> returned = new List<Entity>();
@@ -140,7 +141,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            entityList.AddRange(returned);
+            EntityList.AddRange(returned);
         }
 
         private static List<Entity> UnwrapInsert(Insert insert)
@@ -264,7 +265,7 @@ namespace FeatureRecognitionAPI.Models
                 if (startYFlag && startXFlag && endXFlag && endYFlag)
                 {
                     Line lineEntity = new Line(xStart, yStart, xEnd, yEnd);
-                    entityList.Add(lineEntity);
+                    EntityList.Add(lineEntity);
                     return index;
                 }
                 else
@@ -327,7 +328,7 @@ namespace FeatureRecognitionAPI.Models
                 if (xFlag && yFlag && rFlag && startFlag && endFlag)
                 {
                     Arc arcEntity = new Arc(xPoint, yPoint, radius, startAngle, endAngle);
-                    entityList.Add(arcEntity);
+                    EntityList.Add(arcEntity);
                     return index;
                 }
                 else
@@ -375,7 +376,7 @@ namespace FeatureRecognitionAPI.Models
                 if (xFlag && yFlag && rFlag)
                 {
                     Circle circleEntity = new Circle(xPoint, yPoint, radius);
-                    entityList.Add(circleEntity);
+                    EntityList.Add(circleEntity);
                     return index;
                 }
                 else
@@ -389,12 +390,12 @@ namespace FeatureRecognitionAPI.Models
             //May need to be refactored depending on if c# handles this by copy or by reference
             public override List<Entity> GetEntities()
             {
-                return entityList;
+                return EntityList;
             }
 
             public void SetEntities(List<Entity> entities)
             {
-                entityList = entities;
+                EntityList = entities;
             }
         }
 }
