@@ -10,6 +10,7 @@ using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 public class Feature
 {
@@ -34,11 +35,12 @@ public class Feature
     // contain entities that make up the base shape and possibly corner features
     internal List<Entity> baseEntityList;
 
-    internal List<List<Entity>> PerimeterEntityList; // 2 dimensional list where each list at each index is a group of
+    // 2 dimensional list where each list at each index is a group of
     // touching entities that make up a single perimeter feature for
     // the original feature
     //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
+    internal List<List<Entity>> PerimeterEntityList;
 
     public int getNumLines() { return numLines; }
     public int getNumArcs() { return numArcs; }
@@ -50,8 +52,8 @@ public class Feature
     private int numArcs = 0;
     private int numCircles = 0;
     private const double LOW_ANGLE_TOLERANCE = 359.9;
-    private const double HIGH_ANGLE_TOLERANCE = 360.09; 
-    
+    private const double HIGH_ANGLE_TOLERANCE = 360.09;
+
     #region Constructors
 
     /*
@@ -331,173 +333,173 @@ public class Feature
             switch (arcs)
             {
                 case 1:
-                {
-                    //Find the arc
-                    int arcIndex = 0;
-                    for (int i = 0; i < baseEntityList.Count; i++)
                     {
-                        if (baseEntityList[i] is Arc)
+                        //Find the arc
+                        int arcIndex = 0;
+                        for (int i = 0; i < baseEntityList.Count; i++)
                         {
-                            arcIndex = i;
-                            break;
-                        }
-                    }
-
-                    //Array of 2 entities to contain lines touching the arc.
-                    Entity[] touchingArc = new Entity[2];
-                    int eIndex = 0;
-                    //Find the two lines
-                    for (int i = 0; i < baseEntityList.Count; i++)
-                    {
-                        if (baseEntityList[i] is Line && eIndex < 2)
-                        {
-                            if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i],
-                                    (Arc)baseEntityList[arcIndex]))
+                            if (baseEntityList[i] is Arc)
                             {
-                                touchingArc[eIndex] = (Line)baseEntityList[i];
-                                eIndex++;
+                                arcIndex = i;
+                                break;
                             }
                         }
 
-                        if (eIndex == 2)
+                        //Array of 2 entities to contain lines touching the arc.
+                        Entity[] touchingArc = new Entity[2];
+                        int eIndex = 0;
+                        //Find the two lines
+                        for (int i = 0; i < baseEntityList.Count; i++)
                         {
-                            break;
-                        }
-                    }
+                            if (baseEntityList[i] is Line && eIndex < 2)
+                            {
+                                if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i],
+                                        (Arc)baseEntityList[arcIndex]))
+                                {
+                                    touchingArc[eIndex] = (Line)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
 
-                    if (touchingArc[0] is Line && touchingArc[1] is Line)
+                            if (eIndex == 2)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (touchingArc[0] is Line && touchingArc[1] is Line)
+                        {
+                            if (!touchingArc[0].IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
+                            {
+                                type = PossibleFeatureTypes.Group1C;
+                                this.FeatureType = PossibleFeatureTypes.Group1C;
+                                return true;
+                            }
+                        }
+
+                        type = PossibleFeatureTypes.Unknown;
+                        return false;
+                    }
+                case 2:
                     {
-                        if (!touchingArc[0].IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
+                        //Basically same code as before, but instead of a parallel check ensure arcs aren't touching
+
+                        int arcIndex = 0;
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Arc)
+                            {
+                                arcIndex = i;
+                                break;
+                            }
+                        }
+
+                        Entity[] touchingArc = new Entity[2];
+                        int eIndex = 0;
+                        //Find the two lines
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Line && eIndex < 2)
+                            {
+                                if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i],
+                                        (Arc)baseEntityList[arcIndex]))
+                                {
+                                    touchingArc[eIndex] = (Line)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            else if (baseEntityList[i] is Arc && eIndex < 2)
+                            {
+                                if (((Arc)baseEntityList[arcIndex]).IntersectArcWithArc((Arc)baseEntityList[i],
+                                        (Arc)baseEntityList[arcIndex]))
+                                {
+                                    touchingArc[eIndex] = (Arc)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+
+                            if (eIndex == 2)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (touchingArc[0] is Line && touchingArc[1] is Line)
                         {
                             type = PossibleFeatureTypes.Group1C;
                             this.FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
                         }
+
+                        type = PossibleFeatureTypes.Unknown;
+                        return false;
                     }
-
-                    type = PossibleFeatureTypes.Unknown;
-                    return false;
-                }
-                case 2:
-                {
-                    //Basically same code as before, but instead of a parallel check ensure arcs aren't touching
-
-                    int arcIndex = 0;
-                    for (int i = 0; i < baseEntityList.Count; i++)
+                case 3:
                     {
-                        if (baseEntityList[i] is Arc)
+                        Entity[] arcList = new Entity[2];
+                        //Find two arcs
+                        int arcIndex = 0;
+                        for (int i = 0; i < baseEntityList.Count; i++)
                         {
-                            arcIndex = i;
-                            break;
-                        }
-                    }
-
-                    Entity[] touchingArc = new Entity[2];
-                    int eIndex = 0;
-                    //Find the two lines
-                    for (int i = 0; i < baseEntityList.Count; i++)
-                    {
-                        if (baseEntityList[i] is Line && eIndex < 2)
-                        {
-                            if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i],
-                                    (Arc)baseEntityList[arcIndex]))
+                            if (baseEntityList[i] is Arc)
                             {
-                                touchingArc[eIndex] = (Line)baseEntityList[i];
-                                eIndex++;
+                                arcList[arcIndex] = (Arc)baseEntityList[i];
+                                arcIndex++;
+                            }
+
+                            if (arcIndex == 2) break;
+                        }
+
+                        arcIndex = 0;
+                        //ArcList has 2 arcs, check entities touching both (at least one line should be touching both arcs, so only 3 entities should be added )
+                        Entity[] touchingArc = new Entity[3];
+                        int eIndex = 0;
+                        //Find the two lines
+                        for (int i = 0; i < baseEntityList.Count; i++)
+                        {
+                            if (baseEntityList[i] is Line && eIndex < 4)
+                            {
+                                if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0])
+                                    || arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
+                                {
+                                    touchingArc[eIndex] = (Line)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+                            else if (baseEntityList[i] is Arc && eIndex < 4)
+                            {
+                                //If not equal to arc at 0 and 1
+                                if (!arcList[0].Equals((Arc)baseEntityList[i])
+                                    && !arcList[1].Equals((Arc)baseEntityList[i])
+                                    //And if the arc intersects with the arc at 0 or at 1
+                                    && (arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0])
+                                        || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1])))
+                                {
+                                    touchingArc[eIndex] = (Arc)baseEntityList[i];
+                                    eIndex++;
+                                }
+                            }
+
+                            if (eIndex == 3)
+                            {
+                                break;
                             }
                         }
-                        else if (baseEntityList[i] is Arc && eIndex < 2)
+
+                        //Should have a list of 4 entities, if any of them are arcs, return false (arc is touching an arc)
+                        foreach (Entity entity in touchingArc)
                         {
-                            if (((Arc)baseEntityList[arcIndex]).IntersectArcWithArc((Arc)baseEntityList[i],
-                                    (Arc)baseEntityList[arcIndex]))
+                            if (entity is Arc)
                             {
-                                touchingArc[eIndex] = (Arc)baseEntityList[i];
-                                eIndex++;
+                                type = PossibleFeatureTypes.Unknown;
+                                return false;
                             }
                         }
 
-                        if (eIndex == 2)
-                        {
-                            break;
-                        }
-                    }
-
-                    if (touchingArc[0] is Line && touchingArc[1] is Line)
-                    {
-                        type = PossibleFeatureTypes.Group1C;
                         this.FeatureType = PossibleFeatureTypes.Group1C;
+                        type = PossibleFeatureTypes.Group1C;
                         return true;
                     }
-
-                    type = PossibleFeatureTypes.Unknown;
-                    return false;
-                }
-                case 3:
-                {
-                    Entity[] arcList = new Entity[2];
-                    //Find two arcs
-                    int arcIndex = 0;
-                    for (int i = 0; i < baseEntityList.Count; i++)
-                    {
-                        if (baseEntityList[i] is Arc)
-                        {
-                            arcList[arcIndex] = (Arc)baseEntityList[i];
-                            arcIndex++;
-                        }
-
-                        if (arcIndex == 2) break;
-                    }
-
-                    arcIndex = 0;
-                    //ArcList has 2 arcs, check entities touching both (at least one line should be touching both arcs, so only 3 entities should be added )
-                    Entity[] touchingArc = new Entity[3];
-                    int eIndex = 0;
-                    //Find the two lines
-                    for (int i = 0; i < baseEntityList.Count; i++)
-                    {
-                        if (baseEntityList[i] is Line && eIndex < 4)
-                        {
-                            if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0])
-                                || arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
-                            {
-                                touchingArc[eIndex] = (Line)baseEntityList[i];
-                                eIndex++;
-                            }
-                        }
-                        else if (baseEntityList[i] is Arc && eIndex < 4)
-                        {
-                            //If not equal to arc at 0 and 1
-                            if (!arcList[0].Equals((Arc)baseEntityList[i])
-                                && !arcList[1].Equals((Arc)baseEntityList[i])
-                                //And if the arc intersects with the arc at 0 or at 1
-                                && (arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0])
-                                    || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1])))
-                            {
-                                touchingArc[eIndex] = (Arc)baseEntityList[i];
-                                eIndex++;
-                            }
-                        }
-
-                        if (eIndex == 3)
-                        {
-                            break;
-                        }
-                    }
-
-                    //Should have a list of 4 entities, if any of them are arcs, return false (arc is touching an arc)
-                    foreach (Entity entity in touchingArc)
-                    {
-                        if (entity is Arc)
-                        {
-                            type = PossibleFeatureTypes.Unknown;
-                            return false;
-                        }
-                    }
-
-                    this.FeatureType = PossibleFeatureTypes.Group1C;
-                    type = PossibleFeatureTypes.Group1C;
-                    return true;
-                }
                 default:
                     type = PossibleFeatureTypes.Unknown;
                     return false;
@@ -677,7 +679,7 @@ public class Feature
         int numIntersections = 0;
         int numEndPointIntersections = 0;
         //  Finds the middle angle of the curve and calculates the ray
-        if (entity is Arc arc) 
+        if (entity is Arc arc)
         { ray = arc.VectorFromCenter(arc.degreesToRadians(arc.AngleInMiddle())); }
         else
         { ray = (entity as Ellipse).vectorFromCenter(((entity as Ellipse).EndParameter - (entity as Ellipse).StartParameter) / 2); }
@@ -711,7 +713,7 @@ public class Feature
                         numEndPointIntersections++;
                     }
                 }
-                else if(baseEntityList[i] is Ellipse)
+                else if (baseEntityList[i] is Ellipse)
                 {
                     Ellipse currEntity = (baseEntityList[i] as Ellipse);
                     double major = Math.Sqrt(Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.X - (baseEntityList[i] as Ellipse).Center.X, 2) + Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.Y - (baseEntityList[i] as Ellipse).Center.Y, 2));
@@ -852,36 +854,114 @@ public class Feature
 
     #region Group3
 
-    //Chamfered Corners 
+    /*  chamfered corner detection
+            given 3 lines...
+                if the two matching angles are equal and greater than 90
+                and the angle between edge 1 and 3 are less than 180
+                it is a possible chamfer
+
+            if a shape has multiple possible chamfers
+            2-3 chamfers
+                if an edge is a possible chamfer, if there are any lines parallel to it,
+                those should also be a possible chamfer
+            4 corners
+                have the user select a base chamfer
+                or just use the count as it is and visualize from 4 shortest
+    */
     public bool CheckGroup3()
     {
         int numPossibleChamfers = 0;
         int numConfirmedChamfers = 0;
 
-        List<Line> possibleChamferList;
-        List<Line> confirmerdChamferList;
-
-        /*   chamfer detection
-			given 3 lines...
-				if the two matching angles are equal and less than 90
-				and the angle between edge 1 and 3 are less than 180
-				it is a possible chamfer
-
-			if a shape has multiple possible chamfers
-			2-3 chamfers
-				if an edge is a possible chamfer, if there are any lines parallel to it,
-				those should also be a possible chamfer
-			4 corners
-				have the user select a base chamfer
-				or just use the count as it is and visualize from 4 shortest
-	   */
-
-        
+        List<Line> possibleChamferList = [];
+        List<Line> confirmerdChamferList = [];
 
         //if (this.FeatureType == PossibleFeatureTypes.Group1A1)
         //{
         //}
 
+        //assumes line list is ordered, transition to 
+        List<Line> lineList = [];
+
+        for (int i = 0; i < EntityList.Count; i++)
+        {
+            if (EntityList[i] is Line)
+            {
+                lineList.Add((Line)EntityList[i]);
+            }
+        }
+
+        //check potential chamfers
+        if (lineList.Count >= 3)
+        {
+            for (int i = 0; i < lineList.Count; i++)
+            {
+                Line lineA = lineList[i];
+                Line lineB = lineList[(i + 1) % lineList.Count];
+                Line lineC = lineList[(i + 2) % lineList.Count];
+
+                //need to verify orientation of lines
+                Angle angleAB = GetAngle(lineA, lineB, Side.INTERIOR);
+                Angle angleBC = GetAngle(lineB, lineC, Side.INTERIOR);
+                Angle angleAC = GetAngle(lineA, lineC, Side.INTERIOR);
+
+                if (angleAC.GetDegrees().angle < 180)
+                {
+                    if (angleAB.Equals(angleBC) && angleAB.GetDegrees().angle > 90)
+                    {
+                        lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
+                        numPossibleChamfers++;
+                        possibleChamferList.Add(lineB);
+                    }
+                }
+            }
+
+            // if only one chamfer, it is confirmed to be chamfer
+            if (numPossibleChamfers == 1)
+            {
+                confirmerdChamferList = possibleChamferList;
+                numConfirmedChamfers = numPossibleChamfers;
+
+                foreach (Line l in confirmerdChamferList)
+                {
+                    l.ChamferType = ChamferTypeEnum.CONFIRMED;
+                }
+            }
+            // if 2 to 3 chamfers, only confirm if all parallel lines to it
+            // are also possible/confirmed chamfers
+            else if (numPossibleChamfers >= 2 && numPossibleChamfers <= 3)
+            {
+                foreach (Line pc in possibleChamferList)
+                {
+                    foreach (Line l in lineList)
+                    {
+                        // if potential chamfer is parallel to a normal line,
+                        // it is not a chamfer so remove it from poss list
+                        if ((l.ChamferType == ChamferTypeEnum.NONE) && IsParallel(pc, l))
+                        {
+                            numPossibleChamfers--;
+                            pc.ChamferType = ChamferTypeEnum.NONE;
+                            possibleChamferList.Remove(pc);
+                            break;
+                        }
+                    }
+                }
+                // remaining poss chamfers meet above case so confirm
+                foreach (Line l in possibleChamferList)
+                {
+                    l.ChamferType = ChamferTypeEnum.CONFIRMED;
+                    numConfirmedChamfers++;
+                    confirmerdChamferList.Add(l);
+                }
+            }
+            // if more than 4 chamfers we run into the octagon problem
+            // so we cannot confirm what lines are chamfers
+            // but the count should be correct
+            else if (numPossibleChamfers >= 4)
+            {
+                numConfirmedChamfers = numPossibleChamfers;
+            }
+        }
         return false;
     }
 
@@ -1197,7 +1277,7 @@ public class Feature
     private bool extendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2))
-            //makes sure youre not extending lines that already touch
+        //makes sure youre not extending lines that already touch
         {
             //Does not need to detect if lines are perpendicular since they might not be perfectly perpendicular
             //check if the lines are parallel or perpendicular
@@ -1279,7 +1359,7 @@ public class Feature
 
         Entity head = ExtendedEntityList[0]; // default head is the first index of ExtendedEntityList
         foreach (Entity entity in ExtendedEntityList)
-            // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
+        // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
             if (entity.Length > head.Length)
             {
@@ -1289,7 +1369,7 @@ public class Feature
 
         curPath.Push(head); // pushes the head to the current path
         if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
-            // if it can find a path
+        // if it can find a path
         {
             baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
             baseEntityList.Reverse(); // reverses the order of it since the iterator that converts the stack flips it
@@ -1329,7 +1409,7 @@ public class Feature
             {
                 // checks if entity in loop is not the curent entity being checked
                 if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
-                    // checks that the entitiy has not already been tested and is touching the entity
+                // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
                     if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated path
@@ -1342,7 +1422,7 @@ public class Feature
         //this point in the function means nothing is touching current entity
 
         if (curPath.Peek() == head)
-            //if the function of the head reaches this point it means it has not found a path back to the head
+        //if the function of the head reaches this point it means it has not found a path back to the head
         {
             foreach (Entity entity in ExtendedEntityList)
             {
@@ -1419,7 +1499,7 @@ public class Feature
             {
                 // checks if entity in loop is not the curent entity being checked
                 if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
-                    // checks that the entitiy has not already been tested and is touching the entity
+                // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
                     if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated path
@@ -1623,7 +1703,7 @@ public class Feature
     {
         double minX = double.MaxValue;
         double minY = double.MaxValue;
-        
+
         foreach (Entity entity in EntityList)
         {
             minX = Math.Min(minX, entity.MinX());
@@ -1644,7 +1724,7 @@ public class Feature
                 sumAngles += (entity as Arc).CentralAngle;
             }
         });
-        
+
         if (sumAngles > LOW_ANGLE_TOLERANCE && sumAngles < HIGH_ANGLE_TOLERANCE)
         {
             return true;
