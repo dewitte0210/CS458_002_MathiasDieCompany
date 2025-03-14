@@ -124,6 +124,15 @@ namespace FeatureRecognitionAPI.Models
             if (other is Line)
             {
                 Line lineOther = (Line)other;
+                // Vertical slope edge cases
+                if (Math.Round(this.StartPoint.X, 4).Equals(Math.Round(this.EndPoint.X)) && Math.Round(lineOther.StartPoint.Y, 4).Equals(Math.Round(lineOther.EndPoint.Y, 4)))
+                {
+                    return true;
+                }
+                else if (Math.Round(this.StartPoint.Y, 4).Equals(Math.Round(this.EndPoint.Y, 4)) && Math.Round(lineOther.StartPoint.X, 4).Equals(Math.Round(lineOther.EndPoint.X, 4)))
+                {
+                    return true;
+                }
                 if ((this.SlopeY / this.SlopeX) == (-1 * (lineOther.SlopeX / lineOther.SlopeY)))
                 {
                     return true;
