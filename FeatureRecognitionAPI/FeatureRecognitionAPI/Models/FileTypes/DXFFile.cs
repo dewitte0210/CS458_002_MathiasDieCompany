@@ -68,7 +68,7 @@ namespace FeatureRecognitionAPI.Models
 
             CadDocument doc = reader.Read();
 
-            _lines = File.ReadAllLines(path);
+            _lines = File.ReadAllLines(Path);
             _fileVersion = GetFileVersion();
             ReadEntities(doc);
 

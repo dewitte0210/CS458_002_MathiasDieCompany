@@ -8,7 +8,7 @@ namespace FeatureRecognitionAPI.Models
     {
         public DWGFile(string path) : base(path)
         {
-            fileType = SupportedExtensions.dwg;
+            FileType = SupportedExtensions.dwg;
 
             if (!File.Exists(path))
             {
@@ -37,7 +37,7 @@ namespace FeatureRecognitionAPI.Models
             message "Attempted to read past the end of the stream." */
         public override void ParseFile()
         {
-            DwgReader reader = new DwgReader(path);
+            DwgReader reader = new DwgReader(Path);
             CadDocument doc = reader.Read();
             _fileVersion = GetFileVersion(doc.Header.VersionString);
             ReadEntities(doc);
@@ -76,7 +76,7 @@ namespace FeatureRecognitionAPI.Models
 
         public override List<Entity> GetEntities()
         {
-            return EntityList;
+            return entityList;
         }
     }
 }
