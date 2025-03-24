@@ -17,9 +17,9 @@ namespace FeatureRecognitionAPI.Models
 
         protected string Path { get; set; }
         protected SupportedExtensions FileType { get; set; }
-        protected List<Feature> FeatureList{ get; set; }
-        protected List<Entity> entityList;
-        protected List<FeatureGroup> FeatureGroups { get; }
+        internal List<Feature> FeatureList { get; set; }
+        protected List<Entity> EntityList;
+        internal List<FeatureGroup> FeatureGroups { get; }
         protected FileVersion _fileVersion;
 
         //These functions below exist for testing purposes
@@ -67,6 +67,11 @@ namespace FeatureRecognitionAPI.Models
             FeatureGroups = new List<FeatureGroup>();
         }
 
+        public SupportedFile(List<Entity> entityList)
+        {
+            EntityList = entityList;
+            FeatureList = new List<Feature>();
+        }
         #endregion
 
         #region SpecialGettersAndSetters
@@ -123,20 +128,33 @@ namespace FeatureRecognitionAPI.Models
             FeatureList[0].EntityList.Add(entityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
             listMap[0] = 0;
             
-            for (int i = 0; i < entityList.Count(); i++)
+            for (int i = 0; i < EntityList.Count()-1; i++)
             {
-                for (int j = i+1; j < entityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                int count = 0;
+                for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 {
                     if (i != j && entityList[i].DoesIntersect(entityList[j])) // if i==j they are checking the same object and would return true for intersecting
                     {
                         // adds each entity to their AdjList. This should not happen twice because of the j=i+1
-                        entityList[i].AdjList.Add(entityList[j]);
-                        entityList[j].AdjList.Add(entityList[i]);
-
-                        if (listMap[i] != -1) // means EntityList[i] is already mapped to a feature
+                        EntityList[i].AdjList.Add(EntityList[j]);
+                        EntityList[j].AdjList.Add(EntityList[i]);
+                        
+                        // Check to flag an entity as Kisscut
+                        count++;
+                        if (count == 4 && EntityList[i] is Line tempLine)
                         {
-                            FeatureList[i].EntityList.Add(entityList[j]);
+                            // TODO: tempLine.Kisscut = True;
+                        }
+                        
+                        if (listMap[i] != -1) // means entitiy i is mapped to a feature
+                        {
+                            FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
                             listMap[j] = listMap[i];
+                        }
+                        else if (listMap[j] != -1) // means entitiy j is mapped to a feature
+                        {
+                            FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
+                            listMap[i] = listMap[j];
                         }
                         else // EntityList[i] is not mapped to a feature
                         {
@@ -236,12 +254,12 @@ namespace FeatureRecognitionAPI.Models
             Point minPoint = new(0, 0);
             Point maxPoint = new(0, 0);
             Point maxDiff = new(0, 0);
-            int maxDiffIndex = 0;
+            int maxDiffIndex;
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0, 0);
+            Point tempMinPoint;
+            Point tempMaxPoint;
 
             //bool firstrun = true;
             while (features.Count > 0)
@@ -273,7 +291,7 @@ namespace FeatureRecognitionAPI.Models
                     }
                 }
 
-                //Start the list
+                // Start the list
                 List<Feature> featureGroupList = new List<Feature>();
                 Feature bigFeature = features[maxDiffIndex];
                 featureGroupList.Add(bigFeature);
@@ -345,8 +363,8 @@ namespace FeatureRecognitionAPI.Models
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0, 0);
+            Point tempMinPoint;
+            Point tempMaxPoint;
 
             while (features.Count > 0)
             {
@@ -465,7 +483,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            entityList.AddRange(returned);
+            EntityList.AddRange(returned);
         }
         private static List<Entity> UnwrapInsert(Insert insert)
         {
