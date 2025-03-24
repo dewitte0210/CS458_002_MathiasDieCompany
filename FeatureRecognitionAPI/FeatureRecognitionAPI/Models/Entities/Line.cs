@@ -59,7 +59,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+            Length = Point.Distance(StartPoint, EndPoint);
         }
 
         public bool hasPoint(Point point)
@@ -142,14 +142,9 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        public double findDistance(Point point1, Point point2)
-        {
-            return Math.Sqrt((Math.Pow(point2.X - point1.X, 2)) + (Math.Pow(point2.Y - point1.Y, 2)));
-        }
-
         public Point findPointToExtend(Line line, Point point)
         {
-            if (findDistance(line.StartPoint, point) < findDistance(line.EndPoint, point))
+            if (Point.Distance(line.StartPoint, point) < Point.Distance(line.EndPoint, point))
             {
                 return line.StartPoint;
             }

@@ -54,10 +54,10 @@
             if (Parent1 != null && Parent2 != null)
             {
                 Point pointToExtend;
-                if (Parent1.findDistance(
+                if (Point.Distance(
                         Parent1.StartPoint,
                         Parent2.StartPoint)
-                        < Parent1.findDistance(
+                        < Point.Distance(
                         Parent1.EndPoint,
                         Parent2.StartPoint))
                 //This looks like a lot but all this is doing is finding the closest point on line1 to line2
@@ -74,10 +74,10 @@
                     StartPoint.X = Parent1.StartPoint.X;
                     StartPoint.Y = Parent1.StartPoint.Y;
                 }
-                if (Parent2.findDistance(
+                if (Point.Distance(
                     pointToExtend,
                     Parent2.StartPoint)
-                    > Parent2.findDistance(
+                    > Point.Distance(
                     pointToExtend,
                     Parent2.EndPoint))
                 //Similar to the one above but finds what point on line2 is farthest from line1's point to extend

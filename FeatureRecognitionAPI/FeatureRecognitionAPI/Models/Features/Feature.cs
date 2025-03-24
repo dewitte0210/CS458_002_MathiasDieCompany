@@ -673,7 +673,7 @@ public class Feature
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        double maxLength = 2 * Math.Sqrt(Math.Pow(maxPoint.X - minPoint.X, 2) + Math.Pow(maxPoint.Y - minPoint.Y, 2));
+        double maxLength = Point.Distance(maxPoint, minPoint);
         Line ray;
 
         int numIntersections = 0;
@@ -718,11 +718,10 @@ public class Feature
                         numEndPointIntersections++;
                     }
                 }
-                else if(baseEntityList[i] is Ellipse)
+                else if(baseEntityList[i] is Ellipse ellipse)
                 {
-                    Ellipse currEntity = (baseEntityList[i] as Ellipse);
-                    double major = Math.Sqrt(Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.X - (baseEntityList[i] as Ellipse).Center.X, 2) + Math.Pow((baseEntityList[i] as Ellipse).MajorAxisEndPoint.Y - (baseEntityList[i] as Ellipse).Center.Y, 2));
-                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
+                    double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
+                    if (ray.getIntersectPoint(ray, ellipse).Equals(ellipse.StartPoint) || ray.getIntersectPoint(ray, ellipse).Equals(ellipse.EndPoint))
                     {
                         numEndPointIntersections++;
                     }

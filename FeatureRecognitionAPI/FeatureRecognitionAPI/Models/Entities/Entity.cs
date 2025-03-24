@@ -445,7 +445,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            double major = Math.Sqrt(Math.Pow(ellipse.MajorAxisEndPoint.X - ellipse.Center.X, 2) + Math.Pow(ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y, 2));
+            double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
             double minor = major * ellipse.MinorToMajorAxisRatio;
             //List of solutions from equations
             List<Point> SolnCoords = new List<Point>();
@@ -792,7 +792,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            double major = Math.Sqrt(Math.Pow(ellipse.MajorAxisEndPoint.X - ellipse.Center.X, 2) + Math.Pow(ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y, 2));
+            double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
             double minor = major * ellipse.MinorToMajorAxisRatio;
             //List of solutions from equations
             List<Point> SolnCoords = new List<Point>();
