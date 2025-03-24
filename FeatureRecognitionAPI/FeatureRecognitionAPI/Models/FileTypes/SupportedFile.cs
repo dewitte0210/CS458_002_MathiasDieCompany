@@ -15,11 +15,11 @@ namespace FeatureRecognitionAPI.Models
     public abstract class SupportedFile
     {
 
-        protected string path { get; set; }
-        protected SupportedExtensions fileType { get; set; }
-        protected List<Feature> featureList;
-        protected List<Entity> entityList;
-        protected List<FeatureGroup> featureGroups { get; }
+        protected string Path { get; set; }
+        protected SupportedExtensions FileType { get; set; }
+        internal List<Feature> FeatureList { get; set; }
+        protected List<Entity> EntityList;
+        internal List<FeatureGroup> FeatureGroups { get; }
         protected FileVersion _fileVersion;
 
         //These functions below exist for testing purposes
@@ -28,13 +28,13 @@ namespace FeatureRecognitionAPI.Models
 
         public int GetFeatureGroupCount()
         {
-            return featureGroups.Count;
+            return FeatureGroups.Count;
         }
 
         public int GetTotalFeatureGroups()
         {
             int tmp = 0;
-            foreach (FeatureGroup fGroup in featureGroups)
+            foreach (FeatureGroup fGroup in FeatureGroups)
             {
                 tmp += fGroup.Count;
             }
@@ -44,7 +44,7 @@ namespace FeatureRecognitionAPI.Models
 
         public List<FeatureGroup> GetFeatureGroups()
         {
-            return featureGroups;
+            return FeatureGroups;
         }
 
         #endregion
@@ -483,7 +483,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            entityList.AddRange(returned);
+            EntityList.AddRange(returned);
         }
         private static List<Entity> UnwrapInsert(Insert insert)
         {
