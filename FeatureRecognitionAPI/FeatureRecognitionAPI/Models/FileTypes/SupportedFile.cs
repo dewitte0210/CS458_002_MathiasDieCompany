@@ -55,14 +55,14 @@ namespace FeatureRecognitionAPI.Models
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
         {
-            EntityList = new List<Entity>();
+            entityList = new List<Entity>();
             FeatureList = new List<Feature>();
         }
 
         protected SupportedFile(string path)
         {
             this.Path = path;
-            EntityList = new List<Entity>();
+            entityList = new List<Entity>();
             FeatureList = new List<Feature>();
             FeatureGroups = new List<FeatureGroup>();
         }
@@ -122,10 +122,10 @@ namespace FeatureRecognitionAPI.Models
         // it also constructs each entity's AdjList (Adjacency List)
         public void GroupFeatureEntities()
         {
-            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
+            List<int> listMap = Enumerable.Repeat(-1, entityList.Count).ToList(); // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
             FeatureList.Add(new Feature(new List<Entity>()));
             
-            FeatureList[0].EntityList.Add(EntityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
+            FeatureList[0].EntityList.Add(entityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
             listMap[0] = 0;
             
             for (int i = 0; i < EntityList.Count()-1; i++)
@@ -133,7 +133,7 @@ namespace FeatureRecognitionAPI.Models
                 int count = 0;
                 for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 {
-                    if (i != j && EntityList[i].DoesIntersect(EntityList[j])) // if i==j they are checking the same object and would return true for intersecting
+                    if (i != j && entityList[i].DoesIntersect(entityList[j])) // if i==j they are checking the same object and would return true for intersecting
                     {
                         // adds each entity to their AdjList. This should not happen twice because of the j=i+1
                         EntityList[i].AdjList.Add(EntityList[j]);
@@ -161,8 +161,8 @@ namespace FeatureRecognitionAPI.Models
                             // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
                             FeatureList.Add(new Feature(new List<Entity>()));
                             int index = FeatureList.Count - 1;
-                            FeatureList[index].EntityList.Add(EntityList[i]);
-                            FeatureList[index].EntityList.Add(EntityList[j]);
+                            FeatureList[index].EntityList.Add(entityList[i]);
+                            FeatureList[index].EntityList.Add(entityList[j]);
                             // maps i and j to the index of that new feature in FeatureList
                             listMap[i] = index;
                             listMap[j] = index;
@@ -240,7 +240,7 @@ namespace FeatureRecognitionAPI.Models
          */
         public void SetFeatureGroups()
         {
-            List<List<Entity>> entities = makeTouchingEntitiesList(EntityList);
+            List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
             // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
@@ -461,7 +461,7 @@ namespace FeatureRecognitionAPI.Models
 
         public void detectAllFeatures()
         {
-            makeFeatureList(makeTouchingEntitiesList(EntityList));
+            makeFeatureList(makeTouchingEntitiesList(entityList));
         }
        
         protected void ReadEntities(CadDocument doc)
