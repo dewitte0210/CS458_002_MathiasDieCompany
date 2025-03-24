@@ -111,7 +111,15 @@ namespace Testing_for_Project
             expectedTouchingEntities.Add(new List<Entity>() { line3, line5, line4, line6 });
             foreach (Feature feature in dxf.FeatureList)
             {
-                Assert.IsTrue(expectedTouchingEntities.Contains(feature.EntityList));
+                bool inList = false;
+                foreach(List<Entity> eList in expectedTouchingEntities)
+                {
+                    if (eList.All(feature.EntityList.Contains) && eList.Count == feature.EntityList.Count)
+                    {
+                        inList = true;
+                    }
+                }
+                Assert.IsTrue(inList);
             }
         }
     }

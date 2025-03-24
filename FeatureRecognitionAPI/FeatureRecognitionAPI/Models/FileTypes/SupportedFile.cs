@@ -145,29 +145,43 @@ namespace FeatureRecognitionAPI.Models
                         {
                             // TODO: tempLine.Kisscut = True;
                         }
-                        
-                        if (listMap[i] != -1) // means entitiy i is mapped to a feature
+
+                        if (listMap[i] == -1 || listMap[j] == -1) // checks that either i or j still needs to be mapped
+                        // say there is a third entitiy k that touches i and j. i and j was already checked for k and added to entitylist. when i is checked against j it would attempt to add them again.
                         {
-                            FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
-                            listMap[j] = listMap[i];
-                        }
-                        else if (listMap[j] != -1) // means entitiy j is mapped to a feature
-                        {
-                            FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
-                            listMap[i] = listMap[j];
-                        }
-                        else // EntityList[i] is not mapped to a feature
-                        {
-                            // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
-                            FeatureList.Add(new Feature(new List<Entity>()));
-                            int index = FeatureList.Count - 1;
-                            FeatureList[index].EntityList.Add(EntityList[i]);
-                            FeatureList[index].EntityList.Add(EntityList[j]);
-                            // maps i and j to the index of that new feature in FeatureList
-                            listMap[i] = index;
-                            listMap[j] = index;
+                            if (listMap[i] != -1) // means entitiy i is mapped to a feature
+                            {
+                                FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
+                                listMap[j] = listMap[i];
+                            }
+                            else if (listMap[j] != -1) // means entitiy j is mapped to a feature
+                            {
+                                FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
+                                listMap[i] = listMap[j];
+                            }
+                            else // EntityList[i] is not mapped to a feature
+                            {
+                                // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
+                                FeatureList.Add(new Feature(new List<Entity>()));
+                                int index = FeatureList.Count - 1;
+                                FeatureList[index].EntityList.Add(EntityList[i]);
+                                FeatureList[index].EntityList.Add(EntityList[j]);
+                                // maps i and j to the index of that new feature in FeatureList
+                                listMap[i] = index;
+                                listMap[j] = index;
+                            }
                         }
                     }
+                }
+
+                if (count == 0 && listMap[i] == -1)
+                {
+                    // creates a new feature, adds it to FeatureList with EntityList i being in its EntityList
+                    FeatureList.Add(new Feature(new List<Entity>()));
+                    int index = FeatureList.Count - 1;
+                    FeatureList[index].EntityList.Add(EntityList[i]);
+                    // maps i and j to the index of that new feature in FeatureList
+                    listMap[i] = index;
                 }
             }
         }
