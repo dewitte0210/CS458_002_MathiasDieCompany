@@ -143,7 +143,7 @@ namespace FeatureRecognitionAPI.Models
                         count++;
                         if (count == 4 && EntityList[i] is Line tempLine)
                         {
-                            // TODO: tempLine.Kisscut = True;
+                            tempLine.KissCut = true;
                         }
                         
                         if (listMap[i] != -1) // means entitiy i is mapped to a feature
