@@ -67,5 +67,52 @@ namespace Testing_for_Project
             }
             return true;
         }
+
+
+        [Test]
+        public void GroupFeatureEntitiesTest()
+        {
+            Line line1 = new(7, 4, 7, 6);
+            Line line2 = new(9, 4, 9, 6);
+            Circle circle1 = new(4, 4, 1);
+            Line line3 = new(2, 2, 12, 2);
+            Line line4 = new(12, 8, 2, 8);
+            Arc arc1 = new(8, 6, 1, 0, 180);
+            Arc arc2 = new(8, 4, 1, 180, 0);
+            Line line5 = new(2, 2, 2, 8);
+            Line line6 = new(12, 2, 12, 8);
+            List<Entity> entities = new List<Entity>() { line1, line2, circle1, line3, line4, arc1, arc2, line5, line6 };
+            DXFFile dxf = new DXFFile(entities);
+            dxf.GroupFeatureEntities();
+            
+            Assert.IsTrue(line1.AdjList.Contains(arc1));
+            Assert.IsTrue(line1.AdjList.Contains(arc2));
+            Assert.IsTrue(arc1.AdjList.Contains(line1));
+            Assert.IsTrue(arc1.AdjList.Contains(line2));
+            Assert.IsTrue(line2.AdjList.Contains(arc1));
+            Assert.IsTrue(line2.AdjList.Contains(arc2));
+            Assert.IsTrue(arc2.AdjList.Contains(line1));
+            Assert.IsTrue(arc2.AdjList.Contains(line2));
+            
+            Assert.IsTrue(circle1.AdjList.Count == 0);
+            
+            Assert.IsTrue(line3.AdjList.Contains(line5));
+            Assert.IsTrue(line3.AdjList.Contains(line6));
+            Assert.IsTrue(line5.AdjList.Contains(line3));
+            Assert.IsTrue(line5.AdjList.Contains(line4));
+            Assert.IsTrue(line4.AdjList.Contains(line5));
+            Assert.IsTrue(line4.AdjList.Contains(line6));
+            Assert.IsTrue(line6.AdjList.Contains(line4));
+            Assert.IsTrue(line6.AdjList.Contains(line3));
+            
+            List<List<Entity>> expectedTouchingEntities = new List<List<Entity>>();
+            expectedTouchingEntities.Add(new List<Entity>() { line1, arc1, line2, arc2 });
+            expectedTouchingEntities.Add(new List<Entity>() { circle1 });
+            expectedTouchingEntities.Add(new List<Entity>() { line3, line5, line4, line6 });
+            foreach (Feature feature in dxf.FeatureList)
+            {
+                Assert.IsTrue(expectedTouchingEntities.Contains(feature.EntityList));
+            }
+        }
     }
 }
