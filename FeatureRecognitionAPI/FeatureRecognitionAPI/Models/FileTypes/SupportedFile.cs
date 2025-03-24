@@ -112,10 +112,15 @@ namespace FeatureRecognitionAPI.Models
                             // TODO: tempLine.Kisscut = True;
                         }
                         
-                        if (listMap[i] != -1) // means EntityList[i] is already mapped to a feature
+                        if (listMap[i] != -1) // means entitiy i is mapped to a feature
                         {
                             FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
                             listMap[j] = listMap[i];
+                        }
+                        else if (listMap[j] != -1) // means entitiy j is mapped to a feature
+                        {
+                            FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
+                            listMap[i] = listMap[j];
                         }
                         else // EntityList[i] is not mapped to a feature
                         {
