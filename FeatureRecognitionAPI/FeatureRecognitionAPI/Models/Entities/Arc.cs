@@ -44,7 +44,7 @@ public class Arc : Entity
      * Function to calculate the x coordinate given the center point, Radius
      * and an angle.
      */
-    private double calcXCoord(double x, double radius, double angle)
+    private static double calcXCoord(double x, double radius, double angle)
     {
         return (radius * Math.Cos(Angles.ToRadians(angle)) + x);
     }
@@ -53,7 +53,7 @@ public class Arc : Entity
      * Function to calculate the y coordinate given the center point, Radius
      * and an angle.
      */
-    private double calcYCoord(double y, double radius, double angle)
+    private static double calcYCoord(double y, double radius, double angle)
     {
         return (radius * Math.Sin(Angles.ToRadians(angle)) + y);
     }
@@ -65,7 +65,7 @@ public class Arc : Entity
          * @param endAngle the end angle of the arc being calculated
          * @return the calculated the length of the arc
          */
-        internal double calcCentralAngle(double startAngle, double endAngle)
+        internal static double calcCentralAngle(double startAngle, double endAngle)
         {
             //The subtraction result would be negative, need to add 360 to get correct value
             if (endAngle < startAngle)
@@ -80,7 +80,7 @@ public class Arc : Entity
      * @param centralAngle the central angle for the arc being calculated
      * @return the calculated length (partial circumference) of the arc
      */
-    private double calcLength(double radius, double centralAngle)
+    private static double calcLength(double radius, double centralAngle)
     {
         return (2 * Math.PI * radius * (centralAngle / 360));
     }

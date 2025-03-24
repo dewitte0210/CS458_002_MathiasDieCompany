@@ -344,7 +344,7 @@ public class Feature
                     {
                         if (baseEntityList[i] is Line && eIndex < 2)
                         {
-                            if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i],
+                            if (Entity.IntersectLineWithArc((Line)baseEntityList[i],
                                     (Arc)baseEntityList[arcIndex]))
                             {
                                 touchingArc[eIndex] = (Line)baseEntityList[i];
@@ -360,7 +360,7 @@ public class Feature
 
                     if (touchingArc[0] is Line && touchingArc[1] is Line)
                     {
-                        if (!touchingArc[0].IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
+                        if (!Entity.IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
                         {
                             type = PossibleFeatureTypes.Group1C;
                             this.FeatureType = PossibleFeatureTypes.Group1C;
@@ -392,7 +392,7 @@ public class Feature
                     {
                         if (baseEntityList[i] is Line && eIndex < 2)
                         {
-                            if (((Arc)baseEntityList[arcIndex]).IntersectLineWithArc((Line)baseEntityList[i],
+                            if (Entity.IntersectLineWithArc((Line)baseEntityList[i],
                                     (Arc)baseEntityList[arcIndex]))
                             {
                                 touchingArc[eIndex] = (Line)baseEntityList[i];
@@ -401,7 +401,7 @@ public class Feature
                         }
                         else if (baseEntityList[i] is Arc && eIndex < 2)
                         {
-                            if (((Arc)baseEntityList[arcIndex]).IntersectArcWithArc((Arc)baseEntityList[i],
+                            if (Entity.IntersectArcWithArc((Arc)baseEntityList[i],
                                     (Arc)baseEntityList[arcIndex]))
                             {
                                 touchingArc[eIndex] = (Arc)baseEntityList[i];
@@ -450,8 +450,8 @@ public class Feature
                     {
                         if (baseEntityList[i] is Line && eIndex < 4)
                         {
-                            if (arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0])
-                                || arcList[arcIndex].IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
+                            if (Entity.IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0])
+                                || Entity.IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
                             {
                                 touchingArc[eIndex] = (Line)baseEntityList[i];
                                 eIndex++;
@@ -463,8 +463,8 @@ public class Feature
                             if (!arcList[0].Equals((Arc)baseEntityList[i])
                                 && !arcList[1].Equals((Arc)baseEntityList[i])
                                 //And if the arc intersects with the arc at 0 or at 1
-                                && (arcList[0].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0])
-                                    || arcList[1].IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1])))
+                                && (Entity.IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0])
+                                    || Entity.IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1])))
                             {
                                 touchingArc[eIndex] = (Arc)baseEntityList[i];
                                 eIndex++;
@@ -705,7 +705,7 @@ public class Feature
                 if (baseEntityList[i] is Line)
                 {
                     Line currEntity = (baseEntityList[i] as Line);
-                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
+                    if (Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
                     {
                         numEndPointIntersections++;
                     }
@@ -713,7 +713,7 @@ public class Feature
                 else if (baseEntityList[i] is Arc)
                 {
                     Arc currEntity = (baseEntityList[i] as Arc);
-                    if (ray.getIntersectPoint(ray, currEntity).Equals(currEntity.Start) || ray.getIntersectPoint(ray, currEntity).Equals(currEntity.End))
+                    if (Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.Start) || Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.End))
                     {
                         numEndPointIntersections++;
                     }
@@ -726,14 +726,13 @@ public class Feature
                         numEndPointIntersections++;
                     }
                 }
-                else { continue; }
             }
         }
         //  Even num of intersections = concave
         return (numIntersections - (numEndPointIntersections / 2)) % 2 == 0;
     }
 
-    private bool IsSmoothCurve(Entity entity1, Entity entity2)
+    private static bool IsSmoothCurve(Entity entity1, Entity entity2)
     {
         if (!(entity1 is Arc || entity1 is Ellipse) || !(entity2 is Arc || entity2 is Ellipse)) { return true; }
         if (entity1 is Arc && entity2 is Arc)
@@ -846,7 +845,7 @@ public class Feature
      * Checks to see if the point on the center most angle of the arc is concave to
      * the line (within the bounds) or convex (extends past the bounds)
      */
-    private bool IsArcConcave(Arc arc, Line line)
+    private static bool IsArcConcave(Arc arc, Line line)
     {
         double middleAngle;
         if (arc.EndAngle - arc.StartAngle < 0)
@@ -1263,7 +1262,7 @@ public class Feature
                     return true;
                 }
             }*/
-            if (line1.isSameInfinateLine(line2))
+            if (line1.isSameInfiniteLine(line2))
             {
                 ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
                 ExtendedEntityList.Remove(line1);
@@ -1391,82 +1390,6 @@ public class Feature
     #endregion
 
     #region PerimeterFeatureFunctions
-
-    /*
-     * function that finds a Path from start to target in Entity list
-     *
-     * @Param start is the entity that this algorithm starts
-     * @Param target is the entity that is trying to be reached
-     * @Return the Path from start to target. Null if no viable Path
-     */
-    private List<Entity> findPathFromStartToTargetInEntityList(Entity start, Entity target)
-    {
-        if (EntityList.Contains(start) && EntityList.Contains(target))
-        {
-            Stack<Entity> path = new Stack<Entity>();
-            path.Push(start);
-            if (findPathFromStartToTargetInEntityListHelper(path, new List<Entity>(), start, target))
-            {
-                List<Entity> temp = path.ToList();
-                temp.Reverse();
-                return temp;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    /*
-     * Helper function to find the Path from head to traget. Contains the actual logic for this task
-     *
-     * @Param Path is the current Path taken
-     * @Param visitedEntities contains all visited entities
-     * @Param head is the starting node
-     * @Param target is the entity trying to be reached
-     * @Return true if Path is found
-     */
-    private bool findPathFromStartToTargetInEntityListHelper(Stack<Entity> curPath, List<Entity> testedEntities,
-        Entity head, Entity target)
-    {
-        if (curPath.Peek() == target)
-        {
-            return true;
-        }
-
-        testedEntities.Add(curPath.Peek()); //adds the current entitiy to the visitedEntities
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity != curPath.Peek())
-            {
-                // checks if entity in loop is not the curent entity being checked
-                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
-                    // checks that the entitiy has not already been tested and is touching the entity
-                {
-                    curPath.Push(entity); //adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        //this point in the function means nothing is touching current entity
-
-        if (curPath.Peek() == head)
-        {
-            return false;
-        } // if the current entity is the head it means nothing is touching it and there is no Path
-
-        curPath.Pop(); // nothing is touching this entity so it is popped off of Path
-        return false; // returns false so the previous recursive call can check the next touching entity
-    }
 
     /*
      * Function that uses finds the Path from the two parents of all extended lines and adds the Path as a group of
@@ -1687,7 +1610,7 @@ public class Feature
      * @Param entities is the Entity list that is checked
      * @Return true if a set of parrallel lines is found
      */
-    private bool HasTwoParalellLine(List<Entity> entities)
+    private static bool HasTwoParalellLine(List<Entity> entities)
     {
         for (int i = 0; i < entities.Count(); i++)
         {

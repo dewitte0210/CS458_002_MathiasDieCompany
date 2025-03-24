@@ -78,22 +78,21 @@ namespace FeatureRecognitionAPI.Models
             return Math.Round(this.SlopeY / this.SlopeX, 4).Equals(Math.Round(line.SlopeY / line.SlopeX, 4));
         }
 
-        private bool withinTolerance(double value, double target)
+        private static bool withinTolerance(double value, double target)
         {
             return ((value <= (target + TOLERANCE)) && (value >= (target - TOLERANCE)));
         }
 
-        public bool isSameInfinateLine(Entity other)
+        public bool isSameInfiniteLine(Entity other)
         {
-            if (other is Line)
+            if (other is Line lineOther)
             {
-                Line lineOther = (Line)other;
                 if (this.SlopeX > -0.00005 && this.SlopeX < 0.00005) // means this is a verticle line
                 {
                     if (withinTolerance(lineOther.SlopeX, 0)) // means other is a verticle line
                     {
-                        return ((withinTolerance(this.StartPoint.X,
-                            lineOther.StartPoint.X))); // checks that the x values are within .00005 of each other
+                        return (withinTolerance(this.StartPoint.X,
+                            lineOther.StartPoint.X)); // checks that the x values are within .00005 of each other
                     }
                     else
                     {
@@ -121,9 +120,8 @@ namespace FeatureRecognitionAPI.Models
 
         public bool isPerpendicular(Entity other)
         {
-            if (other is Line)
+            if (other is Line lineOther)
             {
-                Line lineOther = (Line)other;
                 // Vertical slope edge cases
                 if (Math.Round(this.StartPoint.X, 4).Equals(Math.Round(this.EndPoint.X)) && Math.Round(lineOther.StartPoint.Y, 4).Equals(Math.Round(lineOther.EndPoint.Y, 4)))
                 {
@@ -142,19 +140,9 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        public Point findPointToExtend(Line line, Point point)
-        {
-            if (Point.Distance(line.StartPoint, point) < Point.Distance(line.EndPoint, point))
-            {
-                return line.StartPoint;
-            }
-            else return line.EndPoint;
-        }
-
-
         public override bool Equals(object? obj)
         {
-            //If both lines have the same length , and the slopes are equal (within tight tollerance)
+            //If both lines have the same length , and the slopes are equal (within tight tolerance)
             if (obj is Line && Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance)
             {
                 double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
