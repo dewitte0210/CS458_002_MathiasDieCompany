@@ -41,23 +41,12 @@ public class Arc : Entity
     }
 
     /**
-     * Function for calculating radians for cos and sin calculations.
-     *
-     * @param degrees is the amount of degrees being converted
-     * @return the radian value of degrees
-     */
-    internal double degreesToRadians(double degrees)
-    {
-        return (degrees * Math.PI / 180);
-    }
-
-    /**
      * Function to calculate the x coordinate given the center point, Radius
      * and an angle.
      */
     private double calcXCoord(double x, double radius, double angle)
     {
-        return (radius * Math.Cos(degreesToRadians(angle)) + x);
+        return (radius * Math.Cos(Angles.ToRadians(angle)) + x);
     }
 
     /**
@@ -66,7 +55,7 @@ public class Arc : Entity
      */
     private double calcYCoord(double y, double radius, double angle)
     {
-        return (radius * Math.Sin(degreesToRadians(angle)) + y);
+        return (radius * Math.Sin(Angles.ToRadians(angle)) + y);
     }
 
         /**
@@ -161,7 +150,7 @@ public class Arc : Entity
         else
         {
             double tan = Math.Atan2(y, x);
-            degrees = tan * (180 / Math.PI);
+            degrees = Angles.ToDegrees(tan);
         }
 
         // rotate start and end angles to start at 0

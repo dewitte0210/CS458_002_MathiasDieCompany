@@ -8,6 +8,7 @@
 
 using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -679,7 +680,7 @@ public class Feature
         int numEndPointIntersections = 0;
         //  Finds the middle angle of the curve and calculates the ray
         if (entity is Arc arc) 
-        { ray = arc.VectorFromCenter(arc.degreesToRadians(arc.AngleInMiddle())); }
+        { ray = arc.VectorFromCenter(Angles.ToRadians(arc.AngleInMiddle())); }
         else
         {
             Ellipse tempEntity = entity as Ellipse;
