@@ -2,7 +2,6 @@
 {
     public enum SupportedExtensions
     {
-        pdf,
         dwg,
         dxf,
     }

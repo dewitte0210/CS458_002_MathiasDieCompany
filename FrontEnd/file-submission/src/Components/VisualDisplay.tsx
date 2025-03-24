@@ -2,10 +2,10 @@
 
 interface VisualDisplayProps {
     touchingEntities: any[];
-    minX:number;
-    maxX:number;
-    minY:number;
-    maxY:number;
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
 }
 
 const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, maxX, minY, maxY}) => {
@@ -26,15 +26,16 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Padding to ensure the shapes aren't clipped
-            let padding = 0.1;
+            const PADDING = 0.1;
+            const SCALE = 400;
 
-            minX -= padding;
-            minY -= padding;
-            maxX += padding;
-            maxY += padding;
+            minX -= PADDING;
+            minY -= PADDING;
+            maxX += PADDING;
+            maxY += PADDING;
 
             // Calculate scaling factor to fit all shapes within the canvas
-            const scaleFactor = Math.abs(400 / Math.max(maxX - minX, maxY - minY));
+            const scaleFactor = Math.abs(SCALE / Math.max(maxX - minX, maxY - minY));
 
             // Set canvas dimensions based on the bounding box
             canvas.width = (maxX - minX) * scaleFactor;
@@ -47,6 +48,10 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             // Flip y-axis (canvas coordinates vs. typical 2D Cartesian coordinates)
             ctx.setTransform(1, 0, 0, -1, 0, canvas.height);
 
+            // Dashed border, useful for debugging
+            // ctx.setLineDash([5, 10]);
+            // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            
             ctx.setLineDash([]); // Reset to solid lines
 
             // Calculate offsets to shift shapes into the visible area
@@ -60,7 +65,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                         drawLine(ctx, shape, scaleFactor, xOffset, yOffset);
                     } else if (shape["$type"].includes('Arc')) {
                         drawArc(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if ( shape["$type"].includes('Circle')) {
+                    } else if (shape["$type"].includes('Circle')) {
                         drawCircle(ctx, shape, scaleFactor, xOffset, yOffset);
                     } //else if (shape["$type"].includes() === 'quadcurve2d') {
                     //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);

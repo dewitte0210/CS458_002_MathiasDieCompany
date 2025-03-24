@@ -208,10 +208,20 @@ namespace FeatureRecognitionAPI.Models.Utility
 			return aDelta.X * bDelta.Y - aDelta.Y * bDelta.X;
 		}
 
-		public static double DotProduct(Point a, Point b)
-		{
-			return a.X * b.X + a.Y * b.Y;
-		}
+        public static double DotProduct(Point a, Point b)
+        {
+            return a.X * b.X + a.Y * b.Y;
+        }
+
+        public static double ToDegrees(double radians)
+        {
+            return radians * 180 / Math.PI;
+        }
+        
+        public static double ToRadians(double degrees)
+        {
+            return degrees *  Math.PI / 180;
+        }
 
 		/// <summary>
 		/// Calculates the dot product of two lines using their deltas

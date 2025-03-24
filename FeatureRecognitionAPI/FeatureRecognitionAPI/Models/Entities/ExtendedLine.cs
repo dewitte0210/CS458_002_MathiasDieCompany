@@ -11,7 +11,7 @@
         }
         //runs into issues if more than one perimeter feature is on a line
         //would show up as an ExtendedLine being a parent
-        //this would also throw an error when trying to find a path because the parent would not be in EntityList
+        //this would also throw an error when trying to find a Path because the parent would not be in EntityList
         public ExtendedLine(Line parent1, Line parent2) // calls line's default constructor to initialize StartPsoint and EndPoint
         {
             /*if(Parent1 is ExtendedLine)
@@ -39,8 +39,7 @@
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+            this.Length = Point.Distance(StartPoint, EndPoint);
         }
         /*
                 public ExtendedLine(ExtendedLine obj)

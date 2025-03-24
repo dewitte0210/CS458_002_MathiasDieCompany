@@ -646,7 +646,7 @@ namespace Testing_for_Project
         [Test]
         public void example1Entities()
         {
-            //Set path to any filepath containing the 3rd example dxf file
+            //Set Path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
@@ -654,7 +654,7 @@ namespace Testing_for_Project
 
             exampleOne.detectAllFeatures();
 
-            List<Feature> featureList = exampleOne.getFeatureList();
+            List<Feature> featureList = exampleOne.FeatureList;
             foreach (Feature feature in featureList)
             {
                 bool equalLists = false;
@@ -680,7 +680,7 @@ namespace Testing_for_Project
         [Test]
         public void example3EveryBaseEntityinOriginalList()
         {
-            //Set path to any filepath containing the 3rd example dxf file
+            //Set Path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
@@ -694,7 +694,7 @@ namespace Testing_for_Project
                 feature.seperateBaseEntities();
             }
 
-            List<Feature> featureList = exampleOne.getFeatureList();
+            List<Feature> featureList = exampleOne.FeatureList;
             foreach (Feature feature in featureList)
             {
                 bool inBaseList = false;
@@ -706,7 +706,7 @@ namespace Testing_for_Project
                     }
                 }
 
-                Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
+                Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in EntityList
             }
         }
 
@@ -723,7 +723,7 @@ namespace Testing_for_Project
         [Test]
         public void lilBitOfEverythingPerimeterEntitiesInEntityList()
         {
-            //Set path to any filepath containing the 3rd example dxf file
+            //Set Path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-LilBitOfEverything.dxf";
@@ -731,7 +731,7 @@ namespace Testing_for_Project
 
             exampleOne.detectAllFeatures();
 
-            List<Feature> featureList = exampleOne.getFeatureList();
+            List<Feature> featureList = exampleOne.FeatureList;
             bool hasSquareFeature = false;
             bool hasCircleFeature = false;
             bool oneFeatureWithTwoPerimeterFeatures = false;
@@ -758,7 +758,7 @@ namespace Testing_for_Project
                         if (numLines == 2 && numArcs == 1) { hasCircleFeature = true; }
                     }
 
-                    Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in entityList
+                    Assert.IsTrue(inBaseList);//checks that every entity in baseEntityList is in EntityList
                 }
                 else
                 {
@@ -774,7 +774,7 @@ namespace Testing_for_Project
         [Test]
         public void Example2PerimeterFeatures() // This is working without chamfered corners being added as their own feature
         {
-            //Set path to any filepath containing the 3rd example dxf file
+            //Set Path to any filepath containing the 3rd example dxf file
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
@@ -782,7 +782,7 @@ namespace Testing_for_Project
 
             exampleOne.detectAllFeatures();
 
-            List<Feature> featureList = exampleOne.getFeatureList();
+            List<Feature> featureList = exampleOne.FeatureList;
 
             Assert.IsTrue(featureList.Count == 6); // same features are grouped together
             int totalFeatures = 0;

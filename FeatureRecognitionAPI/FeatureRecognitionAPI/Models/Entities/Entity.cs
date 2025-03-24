@@ -1,5 +1,7 @@
 ﻿using DecimalMath;
 using System.Runtime.CompilerServices;
+using CSMath;
+using FeatureRecognitionAPI.Models.Utility;
 
 [assembly: InternalsVisibleTo("Testing_for_Project")]
 
@@ -11,14 +13,13 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity
     {
         public double Length { get; set; }//length of the entity
-        public List<Entity> adjList { get; set; }
+        public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
 
         //Enables the use of a default constructor
-        public Entity()
+        protected Entity()
         {
-            adjList = new List<Entity>();
-            
+            AdjList = new List<Entity>();
         }
 
         private const int intersectTolerance = 4;//Precision for x and y intersect values to
@@ -383,20 +384,33 @@ namespace FeatureRecognitionAPI.Models
             else
             {
                 rotation = Math.Atan2(y, x);
-                //Q2 and Q3
-                if (x < 0)
-                {
-                    rotation += Math.PI;
-                }
-                //Q4
-                else if (x > 0 && y < 0)
-                {
-                    rotation += 2 * Math.PI;
-                }
             }
             if (rotation > 0)
             {
-                line = new Line(-1 * ((line.StartPoint.X * Math.Cos(rotation)) - (line.StartPoint.Y * Math.Sin(rotation))), -1 * ((line.StartPoint.Y * Math.Cos(rotation)) + (line.StartPoint.X * Math.Sin(rotation))), -1 * ((line.EndPoint.X * Math.Cos(rotation)) - (line.EndPoint.Y * Math.Sin(rotation))), -1 * ((line.EndPoint.Y * Math.Cos(rotation)) + (line.EndPoint.X * Math.Sin(rotation))));
+                Point start = line.StartPoint;
+                Point end = line.EndPoint;
+
+                //Translate the line to the origin
+                start.X = start.X - ellipse.Center.X;
+                start.Y = start.Y - ellipse.Center.Y;
+                end.X = end.X - ellipse.Center.X;
+                end.Y = end.Y - ellipse.Center.Y;
+
+                //Rotate around the origin
+                double temp = start.X;
+                start.X = -1 * ((start.X * Math.Cos(rotation)) - (start.Y * Math.Sin(rotation)));
+                start.Y = -1 * ((start.Y * Math.Cos(rotation)) + (temp * Math.Sin(rotation)));
+                temp = end.X;
+                end.X = -1 * ((end.X * Math.Cos(rotation)) - (end.Y * Math.Sin(rotation)));
+                end.Y = -1 * ((end.Y * Math.Cos(rotation)) + (temp * Math.Sin(rotation)));
+
+                //Translate back
+                start.X = start.X + ellipse.Center.X;
+                start.Y = start.Y + ellipse.Center.Y;
+                end.X = end.X + ellipse.Center.X;
+                end.Y = end.Y + ellipse.Center.Y;
+
+                line = new Line(start.X, start.Y, end.X, end.Y);
             }
             //  Get line in the form Ax + By + C = 0 and moved so that ellipse center is the origin
             double Al;
@@ -871,5 +885,7 @@ namespace FeatureRecognitionAPI.Models
         public abstract double MinY();
         public abstract double MaxX();
         public abstract double MaxY();
+
+        public abstract Entity Transform(Matrix3 transform);
     }
 }

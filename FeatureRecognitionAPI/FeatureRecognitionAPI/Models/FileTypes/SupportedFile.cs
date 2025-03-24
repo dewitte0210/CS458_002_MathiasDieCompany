@@ -1,20 +1,26 @@
 ﻿/*
- * Abstract class to be inherrited by every File child class
- * - DWG, DXF, PDF
+ * Abstract class to be inherited by every File child class
+ * - DWG, DXF
  */
 
+using ACadSharp;
+using ACadSharp.Blocks;
+using ACadSharp.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models
 {
-    abstract public class SupportedFile
+    public abstract class SupportedFile
     {
-        protected string path { get; set; }
-        protected SupportedExtensions fileType { get; set; }
-        protected List<Feature> featureList;
-        protected List<Entity> entityList;
-        protected List<FeatureGroup> featureGroups { get; }
+
+        protected string Path { get; set; }
+        protected SupportedExtensions FileType { get; set; }
+        internal List<Feature> FeatureList { get; set; }
+        protected List<Entity> EntityList;
+        internal List<FeatureGroup> FeatureGroups { get; }
+        protected FileVersion _fileVersion;
 
         //These functions below exist for testing purposes
 
@@ -22,13 +28,13 @@ namespace FeatureRecognitionAPI.Models
 
         public int GetFeatureGroupCount()
         {
-            return featureGroups.Count;
+            return FeatureGroups.Count;
         }
 
         public int GetTotalFeatureGroups()
         {
             int tmp = 0;
-            foreach (FeatureGroup fGroup in featureGroups)
+            foreach (FeatureGroup fGroup in FeatureGroups)
             {
                 tmp += fGroup.Count;
             }
@@ -38,37 +44,37 @@ namespace FeatureRecognitionAPI.Models
 
         public List<FeatureGroup> GetFeatureGroups()
         {
-            return featureGroups;
+            return FeatureGroups;
         }
 
         #endregion
+
 
         #region Constructors
 
         //protected keyword for nested enum is about granting 
         protected SupportedFile()
         {
-            entityList = new List<Entity>();
-            featureList = new List<Feature>();
+            EntityList = new List<Entity>();
+            FeatureList = new List<Feature>();
         }
 
-        public SupportedFile(string path)
+        protected SupportedFile(string path)
         {
-            this.path = path;
-            entityList = new List<Entity>();
-            featureList = new List<Feature>();
-            featureGroups = new List<FeatureGroup>();
+            this.Path = path;
+            EntityList = new List<Entity>();
+            FeatureList = new List<Feature>();
+            FeatureGroups = new List<FeatureGroup>();
         }
 
+        public SupportedFile(List<Entity> entityList)
+        {
+            EntityList = entityList;
+            FeatureList = new List<Feature>();
+        }
         #endregion
 
         #region SpecialGettersAndSetters
-
-        public void setFeatureList(List<Feature> featureList)
-        {
-            this.featureList = featureList;
-        }
-
         public List<Feature> makeFeatureList(List<List<Entity>> entities)
         {
             for (int i = 0; i < entities.Count(); i++)
@@ -78,49 +84,97 @@ namespace FeatureRecognitionAPI.Models
                 feature.seperateBaseEntities();
                 feature.seperatePerimeterEntities();
                 feature.DetectFeatures();
-                featureList.Add(feature);
+                FeatureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
                 {
                     for (int j = 0; j < feature.PerimeterEntityList.Count(); j++)
                     {
                         Feature newFeat = new Feature(feature.PerimeterEntityList[j]);
                         newFeat.DetectFeatures();
-                        featureList.Add(newFeat);
+                        FeatureList.Add(newFeat);
                     }
                 }
             }
 
 
             // Group identical features together
-            for (int i = 0; i < featureList.Count(); i++)
+            for (int i = 0; i < FeatureList.Count(); i++)
             {
-                for (int j = i + 1; j < featureList.Count(); j++)
+                for (int j = i + 1; j < FeatureList.Count(); j++)
                 {
-                    if (featureList[i].Equals(featureList[j]))
+                    if (FeatureList[i].Equals(FeatureList[j]))
                     {
-                        featureList[i].count += featureList[j].count;
-                        featureList.RemoveAt(j);
+                        FeatureList[i].count += FeatureList[j].count;
+                        FeatureList.RemoveAt(j);
                         j--;
                     }
                 }
             }
 
 
-            return featureList;
+            return FeatureList;
         }
-
-        public List<Feature> getFeatureList()
-        {
-            return featureList;
-        }
-
         #endregion
 
         #region MakeTouchingEntities
 
+        // This function takes in a list of entities and creates features based on groups of touching entities
+        // it also constructs each entity's AdjList (Adjacency List)
+        public void GroupFeatureEntities()
+        {
+            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
+            FeatureList.Add(new Feature(new List<Entity>()));
+            
+            FeatureList[0].EntityList.Add(EntityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
+            listMap[0] = 0;
+            
+            for (int i = 0; i < EntityList.Count()-1; i++)
+            {
+                int count = 0;
+                for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                {
+                    if (i != j && EntityList[i].DoesIntersect(EntityList[j])) // if i==j they are checking the same object and would return true for intersecting
+                    {
+                        // adds each entity to their AdjList. This should not happen twice because of the j=i+1
+                        EntityList[i].AdjList.Add(EntityList[j]);
+                        EntityList[j].AdjList.Add(EntityList[i]);
+                        
+                        // Check to flag an entity as Kisscut
+                        count++;
+                        if (count == 4 && EntityList[i] is Line tempLine)
+                        {
+                            // TODO: tempLine.Kisscut = True;
+                        }
+                        
+                        if (listMap[i] != -1) // means entitiy i is mapped to a feature
+                        {
+                            FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
+                            listMap[j] = listMap[i];
+                        }
+                        else if (listMap[j] != -1) // means entitiy j is mapped to a feature
+                        {
+                            FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
+                            listMap[i] = listMap[j];
+                        }
+                        else // EntityList[i] is not mapped to a feature
+                        {
+                            // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
+                            FeatureList.Add(new Feature(new List<Entity>()));
+                            int index = FeatureList.Count - 1;
+                            FeatureList[index].EntityList.Add(EntityList[i]);
+                            FeatureList[index].EntityList.Add(EntityList[j]);
+                            // maps i and j to the index of that new feature in FeatureList
+                            listMap[i] = index;
+                            listMap[j] = index;
+                        }
+                    }
+                }
+            }
+        }
+        
         /**
          * Creates and returns a list of features that are made up of touching entities in another list.
-         * @Param entityList - the list of entites in the file
+         * @Param EntityList - the list of entites in the file
          */
         public List<List<Entity>> makeTouchingEntitiesList(List<Entity> entityList)
         {
@@ -186,7 +240,7 @@ namespace FeatureRecognitionAPI.Models
          */
         public void SetFeatureGroups()
         {
-            List<List<Entity>> entities = makeTouchingEntitiesList(entityList);
+            List<List<Entity>> entities = makeTouchingEntitiesList(EntityList);
             // List<Feature> brokenFeatures = makeFeatureList(entities);
             List<Feature> features = new List<Feature>();
 
@@ -200,12 +254,12 @@ namespace FeatureRecognitionAPI.Models
             Point minPoint = new(0, 0);
             Point maxPoint = new(0, 0);
             Point maxDiff = new(0, 0);
-            int maxDiffIndex = 0;
+            int maxDiffIndex;
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0, 0);
+            Point tempMinPoint;
+            Point tempMaxPoint;
 
             //bool firstrun = true;
             while (features.Count > 0)
@@ -237,7 +291,7 @@ namespace FeatureRecognitionAPI.Models
                     }
                 }
 
-                //Start the list
+                // Start the list
                 List<Feature> featureGroupList = new List<Feature>();
                 Feature bigFeature = features[maxDiffIndex];
                 featureGroupList.Add(bigFeature);
@@ -265,7 +319,7 @@ namespace FeatureRecognitionAPI.Models
                 FeatureGroup newfGroup = new FeatureGroup(featureGroupList);
                 if (featureGroupList.Count > 0)
                 {
-                    foreach (FeatureGroup fGroup in featureGroups)
+                    foreach (FeatureGroup fGroup in FeatureGroups)
                     {
                         if (fGroup.Equals(newfGroup))
                         {
@@ -279,13 +333,13 @@ namespace FeatureRecognitionAPI.Models
                     if (!added)
                     {
                         newfGroup.Count++;
-                        featureGroups.Add(newfGroup);
+                        FeatureGroups.Add(newfGroup);
                     }
                 }
                 else
                 {
                     newfGroup.Count++;
-                    featureGroups.Add(newfGroup);
+                    FeatureGroups.Add(newfGroup);
                 }
             }
         }
@@ -309,8 +363,8 @@ namespace FeatureRecognitionAPI.Models
 
             //Temp variables to overwrite
             Point tempDiff = new(0, 0);
-            Point tempMinPoint = new(0, 0);
-            Point tempMaxPoint = new(0, 0);
+            Point tempMinPoint;
+            Point tempMaxPoint;
 
             while (features.Count > 0)
             {
@@ -364,7 +418,7 @@ namespace FeatureRecognitionAPI.Models
                     }
                 }
 
-                //featureGroupList should now contain all features that fall inside of bigFeature
+                //featureGroupList should now contain all features that fall inside bigFeature
                 bool added = false;
                 FeatureGroup newfGroup = new FeatureGroup(featureGroupList);
                 for (int i = 0; i < featureGroupList.Count; i++)
@@ -375,7 +429,7 @@ namespace FeatureRecognitionAPI.Models
 
                 if (featureGroupList.Count > 0)
                 {
-                    foreach (FeatureGroup fGroup in featureGroups)
+                    foreach (FeatureGroup fGroup in FeatureGroups)
                     {
                         if (fGroup.Equals(newfGroup))
                         {
@@ -389,17 +443,17 @@ namespace FeatureRecognitionAPI.Models
                     if (!added)
                     {
                         newfGroup.Count++;
-                        featureGroups.Add(newfGroup);
+                        FeatureGroups.Add(newfGroup);
                     }
                 }
                 else
                 {
                     newfGroup.Count++;
-                    featureGroups.Add(newfGroup);
+                    FeatureGroups.Add(newfGroup);
                 }
             }
 
-            return featureGroups;
+            return FeatureGroups;
         }
 
         #endregion
@@ -407,11 +461,84 @@ namespace FeatureRecognitionAPI.Models
 
         public void detectAllFeatures()
         {
-            makeFeatureList(makeTouchingEntitiesList(entityList));
+            makeFeatureList(makeTouchingEntitiesList(EntityList));
         }
-        // Method to read the data from a file and fill the entityList with entities
-        public abstract void readEntities();
+       
+        protected void ReadEntities(CadDocument doc)
+        {
+            List<Entity> returned = new List<Entity>();
+            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
+            {
+                if (entity is Insert insert)
+                {
+                    returned.AddRange(UnwrapInsert(insert));
+                }
+                else
+                {
+                    Entity? castedEntity = CadObjectToInternalEntity(entity);
+                    if (!(castedEntity is null))
+                    {
+                        returned.Add(castedEntity);
+                    }
+                }
+            }
 
-        public abstract FileVersion GetFileVersion();
+            EntityList.AddRange(returned);
+        }
+        private static List<Entity> UnwrapInsert(Insert insert)
+        {
+            List<Entity> returned = new List<Entity>();
+            
+            Block block = insert.Block.BlockEntity;
+            Matrix3 blockTranslate = Matrix3.Translate(block.BasePoint.X, block.BasePoint.Y);
+                    
+            Matrix3 insertTranslate = Matrix3.Translate(insert.InsertPoint.X, insert.InsertPoint.Y);
+            Matrix3 insertScale = Matrix3.Scale(insert.XScale, insert.YScale);
+            Matrix3 insertRotate = Matrix3.Rotate(insert.Rotation);
+
+            Matrix3 finalTransform = insertScale * blockTranslate * insertTranslate * insertRotate;
+            foreach (ACadSharp.Entities.Entity cadObject in insert.Block.Entities)
+            {
+                Entity? castedEntity = CadObjectToInternalEntity(cadObject);
+                if (!(castedEntity is null))
+                {
+                    returned.Add(castedEntity.Transform(finalTransform));
+                }
+            }
+
+            return returned;
+        }
+        
+        internal static Entity? CadObjectToInternalEntity(ACadSharp.Entities.Entity cadEntity)
+        {
+            switch (cadEntity)
+            {
+                case ACadSharp.Entities.Line line:
+                {
+                    return new Line(line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
+                }
+                case ACadSharp.Entities.Arc arc:
+                {
+                    return new Arc(arc.Center.X, arc.Center.Y, arc.Radius,
+                        arc.StartAngle * (180 / Math.PI), arc.EndAngle * (180 / Math.PI));
+                }
+                case ACadSharp.Entities.Circle circle:
+                {
+                    return new Circle(circle.Center.X, circle.Center.Y, circle.Radius);
+                }
+                case ACadSharp.Entities.Ellipse ellipse:
+                {
+                    return new Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.EndPoint.X,
+                        ellipse.EndPoint.Y,
+                        ellipse.RadiusRatio, ellipse.StartParameter, ellipse.EndParameter);
+                }
+            }
+
+            return null;
+        }
+        
+        public abstract void ParseFile();
+
+        public abstract List<Entity> GetEntities();
     }
 }
