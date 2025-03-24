@@ -1,4 +1,5 @@
-﻿using FeatureRecognitionAPI.Models.Dtos;
+﻿using System.Globalization;
+using FeatureRecognitionAPI.Models.Dtos;
 using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace FeatureRecognitionAPI.Services
                 _soPunchList = GetSoPunchList();
                 _hdsoPunchList = GetHdsoPunchList();
                 _ftPunchList = GetFtPunchList();
-                _swPunchList = GetSWPunchList();
+                _swPunchList = GetSwPunchList();
                 _retractList = GetRetractList();
         }
 
@@ -80,11 +81,11 @@ namespace FeatureRecognitionAPI.Services
                     double featureCost = 0.00;
                     double featureSetup = 0.00;
                     int maxRadius = 0; // 1 for no max radius
-                    bool isOverSized = feature.Perimeter > 20 ? true : false;
+                    bool isOverSized = feature.Perimeter > 20;
                     int quantity = feature.Count * param.FeatureGroups.First().NumberUp;
-                    double tempCost = 0.00;
+                    double tempCost;
 
-                    // Setup Cost = hour/part to setup * ShopRate $/hour
+                    // Setup Cost = hour/part to set up * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
                     // Difficulty Factor * mMain.ShopRate $/hr * hour/part * quantity of parts
                     // For punches, there should be a checkbox that denotes if the height of the punch is .918 instead
@@ -98,7 +99,7 @@ namespace FeatureRecognitionAPI.Services
                     FeaturePrice featureData =
                         _featurePriceList.Find(element => element.Type == feature.FeatureType);
                     
-                    // If the current feature is a Punch featureData will be null and we must use punch pricing rules
+                    // If the current feature is a Punch featureData will be null, and we must use punch pricing rules
                     if (featureData != null)
                     {
                         setupCost = featureData.SetupRate * BASE_SHOP_RATE;
@@ -127,7 +128,7 @@ namespace FeatureRecognitionAPI.Services
                             maxRadius = 4;
                             break;
                         case PossibleFeatureTypes.StdTubePunch:
-                            //Get closest diameter from list
+                            //Get the closest diameter from list
                             var tubePunch = _tubePunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = tubePunch.SetupCost * 1.2;
                             runCost = tubePunch.RunCost;
@@ -137,7 +138,7 @@ namespace FeatureRecognitionAPI.Services
                             totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.SideOutlet:
-                            //Get closest diameter from list
+                            //Get the closest diameter from list
                             var soPunch = _soPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = soPunch.SetupCost* 1.2;
                             runCost = soPunch.RunCost;
@@ -147,7 +148,7 @@ namespace FeatureRecognitionAPI.Services
                             totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.HDSideOutlet:
-                            //Get closest diameter from list
+                            //Get the closest diameter from list
                             var hdsoPunch = _hdsoPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = hdsoPunch.SetupCost * 1.2;
                             runCost = hdsoPunch.RunCost;
@@ -157,7 +158,7 @@ namespace FeatureRecognitionAPI.Services
                             totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdFTPunch:
-                            //Get closest diameter from list
+                            //Get the closest diameter from list
                             var ftPunch = _ftPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = ftPunch.SetupCost * 1.2;
                             runCost = ftPunch.RunCost;
@@ -167,7 +168,7 @@ namespace FeatureRecognitionAPI.Services
                             totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdSWPunch:
-                            //Get closest diameter from list
+                            //Get the closest diameter from list
                             var swPunch = _swPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = swPunch.SetupCost * 1.2;
                             runCost = swPunch.RunCost;
@@ -177,7 +178,7 @@ namespace FeatureRecognitionAPI.Services
                             totalFeatureCost += featureCost;
                             continue;
                         case PossibleFeatureTypes.StdRetractPins:
-                            //Get closest diameter from list
+                            //Get the closest diameter from list
                             var retract = _retractList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
                             setupCost = retract.SetupCost * 1.2;
                             runCost = retract.RunCost;
@@ -214,7 +215,7 @@ namespace FeatureRecognitionAPI.Services
 
                     double costSub1 = runCost;
                     double minCost = runCost * 0.25;
-                    double costSub2 = 0.00;
+                    double costSub2;
                     for (int i = 0; i < quantity; i++)
                     {
                         if (costSub1 > minCost)
@@ -245,7 +246,7 @@ namespace FeatureRecognitionAPI.Services
                 double perimeterCost = totalPerimeter * 0.46;    
                 totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost));
 
-                return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString());
+                return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString(CultureInfo.CurrentCulture));
             }
             catch (Exception ex)
             {
@@ -598,7 +599,7 @@ namespace FeatureRecognitionAPI.Services
                 new PunchPrice(29/64.0, 5/8.0, 8, 7),
                 new PunchPrice(15/32.0, 5/8.0, 6.15, 7),
                 new PunchPrice(15/32.0, 3/4.0, 14.05, 7),
-                new PunchPrice(31/64.0, 5/8, 8, 7),
+                new PunchPrice(31/64.0, 5/8.0, 8, 7),
                 new PunchPrice(1/2.0, 5/8.0, 6.15, 7),
                 new PunchPrice(1/2.0, 3/4.0, 12.2, 7),
                 new PunchPrice(17/32.0, 3/4.0, 12.2, 7),            
@@ -611,7 +612,7 @@ namespace FeatureRecognitionAPI.Services
             return soPunchList;
         }
 
-        private List<PunchPrice> GetSWPunchList()
+        private List<PunchPrice> GetSwPunchList()
         {
             var swList = new List<PunchPrice>()
             {
