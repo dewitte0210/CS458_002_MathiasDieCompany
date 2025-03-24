@@ -76,7 +76,7 @@ namespace FeatureRecognitionAPI.Models
 
         public override List<Entity> GetEntities()
         {
-            return entityList;
+            return EntityList;
         }
     }
 }
