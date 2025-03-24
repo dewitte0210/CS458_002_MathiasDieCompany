@@ -40,9 +40,6 @@ namespace FeatureRecognitionAPI.Services
                     case ".dwg":
                         Console.WriteLine("This is a dwg file");
                         return (OperationStatus.OK, ext);
-                    case ".pdf":
-                        Console.WriteLine("This is a pdf file");
-                        return (OperationStatus.OK, ext);
                     default:
                         Console.WriteLine("ERROR detecting file extension");
                         return (OperationStatus.OK, null);
