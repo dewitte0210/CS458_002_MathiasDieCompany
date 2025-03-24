@@ -1,3 +1,5 @@
+using NHibernate;
+
 /// Author: Andrew Schmidt
 /// <summary>
 /// This file is used for calculating the angle between lines and on what side they lay
@@ -10,6 +12,9 @@ namespace FeatureRecognitionAPI.Models.Utility
 	/// </summary>
 	public static class Angles
 	{
+		public const double ANGLETOLDEG = 0.001;
+		public const double ANGLETOLRAD = ANGLETOLDEG * Math.PI / 180;
+
 		/// <summary>
 		/// The side an angle lies in relation to the rest of the shape
 		/// </summary>
@@ -36,6 +41,38 @@ namespace FeatureRecognitionAPI.Models.Utility
 		{
 			public readonly double angle = angle;
 
+			public override bool Equals(object? obj)
+			{
+				if (obj == null) return false;
+				
+                if (obj is Degrees objD
+                    && angle > objD.angle - ANGLETOLDEG
+                    && angle < objD.angle + ANGLETOLDEG) 
+				{
+					return true;
+				}
+				try
+				{
+					//if numeric try to cast to double
+					double objDbl = Convert.ToDouble(obj);
+					if (angle > objDbl - ANGLETOLDEG
+						&& angle < objDbl + ANGLETOLDEG)
+					{
+						return true;
+					}
+				}
+				catch
+				{
+					return false;
+				}
+				return false;
+			}
+
+			public override int GetHashCode()
+			{
+				return HashCode.Combine(angle);
+			}
+
 			public Degrees GetOppositeAngle()
 			{
 				return new Degrees(360 - angle);
@@ -59,6 +96,37 @@ namespace FeatureRecognitionAPI.Models.Utility
 			public Degrees ToDegrees()
 			{
 				return new Degrees(angle * 180 / Math.PI);
+			}
+
+			public override bool Equals(object? obj)
+			{
+				if (obj == null) return false;
+				if (obj is Degrees objR
+					&& angle > objR.angle - ANGLETOLRAD
+					&& angle < objR.angle + ANGLETOLRAD)
+				{
+					return true;
+				}
+                try
+                {
+                    //if numeric try to cast to double
+                    double objDbl = Convert.ToDouble(obj);
+                    if (angle > objDbl - ANGLETOLDEG
+                        && angle < objDbl + ANGLETOLDEG)
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+                return false;
+			}
+
+			public override int GetHashCode()
+			{
+				return HashCode.Combine(angle);
 			}
 		}
 
@@ -97,27 +165,30 @@ namespace FeatureRecognitionAPI.Models.Utility
 				return side;
 			}
 
-			//TODO: change so that angles that are really close are equal
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) { return false; }
 
-				if (obj is Angle ObjA)
-				{
-                    if (side != Side.UNKNOWN && ObjA.side != Side.UNKNOWN)
-					{
-						if (ObjA.side == this.side && ObjA.angle == this.angle)
-						{
-							return true;
-						}
-                        //sides are opposite
-                        if (ObjA.side != this.side && ObjA.angle.GetOppositeAngle() == angle)
-                        {
-                            return true;
-                        }
+                if (obj is Angle ObjA 
+					&& side != Side.UNKNOWN 
+					&& ObjA.side != Side.UNKNOWN)
+                {
+                    if (ObjA.side == this.side && ObjA.angle == this.angle)
+                    {
+                        return true;
                     }
-				}
-				return false;
+                    //sides are opposite
+                    if (ObjA.side != this.side && ObjA.angle.GetOppositeAngle() == angle)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+			}
+
+			public override int GetHashCode()
+			{
+				throw new NotImplementedException();
 			}
 		}
 
@@ -180,7 +251,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			//prefer 0 degrees interior over 360 for opposite facing parallel lines
 			//since it can return 0 or 360 depending on orientation
-			if ((returnAngle.angle == 360 || returnAngle.angle == 0) && ori == Orientation.CLOCKWISE)
+			if ((returnAngle.Equals(360) || returnAngle.Equals(0)) && ori == Orientation.CLOCKWISE)
 			{
 				returnAngle = returnAngle.GetOppositeAngle();
 			}
@@ -201,128 +272,16 @@ namespace FeatureRecognitionAPI.Models.Utility
 			return new Angle(returnAngle, side);
 		}
 
-		public static bool IsPerpendicular(Line a, Line b, bool exact = false)
+		public static bool IsPerpendicular(Line a, Line b)
 		{
-			const double TOLERANCE = 0.00005;
-			double angle = GetAngle(a, b).GetDegrees().angle;
-
-			if (exact)
-			{
-				if (angle == 90 || angle == 270)
-				{
-					return true;
-				}
-			}
-			else
-			{
-				if (angle > 90 - TOLERANCE && angle < 90 + TOLERANCE)
-				{
-					return true;
-				}
-				if (angle > 270 - TOLERANCE && angle < 270 + TOLERANCE)
-				{
-					return true;
-				}
-			}
-			return false;
+			Degrees angle = GetAngle(a, b).GetDegrees();
+			return (angle.Equals(90) || angle.Equals(270));
 		}
 
-		public static bool IsParallel(Line a, Line b, bool exact = false)
+		public static bool IsParallel(Line a, Line b)
 		{
-			const double TOLERANCE = 0.00005;
-			double angle = GetAngle(a, b).GetDegrees().angle;
-
-			if (exact)
-			{
-				if (angle == 0 || angle == 180)
-				{
-					return true;
-				}
-			}
-			else
-			{
-				if (angle > 0 - TOLERANCE && angle < 0 + TOLERANCE)
-				{
-					return true;
-				}
-				if (angle > 180 - TOLERANCE && angle < 180 + TOLERANCE)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-
-
-		/// <summary>
-		/// Checks if a polygon is closed.
-		/// The polygon must be entirely made of lines.
-		/// </summary>
-		/// <param name="lineList"></param>
-		/// <returns></returns>
-		public static bool PolygonIsClosed(List<Line> lineList)
-		{
-			//check if closed
-			for (int i = 0; i < lineList.Count; i++)
-			{
-				if (lineList[0].EndPoint != lineList[(i + 1) % lineList.Count].StartPoint)
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-
-		/// <summary>
-		/// Calculates the area of a polygon.
-		/// If the area is positive the area is counterclockwise.
-		/// Only works for polygons made entirely up of lines.
-		/// Make sure to do absolute value if all you need is the area.
-		/// </summary>
-		/// <param name="lineList"></param>
-		/// <returns></returns>
-		public static double GetShoelaceArea(List<Line> lineList)
-		{
-			if (!PolygonIsClosed(lineList))
-			{
-				return 0;
-			}
-
-			double area = 0;
-			for (int i = 0; i < lineList.Count; i++)
-			{
-				area += CrossProduct(lineList[i], lineList[(i + 1) % lineList.Count]);
-			}
-			if (area != 0)
-			{
-				area /= 2;
-			}
-			return area;
-		}
-
-		/// <summary>
-		/// Uses shoelace area to determine the orientation of a polygon.
-		/// The same conditions apply as GetShoelaceArea
-		/// </summary>
-		/// <param name="lineList"></param>
-		/// <returns></returns>
-		public static Orientation GetOrientation(List<Line> lineList)
-		{
-			double area = GetShoelaceArea(lineList);
-
-			if (area > 0)
-			{
-				return Orientation.COUNTERCLOCKWISE;
-			}
-			else if (area < 0)
-			{
-				return Orientation.CLOCKWISE;
-			}
-			else
-			{
-				return Orientation.UNKNOWN;
-			}
+			Degrees angle = GetAngle(a, b).GetDegrees();
+			return (angle.Equals(0) || angle.Equals(180) || angle.Equals(360));
 		}
 	}
 }

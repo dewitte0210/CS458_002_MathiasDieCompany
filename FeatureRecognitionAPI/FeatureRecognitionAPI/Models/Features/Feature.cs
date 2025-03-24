@@ -880,14 +880,14 @@ public class Feature
         //{
         //}
 
-        //assumes line list is ordered, transition to 
+        //assumes line list is ordered, transition to adj list when finished
         List<Line> lineList = [];
 
         for (int i = 0; i < EntityList.Count; i++)
         {
-            if (EntityList[i] is Line)
+            if (EntityList[i] is Line line)
             {
-                lineList.Add((Line)EntityList[i]);
+                lineList.Add(line);
             }
         }
 
@@ -905,14 +905,11 @@ public class Feature
                 Angle angleBC = GetAngle(lineB, lineC, Side.INTERIOR);
                 Angle angleAC = GetAngle(lineA, lineC, Side.INTERIOR);
 
-                if (angleAC.GetDegrees().angle < 180)
+                if (angleAC.GetDegrees().angle < 180 && angleAB.Equals(angleBC) && angleAB.GetDegrees().angle > 90)
                 {
-                    if (angleAB.Equals(angleBC) && angleAB.GetDegrees().angle > 90)
-                    {
-                        lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
-                        numPossibleChamfers++;
-                        possibleChamferList.Add(lineB);
-                    }
+                    lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
+                    numPossibleChamfers++;
+                    possibleChamferList.Add(lineB);
                 }
             }
 
