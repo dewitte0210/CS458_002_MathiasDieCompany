@@ -113,25 +113,27 @@ namespace FeatureRecognitionAPI.Services
                 }
 
                 
-                // Create the touching entity list
-                List<List<Entity>> touchingEntityList = supportedFile.makeTouchingEntitiesList(supportedFile.GetEntities());
-                touchingEntityList = touchingEntityList.Select(list => CondenseArcs(list)).ToList();
-                
-                // Set the feature groups
-                List<FeatureGroup> featureGroups = supportedFile.SetFeatureGroups(touchingEntityList);
-                
-                // Set features for each feature group
-                List<Feature> features;
-                for (int i = 0; i < featureGroups.Count; i++)
+                supportedFile.GroupFeatureEntities();
+
+                foreach (Feature feature in supportedFile.FeatureList)
                 {
-                    features = supportedFile.makeFeatureList(featureGroups[i].touchingEntities);
-                    featureGroups[i].setFeatureList(features);
+                    CondenseArcs(feature.EntityList);
                 }
 
+                supportedFile.DetectAllFeatureTypes();
+                
+                // Set the feature groups
+                supportedFile.SetFeatureGroups();
+                List<List<Entity>> touchingEntityList = new List<List<Entity>>();
+                foreach (Feature feature in supportedFile.FeatureList)
+                {
+                    touchingEntityList.Add(feature.EntityList);
+                }
+                
                 // Create JSON that will be sent to the frontend
                 var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
                 settings.Converters.Add(new StringEnumConverter());
-                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, featureGroups), settings);
+                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
 
                 return (OperationStatus.OK, json);
             }

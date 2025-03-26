@@ -652,7 +652,7 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
             DXFFile exampleOne = new DXFFile(path);
 
-            exampleOne.detectAllFeatures();
+            exampleOne.DetectAllFeatureTypes();
 
             List<Feature> featureList = exampleOne.FeatureList;
             foreach (Feature feature in featureList)
@@ -676,7 +676,7 @@ namespace Testing_for_Project
             }
         }
 
-        //Example 3 has no perimeter feature so all entities in in BaseEntityList should be in EntityList and not be changed
+        //Example 3 has no perimeter feature so all entities in BaseEntityList should be in EntityList and not be changed
         [Test]
         public void example3EveryBaseEntityinOriginalList()
         {
@@ -685,11 +685,11 @@ namespace Testing_for_Project
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
             DXFFile exampleOne = new DXFFile(path);
-
-            // same as SupportedFile.makeFeatureList besides perimeter feature stuff because that destroys ExtendedEntityList
-            foreach (List<Entity> entityList in exampleOne.makeTouchingEntitiesList(exampleOne.GetEntities()))
+            
+            exampleOne.GroupFeatureEntities();
+            // same as SupportedFile.DetectAllFeatureTypes besides perimeter feature stuff because that destroys ExtendedEntityList
+            foreach (Feature feature in exampleOne.FeatureList)
             {
-                Feature feature = new Feature(entityList);
                 feature.extendAllEntities();
                 feature.seperateBaseEntities();
             }
@@ -729,7 +729,7 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-LilBitOfEverything.dxf";
             DXFFile exampleOne = new DXFFile(path);
 
-            exampleOne.detectAllFeatures();
+            exampleOne.DetectAllFeatureTypes();
 
             List<Feature> featureList = exampleOne.FeatureList;
             bool hasSquareFeature = false;
@@ -780,7 +780,7 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
             DXFFile exampleOne = new DXFFile(path);
 
-            exampleOne.detectAllFeatures();
+            exampleOne.DetectAllFeatureTypes();
 
             List<Feature> featureList = exampleOne.FeatureList;
 
