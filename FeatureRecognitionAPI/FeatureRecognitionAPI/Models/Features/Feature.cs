@@ -947,15 +947,12 @@ public class Feature
     */
     public bool CheckGroup3()
     {
+        //these can be private since it can be figured out from line chamfertype tag
         int numPossibleChamfers = 0;
         int numConfirmedChamfers = 0;
 
         List<Line> possibleChamferList = [];
         List<Line> confirmerdChamferList = [];
-
-        //if (this.FeatureType == PossibleFeatureTypes.Group1A1)
-        //{
-        //}
 
         //assumes line list is ordered, transition to adj list when finished
         List<Line> lineList = [];
@@ -978,11 +975,11 @@ public class Feature
                 Line lineC = lineList[(i + 2) % lineList.Count];
 
                 //need to verify orientation of lines
-                Angle angleAB = GetAngle(lineA, lineB, Side.INTERIOR);
-                Angle angleBC = GetAngle(lineB, lineC, Side.INTERIOR);
-                Angle angleAC = GetAngle(lineA, lineC, Side.INTERIOR);
+                Angle angleAB = GetAngle(lineA, lineB, Side.Interior);
+                Angle angleBC = GetAngle(lineB, lineC, Side.Interior);
+                Angle angleAC = GetAngle(lineA, lineC, Side.Interior);
 
-                if (angleAC.GetDegrees().angle < 180 && angleAB.Equals(angleBC) && angleAB.GetDegrees().angle > 90)
+                if (angleAC.GetDegrees().Value < 180 && angleAB.Equals(angleBC) && angleAB.GetDegrees().Value > 90)
                 {
                     lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
                     numPossibleChamfers++;

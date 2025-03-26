@@ -1,6 +1,5 @@
-using NHibernate;
+using static FeatureRecognitionAPI.Models.Utility.MDCMath;
 
-/// Author: Andrew Schmidt
 /// <summary>
 /// This file is used for calculating the angle between lines and on what side they lay
 /// </summary>
@@ -12,17 +11,17 @@ namespace FeatureRecognitionAPI.Models.Utility
 	/// </summary>
 	public static class Angles
 	{
-		public const double ANGLETOLDEG = 0.001;
-		public const double ANGLETOLRAD = ANGLETOLDEG * Math.PI / 180;
+		private const double AngleTolDeg = 0.001;
+		private const double AngleTolRad = AngleTolDeg * Math.PI / 180;
 
 		/// <summary>
 		/// The side an angle lies in relation to the rest of the shape
 		/// </summary>
 		public enum Side
 		{
-			INTERIOR,
-			EXTERIOR,
-			UNKNOWN
+			Interior,
+			Exterior,
+			Unknown
 		}
 
 		/// <summary>
@@ -32,34 +31,28 @@ namespace FeatureRecognitionAPI.Models.Utility
 		/// </summary>
 		public enum Orientation
 		{
-			COUNTERCLOCKWISE,
-			CLOCKWISE,
-			UNKNOWN
+			Counter,
+			Clockwise,
+			Unknown
 		}
 
-		public class Degrees(double angle)
+		public class Degrees(double value)
 		{
-			public readonly double angle = angle;
+			public readonly double Value = value;
 
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) return false;
 				
-                if (obj is Degrees objD
-                    && angle > objD.angle - ANGLETOLDEG
-                    && angle < objD.angle + ANGLETOLDEG) 
-				{
-					return true;
-				}
+                if (obj is Degrees objD)
+                {
+	                return DoubleEquals(objD.Value, Value, AngleTolDeg);
+                }
 				try
 				{
 					//if numeric try to cast to double
 					double objDbl = Convert.ToDouble(obj);
-					if (angle > objDbl - ANGLETOLDEG
-						&& angle < objDbl + ANGLETOLDEG)
-					{
-						return true;
-					}
+					return DoubleEquals(Value, objDbl, AngleTolDeg);
 				}
 				catch
 				{
@@ -70,63 +63,58 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			public override int GetHashCode()
 			{
-				return HashCode.Combine(angle);
+				return HashCode.Combine(Value);
 			}
 
 			public Degrees GetOppositeAngle()
 			{
-				return new Degrees(360 - angle);
+				return new Degrees(360 - Value);
 			}
 
 			public Radians ToRadians()
 			{
-				return new Radians(angle * Math.PI / 180);
+				return new Radians(Value * Math.PI / 180);
 			}
 		}
 
-		public class Radians(double angle)
+		public class Radians(double value)
 		{
-			public readonly double angle = angle;
+			public readonly double Value = value;
 
 			public Radians GetOppositeAngle()
 			{
-				return new Radians((2 * Math.PI) - angle);
+				return new Radians((2 * Math.PI) - Value);
 			}
 
 			public Degrees ToDegrees()
 			{
-				return new Degrees(angle * 180 / Math.PI);
+				return new Degrees(Value * 180 / Math.PI);
 			}
 
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) return false;
-				if (obj is Degrees objR
-					&& angle > objR.angle - ANGLETOLRAD
-					&& angle < objR.angle + ANGLETOLRAD)
+				
+				if (obj is Degrees objR)
 				{
-					return true;
+					return DoubleEquals(objR.Value, Value, AngleTolRad);
 				}
-                try
-                {
-                    //if numeric try to cast to double
-                    double objDbl = Convert.ToDouble(obj);
-                    if (angle > objDbl - ANGLETOLDEG
-                        && angle < objDbl + ANGLETOLDEG)
-                    {
-                        return true;
-                    }
-                }
-                catch
-                {
-                    return false;
-                }
-                return false;
+				try
+				{
+					//if numeric try to cast to double
+					double objDbl = Convert.ToDouble(obj);
+					return DoubleEquals(Value, objDbl, AngleTolRad);
+				}
+				catch
+				{
+					return false;
+				}
+				return false;
 			}
 
 			public override int GetHashCode()
 			{
-				return HashCode.Combine(angle);
+				return HashCode.Combine(Value);
 			}
 		}
 
@@ -135,50 +123,50 @@ namespace FeatureRecognitionAPI.Models.Utility
 		/// </summary>
 		public class Angle
 		{
-			private readonly Degrees angle;
-			private readonly Side side;
+			private readonly Degrees _angle;
+			private readonly Side _side;
 
 			public Angle(Degrees angle, Side side)
 			{
-				this.angle = angle;
-				this.side = side;
+				_angle = angle;
+				_side = side;
 			}
 
 			public Angle(Radians angle, Side side)
 			{
-				this.angle = angle.ToDegrees();
-				this.side = side;
+				_angle = angle.ToDegrees();
+				_side = side;
 			}
 
 			public Degrees GetDegrees()
 			{
-				return angle;
+				return _angle;
 			}
 
 			public Radians GetRadians()
 			{
-				return angle.ToRadians();
+				return _angle.ToRadians();
 			}
 
 			public Side GetSide()
 			{
-				return side;
+				return _side;
 			}
 
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) { return false; }
 
-                if (obj is Angle ObjA 
-					&& side != Side.UNKNOWN 
-					&& ObjA.side != Side.UNKNOWN)
+                if (obj is Angle objA 
+					&& _side != Side.Unknown 
+					&& objA._side != Side.Unknown)
                 {
-                    if (ObjA.side == this.side && ObjA.angle == this.angle)
+                    if (objA._side == this._side && objA._angle == this._angle)
                     {
                         return true;
                     }
                     //sides are opposite
-                    if (ObjA.side != this.side && ObjA.angle.GetOppositeAngle() == angle)
+                    if (objA._side != this._side && objA._angle.GetOppositeAngle() == _angle)
                     {
                         return true;
                     }
@@ -208,17 +196,12 @@ namespace FeatureRecognitionAPI.Models.Utility
 			return aDelta.X * bDelta.Y - aDelta.Y * bDelta.X;
 		}
 
-        public static double DotProduct(Point a, Point b)
-        {
-            return a.X * b.X + a.Y * b.Y;
-        }
-
-        public static double ToDegrees(double radians)
+        public static double RadToDegrees(double radians)
         {
             return radians * 180 / Math.PI;
         }
         
-        public static double ToRadians(double degrees)
+        public static double DegToRadians(double degrees)
         {
             return degrees *  Math.PI / 180;
         }
@@ -233,25 +216,38 @@ namespace FeatureRecognitionAPI.Models.Utility
 			return aDelta.X * bDelta.X + aDelta.Y * bDelta.Y;
 		}
 
-		// may not handle all cases yet, to be tested
-		public static Angle GetAngle(Line a, Line b, Side targetSide = Side.INTERIOR, Orientation ori = Orientation.COUNTERCLOCKWISE)
+        /// <summary>
+        /// Calculates the dot product of two points treated as vectors
+        /// </summary>
+        public static double DotProduct(Point a, Point b)
+        {
+            return a.X * b.X + a.Y * b.Y;
+        }
+
+        // may not handle all cases yet, to be tested
+        public static Angle GetAngle(Line a, Line b, Side targetSide = Side.Interior, Orientation ori = Orientation.Counter)
 		{
+			if (DoubleEquals(a.Length, 0) || DoubleEquals(b.Length, 0))
+			{
+				return new Angle(new Degrees(0), Side.Unknown);
+			}
+
 			double cross = CrossProduct(a, b);
 			double dot = DotProduct(a, b);
-			Side side = Side.UNKNOWN;
+			Side side = Side.Unknown;
 
-			double cos_theta = dot / (a.Length * b.Length);
-			cos_theta = Math.Max(-1, Math.Min(1, cos_theta));
+			double cosTheta = dot / (a.Length * b.Length);
+			cosTheta = Math.Max(-1, Math.Min(1, cosTheta));
 
-			double angle = Math.Acos(cos_theta) * (180 / Math.PI);
+			double angle = Math.Acos(cosTheta) * (180 / Math.PI);
 
 			if (cross >= 0)
 			{
-				side = Side.INTERIOR;
+				side = Side.Interior;
 			}
 			else if (cross < 0)
 			{
-				side = Side.EXTERIOR;
+				side = Side.Exterior;
 				angle = 360 - angle;
 			}
 
@@ -261,12 +257,12 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			//prefer 0 degrees interior over 360 for opposite facing parallel lines
 			//since it can return 0 or 360 depending on orientation
-			if ((returnAngle.Equals(360) || returnAngle.Equals(0)) && ori == Orientation.CLOCKWISE)
+			if ((returnAngle.Equals(360) || returnAngle.Equals(0)) && ori == Orientation.Clockwise)
 			{
 				returnAngle = returnAngle.GetOppositeAngle();
 			}
 
-			if (side != Side.UNKNOWN && side != targetSide)
+			if (side != Side.Unknown && side != targetSide)
 			{
 				returnAngle = returnAngle.GetOppositeAngle();
 				side = targetSide;
@@ -274,7 +270,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			//default orientation is assumed to be counterclockwise
 			//flip the angle if it is not
-			if (ori == Orientation.CLOCKWISE)
+			if (ori == Orientation.Clockwise)
 			{
 				returnAngle = returnAngle.GetOppositeAngle();
 			}

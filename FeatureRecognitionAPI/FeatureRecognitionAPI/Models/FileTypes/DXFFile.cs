@@ -26,7 +26,7 @@ namespace FeatureRecognitionAPI.Models
                 throw new FileNotFoundException();
         }
 
-        public override FileVersion GetFileVersion()
+        public FileVersion GetFileVersion()
         {
             for (int i = 0; i < _lines.Length; i++)
             {

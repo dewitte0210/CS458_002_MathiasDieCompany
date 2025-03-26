@@ -401,7 +401,7 @@ public class Arc : Entity
 
             double newWidth = Math.Max(a, Math.Max(b, Math.Max(c, d)));
 
-            double rotation = Angles.ToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+            double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
 
             //divide by sqrt(2) because newWidth is distance from center to bounding box corner, not arc edge
             return new Arc(newCenter.X, newCenter.Y, newWidth / Math.Sqrt(2), StartAngle - rotation, EndAngle - rotation);
