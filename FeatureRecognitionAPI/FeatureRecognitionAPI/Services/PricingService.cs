@@ -127,6 +127,7 @@ namespace FeatureRecognitionAPI.Services
                         case PossibleFeatureTypes.Group6: // Radius Notches
                             maxRadius = 4;
                             break;
+                         
                         case PossibleFeatureTypes.StdTubePunch:
                             //Get the closest diameter from list
                             var tubePunch = _tubePunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
@@ -135,7 +136,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var punchCost = quantity * runCost;
                             featureCost = punchCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
+                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.StdTubePunch, quantity);
                             continue;
                         case PossibleFeatureTypes.SideOutlet:
                             //Get the closest diameter from list
@@ -145,7 +146,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var soCost = quantity * runCost;
                             featureCost = soCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
+                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.SideOutlet, quantity);
                             continue;
                         case PossibleFeatureTypes.HDSideOutlet:
                             //Get the closest diameter from list
@@ -155,7 +156,7 @@ namespace FeatureRecognitionAPI.Services
                             
                             var hdsoCost = quantity * runCost;
                             featureCost = hdsoCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
+                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.HDSideOutlet, quantity);
                             continue;
                         case PossibleFeatureTypes.StdFTPunch:
                             //Get the closest diameter from list
@@ -165,7 +166,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var ftCost = quantity * runCost;
                             featureCost = ftCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
+                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.StdFTPunch, quantity);
                             continue;
                         case PossibleFeatureTypes.StdSWPunch:
                             //Get the closest diameter from list
@@ -175,7 +176,7 @@ namespace FeatureRecognitionAPI.Services
 
                             var swCost = quantity * runCost;
                             featureCost = swCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
+                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.StdSWPunch, quantity);
                             continue;
                         case PossibleFeatureTypes.StdRetractPins:
                             //Get the closest diameter from list
@@ -235,7 +236,7 @@ namespace FeatureRecognitionAPI.Services
                         i++;
                     }
                     
-                    featureCost = featureCost * ruleFactor;
+                    featureCost *= ruleFactor;
                     featureSetup = featureCost * SetupDiscount(feature.Count);
                     totalFeatureCost += featureCost;
                     setupCostTotal += featureSetup;
@@ -254,6 +255,157 @@ namespace FeatureRecognitionAPI.Services
             }
         }
 
+        private double PunchDiscount(PossibleFeatureTypes punchType, int count)
+        {
+            double discount = 1;
+
+            switch (punchType)
+            {
+                case PossibleFeatureTypes.HDSideOutlet:
+                    discount = HDSideDiscount(count);
+                    break;
+                case PossibleFeatureTypes.StdFTPunch:
+                    discount = StdFtDiscount(count); 
+                    break;
+                case PossibleFeatureTypes.StdSWPunch:
+                    discount = StdSwDiscount(count);
+                    break;
+                case PossibleFeatureTypes.StdTubePunch:
+                    discount = TubeDiscount(count);
+                    break;
+                case PossibleFeatureTypes.SideOutlet:
+                    discount = SideOutletDiscount(count);
+                    break;
+            }
+            return discount;
+        }
+
+        private double SideOutletDiscount(int count)
+        {
+            double discount;
+            switch (count)
+            {
+                case >= 200:
+                    discount = 0.73;
+                    break;
+                case >= 100:
+                    discount = 0.77;
+                    break;
+                case >= 50:
+                    discount = 0.82;
+                    break;
+                case >= 25:
+                    discount = 0.90;
+                    break;
+                case >= 13:
+                    discount = 0.94;
+                    break;
+                default:
+                    discount = 1;
+                    break;
+            }
+            return discount;
+        }
+        
+        private double TubeDiscount(int count)
+        {
+            double discount;
+            switch (count)
+            {
+                case >= 200:
+                    discount = 0.56;
+                    break;
+                case >= 100:
+                    discount = 0.64;
+                    break;
+                case >= 50:
+                    discount = 0.73;
+                    break;
+                case >= 25:
+                    discount = 0.85;
+                    break;
+                case >= 13:
+                    discount = 0.93;
+                    break;
+                default:
+                    discount = 1;
+                    break;
+            }
+            return discount;
+        }
+        private double StdSwDiscount(int count)
+        {
+            double discount;
+            switch (count)
+            {
+                case >= 50:
+                    discount = 0.79;
+                    break;
+                case >= 25:
+                    discount = 0.86;
+                    break;
+                case >= 13:
+                    discount = 0.93;
+                    break;
+                default:
+                    discount = 1;
+                    break;
+            }
+            return discount;
+        }
+        private double StdFtDiscount(int count)
+        {
+            double discount;
+            switch (count)
+            {
+                case >= 200:
+                    discount = 0.67;
+                    break;
+                case >= 100:
+                    discount = 0.78;
+                    break;
+                case >= 50:
+                    discount = 0.82;
+                    break;
+                case >= 25:
+                    discount = 0.86;
+                    break;
+                case >= 13:
+                    discount = 0.93;
+                    break;
+                default:
+                    discount = 1;
+                    break;
+            }
+            return discount;
+        }
+        private double HDSideDiscount(int count)
+        {
+            double discount;
+            switch (count)
+            {
+                case >= 200:
+                    discount = 0.83;
+                    break;
+                case >= 100:
+                    discount = 0.86;
+                    break;
+                case >= 50:
+                    discount = 0.89;
+                    break;
+                case >= 25:
+                    discount = 0.93;
+                    break;
+                case >= 13:
+                    discount = 0.97;
+                    break;
+                default:
+                    discount = 1;
+                    break;
+            }
+            return discount;
+        }
+        
         private double SetupDiscount(int count)
         {
             return count switch
