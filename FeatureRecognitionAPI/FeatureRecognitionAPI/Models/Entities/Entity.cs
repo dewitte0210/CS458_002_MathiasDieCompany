@@ -392,7 +392,7 @@ namespace FeatureRecognitionAPI.Models
             return intersect1IsValid || intersect2IsValid;
         }
 
-        internal bool IntersectLineWithEllipse(Line line, Ellipse ellipse)
+        internal static bool IntersectLineWithEllipse(Line line, Ellipse ellipse)
         {
             //Need to rotate the line around the origin for rotated ellipses
             double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
@@ -542,86 +542,86 @@ namespace FeatureRecognitionAPI.Models
             {
                 return false;
             }
-            if (this is Line)
+            if (this is Line line1)
             {
-                if (e2 is Line)
+                if (e2 is Line line2)
                 {
-                    if (((Line)this).StartPoint.Equals(((Line)e2).StartPoint))
+                    if (line1.StartPoint.Equals(line2.StartPoint))
                     {
                         return true;
                     }
-                    if (((Line)this).StartPoint.Equals(((Line)e2).EndPoint))
+                    if (line1.StartPoint.Equals(line2.EndPoint))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Line)e2).StartPoint))
+                    if (line1.EndPoint.Equals(line2.StartPoint))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Line)e2).EndPoint))
+                    if (line1.EndPoint.Equals(line2.EndPoint))
                     {
                         return true;
                     }
                     return false;
                 }
-                else if (e2 is Arc)
+                else if (e2 is Arc arc)
                 {
-                    if (((Line)this).StartPoint.Equals(((Arc)e2).Start))
+                    if (line1.StartPoint.Equals(arc.Start))
                     {
                         return true;
                     }
-                    if (((Line)this).StartPoint.Equals(((Arc)e2).End))
+                    if (line1.StartPoint.Equals(arc.End))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Arc)e2).Start))
+                    if (line1.EndPoint.Equals(arc.Start))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Arc)e2).End))
+                    if (line1.EndPoint.Equals(arc.End))
                     {
                         return true;
                     }
                     return false;
                 }
             }
-            else if (this is Arc)
+            else if (this is Arc arc)
             {
-                if (e2 is Line)
+                if (e2 is Line line)
                 {
-                    if (((Arc)this).Start.Equals(((Line)e2).StartPoint))
+                    if (arc.Start.Equals(line.StartPoint))
                     {
                         return true;
                     }
-                    if (((Arc)this).Start.Equals(((Line)e2).EndPoint))
+                    if (arc.Start.Equals(line.EndPoint))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Line)e2).StartPoint))
+                    if (arc.End.Equals(line.StartPoint))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Line)e2).EndPoint))
+                    if (arc.End.Equals(line.EndPoint))
                     {
                         return true;
                     }
                     return false;
                 }
-                else if (e2 is Arc)
+                else if (e2 is Arc arc2)
                 {
-                    if (((Arc)this).Start.Equals(((Arc)e2).Start))
+                    if (arc.Start.Equals(arc2.Start))
                     {
                         return true;
                     }
-                    if (((Arc)this).Start.Equals(((Arc)e2).End))
+                    if (arc.Start.Equals(arc2.End))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Arc)e2).Start))
+                    if (arc.End.Equals(arc2.Start))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Arc)e2).End))
+                    if (arc.End.Equals(arc2.End))
                     {
                         return true;
                     }
@@ -639,7 +639,7 @@ namespace FeatureRecognitionAPI.Models
          * @param line2 is the second line being checked
          * @return the point that line1 and line2 intersects. The points intersect field will be false if they are parallel
          */
-        public static Point getIntersectPoint(Line line1, Line line2)
+        public static Point GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
             double A1 = line1.EndPoint.Y - line1.StartPoint.Y;
@@ -652,7 +652,7 @@ namespace FeatureRecognitionAPI.Models
 
             double delta = A1 * B2 - A2 * B1;
 
-            // Lines are parralell and thus cannot intersect
+            // Lines are parallel and thus cannot intersect
             intersectPoint.intersect = !(delta == 0);
 
             // Intersection point
@@ -660,7 +660,7 @@ namespace FeatureRecognitionAPI.Models
             return intersectPoint;
         }
 
-        internal static Point getIntersectPoint(Line line, Arc arc)
+        internal static Point GetIntersectPoint(Line line, Arc arc)
         {
             //  Get line in the slope-intercept form, then transform it to the
             //  general form: Ax + By + C = 0
@@ -763,7 +763,7 @@ namespace FeatureRecognitionAPI.Models
             return null;
         }
 
-        internal Point getIntersectPoint(Line line, Ellipse ellipse)
+        internal static Point GetIntersectPoint(Line line, Ellipse ellipse)
         {
             //Need to rotate the line around the origin for rotated ellipses
             double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;

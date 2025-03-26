@@ -125,7 +125,7 @@ namespace FeatureRecognitionAPI.Services
                 for (int i = 0; i < featureGroups.Count; i++)
                 {
                     features = supportedFile.makeFeatureList(featureGroups[i].touchingEntities);
-                    featureGroups[i].setFeatureList(features);
+                    featureGroups[i].SetFeatureList(features);
                 }
 
                 // Create JSON that will be sent to the frontend

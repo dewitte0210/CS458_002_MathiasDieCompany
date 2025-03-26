@@ -40,10 +40,10 @@ public class Feature
     //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
 
-    public int getNumLines() { return numLines; }
-    public int getNumArcs() { return numArcs; }
-    public int getNumCircles() { return numCircles; }
-    public int getNumEllipses() { return numEllipses; }
+    public int GetNumLines() { return numLines; }
+    public int GetNumArcs() { return numArcs; }
+    public int GetNumCircles() { return numCircles; }
+    public int GetNumEllipses() { return numEllipses; }
 
     private int numEllipses = 0;
     private int numLines = 0;
@@ -75,7 +75,7 @@ public class Feature
         PerimeterEntityList = new List<List<Entity>>();
         this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
-        calcPerimeter();
+        CalcPerimeter();
     }
 
     /*
@@ -100,7 +100,7 @@ public class Feature
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
 
         //calculate and set the perimeter of the feature
-        calcPerimeter();
+        CalcPerimeter();
     }
 
     #endregion
@@ -203,10 +203,10 @@ public class Feature
         CheckGroup6Perimeter();
             
         //calculate and set the perimeter of the feature
-        calcPerimeter();
+        CalcPerimeter();
 
         //check if the feature has multiple radii
-        checkMultipleRadius();
+        CheckMultipleRadius();
     }
 
 
@@ -705,7 +705,7 @@ public class Feature
                 if (baseEntityList[i] is Line)
                 {
                     Line currEntity = (baseEntityList[i] as Line);
-                    if (Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
+                    if (Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
                     {
                         numEndPointIntersections++;
                     }
@@ -713,7 +713,7 @@ public class Feature
                 else if (baseEntityList[i] is Arc)
                 {
                     Arc currEntity = (baseEntityList[i] as Arc);
-                    if (Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.Start) || Entity.getIntersectPoint(ray, currEntity).Equals(currEntity.End))
+                    if (Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.Start) || Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.End))
                     {
                         numEndPointIntersections++;
                     }
@@ -721,7 +721,7 @@ public class Feature
                 else if(baseEntityList[i] is Ellipse ellipse)
                 {
                     double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
-                    if (ray.getIntersectPoint(ray, ellipse).Equals(ellipse.StartPoint) || ray.getIntersectPoint(ray, ellipse).Equals(ellipse.EndPoint))
+                    if (Entity.GetIntersectPoint(ray, ellipse).Equals(ellipse.StartPoint) || Entity.GetIntersectPoint(ray, ellipse).Equals(ellipse.EndPoint))
                     {
                         numEndPointIntersections++;
                     }
@@ -885,7 +885,7 @@ public class Feature
     #region Group6base
 
     /*
-     * Checks the feature it is being called on to see if it is a group 6 base feature (trapeziod with radius corners).
+     * Checks the feature it is being called on to see if it is a group 6 base feature (trapezoid with radius corners).
      *
      * @return True if it is Group 6, false if not
      */
@@ -1147,25 +1147,13 @@ public class Feature
     #region ExtendEntities
 
     /*
-     * Recursive function that calls extendAllEntitiesHelper. Useful for testing if you want to extend entities
-     * on a certain list without changing the baseEntityList
-     *
-     * @Param myEntityList parameter that extendedEntityList is set equal to
-     */
-    public void extendAllEntities(List<Entity> myEntityList)
-    {
-        ExtendedEntityList = myEntityList;
-        extendAllEntitiesHelper();
-    }
-
-    /*
      *  Recursive function that calls extendAllEntitiesHelper. Sets extendedEntityList to EntityList.
      *  This is the main function that should be called to extend entities
      */
-    public void extendAllEntities()
+    public void ExtendAllEntities()
     {
         ExtendedEntityList = new List<Entity>(EntityList);
-        extendAllEntitiesHelper();
+        ExtendAllEntitiesHelper();
     }
 
     /*
@@ -1174,7 +1162,7 @@ public class Feature
      * Should be N^N runtime seeing as the nested for loops is N^2, then it is called recursively with N-1 every time.
      * This makes it (((N!)^2) * N!) which is
      */
-    private void extendAllEntitiesHelper()
+    private void ExtendAllEntitiesHelper()
     {
         bool extendedALine = false;
         int i = 0;
@@ -1190,7 +1178,7 @@ public class Feature
                         // for each entity it checks if it can extend with every other entity and does so
                         // removes the two previous entities
                         // new extended lines are added in the extendTwoLines method
-                        if (extendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
+                        if (ExtendTwoLines((Line)ExtendedEntityList[i], (Line)ExtendedEntityList[j]))
                         {
                             extendedALine = true;
                         }
@@ -1205,7 +1193,7 @@ public class Feature
 
         if (extendedALine)
         {
-            extendAllEntitiesHelper();
+            ExtendAllEntitiesHelper();
         }
     }
 
@@ -1214,54 +1202,18 @@ public class Feature
      * 2. are parallel or perpendicular
      * adds extended line(parallel) or lines(perpendicular) to extendedEntityList
      * Perpendicular functionality has been commented out due to inconsistent slopes of lines,
-     * which means a perpendicular angle of intersection is not garunteed on features it should be
+     * which means a perpendicular angle of intersection is not guaranteed on features it should be
      *
      * @Param line1 is the first line being extended
      * @Param line2 is the second line being extended
-     * @Return true if succesfully extended. Could be false if the two lines dont have an intersect point,
-     * arent the same infinate line, or already touch
+     * @Return true if successfully extended. Could be false if the two lines don't have an intersect point,
+     * aren't the same infinite line, or already touch
      */
-    private bool extendTwoLines(Line line1, Line line2)
+    private bool ExtendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2))
-            //makes sure youre not extending lines that already touch
+            //makes sure you're not extending lines that already touch
         {
-            //Does not need to detect if lines are perpendicular since they might not be perfectly perpendicular
-            //check if the lines are parallel or perpendicular
-            /*if (line1.isPerpendicular(line2))
-            {
-                Point intersectPoint = line1.getIntersectPoint(line1, line2);
-                Point PointToExtendLine1 = line1.findPointToExtend(line1, intersectPoint);
-                Point PointToExtendLine2 = line2.findPointToExtend(line2, intersectPoint);
-                if (PointToExtendLine1 != null && PointToExtendLine2 != null)
-                {
-                    // Logic for extending line1: determines what point to extend for line1
-                    if (PointToExtendLine1.X == line1.Start.X && PointToExtendLine1.Y == line1.Start.Y)
-                    {
-                        //make new line1 line with extended start point
-                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line1.End.X, line1.End.Y, true));
-                    }
-                    else
-                    {
-                        //make new line1 line with extended end point
-                        ExtendedEntityList.Add(new Line(line1.Start.X, line1.Start.Y, intersectPoint.X, intersectPoint.Y, true));
-                    }
-
-
-                    // Logic for extending line2: determines what point to extend for line2
-                    if (PointToExtendLine2.X == line2.Start.X && PointToExtendLine2.Y == line2.Start.Y)
-                    {
-                        //make new line2 line with extended start point
-                        ExtendedEntityList.Add(new Line(intersectPoint.X, intersectPoint.Y, line2.End.X, line2.End.Y, true));
-                    }
-                    else
-                    {
-                        //make new line2 line with extended end point
-                        ExtendedEntityList.Add(new Line(line2.Start.X, line2.Start.Y, intersectPoint.X, intersectPoint.Y, true));
-                    }
-                    return true;
-                }
-            }*/
             if (line1.isSameInfiniteLine(line2))
             {
                 ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
@@ -1285,7 +1237,7 @@ public class Feature
      *
      * @Return true if successfully seperates base entities
      */
-    public bool seperateBaseEntities()
+    public bool SeperateBaseEntities()
     {
         if (ExtendedEntityList[0] is Circle) // case where the feature contains a circle
         {
@@ -1315,7 +1267,7 @@ public class Feature
         }
 
         curPath.Push(head); // pushes the head to the current Path
-        if (seperateBaseEntitiesHelper(curPath, testedEntities, head))
+        if (SeperateBaseEntitiesHelper(curPath, testedEntities, head))
             // if it can find a Path
         {
             baseEntityList = curPath.ToList(); // converts the stack to an Entity<List>
@@ -1330,11 +1282,11 @@ public class Feature
      * recursive helper function to find a closed shape with extended lines
      *
      * @Param Path is the current Path that has been taken
-     * @Param testedEnttiies is a list of enties that have been visited
+     * @Param testedEntities is a list of entities that have been visited
      * @Param head is the target entity that is trying to loop back through
      * @Return true if a Path has been found
      */
-    private bool seperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
+    private bool SeperateBaseEntitiesHelper(Stack<Entity> curPath, List<Entity> testedEntities, Entity head)
     {
         if (curPath.Count > 2)
         {
@@ -1359,7 +1311,7 @@ public class Feature
                     // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
-                    if (seperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
+                    if (SeperateBaseEntitiesHelper(curPath, testedEntities, head)) //recursive call with updated Path
                     {
                         return true;
                     }
@@ -1378,7 +1330,7 @@ public class Feature
                 {
                     curPath.Clear(); //clears Path and adds the new head to it
                     curPath.Push(entity);
-                    return seperateBaseEntitiesHelper(curPath, testedEntities, entity);
+                    return SeperateBaseEntitiesHelper(curPath, testedEntities, entity);
                 }
             }
         }
@@ -1397,7 +1349,7 @@ public class Feature
      *
      * @Return true if a valid Path is found and seperated successfully
      */
-    public void seperatePerimeterEntities()
+    public void SeperatePerimeterEntities()
     {
         // lists to pass to the helper function
         List<Entity> path = new List<Entity>();
@@ -1407,7 +1359,7 @@ public class Feature
             ExtendedEntityList.Remove(entity);
         }
 
-        addBackParents();
+        AddBackParents();
         // at this point ExtendedEntityList should only contain perimeter features
 
         List<Entity> unusedEntities = new List<Entity>(ExtendedEntityList);
@@ -1416,7 +1368,7 @@ public class Feature
 
         while (unusedEntities.Count > 0)
         {
-            getTouchingList(path, unusedEntities, null);
+            GetTouchingList(path, unusedEntities, null);
             if (path.Count > 0)
             {
                 PerimeterEntityList.Add(new List<Entity>(path));
@@ -1426,59 +1378,13 @@ public class Feature
         }
     }
 
-    /*
-        public void seperatePerimeterEntitiesHelper(List<Entity> Path, List<Entity> unusedEntities, Entity curEntity)
-        {
-            if (unusedEntities.Count > 0) // base case: all entities have been used in a perimeter feature
-            {
-                if (curEntity is null) // means not at any entity currently
-                {
-                    if (Path.Count > 0)
-                    {
-                        PerimeterEntityList.Add(new List<Entity>(Path)); // adds all perimeter feature paths besides last one
-                    }
-                    Path.Clear();
-                    Path.Add(unusedEntities[0]);
-                    unusedEntities.RemoveAt(0);
-                    seperatePerimeterEntitiesHelper(Path, unusedEntities, Path.Last());
-                }
-                else // means there is a current entity
-                {
-                    bool intersected;
-                    do
-                    {
-                        intersected = false;
-                        foreach (Entity entity in unusedEntities)
-                        {
-                            if (curEntity.DoesIntersect(entity)) // add every unused entity that intersects current entity
-                            {
-                                Path.Add(entity);
-                                unusedEntities.Remove(entity);
-                                intersected = true;
-                                seperatePerimeterEntitiesHelper(Path, unusedEntities, Path.Last()); // reruns with touching entity now being current entity
-
-                                break;
-                            }
-                        }
-
-                    } while (intersected);
-
-                    if (Path.Count > 0)
-                    {
-                        PerimeterEntityList.Add(new List<Entity>(Path));
-                    }
-                    seperatePerimeterEntitiesHelper(Path, unusedEntities, null); // all touching entities to current entitiy have been found, rerun with null current entity
-                }
-            }
-        }
-    */
     /* Recursive function that adds all entities in unusedEntities that intersect curEntity into Path
      *
      * @Param Path is the list of touching entities
      * @Param unusedEntities are all available entities to add
      * @Param curEntity is the current entity being checked
      */
-    public void getTouchingList(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+    public void GetTouchingList(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
     {
         if (curEntity is null)
         {
@@ -1503,40 +1409,28 @@ public class Feature
 
         foreach (Entity entity in touchingList)
         {
-            getTouchingList(path, unusedEntities, entity);
-        }
-    }
-
-    // Adds back all parents of all extended lines in targetList
-    private void addBackParents(List<Entity> targetList)
-    {
-        foreach (Entity entity in targetList)
-        {
-            if (entity is ExtendedLine)
-            {
-                addBackParentsHelper((ExtendedLine)entity, targetList);
-            }
+            GetTouchingList(path, unusedEntities, entity);
         }
     }
 
     // Adds back all parents of extended lines that are not in baseEntityList back into ExtendedEntityList
-    private void addBackParents()
+    private void AddBackParents()
     {
         for (int i = 0; i < ExtendedEntityList.Count; i++)
         {
             if (ExtendedEntityList[i] is ExtendedLine && (!baseEntityList.Contains(ExtendedEntityList[i])))
             {
-                addBackParentsHelper((ExtendedLine)ExtendedEntityList[i], ExtendedEntityList);
+                AddBackParentsHelper((ExtendedLine)ExtendedEntityList[i], ExtendedEntityList);
                 i--;
             }
         }
     }
 
-    private void addBackParentsHelper(ExtendedLine exLine, List<Entity> targetList)
+    private void AddBackParentsHelper(ExtendedLine exLine, List<Entity> targetList)
     {
         if (exLine.Parent1 is ExtendedLine)
         {
-            addBackParentsHelper((ExtendedLine)exLine.Parent1, targetList);
+            AddBackParentsHelper((ExtendedLine)exLine.Parent1, targetList);
         }
         else
         {
@@ -1545,7 +1439,7 @@ public class Feature
 
         if (exLine.Parent2 is ExtendedLine)
         {
-            addBackParentsHelper((ExtendedLine)exLine.Parent2, targetList);
+            AddBackParentsHelper((ExtendedLine)exLine.Parent2, targetList);
         }
         else
         {
@@ -1654,7 +1548,7 @@ public class Feature
      * This should only be called once, and probably by the constructor, but the perimeter = 0 is a safeguard in case this is
      * called more than once.
      */
-    public void calcPerimeter()
+    public void CalcPerimeter()
     {
         perimeter = 0;
         for (int i = 0; i < EntityList.Count; i++)
@@ -1672,7 +1566,7 @@ public class Feature
      * Function that checks the number of unique radius lengths in a feature.
      * multipleRadius is initially set to 1, incremented for each unique radius found.
      */
-    public void checkMultipleRadius()
+    public void CheckMultipleRadius()
     {
         // Only can be run on Group 1A2, 1C, and 2A2
         if (FeatureType == PossibleFeatureTypes.Group1A2 || FeatureType == PossibleFeatureTypes.Group1C ||
