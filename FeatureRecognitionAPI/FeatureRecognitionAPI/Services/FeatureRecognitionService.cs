@@ -114,8 +114,7 @@ namespace FeatureRecognitionAPI.Services
 
                 
                 // Create the touching entity list
-                List<List<Entity>> touchingEntityList = supportedFile.makeTouchingEntitiesList(supportedFile.GetEntities());
-                touchingEntityList = touchingEntityList.Select(list => CondenseArcs(list)).ToList();
+                List<List<Entity>> touchingEntityList = supportedFile.makeTouchingEntitiesList(CondenseArcs(supportedFile.GetEntities()));
                 
                 // Set the feature groups
                 List<FeatureGroup> featureGroups = supportedFile.SetFeatureGroups(touchingEntityList);
