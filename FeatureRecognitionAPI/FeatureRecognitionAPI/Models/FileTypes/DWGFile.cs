@@ -42,7 +42,7 @@ namespace FeatureRecognitionAPI.Models
             _fileVersion = GetFileVersion(doc.Header.VersionString);
             ReadEntities(doc);
         }
-        //Throws exeption if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
+        //Throws exception if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
 
         public FileVersion GetFileVersion(string version)
         {

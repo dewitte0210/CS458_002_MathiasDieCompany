@@ -56,7 +56,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(-2, -1, 0, 5);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.False);
         }
 
@@ -65,7 +65,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(1, 0, 4, 3);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.True);
         }
 
@@ -74,7 +74,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(3, -1, 4, 7);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.True);
         }
 
@@ -83,7 +83,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(0, 6, 4, 6);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.False);
         }
 
@@ -92,7 +92,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(3, 2, 5, 2);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.True);
         }
 
@@ -101,7 +101,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(4, 0, 4, 6);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.False);
         }
 
@@ -110,7 +110,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(3, -1, 3, 6);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = resultLine.IntersectLineWithArc(resultLine, resultArc);
+            bool result = Entity.IntersectLineWithArc(resultLine, resultArc);
             Assert.That(result, Is.True);
         }
         #endregion
@@ -121,7 +121,7 @@ namespace Testing_for_Project
         {
             Arc arc1 = new Arc(0.0, 0.0, 10, 270, 90);
             Arc arc2 = new Arc(20.0, 0.0, 10, 90, 280);
-            bool result = arc1.IntersectArcWithArc(arc1, arc2);
+            bool result = Entity.IntersectArcWithArc(arc1, arc2);
             Assert.That(result, Is.True);
         }
 
@@ -130,7 +130,7 @@ namespace Testing_for_Project
         {
             Arc arc1 = new Arc(0.0, 0.0, 10, 270, 90);
             Arc arc2 = new Arc(25.0, 0.0, 10, 90, 280);
-            bool result = arc1.IntersectArcWithArc(arc1, arc2);
+            bool result = Entity.IntersectArcWithArc(arc1, arc2);
             Assert.That(result, Is.False);
         }
 
@@ -139,7 +139,7 @@ namespace Testing_for_Project
         {
             Arc arc1 = new Arc(0.0, 0.0, 10, 270, 90);
             Arc arc2 = new Arc(19.0, 0.0, 10, 90, 270);
-            bool result = arc1.IntersectArcWithArc(arc1, arc2);
+            bool result = Entity.IntersectArcWithArc(arc1, arc2);
             Assert.That(result, Is.True);
         }
         #endregion
@@ -150,7 +150,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 5.0);
             Line line2 = new(0.0, 5.0, 5.0, 0.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.True);
         }
 
@@ -159,7 +159,7 @@ namespace Testing_for_Project
         {
             Line line2 = new(0.0, 0.0, 5.0, 5.0);
             Line line1 = new(2.0, -1.0, 2.0, 6.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.True);
         }
 
@@ -168,7 +168,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 5.0);
             Line line2 = new(2.0, -1.0, 2.0, 6.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.True);
         }
 
@@ -177,7 +177,7 @@ namespace Testing_for_Project
         {
             Line line2 = new(0.0, 0.0, 5.0, 5.0);
             Line line1 = new(-1.0, 3.0, 6.0, 3.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.True);
         }
 
@@ -186,7 +186,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 5.0);
             Line line2 = new(-1.0, 3.0, 6.0, 3.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.True);
         }
 
@@ -195,7 +195,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 1.0);
             Line line2 = new(5.0, 5.0, 5.0, 4.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.False);
         }
 
@@ -204,7 +204,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 0.0);
             Line line2 = new(0.0, 5.0, 5.0, 5.0);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.False);
         }
 
@@ -213,7 +213,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(2, 2, 12, 2);
             Line line2 = new(2, 2, 2, 8);
-            bool result = line1.IntersectLineWithLine(line1, line2);
+            bool result = Entity.IntersectLineWithLine(line1, line2);
             Assert.That(result, Is.True);
         }
         #endregion

@@ -22,34 +22,6 @@ namespace FeatureRecognitionAPI.Models
         internal List<FeatureGroup> FeatureGroups { get; }
         protected FileVersion _fileVersion;
 
-        //These functions below exist for testing purposes
-
-        #region testingFunctions
-
-        public int GetFeatureGroupCount()
-        {
-            return FeatureGroups.Count;
-        }
-
-        public int GetTotalFeatureGroups()
-        {
-            int tmp = 0;
-            foreach (FeatureGroup fGroup in FeatureGroups)
-            {
-                tmp += fGroup.Count;
-            }
-
-            return tmp;
-        }
-
-        public List<FeatureGroup> GetFeatureGroups()
-        {
-            return FeatureGroups;
-        }
-
-        #endregion
-
-
         #region Constructors
 
         //protected keyword for nested enum is about granting 
@@ -80,9 +52,9 @@ namespace FeatureRecognitionAPI.Models
             for (int i = 0; i < entities.Count(); i++)
             {
                 Feature feature = new Feature(entities[i]);
-                feature.extendAllEntities();
-                feature.seperateBaseEntities();
-                feature.seperatePerimeterEntities();
+                feature.ExtendAllEntities();
+                feature.SeperateBaseEntities();
+                feature.SeperatePerimeterEntities();
                 feature.DetectFeatures();
                 FeatureList.Add(feature);
                 if (feature.PerimeterEntityList != null)
