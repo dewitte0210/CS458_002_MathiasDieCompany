@@ -3,7 +3,7 @@
  * calc number up using number of borders
  *
  * for optimization before detecting features ignore all entity groups outside
- * the first border and calculates feautrues only for that one
+ * the first border and calculates features only for that one
  */
 
 using FeatureRecognitionAPI.Models;
@@ -16,7 +16,7 @@ public class Feature
 {
     [JsonProperty] public PossibleFeatureTypes FeatureType { get; set; }
 
-    // A list of all the perimeter features attached to this features.
+    // A list of all the perimeter features attached to these features.
     [JsonProperty] public List<PerimeterFeatureTypes> PerimeterFeatures { get; set; }
 
     [JsonProperty] public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
@@ -26,6 +26,7 @@ public class Feature
     [JsonProperty] public double perimeter;
     [JsonProperty] public double diameter;
     [JsonProperty] public int count;
+    [JsonProperty] public int NumChamfers = 0;
 
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -35,10 +36,10 @@ public class Feature
     // contain entities that make up the base shape and possibly corner features
     internal List<Entity> baseEntityList;
 
-    // 2 dimensional list where each list at each index is a group of
+    // 2-dimensional list where each list at each index is a group of
     // touching entities that make up a single perimeter feature for
     // the original feature
-    //EXAMPLE: <[list for Mitiered notch], [list for raduis notch], [list for Group17], [list for chamfered corner]>
+    //EXAMPLE: <[list for Mitered notch], [list for radius notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
     internal List<List<Entity>> PerimeterEntityList;
 
@@ -65,7 +66,7 @@ public class Feature
      * @Param EntityList is the EntityList being passed into the feature. could be a base feature,
      * that includes perimeter features, or just the list for a perimeter feature
      * @Param kissCut stores whether the feature is kiss cut
-     * @Param multipleRadius stores whther the feature has multiple radiuses for rounded corners
+     * @Param multipleRadius stores whether the feature has multiple radiuses for rounded corners
      */
     public Feature(List<Entity> entityList, bool kissCut, int multipleRadius)
     {
@@ -83,7 +84,7 @@ public class Feature
     /*
      * Constructor that is expected to be used the most as it just passes in the EntityList for the
      * feature and detection, along with all other fields will be calculated based off this list in
-     * a seperate function
+     * a separate function
      *
      * @Param EntityList is the list being passed into the feature which includes all base entities
      * of the feature, including the perimeter features entities, unless the feature is just a
@@ -116,9 +117,9 @@ public class Feature
      * and any changes to the list in this function will change the list in the scope of wherever this
      * function was called from
      * @Param numLines is the counted number of lines. The out keyword means that the value is returned
-     * to the paramter passed when calling the function
+     * to the parameter passed when calling the function
      * @Param numArcs is the counted number of arcs. The out keyword means that the value is returned
-     * to the paramter passed when calling the function
+     * to the parameter passed when calling the function
      * @Param numCircles is the counted number of circles. The out keyword means that the value is returned
      * to the paramter passed when calling the function. As far as I can tell there should only ever be one
      * circle in a feature, and should be the only entity in the list
@@ -200,6 +201,7 @@ public class Feature
         }
         
         // Perimeter Feature Detection
+        CheckGroup3();
         CheckGroup4();
         CheckGroup5();
         CheckGroup6Perimeter();
@@ -944,96 +946,132 @@ public class Feature
             4 corners
                 have the user select a base chamfer
                 or just use the count as it is and visualize from 4 shortest
+                
+        calculates in bulk so do not call per entity
+        only runs detection on perimeter features since chamfers
+          are only on the outside of a part
+        returns true if no problems??
     */
-    public bool CheckGroup3()
+
+    private List<Line> GetLinesFrom2DEntityList(List<List<Entity>> entities)
     {
-        //these can be private since it can be figured out from line chamfertype tag
-        int numPossibleChamfers = 0;
-        int numConfirmedChamfers = 0;
-
-        List<Line> possibleChamferList = [];
-        List<Line> confirmerdChamferList = [];
-
-        //assumes line list is ordered, transition to adj list when finished
+        // current assumptions made:
+        // all entities have an adjacent
+        // the first adjacent is different so a loop is not made
+        // orientation is consistent
+            
+        //List<Entity> tempEntityList = [];
+        //tempEntityList.Add(startEntity);
+        //Entity currentEntity = startEntity.AdjList[0];
+        //int loopCount = 50;
+        //
+        //while (!currentEntity.Equals(startEntity) && loopCount > 0)
+        //{
+        //    tempEntityList.Add(currentEntity);
+        //    currentEntity = currentEntity.AdjList[0];
+        //    loopCount--;
+        //}
+        
         List<Line> lineList = [];
-
-        for (int i = 0; i < EntityList.Count; i++)
+        foreach (List<Entity> perimeterLoop in PerimeterEntityList) //tempEntityList
         {
-            if (EntityList[i] is Line line)
+            foreach (Entity entity in perimeterLoop)
             {
-                lineList.Add(line);
+                if (entity is Line line)
+                {
+                    //this will probably combine all perimeter lines into one list
+                    //need to fix
+                    lineList.Add(line);
+                }
             }
         }
-
-        //check potential chamfers
-        if (lineList.Count >= 3)
+        return lineList;
+    }
+    public void CheckGroup3()
+    {
+        if (FeatureType == PossibleFeatureTypes.Group1A1)
         {
-            for (int i = 0; i < lineList.Count; i++)
+            //these can be private since it can be figured out from line chamfertype tag
+            
+            //replace count with list counts
+            int numPossibleChamfers = 0;
+            int numConfirmedChamfers = 0;
+            List<Line> possibleChamferList = [];
+            List<Line> confirmedChamferList = [];
+
+            List<Line> lineList = GetLinesFrom2DEntityList(PerimeterEntityList);
+
+            //check potential chamfers
+            if (lineList.Count >= 3)
             {
-                Line lineA = lineList[i];
-                Line lineB = lineList[(i + 1) % lineList.Count];
-                Line lineC = lineList[(i + 2) % lineList.Count];
-
-                //need to verify orientation of lines
-                Angle angleAB = GetAngle(lineA, lineB, Side.Interior);
-                Angle angleBC = GetAngle(lineB, lineC, Side.Interior);
-                Angle angleAC = GetAngle(lineA, lineC, Side.Interior);
-
-                if (angleAC.GetDegrees().Value < 180 && angleAB.Equals(angleBC) && angleAB.GetDegrees().Value > 90)
+                for (int i = 0; i < lineList.Count; i++)
                 {
-                    lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
-                    numPossibleChamfers++;
-                    possibleChamferList.Add(lineB);
-                }
-            }
+                    Line lineA = lineList[i];
+                    Line lineB = lineList[(i + 1) % lineList.Count];
+                    Line lineC = lineList[(i + 2) % lineList.Count];
 
-            // if only one chamfer, it is confirmed to be chamfer
-            if (numPossibleChamfers == 1)
-            {
-                confirmerdChamferList = possibleChamferList;
-                numConfirmedChamfers = numPossibleChamfers;
+                    //need to verify orientation of lines
+                    Angle angleAB = GetAngle(lineA, lineB);
+                    Angle angleBC = GetAngle(lineB, lineC);
+                    Angle angleAC = GetAngle(lineA, lineC);
 
-                foreach (Line l in confirmerdChamferList)
-                {
-                    l.ChamferType = ChamferTypeEnum.CONFIRMED;
-                }
-            }
-            // if 2 to 3 chamfers, only confirm if all parallel lines to it
-            // are also possible/confirmed chamfers
-            else if (numPossibleChamfers >= 2 && numPossibleChamfers <= 3)
-            {
-                foreach (Line pc in possibleChamferList)
-                {
-                    foreach (Line l in lineList)
+                    //meets single chamfer conditions
+                    if (angleAC.GetDegrees().Value < 180 && angleAB.Equals(angleBC) && angleAB.GetDegrees().Value > 90)
                     {
-                        // if potential chamfer is parallel to a normal line,
-                        // it is not a chamfer so remove it from poss list
-                        if ((l.ChamferType == ChamferTypeEnum.NONE) && IsParallel(pc, l))
-                        {
-                            numPossibleChamfers--;
-                            pc.ChamferType = ChamferTypeEnum.NONE;
-                            possibleChamferList.Remove(pc);
-                            break;
-                        }
+                        lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
+                        numPossibleChamfers++;
+                        possibleChamferList.Add(lineB);
                     }
                 }
-                // remaining poss chamfers meet above case so confirm
-                foreach (Line l in possibleChamferList)
+
+                // if only one chamfer, it is confirmed to be chamfer
+                if (numPossibleChamfers == 1)
                 {
-                    l.ChamferType = ChamferTypeEnum.CONFIRMED;
-                    numConfirmedChamfers++;
-                    confirmerdChamferList.Add(l);
+                    confirmedChamferList = possibleChamferList;
+                    numConfirmedChamfers = numPossibleChamfers;
+
+                    foreach (Line line in confirmedChamferList)
+                    {
+                        line.ChamferType = ChamferTypeEnum.CONFIRMED;
+                    }
                 }
-            }
-            // if more than 4 chamfers we run into the octagon problem
-            // so we cannot confirm what lines are chamfers
-            // but the count should be correct
-            else if (numPossibleChamfers >= 4)
-            {
-                numConfirmedChamfers = numPossibleChamfers;
+                // if 2 to 3 chamfers, only confirm if all parallel lines to it
+                // are also possible/confirmed chamfers
+                else if (numPossibleChamfers >= 2 && numPossibleChamfers <= 3)
+                {
+                    foreach (Line possibleChamfer in possibleChamferList)
+                    {
+                        foreach (Line line in lineList)
+                        {
+                            // if potential chamfer is parallel to a normal line,
+                            // it is not a chamfer so remove it from poss list
+                            if ((line.ChamferType == ChamferTypeEnum.NONE) && IsParallel(possibleChamfer, line))
+                            {
+                                numPossibleChamfers--;
+                                possibleChamfer.ChamferType = ChamferTypeEnum.NONE;
+                                possibleChamferList.Remove(possibleChamfer);
+                                break;
+                            }
+                        }
+                    }
+                    // remaining poss chamfers meet above case so confirm
+                    foreach (Line line in possibleChamferList)
+                    {
+                        line.ChamferType = ChamferTypeEnum.CONFIRMED;
+                        numConfirmedChamfers++;
+                        confirmedChamferList.Add(line);
+                    }
+                }
+                // if more than 4 chamfers we run into the octagon problem
+                // so we cannot confirm what lines are chamfers
+                // but the count should be correct
+                else if (numPossibleChamfers >= 4)
+                {
+                    numConfirmedChamfers = numPossibleChamfers;
+                }
+                NumChamfers = numConfirmedChamfers;
             }
         }
-        return false;
     }
 
     #endregion

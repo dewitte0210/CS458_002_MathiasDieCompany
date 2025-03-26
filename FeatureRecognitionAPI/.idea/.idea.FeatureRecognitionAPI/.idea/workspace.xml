@@ -10,13 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c53808f-85d7-4b06-9a22-5de316511b8e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/MDCMath.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Entities/Arc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Entities/Arc.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/DXFFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/DXFFile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/Angles.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/Angles.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Testing for Project/UtilityTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Testing for Project/UtilityTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +34,7 @@
     &quot;accountId&quot;: &quot;8a0d3b92-8e1c-40ca-bdc1-e038d5e73ae8&quot;
   }
 }</component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -60,7 +57,7 @@
     "nodejs_package_manager_path": "npm",
     "npm.start Frontend.executor": "Run",
     "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.selected.configurable": "RiderDotCoverContinuousTestingPageId",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -148,6 +145,7 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

@@ -206,7 +206,7 @@ namespace FeatureRecognitionAPI.Models
          */
         void scanThroughEntityList(Entity entity, List<Entity> myEntityList, List<Entity> features)
         {
-            /**
+            /*
              * This will scan through the entity list and if another touching entity is found,
              * that entity is added to features and removed from the entity list. i is then downticked
              * so the scan does not skip over the next entity in the list. The function is
