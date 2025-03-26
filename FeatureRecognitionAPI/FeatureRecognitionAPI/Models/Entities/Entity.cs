@@ -79,7 +79,7 @@ namespace FeatureRecognitionAPI.Models
          * @param line2 is the second Line being checked
          * @return true if they intersect, otherwise false
          */
-        internal bool IntersectLineWithLine(Line line1, Line line2)
+        internal static bool IntersectLineWithLine(Line line1, Line line2)
         {
             // If the endpoints are touching we can avoid the intersect math
             bool touching = line1.StartPoint.Equals(line2.StartPoint) || line1.StartPoint.Equals(line2.EndPoint) || line1.EndPoint.Equals(line2.StartPoint) || line1.EndPoint.Equals(line2.EndPoint);
@@ -216,13 +216,17 @@ namespace FeatureRecognitionAPI.Models
          * @param arc is the arc being checked
          * @return true if they intersect, otherwise false
          */
-        internal bool IntersectLineWithArc(Line line, Arc arc)
+        internal static bool IntersectLineWithArc(Line line, Arc arc)
         {
             //Check if the endpoints are touching first to avoid the intersect calculations
             Point aStart = new(arc.Start.X, arc.Start.Y);
             Point aEnd = new(arc.End.X, arc.End.Y);
-            bool touching = line.StartPoint.Equals(aStart) || line.StartPoint.Equals(aEnd) || line.EndPoint.Equals(aStart) || line.EndPoint.Equals(aEnd);
-            if (touching) { return true; }
+            bool touching = line.StartPoint.Equals(aStart) || line.StartPoint.Equals(aEnd) ||
+                            line.EndPoint.Equals(aStart) || line.EndPoint.Equals(aEnd);
+            if (touching)
+            {
+                return true;
+            }
 
             //  Get line in the slope-intercept form, then transform it to the
             //  general form: Ax + By + C = 0
@@ -250,6 +254,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     slope = 0;
                 }
+
                 intercept = line.EndPoint.Y - (slope * line.EndPoint.X);
                 // The slope of the line ends up being A in the general form
                 a = slope;
@@ -265,52 +270,73 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Checks if the line passes through or touches the circle the arc represents
-            double numerator = Math.Abs(a * arc.Center.X + b * arc.Center.Y + c);
-            double distance = numerator / Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
-            /*if (arc.Radius >= distance)
-            {*/
-                //  Will hold the solution values of the quadratic equation
-                List<double> solns = new();
+            //  Will hold the solution values of the quadratic equation
+            List<double> solns = new();
 
-                //  Special case for vertical line
-                if (line.EndPoint.X == line.StartPoint.X)
+            //  Special case for vertical line
+            if (line.EndPoint.X == line.StartPoint.X)
+            {
+                decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.Center.Y),
+                    (decimal)(Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) -
+                              Math.Pow(arc.Radius, 2)));
+
+                foreach (decimal number in tempSolns)
                 {
-                    decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.Center.Y), (decimal)(Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2)));
+                    solns.Add((double)number);
+                }
 
-                    foreach (decimal number in tempSolns)
+                //  Checks if each solution is on the arc, if one is on it return true
+                for (int i = 0; i < solns.Count(); i++)
+                {
+                    //  Solution y value
+                    double y = solns[i];
+                    //  Solution x value
+                    double x = line.EndPoint.X;
+                    if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x &&
+                        Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y &&
+                        Math.Max(line.StartPoint.X, line.EndPoint.X) >= x &&
+                        Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y)
                     {
-                        solns.Add((double)number);
-                    }
-                    //  Checks if each solution is on the arc, if one is on it return true
-                    for (int i = 0; i < solns.Count(); i++)
-                    {
-                        //  Solution y value
-                        double y = solns[i];
-                        //  Solution x value
-                        double x = line.EndPoint.X;
-                        if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x && Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y && Math.Max(line.StartPoint.X, line.EndPoint.X) >= x && Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y) { return true; }
+                        return true;
                     }
                 }
-                else
+            }
+            else
+            {
+                decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1),
+                    (decimal)(-2.0 * arc.Center.X) + (decimal)(2 * (intercept * slope)) -
+                    (decimal)(2 * (arc.Center.Y * slope)),
+                    (decimal)Math.Pow(arc.Center.X, 2) + (decimal)Math.Pow(intercept, 2) -
+                    (decimal)(2 * (intercept * arc.Center.Y)) + (decimal)Math.Pow(arc.Center.Y, 2) -
+                    (decimal)Math.Pow(arc.Radius, 2));
+                foreach (decimal number in tempSolns)
                 {
-                    decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1), (decimal)(-2.0 * arc.Center.X) + (decimal)(2 * (intercept * slope)) - (decimal)(2 * (arc.Center.Y * slope)), (decimal)Math.Pow(arc.Center.X, 2) + (decimal)Math.Pow(intercept, 2) - (decimal)(2 * (intercept * arc.Center.Y)) + (decimal)Math.Pow(arc.Center.Y, 2) - (decimal)Math.Pow(arc.Radius, 2));
-                    foreach (decimal number in tempSolns)
-                    {
-                        solns.Add((double)number);
-                    }
+                    solns.Add((double)number);
+                }
 
-                    //  Checks if each solution is on the arc, if one is on it return true
-                    for (int i = 0; i < solns.Count; i++)
-                    {
-                        //Solution x value
-                        double x = solns[i];
-                        //Solution y value
-                        double y = ((-1 * a) * solns[i] - c) / b;
+                //  Checks if each solution is on the arc, if one is on it return true
+                for (int i = 0; i < solns.Count; i++)
+                {
+                    //Solution x value
+                    double x = solns[i];
+                    //Solution y value
+                    double y = ((-1 * a) * solns[i] - c) / b;
 
-                        if (arc.IsInArcRange(new Point(x, y)) && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= x && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= y && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= x && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= y) { return true; };
+                    if (arc.IsInArcRange(new Point(x, y)) &&
+                        Math.Min(Math.Round(line.StartPoint.X, intersectTolerance),
+                            Math.Round(line.EndPoint.X, intersectTolerance)) <= x &&
+                        Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance),
+                            Math.Round(line.EndPoint.Y, intersectTolerance)) <= y &&
+                        Math.Max(Math.Round(line.StartPoint.X, intersectTolerance),
+                            Math.Round(line.EndPoint.X, intersectTolerance)) >= x &&
+                        Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance),
+                            Math.Round(line.EndPoint.Y, intersectTolerance)) >= y)
+                    {
+                        return true;
                     }
                 }
-            //}
+            }
+
             return false;
         }
 
@@ -322,7 +348,7 @@ namespace FeatureRecognitionAPI.Models
          * @param arc2 is the second Arc being checked
          * @return true if they intersect, otherwise false
          */
-        internal bool IntersectArcWithArc(Arc arc1, Arc arc2)
+        internal static bool IntersectArcWithArc(Arc arc1, Arc arc2)
         {
 
             // If the endpoints are touching we can avoid the intersect math 
@@ -364,10 +390,9 @@ namespace FeatureRecognitionAPI.Models
                    arc2.IsInArcRange(new Point(intersect2X, intersect2Y));
 
             return intersect1IsValid || intersect2IsValid;
-            ;
         }
 
-        internal bool IntersectLineWithEllipse(Line line, Ellipse ellipse)
+        internal static bool IntersectLineWithEllipse(Line line, Ellipse ellipse)
         {
             //Need to rotate the line around the origin for rotated ellipses
             double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
@@ -445,7 +470,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            double major = Math.Sqrt(Math.Pow(ellipse.MajorAxisEndPoint.X - ellipse.Center.X, 2) + Math.Pow(ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y, 2));
+            double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
             double minor = major * ellipse.MinorToMajorAxisRatio;
             //List of solutions from equations
             List<Point> SolnCoords = new List<Point>();
@@ -517,86 +542,86 @@ namespace FeatureRecognitionAPI.Models
             {
                 return false;
             }
-            if (this is Line)
+            if (this is Line line1)
             {
-                if (e2 is Line)
+                if (e2 is Line line2)
                 {
-                    if (((Line)this).StartPoint.Equals(((Line)e2).StartPoint))
+                    if (line1.StartPoint.Equals(line2.StartPoint))
                     {
                         return true;
                     }
-                    if (((Line)this).StartPoint.Equals(((Line)e2).EndPoint))
+                    if (line1.StartPoint.Equals(line2.EndPoint))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Line)e2).StartPoint))
+                    if (line1.EndPoint.Equals(line2.StartPoint))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Line)e2).EndPoint))
+                    if (line1.EndPoint.Equals(line2.EndPoint))
                     {
                         return true;
                     }
                     return false;
                 }
-                else if (e2 is Arc)
+                else if (e2 is Arc arc)
                 {
-                    if (((Line)this).StartPoint.Equals(((Arc)e2).Start))
+                    if (line1.StartPoint.Equals(arc.Start))
                     {
                         return true;
                     }
-                    if (((Line)this).StartPoint.Equals(((Arc)e2).End))
+                    if (line1.StartPoint.Equals(arc.End))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Arc)e2).Start))
+                    if (line1.EndPoint.Equals(arc.Start))
                     {
                         return true;
                     }
-                    if (((Line)this).EndPoint.Equals(((Arc)e2).End))
+                    if (line1.EndPoint.Equals(arc.End))
                     {
                         return true;
                     }
                     return false;
                 }
             }
-            else if (this is Arc)
+            else if (this is Arc arc)
             {
-                if (e2 is Line)
+                if (e2 is Line line)
                 {
-                    if (((Arc)this).Start.Equals(((Line)e2).StartPoint))
+                    if (arc.Start.Equals(line.StartPoint))
                     {
                         return true;
                     }
-                    if (((Arc)this).Start.Equals(((Line)e2).EndPoint))
+                    if (arc.Start.Equals(line.EndPoint))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Line)e2).StartPoint))
+                    if (arc.End.Equals(line.StartPoint))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Line)e2).EndPoint))
+                    if (arc.End.Equals(line.EndPoint))
                     {
                         return true;
                     }
                     return false;
                 }
-                else if (e2 is Arc)
+                else if (e2 is Arc arc2)
                 {
-                    if (((Arc)this).Start.Equals(((Arc)e2).Start))
+                    if (arc.Start.Equals(arc2.Start))
                     {
                         return true;
                     }
-                    if (((Arc)this).Start.Equals(((Arc)e2).End))
+                    if (arc.Start.Equals(arc2.End))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Arc)e2).Start))
+                    if (arc.End.Equals(arc2.Start))
                     {
                         return true;
                     }
-                    if (((Arc)this).End.Equals(((Arc)e2).End))
+                    if (arc.End.Equals(arc2.End))
                     {
                         return true;
                     }
@@ -614,7 +639,7 @@ namespace FeatureRecognitionAPI.Models
          * @param line2 is the second line being checked
          * @return the point that line1 and line2 intersects. The points intersect field will be false if they are parallel
          */
-        public Point getIntersectPoint(Line line1, Line line2)
+        public static Point GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
             double A1 = line1.EndPoint.Y - line1.StartPoint.Y;
@@ -627,7 +652,7 @@ namespace FeatureRecognitionAPI.Models
 
             double delta = A1 * B2 - A2 * B1;
 
-            // Lines are parralell and thus cannot intersect
+            // Lines are parallel and thus cannot intersect
             intersectPoint.intersect = !(delta == 0);
 
             // Intersection point
@@ -635,7 +660,7 @@ namespace FeatureRecognitionAPI.Models
             return intersectPoint;
         }
 
-        internal Point getIntersectPoint(Line line, Arc arc)
+        internal static Point GetIntersectPoint(Line line, Arc arc)
         {
             //  Get line in the slope-intercept form, then transform it to the
             //  general form: Ax + By + C = 0
@@ -720,14 +745,25 @@ namespace FeatureRecognitionAPI.Models
                         //Solution y value
                         double y = slope * solns[i] + intercept;
 
-                        if (arc.IsInArcRange(new Point(x, y)) && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= x && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= y && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= x && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= y) { return new Point(x, y); };
+                        if (arc.IsInArcRange(new Point(x, y)) &&
+                            Math.Min(Math.Round(line.StartPoint.X, intersectTolerance),
+                                Math.Round(line.EndPoint.X, intersectTolerance)) <= x &&
+                            Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance),
+                                Math.Round(line.EndPoint.Y, intersectTolerance)) <= y &&
+                            Math.Max(Math.Round(line.StartPoint.X, intersectTolerance),
+                                Math.Round(line.EndPoint.X, intersectTolerance)) >= x &&
+                            Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance),
+                                Math.Round(line.EndPoint.Y, intersectTolerance)) >= y)
+                        {
+                            return new Point(x, y);
+                        }
                     }
                 }
             }
             return null;
         }
 
-        internal Point getIntersectPoint(Line line, Ellipse ellipse)
+        internal static Point GetIntersectPoint(Line line, Ellipse ellipse)
         {
             //Need to rotate the line around the origin for rotated ellipses
             double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
@@ -792,7 +828,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            double major = Math.Sqrt(Math.Pow(ellipse.MajorAxisEndPoint.X - ellipse.Center.X, 2) + Math.Pow(ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y, 2));
+            double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
             double minor = major * ellipse.MinorToMajorAxisRatio;
             //List of solutions from equations
             List<Point> SolnCoords = new List<Point>();
@@ -857,7 +893,7 @@ namespace FeatureRecognitionAPI.Models
          * 
          * @Return - List of solutions
          */
-        internal List<double> QuadraticFormula(double a, double b, double c)
+        internal static List<double> QuadraticFormula(double a, double b, double c)
         {
             List<double> solns = new List<double>();
             if (a == 0) { return solns; }
