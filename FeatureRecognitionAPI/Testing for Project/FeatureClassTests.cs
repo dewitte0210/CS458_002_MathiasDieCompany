@@ -200,6 +200,47 @@ namespace Testing_for_Project
         #region CheckGroup3
 
         [Test]
+        public void TestGetPossibleChamfersOneChamfer()
+        {
+            // counterclockwise
+            // one chamfer in top left corner
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            Line line3 = new Line(5, 5, 2, 5);
+            Line lineCham = new Line(2, 5, 0, 3);
+            Line line5 = new Line(0, 3, 0, 0);
+            List<Line> ll = new List<Line>() { line1, line2, line3, lineCham, line5 };
+            
+            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            
+            Assert.That(possibleChamList.Count, Is.EqualTo(1));
+            Assert.That(possibleChamList[0], Is.EqualTo(lineCham));
+        }
+        
+        [Test]
+        public void TestGetPossibleChamfersTwoChamfer()
+        {
+            // counterclockwise
+            // two chamfer in top left and right corner
+            // and top line should be recognized as well
+            // so 3 possible chamfers total
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 3);
+            Line lineCham3 = new Line(5, 3, 3, 5);
+            Line line4 = new Line(3, 5, 2, 5);
+            Line lineCham5 = new Line(2, 5, 0, 3);
+            Line line6 = new Line(0, 3, 0, 0);
+            List<Line> ll = new List<Line>() {line1, line2, lineCham3, line4, lineCham5, line6};
+            
+            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            
+            Assert.That(possibleChamList.Count, Is.EqualTo(3));
+            Assert.Contains(lineCham3, possibleChamList);
+            Assert.Contains(line4, possibleChamList);
+            Assert.Contains(lineCham5, possibleChamList);
+        }
+        
+        [Test]
         public void CheckGroup3()
         {
             Line line1 = new(1, 2, 2, 1);

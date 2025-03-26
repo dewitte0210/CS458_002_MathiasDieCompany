@@ -11,13 +11,18 @@
   <component name="ChangeListManager">
     <list default="true" id="7c53808f-85d7-4b06-9a22-5de316511b8e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Entities/Line.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Entities/Line.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/Angles.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/Angles.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DpaMonitoringSettings">
+    <option name="firstShow" value="false" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -34,6 +39,14 @@
     &quot;accountId&quot;: &quot;8a0d3b92-8e1c-40ca-bdc1-e038d5e73ae8&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/46a322d26154b982566e1817203e5452c91223f93b0e392d9c5b4806696fdc1/Assert.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/866fe33c149b6c91ce36d87bf1485dd3d8c46c9acf7593f805a11a049cdb4/Is.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
@@ -46,8 +59,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     ".NET Launch Settings Profile.FeatureRecognitionAPI: https.executor": "Run",
+    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "XThreadsFramesViewSplitterKey": "0.12298387",
     "git-widget-placeholder": "corner-features-2",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
@@ -57,7 +72,7 @@
     "nodejs_package_manager_path": "npm",
     "npm.start Frontend.executor": "Run",
     "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "RiderDotCoverContinuousTestingPageId",
+    "settings.editor.selected.configurable": "editor.preferences.tabs",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -147,7 +162,42 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/UtilityTests.cs</url>
+          <line>253</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\UtilityTests.cs" containingFunctionPresentation="Lambda expression inside Method 'TestClockwiseSeperated180'">
+            <startOffsets>
+              <option value="9624" />
+            </startOffsets>
+            <endOffsets>
+              <option value="9669" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="RiderUnitTests">
+        <watch expression="this._angle" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

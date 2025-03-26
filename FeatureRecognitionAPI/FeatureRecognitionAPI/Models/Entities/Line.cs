@@ -5,9 +5,9 @@ namespace FeatureRecognitionAPI.Models
 {
     public enum ChamferTypeEnum
     {
-        NONE,
-        POSSIBLE,
-        CONFIRMED
+        None,
+        Possible,
+        Confirmed
     }
 
     public class Line : Entity
@@ -26,7 +26,7 @@ namespace FeatureRecognitionAPI.Models
         {
             StartPoint = new Point();
             EndPoint = new Point();
-            ChamferType = ChamferTypeEnum.NONE;
+            ChamferType = ChamferTypeEnum.None;
         }
 
         public Line(Line line)
@@ -36,7 +36,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = line.SlopeY;
             SlopeX = line.SlopeX;
             Length = line.Length;
-            ChamferType = ChamferTypeEnum.NONE;
+            ChamferType = ChamferTypeEnum.None;
         }
 
         public Line(double startX, double startY, double endX, double endY)
@@ -45,7 +45,7 @@ namespace FeatureRecognitionAPI.Models
             EndPoint = new Point(endX, endY);
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
-            ChamferType = ChamferTypeEnum.NONE;
+            ChamferType = ChamferTypeEnum.None;
 
             this.Length = Point.Distance(StartPoint, EndPoint);
         }
@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
 
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
-            ChamferType = ChamferTypeEnum.NONE;
+            ChamferType = ChamferTypeEnum.None;
 
             Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
         }

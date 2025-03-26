@@ -1,8 +1,6 @@
 using static FeatureRecognitionAPI.Models.Utility.MDCMath;
 
-/// <summary>
-/// This file is used for calculating the angle between lines and on what side they lay
-/// </summary>
+// This file is used for calculating the angle between lines and on what side they lay
 namespace FeatureRecognitionAPI.Models.Utility
 {
 	/// <summary>
@@ -40,32 +38,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 		{
 			public readonly double Value = value;
 
-			public override bool Equals(object? obj)
-			{
-				if (obj == null) return false;
-				
-                if (obj is Degrees objD)
-                {
-	                return DoubleEquals(objD.Value, Value, AngleTolDeg);
-                }
-				try
-				{
-					//if numeric try to cast to double
-					double objDbl = Convert.ToDouble(obj);
-					return DoubleEquals(Value, objDbl, AngleTolDeg);
-				}
-				catch
-				{
-					return false;
-				}
-				return false;
-			}
-
-			public override int GetHashCode()
-			{
-				return HashCode.Combine(Value);
-			}
-
 			public Degrees GetOppositeAngle()
 			{
 				return new Degrees(360 - Value);
@@ -75,6 +47,38 @@ namespace FeatureRecognitionAPI.Models.Utility
 			{
 				return new Radians(Value * Math.PI / 180);
 			}
+			
+			#region Overrides
+
+			public override bool Equals(object? obj)
+			{
+				if (obj == null) return false;
+				
+				if (obj is Degrees objD)
+				{
+					return DoubleEquals(objD, Value);
+				}
+				return false;
+			}
+
+			public static bool operator ==(Degrees a, Degrees b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Degrees a, Degrees b)
+			{
+				return !a.Equals(b);
+			}
+			
+			public static implicit operator double(Degrees d) => d.Value;
+			
+			public override int GetHashCode()
+			{
+				return HashCode.Combine(Value);
+			}
+
+			#endregion
 		}
 
 		public class Radians(double value)
@@ -90,6 +94,8 @@ namespace FeatureRecognitionAPI.Models.Utility
 			{
 				return new Degrees(Value * 180 / Math.PI);
 			}
+			
+			#region Overrides
 
 			public override bool Equals(object? obj)
 			{
@@ -97,25 +103,29 @@ namespace FeatureRecognitionAPI.Models.Utility
 				
 				if (obj is Degrees objR)
 				{
-					return DoubleEquals(objR.Value, Value, AngleTolRad);
-				}
-				try
-				{
-					//if numeric try to cast to double
-					double objDbl = Convert.ToDouble(obj);
-					return DoubleEquals(Value, objDbl, AngleTolRad);
-				}
-				catch
-				{
-					return false;
+					return DoubleEquals(objR, Value, AngleTolRad);
 				}
 				return false;
 			}
 
+			public static bool operator ==(Radians a, Radians b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Radians a, Radians b)
+			{
+				return !a.Equals(b);
+			}
+			
+			public static implicit operator double(Radians r) => r.Value;
+			
 			public override int GetHashCode()
 			{
 				return HashCode.Combine(Value);
 			}
+			
+			#endregion
 		}
 
 		/// <summary>
@@ -153,6 +163,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 				return _side;
 			}
 
+			#region Overrides
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) { return false; }
@@ -173,13 +184,23 @@ namespace FeatureRecognitionAPI.Models.Utility
                 }
                 return false;
 			}
+			
+			public static bool operator ==(Angle a, Angle b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Angle a, Angle b)
+			{
+				return !a.Equals(b);
+			}
 
 			public override int GetHashCode()
 			{
 				throw new NotImplementedException();
 			}
+			#endregion
 		}
-
 
 		public static double CrossProduct(Point a, Point b)
 		{
@@ -257,7 +278,9 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			//prefer 0 degrees interior over 360 for opposite facing parallel lines
 			//since it can return 0 or 360 depending on orientation
-			if ((returnAngle.Equals(360) || returnAngle.Equals(0)) && ori == Orientation.Clockwise)
+			if ((DoubleEquals(returnAngle, 360) 
+			     || DoubleEquals(returnAngle, 0)) 
+			    && ori == Orientation.Clockwise)
 			{
 				returnAngle = returnAngle.GetOppositeAngle();
 			}
@@ -281,13 +304,13 @@ namespace FeatureRecognitionAPI.Models.Utility
 		public static bool IsPerpendicular(Line a, Line b)
 		{
 			Degrees angle = GetAngle(a, b).GetDegrees();
-			return (angle.Equals(90) || angle.Equals(270));
+			return DoubleEquals((angle + 90) % 180, 0);
 		}
 
 		public static bool IsParallel(Line a, Line b)
 		{
 			Degrees angle = GetAngle(a, b).GetDegrees();
-			return (angle.Equals(0) || angle.Equals(180) || angle.Equals(360));
+			return DoubleEquals(angle % 180, 0);
 		}
 	}
 }

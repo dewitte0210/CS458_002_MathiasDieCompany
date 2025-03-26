@@ -953,7 +953,7 @@ public class Feature
         returns true if no problems??
     */
 
-    private List<Line> GetLinesFrom2DEntityList(List<List<Entity>> entities)
+    internal List<Line> GetLinesFrom2DEntityList(List<List<Entity>> entities)
     {
         // current assumptions made:
         // all entities have an adjacent
@@ -987,91 +987,80 @@ public class Feature
         }
         return lineList;
     }
-    public void CheckGroup3()
+
+    internal static List<Line> GetPossibleChamfers(List<Line> lineList)
     {
-        if (FeatureType == PossibleFeatureTypes.Group1A1)
+        List<Line> possibleChamferList = new List<Line>();
+        
+        if (lineList.Count >= 3)
         {
-            //these can be private since it can be figured out from line chamfertype tag
-            
-            //replace count with list counts
-            int numPossibleChamfers = 0;
-            int numConfirmedChamfers = 0;
-            List<Line> possibleChamferList = [];
-            List<Line> confirmedChamferList = [];
-
-            List<Line> lineList = GetLinesFrom2DEntityList(PerimeterEntityList);
-
-            //check potential chamfers
-            if (lineList.Count >= 3)
+            for (int i = 0; i < lineList.Count; i++)
             {
-                for (int i = 0; i < lineList.Count; i++)
-                {
-                    Line lineA = lineList[i];
-                    Line lineB = lineList[(i + 1) % lineList.Count];
-                    Line lineC = lineList[(i + 2) % lineList.Count];
+                Line lineA = lineList[i];
+                Line lineB = lineList[(i + 1) % lineList.Count];
+                Line lineC = lineList[(i + 2) % lineList.Count];
 
-                    //need to verify orientation of lines
-                    Angle angleAB = GetAngle(lineA, lineB);
-                    Angle angleBC = GetAngle(lineB, lineC);
-                    Angle angleAC = GetAngle(lineA, lineC);
+                //need to verify orientation of lines
+                Angle angleAB = GetAngle(lineA, lineB);
+                Angle angleBC = GetAngle(lineB, lineC);
+                Angle angleAC = GetAngle(lineA, lineC);
 
-                    //meets single chamfer conditions
-                    if (angleAC.GetDegrees().Value < 180 && angleAB.Equals(angleBC) && angleAB.GetDegrees().Value > 90)
-                    {
-                        lineB.ChamferType = ChamferTypeEnum.POSSIBLE;
-                        numPossibleChamfers++;
-                        possibleChamferList.Add(lineB);
-                    }
-                }
-
-                // if only one chamfer, it is confirmed to be chamfer
-                if (numPossibleChamfers == 1)
+                //meets single chamfer conditions
+                if (angleAB.Equals(angleBC) && angleAC.GetDegrees() < 180 && angleAB.GetDegrees() > 90)
                 {
-                    confirmedChamferList = possibleChamferList;
-                    numConfirmedChamfers = numPossibleChamfers;
-
-                    foreach (Line line in confirmedChamferList)
-                    {
-                        line.ChamferType = ChamferTypeEnum.CONFIRMED;
-                    }
+                    lineB.ChamferType = ChamferTypeEnum.Possible;
+                    possibleChamferList.Add(lineB);
                 }
-                // if 2 to 3 chamfers, only confirm if all parallel lines to it
-                // are also possible/confirmed chamfers
-                else if (numPossibleChamfers >= 2 && numPossibleChamfers <= 3)
-                {
-                    foreach (Line possibleChamfer in possibleChamferList)
-                    {
-                        foreach (Line line in lineList)
-                        {
-                            // if potential chamfer is parallel to a normal line,
-                            // it is not a chamfer so remove it from poss list
-                            if ((line.ChamferType == ChamferTypeEnum.NONE) && IsParallel(possibleChamfer, line))
-                            {
-                                numPossibleChamfers--;
-                                possibleChamfer.ChamferType = ChamferTypeEnum.NONE;
-                                possibleChamferList.Remove(possibleChamfer);
-                                break;
-                            }
-                        }
-                    }
-                    // remaining poss chamfers meet above case so confirm
-                    foreach (Line line in possibleChamferList)
-                    {
-                        line.ChamferType = ChamferTypeEnum.CONFIRMED;
-                        numConfirmedChamfers++;
-                        confirmedChamferList.Add(line);
-                    }
-                }
-                // if more than 4 chamfers we run into the octagon problem
-                // so we cannot confirm what lines are chamfers
-                // but the count should be correct
-                else if (numPossibleChamfers >= 4)
-                {
-                    numConfirmedChamfers = numPossibleChamfers;
-                }
-                NumChamfers = numConfirmedChamfers;
             }
         }
+        return possibleChamferList;
+    }
+    
+    public void CheckGroup3()
+    {
+        if (FeatureType != PossibleFeatureTypes.Group1A1) return;
+        
+        List<Line> lineList = GetLinesFrom2DEntityList(PerimeterEntityList);
+        List<Line> possibleChamferList = GetPossibleChamfers(lineList);
+        
+        if (lineList.Count < 3) return;
+
+        //check potential chamfers
+        // if only one chamfer, it is confirmed to be chamfer
+        if (possibleChamferList.Count == 1)
+        {
+            possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
+        }
+        // if 2 to 3 chamfers, only confirm if a parallel line to it
+        // is also possible/confirmed chamfers
+        else if (possibleChamferList.Count >= 2 && possibleChamferList.Count <= 3)
+        {
+            bool hasPallelChamfer = false;
+            foreach (Line possibleChamfer in possibleChamferList)
+            {
+                foreach (Line line in lineList)
+                {
+                    if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                    {
+                        hasPallelChamfer = true;
+                    }
+                }
+                if (!hasPallelChamfer)
+                {
+                    possibleChamfer.ChamferType = ChamferTypeEnum.None;
+                    if (possibleChamferList.Remove(possibleChamfer)) { break; }   
+                }
+            }
+            // remaining possible chamfers meet above case so confirm
+            foreach (Line line in possibleChamferList)
+            {
+                line.ChamferType = ChamferTypeEnum.Confirmed;
+            }
+        }
+        // if more than 4 chamfers we run into the octagon problem
+        // so we cannot confirm what lines are chamfers
+        // but the count should be correct, so don't have to handle it
+        NumChamfers = possibleChamferList.Count;
     }
 
     #endregion
