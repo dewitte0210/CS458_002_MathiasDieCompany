@@ -685,7 +685,7 @@ public class Feature
         int numEndPointIntersections = 0;
         //  Finds the middle angle of the curve and calculates the ray
         if (entity is Arc arc) 
-        { ray = arc.VectorFromCenter(Angles.ToRadians(arc.AngleInMiddle())); }
+        { ray = arc.VectorFromCenter(Angles.DegToRadians(arc.AngleInMiddle())); }
         else
         {
             Ellipse tempEntity = entity as Ellipse;

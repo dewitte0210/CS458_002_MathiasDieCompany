@@ -46,7 +46,7 @@ public class Arc : Entity
      */
     private static double calcXCoord(double x, double radius, double angle)
     {
-        return (radius * Math.Cos(Angles.ToRadians(angle)) + x);
+        return (radius * Math.Cos(Angles.DegToRadians(angle)) + x);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Arc : Entity
      */
     private static double calcYCoord(double y, double radius, double angle)
     {
-        return (radius * Math.Sin(Angles.ToRadians(angle)) + y);
+        return (radius * Math.Sin(Angles.DegToRadians(angle)) + y);
     }
 
         /**
@@ -150,7 +150,7 @@ public class Arc : Entity
         else
         {
             double tan = Math.Atan2(y, x);
-            degrees = Angles.ToDegrees(tan);
+            degrees = Angles.RadToDegrees(tan);
         }
 
         // rotate start and end angles to start at 0
