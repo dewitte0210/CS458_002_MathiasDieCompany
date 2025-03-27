@@ -200,6 +200,46 @@ namespace Testing_for_Project
         #region CheckGroup3
 
         [Test]
+        public void TestGetLinesFromEntityListSquare()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            Line line3 = new Line(5, 5, 0, 5);
+            Line line4 = new Line(0, 5, 0, 0);
+            List<Entity> ll = [line1, line2, line3, line4];
+
+            List<Line> fromLL = Feature.GetLinesFromEntityList(ll);
+            
+            Assert.That(fromLL.Count, Is.EqualTo(4));
+            Assert.Contains(line1, fromLL);
+            Assert.Contains(line2, fromLL);
+            Assert.Contains(line3, fromLL);
+            Assert.Contains(line4, fromLL);
+        }
+        
+        [Test]
+        public void TestGetLinesFromEntityListSquareWithArcs()
+        {
+            Line line1 = new Line(1, 0, 4, 0);
+            Arc a1 = new Arc(0.5, 0.5, 0.5, 0.5, 0.5);
+            Line line2 = new Line(4, 0, 5, 5);
+            Arc a2 = new Arc(0.5, 0.5, 0.5, 0.5, 0.5);
+            Line line3 = new Line(5, 5, 0, 5);
+            Arc a3 = new Arc(0.5, 0.5, 0.5, 0.5, 0.5);
+            Line line4 = new Line(0, 5, 0, 0);
+            Arc a4 = new Arc(0.5, 0.5, 0.5, 0.5, 0.5);
+            List<Entity> eList = [line1, a1, line2, a2, line3, a3, line4, a4];
+
+            List<Line> ll = Feature.GetLinesFromEntityList(eList);
+            
+            Assert.That(ll.Count, Is.EqualTo(4));
+            Assert.Contains(line1, ll);
+            Assert.Contains(line2, ll);
+            Assert.Contains(line3, ll);
+            Assert.Contains(line4, ll);
+        }
+
+        [Test]
         public void TestGetPossibleChamfersOneChamfer()
         {
             // counterclockwise
@@ -209,7 +249,7 @@ namespace Testing_for_Project
             Line line3 = new Line(5, 5, 2, 5);
             Line lineCham = new Line(2, 5, 0, 3);
             Line line5 = new Line(0, 3, 0, 0);
-            List<Line> ll = new List<Line>() { line1, line2, line3, lineCham, line5 };
+            List<Line> ll = [line1, line2, line3, lineCham, line5];
             
             List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
             
@@ -218,7 +258,7 @@ namespace Testing_for_Project
         }
         
         [Test]
-        public void TestGetPossibleChamfersTwoChamfer()
+        public void TestGetPossibleChamfersThreeChamfer()
         {
             // counterclockwise
             // two chamfer in top left and right corner
@@ -230,7 +270,7 @@ namespace Testing_for_Project
             Line line4 = new Line(3, 5, 2, 5);
             Line lineCham5 = new Line(2, 5, 0, 3);
             Line line6 = new Line(0, 3, 0, 0);
-            List<Line> ll = new List<Line>() {line1, line2, lineCham3, line4, lineCham5, line6};
+            List<Line> ll = [line1, line2, lineCham3, line4, lineCham5, line6];
             
             List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
             
@@ -241,21 +281,100 @@ namespace Testing_for_Project
         }
         
         [Test]
-        public void CheckGroup3()
+        public void TestGetPossibleChamfersEightChamfer()
         {
-            Line line1 = new(1, 2, 2, 1);
-            Line line2 = new(1, 2, 1, 5);
-            Line line3 = new(1, 5, 2, 6);
-            Line line4 = new(2, 6, 5, 6);
-            Line line5 = new(5, 6, 6, 5);
-            Line line6 = new(6, 5, 6, 2);
-            Line line7 = new(6, 2, 5, 1);
-            Line line8 = new(5, 1, 2, 1);
-            List<Entity> eList = new List<Entity>() { line1, line2, line3, line4, line5, line6, line7, line8 };
-
+            // counterclockwise
+            // one chamfer on each corner of a square
+            // like an octagon
+            // each line could be a possible chamfer so
+            // list size should be eight
+            Line line1 = new Line(2, 0, 3, 0);
+            Line line2 = new Line(3, 0, 5, 2);
+            Line line3 = new Line(5, 2, 5, 3);
+            Line line4 = new Line(5, 3, 3, 5);
+            Line line5 = new Line(3, 5, 2, 5);
+            Line line6 = new Line(2, 5, 0, 3);
+            Line line7 = new Line(0, 3, 0, 2);
+            Line line8 = new Line(0, 2, 2, 0);
+            List<Line> ll = [line1, line2, line3, line4, line5, line6, line7, line8];
+            
+            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            
+            Assert.That(possibleChamList.Count, Is.EqualTo(8));
+            Assert.Contains(line1, possibleChamList);
+            Assert.Contains(line2, possibleChamList);
+            Assert.Contains(line3, possibleChamList);
+            Assert.Contains(line4, possibleChamList);
+            Assert.Contains(line5, possibleChamList);
+            Assert.Contains(line6, possibleChamList);
+            Assert.Contains(line7, possibleChamList);
+            Assert.Contains(line8, possibleChamList);
+        }
+        
+        [Test]
+        public void CheckGroup3OneChamfer()
+        {
+            // counterclockwise
+            // one chamfer in top left corner
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            Line line3 = new Line(5, 5, 2, 5);
+            Line lineCham = new Line(2, 5, 0, 3);
+            Line line5 = new Line(0, 3, 0, 0);
+            List<Entity> eList = [line1, line2, line3, lineCham, line5];
             Feature f = new(eList);
-
-            //  f.CheckGroup3();
+            
+            //detects all groups including group3
+            f.DetectFeatures();
+            
+            Assert.That(f.NumChamfers, Is.EqualTo(1));
+            // TODO: check later that the chamfertype is flagged in baseEntityList
+        }
+        
+        [Test]
+        public void CheckGroup3TwoCornerChamfer()
+        {
+            // counterclockwise
+            // two chamfer in top left and right corner
+            // and top line should be recognized as well
+            // so 3 possible chamfers total but 2 confirmed
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 3);
+            Line lineCham3 = new Line(5, 3, 3, 5);
+            Line line4 = new Line(3, 5, 2, 5);
+            Line lineCham5 = new Line(2, 5, 0, 3);
+            Line line6 = new Line(0, 3, 0, 0);
+            List<Entity> eList = [line1, line2, lineCham3, line4, lineCham5, line6];
+            Feature f = new(eList);
+            
+            //detects all groups including group3
+            f.DetectFeatures();
+            
+            Assert.That(f.NumChamfers, Is.EqualTo(2));
+            // TODO: check later that the chamfertype is flagged in baseEntityList
+        }
+        
+        [Test]
+        public void CheckGroup3Octagon()
+        {
+            // counterclockwise
+            // one chamfer on each corner of a square like an octagon
+            // each line could be a possible chamfer but confirm 4
+            Line line1 = new Line(2, 0, 3, 0);
+            Line line2 = new Line(3, 0, 5, 2);
+            Line line3 = new Line(5, 2, 5, 3);
+            Line line4 = new Line(5, 3, 3, 5);
+            Line line5 = new Line(3, 5, 2, 5);
+            Line line6 = new Line(2, 5, 0, 3);
+            Line line7 = new Line(0, 3, 0, 2);
+            Line line8 = new Line(0, 2, 2, 0);
+            List<Entity> eList = [line1, line2, line3, line4, line5, line6, line7, line8];
+            Feature f = new(eList);
+            
+            //detects all groups including group3
+            f.DetectFeatures();
+            
+            Assert.That(f.NumChamfers, Is.EqualTo(4));
         }
 
         #endregion

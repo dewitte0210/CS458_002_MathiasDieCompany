@@ -11,6 +11,7 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NHibernate.Dialect.Function;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 public class Feature
@@ -952,44 +953,26 @@ public class Feature
         returns true if no problems??
     */
 
-    internal List<Line> GetLinesFrom2DEntityList(List<List<Entity>> entities)
+    internal static List<Line> GetLinesFromEntityList(List<Entity> entities)
     {
         // current assumptions made:
-        // all entities have an adjacent
-        // the first adjacent is different so a loop is not made
         // orientation is consistent
-            
-        //List<Entity> tempEntityList = [];
-        //tempEntityList.Add(startEntity);
-        //Entity currentEntity = startEntity.AdjList[0];
-        //int loopCount = 50;
-        //
-        //while (!currentEntity.Equals(startEntity) && loopCount > 0)
-        //{
-        //    tempEntityList.Add(currentEntity);
-        //    currentEntity = currentEntity.AdjList[0];
-        //    loopCount--;
-        //}
         
         List<Line> lineList = [];
-        foreach (List<Entity> perimeterLoop in PerimeterEntityList) //tempEntityList
+        foreach (Entity entity in entities)
         {
-            foreach (Entity entity in perimeterLoop)
+            if (entity is Line line)
             {
-                if (entity is Line line)
-                {
-                    //this will probably combine all perimeter lines into one list
-                    //need to fix
-                    lineList.Add(line);
-                }
+                lineList.Add(line);
             }
         }
         return lineList;
     }
 
+    // TODO: make sure this handles unordered lines
     internal static List<Line> GetPossibleChamfers(List<Line> lineList)
     {
-        List<Line> possibleChamferList = new List<Line>();
+        List<Line> possibleChamferList = [];
         
         if (lineList.Count >= 3)
         {
@@ -1015,24 +998,27 @@ public class Feature
         return possibleChamferList;
     }
     
-    public void CheckGroup3()
+     internal void CheckGroup3()
     {
         if (FeatureType != PossibleFeatureTypes.Group1A1) return;
         
-        List<Line> lineList = GetLinesFrom2DEntityList(PerimeterEntityList);
+        List<Line> lineList = GetLinesFromEntityList(baseEntityList);
         List<Line> possibleChamferList = GetPossibleChamfers(lineList);
         
         if (lineList.Count < 3) return;
 
-        //check potential chamfers
+        // check potential chamfers
         // if only one chamfer, it is confirmed to be chamfer
         if (possibleChamferList.Count == 1)
         {
+            // TODO: will not directly change chamfertype in baseEntityList
+            // so you will not be able to go back and check what lines
+            // were chamfers
             possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
         }
         // if 2 to 3 chamfers, only confirm if a parallel line to it
         // is also possible/confirmed chamfers
-        else if (possibleChamferList.Count >= 2 && possibleChamferList.Count <= 3)
+        else if (possibleChamferList.Count is >= 2 and <= 3)
         {
             bool hasPallelChamfer = false;
             foreach (Line possibleChamfer in possibleChamferList)
@@ -1058,8 +1044,15 @@ public class Feature
         }
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
-        // but the count should be correct, so don't have to handle it
-        NumChamfers = possibleChamferList.Count;
+        // TODO: implement better check for octagon problem
+        if (possibleChamferList.Count > 4)
+        {
+            NumChamfers =  possibleChamferList.Count / 2;
+        }
+        else
+        {
+            NumChamfers = possibleChamferList.Count;
+        }
     }
 
     #endregion
