@@ -14,24 +14,6 @@
         //this would also throw an error when trying to find a Path because the parent would not be in EntityList
         public ExtendedLine(Line parent1, Line parent2) // calls line's default constructor to initialize StartPsoint and EndPoint
         {
-            /*if(Parent1 is ExtendedLine)
-            {
-                Parent1 = new ExtendedLine(Parent1);
-            }
-            else
-            {
-            Parent1 = new Line(parent1);
-
-            }
-            if (Parent2 is ExtendedLine)
-            {
-                Parent2 = new ExtendedLine(Parent2);
-            }
-            else
-            {
-                Parent2 = new Line(parent2);
-            }*/
-
             Parent1 = parent1;
             Parent2 = parent2;
             calcPoints();
@@ -41,12 +23,6 @@
 
             this.Length = Point.Distance(StartPoint, EndPoint);
         }
-        /*
-                public ExtendedLine(ExtendedLine obj)
-                {
-                    if (obj.Parent1 is ExtendedLine) { }
-                    this.Parent1 = obj.Parent1;
-                }*/
 
         //Function that calculates StartPoint and EndPoint based off parents
         public void calcPoints()
@@ -54,10 +30,10 @@
             if (Parent1 != null && Parent2 != null)
             {
                 Point pointToExtend;
-                if (Parent1.findDistance(
+                if (Point.Distance(
                         Parent1.StartPoint,
                         Parent2.StartPoint)
-                        < Parent1.findDistance(
+                        < Point.Distance(
                         Parent1.EndPoint,
                         Parent2.StartPoint))
                 //This looks like a lot but all this is doing is finding the closest point on line1 to line2
@@ -74,10 +50,10 @@
                     StartPoint.X = Parent1.StartPoint.X;
                     StartPoint.Y = Parent1.StartPoint.Y;
                 }
-                if (Parent2.findDistance(
+                if (Point.Distance(
                     pointToExtend,
                     Parent2.StartPoint)
-                    > Parent2.findDistance(
+                    > Point.Distance(
                     pointToExtend,
                     Parent2.EndPoint))
                 //Similar to the one above but finds what point on line2 is farthest from line1's point to extend

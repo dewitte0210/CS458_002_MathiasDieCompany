@@ -421,7 +421,7 @@ namespace Testing_for_Project
             Line line4 = new(2, -2, 0, 0);
             List<Entity> entities = new List<Entity>() { line1, line2, line3, arc1, line4 };
             Feature testFeature = new(entities) { ExtendedEntityList = entities };
-            bool testBool = testFeature.seperateBaseEntities();
+            bool testBool = testFeature.SeperateBaseEntities();
             Assert.That(testBool, Is.True);
         }
     }
