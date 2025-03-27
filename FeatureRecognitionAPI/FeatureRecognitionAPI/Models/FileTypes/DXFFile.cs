@@ -12,6 +12,8 @@ namespace FeatureRecognitionAPI.Models
         {
         }
 
+        public DXFFile(List<Entity> entities) : base(entities) {}
+
         public DXFFile(string path) : base(path)
         {
             FileType = SupportedExtensions.dxf;
@@ -68,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
 
             CadDocument doc = reader.Read();
 
-            _lines = File.ReadAllLines(path);
+            _lines = File.ReadAllLines(Path);
             _fileVersion = GetFileVersion();
             ReadEntities(doc);
 
@@ -77,12 +79,12 @@ namespace FeatureRecognitionAPI.Models
         //May need to be refactored depending on if c# handles this by copy or by reference
         public override List<Entity> GetEntities()
         {
-            return entityList;
+            return EntityList;
         }
 
         public void SetEntities(List<Entity> entities)
         {
-            entityList = entities;
+            EntityList = entities;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
             public Radians ToRadians()
             {
-                return new Radians(angle * Math.PI / 180);
+                return new Radians(Angles.ToRadians(angle));
             }
             
         }

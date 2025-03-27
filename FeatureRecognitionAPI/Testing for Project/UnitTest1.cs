@@ -108,7 +108,7 @@ namespace Testing_for_Project
             Line test = new Line(0, 0, 0, 0);
             List<double> solutions1 = new List<double>() { 2, 5 };
             List<double> solutions2 = new List<double>() { 5, 2 };
-            List<double> actual = test.QuadraticFormula(1, -7, 10);
+            List<double> actual = Entity.QuadraticFormula(1, -7, 10);
             Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
         }
 

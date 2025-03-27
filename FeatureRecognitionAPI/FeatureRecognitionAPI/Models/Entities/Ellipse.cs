@@ -25,8 +25,8 @@ namespace FeatureRecognitionAPI.Models
             double startParameter, double endParameter)
         {
             Center = new Point(centerX, centerY);
-            MajorAxisEndPoint = new Point(majorAxisXValue + Center.X, majorAxisYValue + Center.Y);
-            MajorAxis = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            MajorAxisEndPoint = new Point(majorAxisXValue, majorAxisYValue);
+            MajorAxis = Point.Distance(MajorAxisEndPoint, Center);
             MinorAxis = MajorAxis * minorToMajorAxisRatio;
             this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
             this.StartParameter = startParameter;
@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
         private double fullPerimeterCalc()
         {
             //Major axis Radius
-            double majorAxis = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            double majorAxis = Point.Distance(MajorAxisEndPoint, Center);
             double a = 1;
             double g = MinorToMajorAxisRatio;
             double total = (Math.Pow(a, 2) - Math.Pow(g, 2)) / 2;
@@ -92,7 +92,7 @@ namespace FeatureRecognitionAPI.Models
         private double partialPerimterCalc()
         {
             //Major axis value
-            double a = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            double a = Point.Distance(MajorAxisEndPoint, Center);
             //Minor axis value
             double b = MinorToMajorAxisRatio * a;
             //Return value for perimeter
@@ -185,7 +185,7 @@ namespace FeatureRecognitionAPI.Models
 
         public Line vectorFromCenter(double angle)
         {
-            double a = Math.Sqrt(Math.Pow(MajorAxisEndPoint.X - Center.X, 2) + Math.Pow(MajorAxisEndPoint.Y - Center.Y, 2));
+            double a = Point.Distance(MajorAxisEndPoint, Center);
             Point endPoint = PointOnEllipseGivenAngleInRadians(a, MinorToMajorAxisRatio * a, angle);
             return new Line(Center.X, Center.Y, endPoint.X + Center.X, endPoint.Y + Center.Y);
         }

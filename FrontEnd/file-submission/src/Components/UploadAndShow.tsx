@@ -5,6 +5,7 @@ import QuoteSubmission from "./QuoteSubmission";
 import ParentModal from "./SupportedFeaturesModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import VisualDisplay from "./VisualDisplay";
+import {translate} from "../translator";
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -12,6 +13,7 @@ import VisualDisplay from "./VisualDisplay";
 interface UploadAndShowProps {
     onFilesSelected?: (files: File[]) => void;
 }
+
 
 /*
   Main component that handles drag-and-drop and file submission.
@@ -73,6 +75,16 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
         setJsonResponse(null); // Clear the JSON response on going back
     };
 
+    function translateJSON(jsonResponseElement: any) {
+        return jsonResponseElement.map((element) => {
+            element.features = element.features.map((feature) =>{
+                feature.FeatureType = translate(feature.FeatureType);
+                return feature;
+            })
+            return element;
+        });
+    }
+
     return (
         <div className="upload-and-show">
             {isLoading ? ( // Display loading screen during file upload
@@ -119,7 +131,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                         <div className="table-data">
                             {jsonResponse && ( // Conditionally render the JSON response
                                 <QuoteSubmission
-                                    featureGroups={jsonResponse["_featureGroups"]}
+                                    featureGroups={translateJSON(jsonResponse["_featureGroups"])}
                                     backToUpload={backToUpload}
                                 />
                             )}
