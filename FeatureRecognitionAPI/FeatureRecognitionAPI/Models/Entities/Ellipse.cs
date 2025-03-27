@@ -25,7 +25,7 @@ namespace FeatureRecognitionAPI.Models
             double startParameter, double endParameter)
         {
             Center = new Point(centerX, centerY);
-            MajorAxisEndPoint = new Point(majorAxisXValue, majorAxisYValue);
+            MajorAxisEndPoint = new Point(majorAxisXValue + centerX, majorAxisYValue + centerY);
             MajorAxis = Point.Distance(MajorAxisEndPoint, Center);
             MinorAxis = MajorAxis * minorToMajorAxisRatio;
             this.MinorToMajorAxisRatio = minorToMajorAxisRatio;
