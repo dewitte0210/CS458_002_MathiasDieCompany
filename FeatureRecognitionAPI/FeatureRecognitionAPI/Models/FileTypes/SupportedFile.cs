@@ -48,17 +48,19 @@ namespace FeatureRecognitionAPI.Models
         
         public List<Feature> DetectAllFeatureTypes()
         {
-            foreach(Feature feature in FeatureList)
+            GroupFeatureEntities();
+            
+            for (int i = 0; i < FeatureList.Count; i++)
             {
-                feature.extendAllEntities();
-                feature.seperateBaseEntities();
-                feature.seperatePerimeterEntities();
-                feature.DetectFeatures();
-                if (feature.PerimeterEntityList != null)
+                FeatureList[i].extendAllEntities();
+                FeatureList[i].seperateBaseEntities();
+                FeatureList[i].seperatePerimeterEntities();
+                FeatureList[i].DetectFeatures();
+                if (FeatureList[i].PerimeterEntityList != null)
                 {
-                    for (int j = 0; j < feature.PerimeterEntityList.Count(); j++)
+                    for (int j = 0; j < FeatureList[i].PerimeterEntityList.Count(); j++)
                     {
-                        Feature newFeat = new Feature(feature.PerimeterEntityList[j]);
+                        Feature newFeat = new Feature(FeatureList[i].PerimeterEntityList[j]);
                         newFeat.DetectFeatures();
                         FeatureList.Add(newFeat);
                     }
@@ -86,6 +88,8 @@ namespace FeatureRecognitionAPI.Models
         // it also constructs each entity's AdjList (Adjacency List)
         public void GroupFeatureEntities()
         {
+            if (FeatureList.Count > 0) {return;}
+            
             List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
             FeatureList.Add(new Feature(new List<Entity>()));
             
@@ -123,7 +127,7 @@ namespace FeatureRecognitionAPI.Models
                                 FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
                                 listMap[i] = listMap[j];
                             }
-                            else // EntityList[i] is not mapped to a feature
+                            else // both i and j is not mapped to a feature
                             {
                                 // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
                                 FeatureList.Add(new Feature(new List<Entity>()));
@@ -133,6 +137,27 @@ namespace FeatureRecognitionAPI.Models
                                 // maps i and j to the index of that new feature in FeatureList
                                 listMap[i] = index;
                                 listMap[j] = index;
+                            }
+                        }
+                        else // both i and j are already mapped
+                        {
+                            if (listMap[i] != listMap[j]) // means they should become the same feature
+                            {
+                                FeatureList[listMap[i]].EntityList.AddRange(FeatureList[listMap[j]].EntityList); // combines the EntityLists
+                                FeatureList.RemoveAt(listMap[j]); // removed the feature with entity j
+                                
+                                for (int k = 0; k < listMap.Count; k++) // this for loop corrects the mapping after a feature was removed
+                                {
+                                    if (k!=j && listMap[k] == listMap[j])
+                                    {
+                                        listMap[k] = listMap[i];
+                                    }
+                                    else if (listMap[k] > listMap[j])
+                                    {
+                                        listMap[k]--;
+                                    }
+                                }
+                                listMap[j] = listMap[i];
                             }
                         }
                     }
@@ -148,6 +173,12 @@ namespace FeatureRecognitionAPI.Models
                     listMap[i] = index;
                 }
             }
+
+            foreach (Feature feature in FeatureList)
+            {
+                feature.ConstructFromEntityList();
+                feature.CountEntities();
+            }
         }
         
         /*
@@ -156,6 +187,10 @@ namespace FeatureRecognitionAPI.Models
          */
         public void SetFeatureGroups()
         {
+            if (FeatureList.Count == 0)
+            {
+                GroupFeatureEntities();
+            }
             List<Feature> features = new List<Feature>(FeatureList);
             
             Point minPoint = new(0, 0);

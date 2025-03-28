@@ -88,6 +88,15 @@ public class Feature
      */
     public Feature(List<Entity> EntityList)
     {
+        this.EntityList = EntityList;
+        ConstructFromEntityList();
+    }
+
+    #endregion
+
+    // This got moved out so Initialization can be called after populating its EntityList
+    public void ConstructFromEntityList()
+    {
         this.count = 1;
         this.multipleRadius = 1;
         this.EntityList = EntityList;
@@ -101,10 +110,13 @@ public class Feature
         //calculate and set the perimeter of the feature
         calcPerimeter();
     }
-
-    #endregion
-
+    
     #region FeatureDetection
+
+    public void CountEntities()
+    {
+        CountEntities(EntityList, out numLines, out numArcs, out numCircles, out numEllipses);
+    }
 
     /*
      * Counts the Lines, Arcs, and Circles in the EntityList.

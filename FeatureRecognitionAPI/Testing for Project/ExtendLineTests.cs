@@ -786,7 +786,6 @@ namespace Testing_for_Project
 
             Assert.IsTrue(featureList.Count == 6); // same features are grouped together
             int totalFeatures = 0;
-            Assert.IsTrue(featureList.Count == 6);
             foreach (Feature feature in featureList)
             {
                 totalFeatures += feature.count;
