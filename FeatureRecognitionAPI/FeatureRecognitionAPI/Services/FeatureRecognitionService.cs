@@ -111,19 +111,14 @@ namespace FeatureRecognitionAPI.Services
                         Console.WriteLine("ERROR detecting file extension");
                         return (OperationStatus.BadRequest, null);
                 }
-
                 
-                supportedFile.GroupFeatureEntities();
-
-                foreach (Feature feature in supportedFile.FeatureList)
-                {
-                    CondenseArcs(feature.EntityList);
-                }
+                // supportedFile.GroupFeatureEntities();
+                
+                supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
 
                 supportedFile.DetectAllFeatureTypes();
                 
                 // Set the feature groups
-                supportedFile.SetFeatureGroups();
                 List<List<Entity>> touchingEntityList = new List<List<Entity>>();
                 foreach (Feature feature in supportedFile.FeatureList)
                 {

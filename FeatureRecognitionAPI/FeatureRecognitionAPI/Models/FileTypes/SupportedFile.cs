@@ -46,42 +46,15 @@ namespace FeatureRecognitionAPI.Models
         }
         #endregion
         
-        public List<Feature> DetectAllFeatureTypes()
+        public void DetectAllFeatureTypes()
         {
             GroupFeatureEntities();
-            
-            for (int i = 0; i < FeatureList.Count; i++)
-            {
-                FeatureList[i].ExtendAllEntities();
-                FeatureList[i].SeperateBaseEntities();
-                FeatureList[i].SeperatePerimeterEntities();
-                FeatureList[i].DetectFeatures();
-                if (FeatureList[i].PerimeterEntityList != null)
-                {
-                    for (int j = 0; j < FeatureList[i].PerimeterEntityList.Count(); j++)
-                    {
-                        Feature newFeat = new Feature(FeatureList[i].PerimeterEntityList[j]);
-                        newFeat.DetectFeatures();
-                        FeatureList.Add(newFeat);
-                    }
-                }
-            }
+            SetFeatureGroups();
 
-
-            // Group identical features together
-            for (int i = 0; i < FeatureList.Count(); i++)
+            foreach (FeatureGroup featureGroup in FeatureGroups)
             {
-                for (int j = i + 1; j < FeatureList.Count(); j++)
-                {
-                    if (FeatureList[i].Equals(FeatureList[j]))
-                    {
-                        FeatureList[i].count += FeatureList[j].count;
-                        FeatureList.RemoveAt(j);
-                        j--;
-                    }
-                }
+                featureGroup.FindFeatureTypes();
             }
-            return FeatureList;
         }
         
         // This function takes in a list of entities and creates features based on groups of touching entities
@@ -361,6 +334,7 @@ namespace FeatureRecognitionAPI.Models
         
         public abstract void ParseFile();
 
-        public abstract List<Entity> GetEntities();
+        public  List<Entity> GetEntities() {return EntityList;}
+        public void SetEntities(List<Entity> entities) { EntityList = entities; }
     }
 }

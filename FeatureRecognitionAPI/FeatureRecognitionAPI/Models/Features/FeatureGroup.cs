@@ -23,6 +23,41 @@ namespace FeatureRecognitionAPI.Models.Features
             }
         }
 
+        public void FindFeatureTypes()
+        {
+            for (int i = 0; i < features.Count; i++)
+            {
+                features[i].ExtendAllEntities();
+                features[i].SeperateBaseEntities();
+                features[i].SeperatePerimeterEntities();
+                features[i].DetectFeatures();
+                if (features[i].PerimeterEntityList != null)
+                {
+                    for (int j = 0; j < features[i].PerimeterEntityList.Count(); j++)
+                    {
+                        Feature newFeat = new Feature(features[i].PerimeterEntityList[j]);
+                        newFeat.DetectFeatures();
+                        features.Add(newFeat);
+                    }
+                }
+            }
+
+
+            // Group identical features together
+            for (int i = 0; i < features.Count(); i++)
+            {
+                for (int j = i + 1; j < features.Count(); j++)
+                {
+                    if (features[i].Equals(features[j]))
+                    {
+                        features[i].count += features[j].count;
+                        features.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+        }
+        
         public void SetFeatureList(List<Feature> features)
         {
             this.features = features;

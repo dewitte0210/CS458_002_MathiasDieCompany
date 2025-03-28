@@ -782,21 +782,19 @@ namespace Testing_for_Project
 
             exampleOne.DetectAllFeatureTypes();
 
-            List<Feature> featureList = exampleOne.FeatureList;
+            Assert.IsTrue(exampleOne.FeatureGroups.Count == 1); // one overall feature when combined
+            Assert.IsTrue(exampleOne.FeatureGroups[0].Count == 6); // 6 identical features
+            List<Feature> singleFeatureList = exampleOne.FeatureGroups[0].GetFeatures();
 
-            Assert.IsTrue(featureList.Count == 6); // same features are grouped together
+            Assert.IsTrue(singleFeatureList.Count == 6); // 6 features make up the die
+            
             int totalFeatures = 0;
-            Assert.IsTrue(featureList.Count == 6);
-            foreach (Feature feature in featureList)
+            foreach (Feature feature in singleFeatureList)
             {
                 totalFeatures += feature.count;
-                if (feature.PerimeterEntityList.Count != 0)
-                {
-                    Assert.IsTrue(feature.PerimeterEntityList.Count == 1);
-                }
             }
-
-            Assert.IsTrue(totalFeatures == 48); // Count of all features
+            totalFeatures *= exampleOne.FeatureGroups[0].Count;
+            Assert.IsTrue(totalFeatures == 48); // number of features accounting for combined features
         }
 
         #endregion
