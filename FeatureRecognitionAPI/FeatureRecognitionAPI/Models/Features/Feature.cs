@@ -32,7 +32,8 @@ public class Feature
 
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
-    internal List<Entity> ExtendedEntityList { get; set; } // list of entities after extending them all
+    // list of entities after extending them all
+    internal List<Entity> ExtendedEntityList { get; set; } 
 
     // what the list is sorted into from extendedEntityList which should only
     // contain entities that make up the base shape and possibly corner features
@@ -953,13 +954,22 @@ public class Feature
         returns true if no problems??
     */
 
-    internal static List<Line> GetLinesFromEntityList(List<Entity> entities)
+    internal static List<Line> GetLinesFromEntityList(List<Entity> entityList)
     {
         // current assumptions made:
         // orientation is consistent
         
+        // assumptions that can be made
+        // the three checked lines must be touching
+        
+        /*
+         *  TODO: seperate entity list into groups of touching lines
+         *  or transition to adjacency list but how to do efficiently
+         *  trying to fight the urge to scorched earth refactor
+         */
+        
         List<Line> lineList = [];
-        foreach (Entity entity in entities)
+        foreach (Entity entity in entityList)
         {
             if (entity is Line line)
             {

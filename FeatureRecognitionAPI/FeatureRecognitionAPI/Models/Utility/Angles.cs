@@ -1,3 +1,4 @@
+using System.Security.Policy;
 using static FeatureRecognitionAPI.Models.Utility.MDCMath;
 
 // This file is used for calculating the angle between lines and on what side they lay
@@ -36,7 +37,8 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 		public class Degrees(double value)
 		{
-			public readonly double Value = value;
+			//set internal, only use through implicit cast to double
+			internal readonly double Value = value;
 
 			public Degrees GetOppositeAngle()
 			{
@@ -83,7 +85,8 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 		public class Radians(double value)
 		{
-			public readonly double Value = value;
+			//set internal, only use through implicit cast to double
+			internal readonly double Value = value;
 
 			public Radians GetOppositeAngle()
 			{
@@ -197,7 +200,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			public override int GetHashCode()
 			{
-				throw new NotImplementedException();
+				return HashCode.Combine(this._angle.GetHashCode(), this._side.GetHashCode());
 			}
 			#endregion
 		}
