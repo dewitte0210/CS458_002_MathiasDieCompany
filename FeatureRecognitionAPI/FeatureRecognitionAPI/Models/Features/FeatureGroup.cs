@@ -17,13 +17,13 @@ namespace FeatureRecognitionAPI.Models.Features
 
             foreach (Feature feature in features)
             {
-                this.totalArcs += feature.getNumArcs();
-                this.totalLines += feature.getNumLines();
-                this.totalCircles += feature.getNumCircles();
+                this.totalArcs += feature.GetNumArcs();
+                this.totalLines += feature.GetNumLines();
+                this.totalCircles += feature.GetNumCircles();
             }
         }
 
-        public void setFeatureList(List<Feature> features)
+        public void SetFeatureList(List<Feature> features)
         {
             this.features = features;
         }

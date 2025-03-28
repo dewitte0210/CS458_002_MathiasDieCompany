@@ -52,9 +52,9 @@ namespace FeatureRecognitionAPI.Models
             
             for (int i = 0; i < FeatureList.Count; i++)
             {
-                FeatureList[i].extendAllEntities();
-                FeatureList[i].seperateBaseEntities();
-                FeatureList[i].seperatePerimeterEntities();
+                FeatureList[i].ExtendAllEntities();
+                FeatureList[i].SeperateBaseEntities();
+                FeatureList[i].SeperatePerimeterEntities();
                 FeatureList[i].DetectFeatures();
                 if (FeatureList[i].PerimeterEntityList != null)
                 {
