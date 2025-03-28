@@ -199,6 +199,9 @@ namespace Testing_for_Project
 
         #region CheckGroup3
 
+        // TODO: test from file upload
+        // TODO: test with unordered lines
+        
         [Test]
         public void TestGetLinesFromEntityListSquare()
         {
@@ -309,6 +312,19 @@ namespace Testing_for_Project
             Assert.Contains(line6, possibleChamList);
             Assert.Contains(line7, possibleChamList);
             Assert.Contains(line8, possibleChamList);
+        }
+        
+        [Test]
+        public void CheckGroup3NoChamferSquare()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            Line line3 = new Line(5, 5, 0, 5);
+            Line line4 = new Line(0, 5, 0, 0);
+            List<Entity> eList = [line1, line2, line3, line4];
+            Feature f = new(eList);
+            
+            Assert.That(f.NumChamfers, Is.EqualTo(0));
         }
         
         [Test]
