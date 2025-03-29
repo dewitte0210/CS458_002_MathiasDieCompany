@@ -992,6 +992,13 @@ public class Feature
     }
 
     // TODO: make sure this handles unordered lines
+    
+    /// <summary>
+    /// Gets a list of possible chamfer lines from a base list of lines
+    /// </summary>
+    /// <param name="lineList"> list of lines, possible chamfers in this list
+    /// will be flagged as such</param>
+    /// <returns>list of lines where each line has a chamfer type of possible</returns>
     internal static List<Line> GetPossibleChamfers(List<Line> lineList)
     {
         List<Line> possibleChamferList = [];
@@ -1019,23 +1026,22 @@ public class Feature
         }
         return possibleChamferList;
     }
-    
-     internal void CheckGroup3()
+
+    private void CheckGroup3()
     {
         if (FeatureType != PossibleFeatureTypes.Group1A1) return;
         
-        List<Line> lineList = GetLinesFromEntityList(baseEntityList);
+        // copy of base entity list with just lines
+        List<Line> lineList = GetLinesFromEntityList(baseEntityList).ToList();
         List<Line> possibleChamferList = GetPossibleChamfers(lineList);
         
         if (lineList.Count < 3) return;
+        if (possibleChamferList.Count <= 0) return;
 
         // check potential chamfers
         // if only one chamfer, it is confirmed to be chamfer
         if (possibleChamferList.Count == 1)
         {
-            // TODO: will not directly change chamfertype in baseEntityList
-            // so you will not be able to go back and check what lines
-            // were chamfers
             possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
         }
         // if 2 to 3 chamfers, only confirm if a parallel line to it
@@ -1054,8 +1060,8 @@ public class Feature
                 }
                 if (!hasPallelChamfer)
                 {
-                    possibleChamfer.ChamferType = ChamferTypeEnum.None;
-                    if (possibleChamferList.Remove(possibleChamfer)) { break; }   
+                    possibleChamferList.Remove(possibleChamfer);
+                    break;
                 }
             }
             // remaining possible chamfers meet above case so confirm
@@ -1066,7 +1072,7 @@ public class Feature
         }
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
-        // TODO: implement better check for octagon problem
+        // TODO: implement better check for octagon problem, perhaps with frontend
         if (possibleChamferList.Count > 4)
         {
             NumChamfers =  possibleChamferList.Count / 2;

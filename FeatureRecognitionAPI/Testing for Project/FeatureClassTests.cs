@@ -1,6 +1,9 @@
-﻿using FeatureRecognitionAPI.Models;
+﻿using FeatureRecognitionAPI.Controllers;
+using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Testing_for_Project
 {
@@ -199,7 +202,6 @@ namespace Testing_for_Project
 
         #region CheckGroup3
 
-        // TODO: test from file upload
         // TODO: test with unordered lines
         
         [Test]
@@ -325,6 +327,13 @@ namespace Testing_for_Project
             Feature f = new(eList);
             
             Assert.That(f.NumChamfers, Is.EqualTo(0));
+            //check if there is a baseEntity with chamfer type
+            Assert.That(f.baseEntityList.Any(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }),
+                Is.EqualTo(false));
+            Assert.That(f.baseEntityList.Any(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }),
+                Is.EqualTo(false));
         }
         
         [Test]
@@ -344,7 +353,13 @@ namespace Testing_for_Project
             f.DetectFeatures();
             
             Assert.That(f.NumChamfers, Is.EqualTo(1));
-            // TODO: check later that the chamfertype is flagged in baseEntityList
+            //check if there is a baseEntity with chamfer type
+            Assert.That(f.baseEntityList.Where(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
+                Is.EqualTo(0));
+            Assert.That(f.baseEntityList.Where(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
+                Is.EqualTo(1));
         }
         
         [Test]
@@ -367,7 +382,13 @@ namespace Testing_for_Project
             f.DetectFeatures();
             
             Assert.That(f.NumChamfers, Is.EqualTo(2));
-            // TODO: check later that the chamfertype is flagged in baseEntityList
+            //check if there is a baseEntity with chamfer type
+            Assert.That(f.baseEntityList.Where(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
+                Is.EqualTo(1));
+            Assert.That(f.baseEntityList.Where(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
+                Is.EqualTo(2));
         }
         
         [Test]
@@ -387,10 +408,17 @@ namespace Testing_for_Project
             List<Entity> eList = [line1, line2, line3, line4, line5, line6, line7, line8];
             Feature f = new(eList);
             
-            //detects all groups including group3
+            // detects all groups including group3
             f.DetectFeatures();
             
             Assert.That(f.NumChamfers, Is.EqualTo(4));
+            // check if there is a baseEntity with chamfer type
+            Assert.That(f.baseEntityList.Where(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
+                Is.EqualTo(8));
+            Assert.That(f.baseEntityList.Where(
+                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
+                Is.EqualTo(0));
         }
 
         #endregion
