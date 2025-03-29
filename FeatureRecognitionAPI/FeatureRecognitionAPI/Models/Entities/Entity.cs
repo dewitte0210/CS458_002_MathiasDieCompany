@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using CSMath;
 using FeatureRecognitionAPI.Models.Utility;
+using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("Testing_for_Project")]
 
@@ -13,7 +14,7 @@ namespace FeatureRecognitionAPI.Models
     public abstract class Entity
     {
         public double Length { get; set; }//length of the entity
-        public List<Entity> AdjList { get; set; }
+        [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
 
         //Enables the use of a default constructor

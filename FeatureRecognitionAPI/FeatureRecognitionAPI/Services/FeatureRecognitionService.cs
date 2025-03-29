@@ -35,10 +35,8 @@ namespace FeatureRecognitionAPI.Services
                 switch (ext)
                 {
                     case ".dxf":
-                        Console.WriteLine("This is a dxf file");
                         return (OperationStatus.OK, ext);
                     case ".dwg":
-                        Console.WriteLine("This is a dwg file");
                         return (OperationStatus.OK, ext);
                     default:
                         Console.WriteLine("ERROR detecting file extension");
@@ -111,26 +109,24 @@ namespace FeatureRecognitionAPI.Services
                         Console.WriteLine("ERROR detecting file extension");
                         return (OperationStatus.BadRequest, null);
                 }
-
                 
-                // Create the touching entity list
-                List<List<Entity>> touchingEntityList = supportedFile.makeTouchingEntitiesList(CondenseArcs(supportedFile.GetEntities()));
+                // supportedFile.GroupFeatureEntities();
+                
+                supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
+
+                supportedFile.DetectAllFeatureTypes();
                 
                 // Set the feature groups
-                List<FeatureGroup> featureGroups = supportedFile.SetFeatureGroups(touchingEntityList);
-                
-                // Set features for each feature group
-                List<Feature> features;
-                for (int i = 0; i < featureGroups.Count; i++)
+                List<List<Entity>> touchingEntityList = new List<List<Entity>>();
+                foreach (Feature feature in supportedFile.FeatureList)
                 {
-                    features = supportedFile.makeFeatureList(featureGroups[i].touchingEntities);
-                    featureGroups[i].SetFeatureList(features);
+                    touchingEntityList.Add(feature.EntityList);
                 }
-
+                
                 // Create JSON that will be sent to the frontend
                 var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
                 settings.Converters.Add(new StringEnumConverter());
-                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, featureGroups), settings);
+                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
 
                 return (OperationStatus.OK, json);
             }
