@@ -35,10 +35,8 @@ namespace FeatureRecognitionAPI.Services
                 switch (ext)
                 {
                     case ".dxf":
-                        Console.WriteLine("This is a dxf file");
                         return (OperationStatus.OK, ext);
                     case ".dwg":
-                        Console.WriteLine("This is a dwg file");
                         return (OperationStatus.OK, ext);
                     default:
                         Console.WriteLine("ERROR detecting file extension");
