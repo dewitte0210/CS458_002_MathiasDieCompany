@@ -1,4 +1,6 @@
-﻿namespace FeatureRecognitionAPI.Models
+﻿using FeatureRecognitionAPI.Models.Utility;
+
+namespace FeatureRecognitionAPI.Models
 {
     /**
      * Class that represents a Ellipse object that extends Entity
@@ -232,16 +234,6 @@
             else
             {
                 ellipseRotation = Math.Atan2(ellipseY, ellipseX);
-                //Q2 and Q3
-                if (ellipseX < 0)
-                {
-                    ellipseRotation += Math.PI;
-                }
-                //Q4
-                else if (ellipseX > 0 && ellipseY < 0)
-                {
-                    ellipseRotation += 2 * Math.PI;
-                }
             }
             //Adjusting for ellipse rotation
             pointAngle -= ellipseRotation;
@@ -288,6 +280,11 @@
         public override double MaxY()
         {
             throw new NotImplementedException();
+        }
+        
+        public override Ellipse Transform(Matrix3 transform)
+        {
+            throw new NotImplementedException("Ellipses within insert blocks are not yet supported.");
         }
     }
 }

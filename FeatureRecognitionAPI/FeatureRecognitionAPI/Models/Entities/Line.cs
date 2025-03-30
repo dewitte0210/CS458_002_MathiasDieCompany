@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -34,8 +35,19 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(endX - startX, 2) + Math.Pow(endY - startY, 2)));
+            this.Length = Point.Distance(StartPoint, EndPoint);
+        }
+
+
+        public Line(Point startPoint, Point endPoint)
+        {
+            StartPoint = new Point(startPoint);
+            EndPoint = new Point(endPoint);
+            
+            SlopeY = EndPoint.Y - StartPoint.Y;
+            SlopeX = EndPoint.X - StartPoint.X;
+            
+            this.Length = Point.Distance(StartPoint, EndPoint);
         }
 
         //constructor with extendedline parameter
@@ -47,8 +59,7 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
 
-            // Distance Calculation
-            this.Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
+            Length = (Math.Sqrt(Math.Pow(EndPoint.X - StartPoint.X, 2) + Math.Pow(EndPoint.Y - StartPoint.Y, 2)));
         }
 
         public bool hasPoint(Point point)
@@ -113,6 +124,15 @@ namespace FeatureRecognitionAPI.Models
             if (other is Line)
             {
                 Line lineOther = (Line)other;
+                // Vertical slope edge cases
+                if (Math.Round(this.StartPoint.X, 4).Equals(Math.Round(this.EndPoint.X, 4)) && Math.Round(lineOther.StartPoint.Y, 4).Equals(Math.Round(lineOther.EndPoint.Y, 4)))
+                {
+                    return true;
+                }
+                else if (Math.Round(this.StartPoint.Y, 4).Equals(Math.Round(this.EndPoint.Y, 4)) && Math.Round(lineOther.StartPoint.X, 4).Equals(Math.Round(lineOther.EndPoint.X, 4)))
+                {
+                    return true;
+                }
                 if ((this.SlopeY / this.SlopeX) == (-1 * (lineOther.SlopeX / lineOther.SlopeY)))
                 {
                     return true;
@@ -200,6 +220,13 @@ namespace FeatureRecognitionAPI.Models
         public Point GetDelta()
         {
             return new Point(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y);
+        }
+        
+        public override Line Transform(Matrix3 transform)
+        {
+            Point newStart = transform * StartPoint; 
+            Point newEnd =  transform * EndPoint;
+            return new Line(newStart, newEnd);
         }
     }
 }
