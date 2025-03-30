@@ -13,8 +13,12 @@ namespace FeatureRecognitionAPI.Services
     {
         // Change these as necessary
         private const double BASE_SHOP_RATE = 139.10;
+        
+        // This only appears to be used for some sort of report calc that we are not doing
         private const double DIE_CUTTING_SHOP_RATE = 126.45;
+        // Not entirely sure when this comes into play. Looks like it is involved in the final price calc 
         private const double PLUG_RATE = 95.17;
+        
         private const double BASE = 130;
         private const double DISCOUNT = 1;
         private readonly List<PunchPrice> _tubePunchList, _soPunchList, _hdsoPunchList,
@@ -111,7 +115,7 @@ namespace FeatureRecognitionAPI.Services
                         case PossibleFeatureTypes.Group2A1: // Elipses
                         case PossibleFeatureTypes.Group2A2: // Bowties
                         case PossibleFeatureTypes.Group1B1: // Circle
-                        case PossibleFeatureTypes.Group1B2: // Rounded Rectangle
+                        case PossibleFeatureTypes.Group1B2: // Obround 
                             maxRadius = 1;
                             break;
                         case PossibleFeatureTypes.Group5: // Mitered Notches
@@ -192,11 +196,11 @@ namespace FeatureRecognitionAPI.Services
                             continue;
                     }
 
-                    if (feature.MultipleRadius)
+                    if (feature.MultipleRadius > 1)
                     {
-                        if (maxRadius == 1)
+                        if (maxRadius != 1)
                         {
-                            setupCost = setupCost * 0.7;
+                            setupCost = setupCost * 0.7 * feature.MultipleRadius;
                             runCost = runCost * 1.1;
                         }
                     }
@@ -245,7 +249,7 @@ namespace FeatureRecognitionAPI.Services
                 }
 
                 double perimeterCost = totalPerimeter * 0.46;    
-                totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost));
+                totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost)) + perimeterCost;
 
                 return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString(CultureInfo.CurrentCulture));
             }
