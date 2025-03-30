@@ -10,6 +10,7 @@
     "Group4" : "Perimeter Feature",
     "Group5" : "Mitered Notch",
     "Group6" : "Radius Notch",
+    "Group9" : "Kiss-Cut Tab",
     "Group17" : "Freehand",
 };
 
