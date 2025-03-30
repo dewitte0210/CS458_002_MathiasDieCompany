@@ -73,10 +73,5 @@ namespace FeatureRecognitionAPI.Models
                     return FileVersion.Unknown;
             }
         }
-
-        public override List<Entity> GetEntities()
-        {
-            return EntityList;
-        }
     }
 }
