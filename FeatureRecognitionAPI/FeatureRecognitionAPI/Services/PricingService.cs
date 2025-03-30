@@ -54,40 +54,29 @@ namespace FeatureRecognitionAPI.Services
 
 
                 //Set rule factor based on rule type
-                switch (param.RuleType)
+                ruleFactor = param.RuleType switch
                 {
-                    case RuleTypeEnum.TwoPtCB937:
-                        ruleFactor = 1; break;
-                    case RuleTypeEnum.TwoPtSB937:
-                        ruleFactor = 1.3; break;
-                    case RuleTypeEnum.TwoPtDDB937:
-                        ruleFactor = 1.1; break;
-                    case RuleTypeEnum.TwoPtCB1125:
-                        ruleFactor = 1.25; break;
-                    case RuleTypeEnum.ThreePtCB937:
-                        ruleFactor = 1.3; break;
-                    case RuleTypeEnum.ThreePtSB937:
-                        ruleFactor = 1.5; break;
-                    case RuleTypeEnum.ThreePtDDB937:
-                        ruleFactor = 1.3; break;
-                    case RuleTypeEnum.ThreePtDSB927:
-                        ruleFactor = 1.5; break;
-                    case RuleTypeEnum.FourTwelveCB472:
-                        ruleFactor = 1.3; break;
-                    case RuleTypeEnum.FiveTwelveCB472:
-                        ruleFactor = 1.3; break;
-                }
+                    RuleTypeEnum.TwoPtCB937 => 1,
+                    RuleTypeEnum.TwoPtSB937 => 1.3,
+                    RuleTypeEnum.TwoPtDDB937 => 1.1,
+                    RuleTypeEnum.TwoPtCB1125 => 1.25,
+                    RuleTypeEnum.ThreePtCB937 => 1.3,
+                    RuleTypeEnum.ThreePtSB937 => 1.5,
+                    RuleTypeEnum.ThreePtDDB937 => 1.3,
+                    RuleTypeEnum.ThreePtDSB927 => 1.5,
+                    RuleTypeEnum.FourTwelveCB472 => 1.3,
+                    RuleTypeEnum.FiveTwelveCB472 => 1.3,
+                    _ => ruleFactor
+                };
 
                 foreach (var feature in param.FeatureGroups.First().Features)
                 {
                     double setupCost = 0.00;
                     double runCost = 0.00;
                     double featureCost = 0.00;
-                    double featureSetup = 0.00;
                     int maxRadius = 0; // 1 for no max radius
                     bool isOverSized = feature.Perimeter > 20;
                     int quantity = feature.Count * param.FeatureGroups.First().NumberUp;
-                    double tempCost;
 
                     // Setup Cost = hour/part to set up * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
@@ -97,7 +86,6 @@ namespace FeatureRecognitionAPI.Services
                     /*
                         Setupcost = 0.22 * mMain.Shoprate
                         RunCost = 1 * mMain.Shoprate * 0.04 * 4
-                        Descript = "Radius/Mitered Rectangle - Group 1A" 
                     */
                     
                     FeaturePrice featureData =
@@ -108,144 +96,96 @@ namespace FeatureRecognitionAPI.Services
                     {
                         setupCost = featureData.SetupRate * BASE_SHOP_RATE;
                         runCost = featureData.DifficultyFactor * BASE_SHOP_RATE * featureData.RunRate * featureData.Quantity;
-                    }
+                       
+                        if (feature.MultipleRadius > 1)
+                        {
+                            if (featureData.MaxRadius != 1)
+                            {
+                                setupCost = setupCost * 0.7 * feature.MultipleRadius;
+                                runCost *= 1.1;
+                            }
+                        }
+                          
+                        if (feature.KissCut)
+                        {
+                            setupCost *= 1.15;
+                            runCost *= 1.15;
+                        }
+
+                        if (isOverSized)
+                        {
+                            // NOTE: Currently feature detection does not support knifed features
+                            var tempCost = feature.Perimeter * .19;
+                            runCost += (tempCost / 2);
+                        }
+
+                        double costSub1 = runCost;
+                        double minCost = runCost * 0.25;
+                        for (int i = 0; i < quantity; i++)
+                        {
+                            if (costSub1 > minCost)
+                            {
+                                featureCost += costSub1;
+
+                                var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); // 
+
+                                var costSub2 = costSub1 * efficiencySlope;
+                                costSub1 = costSub2;
+                            }
+                            else
+                            {
+                                featureCost += minCost;
+                            }
+
+                            i++;
+                        }
                     
-                    switch (feature.FeatureType)
-                    {
-                        case PossibleFeatureTypes.Group2A1: // Elipses
-                        case PossibleFeatureTypes.Group2A2: // Bowties
-                        case PossibleFeatureTypes.Group1B1: // Circle
-                        case PossibleFeatureTypes.Group1B2: // Obround 
-                            maxRadius = 1;
-                            break;
-                        case PossibleFeatureTypes.Group5: // Mitered Notches
-                        case PossibleFeatureTypes.Group3: // Corner Chamfer
-                            maxRadius = 2;
-                            break;
-                        case PossibleFeatureTypes.Group1C: // Triangles
-                        case PossibleFeatureTypes.Group4: // V-Notch & Corner Notch
-                            maxRadius = 3;
-                            break;
-                        case PossibleFeatureTypes.Group1A1: // Mitered Rectangle
-                        case PossibleFeatureTypes.Group1A2: // Radius Corner Rectangle
-                        case PossibleFeatureTypes.Group6: // Radius Notches
-                            maxRadius = 4;
-                            break;
-                         
-                        case PossibleFeatureTypes.StdTubePunch:
-                            //Get the closest diameter from list
-                            var tubePunch = _tubePunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
-                            setupCost = tubePunch.SetupCost * 1.2;
-                            runCost = tubePunch.RunCost;
+                        featureCost *= ruleFactor;
+                        var featureSetup = setupCost * SetupDiscount(feature.Count);
+                        totalFeatureCost += featureCost;
+                        setupCostTotal += featureSetup;
+
+                        totalPerimeter += (feature.Perimeter * feature.Count);
+                    }
+                    else
+                    { 
+                        // For punch pricing we get the closest punch by comparing the perimeter with the punch sizes in our lists 
+                        PunchPrice punch; 
+                        switch (feature.FeatureType)
+                        { 
+                            case PossibleFeatureTypes.StdTubePunch:
+                                punch = _tubePunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                break;
+                            case PossibleFeatureTypes.SideOutlet:
+                                punch = _soPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                break;
+                            case PossibleFeatureTypes.HDSideOutlet:
+                                punch = _hdsoPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                break;
+                            case PossibleFeatureTypes.StdFTPunch:
+                                punch = _ftPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                break;
+                            case PossibleFeatureTypes.StdSWPunch:
+                                punch = _swPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                break; 
+                            case PossibleFeatureTypes.StdRetractPins:
+                                punch = _retractList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                break;
+                            // Not sure if Punch is even valid for pricing 
+                            case PossibleFeatureTypes.Punch:
+                            default:
+                                continue;
+                        }
+                        
+                            setupCost = punch.SetupCost * 1.2;
+                            runCost = punch.RunCost;
 
                             var punchCost = quantity * runCost;
                             featureCost = punchCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.StdTubePunch, quantity);
-                            continue;
-                        case PossibleFeatureTypes.SideOutlet:
-                            //Get the closest diameter from list
-                            var soPunch = _soPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
-                            setupCost = soPunch.SetupCost* 1.2;
-                            runCost = soPunch.RunCost;
-
-                            var soCost = quantity * runCost;
-                            featureCost = soCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.SideOutlet, quantity);
-                            continue;
-                        case PossibleFeatureTypes.HDSideOutlet:
-                            //Get the closest diameter from list
-                            var hdsoPunch = _hdsoPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
-                            setupCost = hdsoPunch.SetupCost * 1.2;
-                            runCost = hdsoPunch.RunCost;
-                            
-                            var hdsoCost = quantity * runCost;
-                            featureCost = hdsoCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.HDSideOutlet, quantity);
-                            continue;
-                        case PossibleFeatureTypes.StdFTPunch:
-                            //Get the closest diameter from list
-                            var ftPunch = _ftPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
-                            setupCost = ftPunch.SetupCost * 1.2;
-                            runCost = ftPunch.RunCost;
-
-                            var ftCost = quantity * runCost;
-                            featureCost = ftCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.StdFTPunch, quantity);
-                            continue;
-                        case PossibleFeatureTypes.StdSWPunch:
-                            //Get the closest diameter from list
-                            var swPunch = _swPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
-                            setupCost = swPunch.SetupCost * 1.2;
-                            runCost = swPunch.RunCost;
-
-                            var swCost = quantity * runCost;
-                            featureCost = swCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost * PunchDiscount(PossibleFeatureTypes.StdSWPunch, quantity);
-                            continue;
-                        case PossibleFeatureTypes.StdRetractPins:
-                            //Get the closest diameter from list
-                            var retract = _retractList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
-                            setupCost = retract.SetupCost * 1.2;
-                            runCost = retract.RunCost;
-
-                            var retractCost = quantity * runCost;
-                            featureCost = retractCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
-                            continue;
-                        case PossibleFeatureTypes.Punch:
+                            totalFeatureCost += featureCost * PunchPrice.PunchDiscount(feature.FeatureType, quantity);
                             continue;
                     }
-
-                    if (feature.MultipleRadius > 1)
-                    {
-                        if (maxRadius != 1)
-                        {
-                            setupCost = setupCost * 0.7 * feature.MultipleRadius;
-                            runCost = runCost * 1.1;
-                        }
-                    }
-
-                    if (feature.KissCut)
-                    {
-                        setupCost = setupCost * 1.15;
-                        runCost = runCost * 1.15;
-                    }
-
-                    if (isOverSized)
-                    {
-                        // NOTE: Currently feature detection does not support knifed features
-                        tempCost = feature.Perimeter * .19;
-                        runCost += (tempCost / 2);
-                    }
-
-                    double costSub1 = runCost;
-                    double minCost = runCost * 0.25;
-                    double costSub2;
-                    for (int i = 0; i < quantity; i++)
-                    {
-                        if (costSub1 > minCost)
-                        {
-                            featureCost += costSub1;
-
-                            var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02);
-
-                            costSub2 = costSub1 * efficiencySlope;
-                            costSub1 = costSub2;
-                        }
-                        else
-                        {
-                            featureCost += minCost;
-                        }
-
-                        i++;
-                    }
-                    
-                    featureCost *= ruleFactor;
-                    featureSetup = featureCost * SetupDiscount(feature.Count);
-                    totalFeatureCost += featureCost;
-                    setupCostTotal += featureSetup;
-
-                    totalPerimeter += (feature.Perimeter * feature.Count);
+                  
                 }
 
                 double perimeterCost = totalPerimeter * 0.46;    
@@ -258,158 +198,6 @@ namespace FeatureRecognitionAPI.Services
                 return (OperationStatus.ExternalApiFailure, ex.Message, null);
             }
         }
-
-        private double PunchDiscount(PossibleFeatureTypes punchType, int count)
-        {
-            double discount = 1;
-
-            switch (punchType)
-            {
-                case PossibleFeatureTypes.HDSideOutlet:
-                    discount = HDSideDiscount(count);
-                    break;
-                case PossibleFeatureTypes.StdFTPunch:
-                    discount = StdFtDiscount(count); 
-                    break;
-                case PossibleFeatureTypes.StdSWPunch:
-                    discount = StdSwDiscount(count);
-                    break;
-                case PossibleFeatureTypes.StdTubePunch:
-                    discount = TubeDiscount(count);
-                    break;
-                case PossibleFeatureTypes.SideOutlet:
-                    discount = SideOutletDiscount(count);
-                    break;
-            }
-            return discount;
-        }
-
-        private double SideOutletDiscount(int count)
-        {
-            double discount;
-            switch (count)
-            {
-                case >= 200:
-                    discount = 0.73;
-                    break;
-                case >= 100:
-                    discount = 0.77;
-                    break;
-                case >= 50:
-                    discount = 0.82;
-                    break;
-                case >= 25:
-                    discount = 0.90;
-                    break;
-                case >= 13:
-                    discount = 0.94;
-                    break;
-                default:
-                    discount = 1;
-                    break;
-            }
-            return discount;
-        }
-        
-        private double TubeDiscount(int count)
-        {
-            double discount;
-            switch (count)
-            {
-                case >= 200:
-                    discount = 0.56;
-                    break;
-                case >= 100:
-                    discount = 0.64;
-                    break;
-                case >= 50:
-                    discount = 0.73;
-                    break;
-                case >= 25:
-                    discount = 0.85;
-                    break;
-                case >= 13:
-                    discount = 0.93;
-                    break;
-                default:
-                    discount = 1;
-                    break;
-            }
-            return discount;
-        }
-        private double StdSwDiscount(int count)
-        {
-            double discount;
-            switch (count)
-            {
-                case >= 50:
-                    discount = 0.79;
-                    break;
-                case >= 25:
-                    discount = 0.86;
-                    break;
-                case >= 13:
-                    discount = 0.93;
-                    break;
-                default:
-                    discount = 1;
-                    break;
-            }
-            return discount;
-        }
-        private double StdFtDiscount(int count)
-        {
-            double discount;
-            switch (count)
-            {
-                case >= 200:
-                    discount = 0.67;
-                    break;
-                case >= 100:
-                    discount = 0.78;
-                    break;
-                case >= 50:
-                    discount = 0.82;
-                    break;
-                case >= 25:
-                    discount = 0.86;
-                    break;
-                case >= 13:
-                    discount = 0.93;
-                    break;
-                default:
-                    discount = 1;
-                    break;
-            }
-            return discount;
-        }
-        private double HDSideDiscount(int count)
-        {
-            double discount;
-            switch (count)
-            {
-                case >= 200:
-                    discount = 0.83;
-                    break;
-                case >= 100:
-                    discount = 0.86;
-                    break;
-                case >= 50:
-                    discount = 0.89;
-                    break;
-                case >= 25:
-                    discount = 0.93;
-                    break;
-                case >= 13:
-                    discount = 0.97;
-                    break;
-                default:
-                    discount = 1;
-                    break;
-            }
-            return discount;
-        }
-        
         private double SetupDiscount(int count)
         {
             return count switch
@@ -424,35 +212,37 @@ namespace FeatureRecognitionAPI.Services
                 _ => 1,
             };
         }
-
+       
         private List<FeaturePrice> GetFeaturePriceList()
         {
+            // Features with maxRadius of 1 cannot have multi-radius calculation
+            // Groups 15 and 16 dont have any price calculations attached
            var features = new List<FeaturePrice>()
            {
-               new FeaturePrice(PossibleFeatureTypes.Group1A1,  0.22, 0.04, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group1A2, 0.22, 0.04, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group1B1, 0.3, 0.042, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group1B2, 0.3, 0.042, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group1C, 0.32, 0.045, 1, 6),
-               new FeaturePrice(PossibleFeatureTypes.Group2A1, 0.9, 0.045, 1, 6),
-               new FeaturePrice(PossibleFeatureTypes.Group2A2, 0.9, 0.045, 1, 6),
-               new FeaturePrice(PossibleFeatureTypes.Group3, 0.14, 0.04, 1, 2),
-               new FeaturePrice(PossibleFeatureTypes.Group4, 0.25, 0.04, 1, 3),
-               new FeaturePrice(PossibleFeatureTypes.Group5, 0.25, 0.04, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group6, 0.33, 0.04, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group7, 0.5, 0.08, 1, 4),
-               new FeaturePrice(PossibleFeatureTypes.Group8, 0.6, 0.042, 1, 8),
-               new FeaturePrice(PossibleFeatureTypes.Group9, 0.25, 0.035, 0.75, 6),
-               new FeaturePrice(PossibleFeatureTypes.Group10, 0.63, 0.06, 1, 12),
-               new FeaturePrice(PossibleFeatureTypes.Group11, 0.3333, 0.04, 1, 7),
-               new FeaturePrice(PossibleFeatureTypes.Group12, 0.3, 0.04, 1, 6),
-               new FeaturePrice(PossibleFeatureTypes.Group13, 0.6, 0.035, 1,8),
-               new FeaturePrice(PossibleFeatureTypes.Group14, 0.2, 0.023,1,4),
-               new FeaturePrice(PossibleFeatureTypes.Group17, 0.58, 0.04, 1, 8),
-               new FeaturePrice(PossibleFeatureTypes.GroupS1, 0.19, 0.019, 1, 6),
-               new FeaturePrice(PossibleFeatureTypes.GroupS2, 0.2, 0.018, 1, 8),
-               new FeaturePrice(PossibleFeatureTypes.GroupS3, 0.21, 0.017, 1, 10),
-               new FeaturePrice(PossibleFeatureTypes.GroupS4, 0.22, 0.016, 1, 12),
+               new FeaturePrice(PossibleFeatureTypes.Group1A1,  0.22, 0.04, 1, 4, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1A2, 0.22, 0.04, 1, 4, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1B1, 0.3, 0.042, 1, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1B2, 0.3, 0.042, 1, 1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group1C, 0.32, 0.045, 1, 3, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group2A1, 0.9, 0.045, 1, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group2A2, 0.9, 0.045, 1, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group3, 0.14, 0.04, 1, 2, 1),
+               new FeaturePrice(PossibleFeatureTypes.Group4, 0.25, 0.04, 1, 3, 3),
+               new FeaturePrice(PossibleFeatureTypes.Group5, 0.25, 0.04, 1, 2, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group6, 0.33, 0.04, 1, 4, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group7, 0.5, 0.08, 1, 1, 4), 
+               new FeaturePrice(PossibleFeatureTypes.Group8, 0.6, 0.042, 1, 6, 8),
+               new FeaturePrice(PossibleFeatureTypes.Group9, 0.25, 0.035, 0.75, 2, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group10, 0.63, 0.06, 1, 1, 10),
+               new FeaturePrice(PossibleFeatureTypes.Group11, 0.3333, 0.04, 1, 1, 7),
+               new FeaturePrice(PossibleFeatureTypes.Group12, 0.3, 0.04, 1, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.Group13, 0.6, 0.035, 1,6, 8),
+               new FeaturePrice(PossibleFeatureTypes.Group14, 0.2, 0.023,1,1, 4),
+               new FeaturePrice(PossibleFeatureTypes.Group17, 0.58, 0.04, 1, 1, 8),
+               new FeaturePrice(PossibleFeatureTypes.GroupS1, 0.19, 0.019, 1, 1, 6),
+               new FeaturePrice(PossibleFeatureTypes.GroupS2, 0.2, 0.018, 1, 1, 8),
+               new FeaturePrice(PossibleFeatureTypes.GroupS3, 0.21, 0.017, 1, 1, 10),
+               new FeaturePrice(PossibleFeatureTypes.GroupS4, 0.22, 0.016, 1, 1, 12),
            };
            return features;
         }

@@ -2,7 +2,7 @@ using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Models.Pricing;
 
-public class FeaturePrice(PossibleFeatureTypes type, double setupRate, double runRate, double difficultyFactor, int quantity )
+public class FeaturePrice(PossibleFeatureTypes type, double setupRate, double runRate, double difficultyFactor, int maxRadius, int quantity)
 {
     /// <summary>
     ///  Denotes the hour/part rate of setting up the cut
@@ -17,10 +17,11 @@ public class FeaturePrice(PossibleFeatureTypes type, double setupRate, double ru
     public double DifficultyFactor { get; set; } = difficultyFactor;
 
     /// <summary>
-    /// Not entirely sure what quantity this refers to yet as the VB6 logic is using different numbers for this
-    /// even when there is only one of the parts
+    /// Denotes the Part Quantity used to make the feature
     /// </summary>
     public int Quantity { get; set; } = quantity;
 
+    public int MaxRadius { get; set; } = maxRadius; 
+    
     public PossibleFeatureTypes Type { get; set; } = type;
 }
