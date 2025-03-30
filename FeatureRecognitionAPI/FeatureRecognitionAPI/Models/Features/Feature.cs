@@ -1024,7 +1024,31 @@ public class Feature
     }
 
     #endregion
+    
+    #region Group9
 
+    internal void CheckGroup9()
+    {
+        // check if a line that is not in base shape is touching kiss-cut line in adjacency list
+
+        for (int i = 0; i < baseEntityList.Count() - 1; i++)
+        {
+            if (baseEntityList[i] is Line && ((Line)baseEntityList[i]).KissCut)
+            {
+                for (int j = 0; j < baseEntityList[i].AdjList.Count() - 1; j++)
+                {
+                    if(!baseEntityList.Contains(baseEntityList[i].AdjList[j]))
+                    {
+                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group9);
+                    }
+                }
+            }
+
+        }
+    }
+
+    #endregion
+    
     #region Group17
 
     /*
@@ -1223,18 +1247,20 @@ public class Feature
      */
     private bool ExtendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2))
-            //makes sure you're not extending lines that already touch
-        {
-            if (line1.isSameInfiniteLine(line2))
+        
+            if (!line1.KissCut || !line2.KissCut)
+                // Makes sure KissCut lines are not extended
             {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
-                ExtendedEntityList.Remove(line1);
-                ExtendedEntityList.Remove(line2);
-                ExtendedEntityList.Add(tempLine);
-                return true; // extended two parallel lines into 1
+                if (line1.isSameInfiniteLine(line2))
+                {
+                    ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
+                    ExtendedEntityList.Remove(line1);
+                    ExtendedEntityList.Remove(line2);
+                    ExtendedEntityList.Add(tempLine);
+                    return true; // extended two parallel lines into 1
+                }
             }
-        }
+        
 
         return false;
     }
