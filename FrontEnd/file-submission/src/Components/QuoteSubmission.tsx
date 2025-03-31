@@ -13,6 +13,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                              featureGroups,
                                                              backToUpload,
                                                          }) => {
+
     // Sort the initial data
     const sortedData = React.useMemo(() => {
         return featureGroups.map((group) => ({
@@ -29,6 +30,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         ejecMethod: "",
     });
     const [priceJSON, setPriceJSON] = useState<number | null>(null);
+
 
     /*
       Event handler for when the user changes a field in the form.
@@ -327,7 +329,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                         </td>
                                                         <td>
                                                             <select
-                                                                value={feature.FeatureType}
+                                                                value={translate(feature.FeatureType)}
                                                                 onChange={(e) => handleChange(
                                                                     "FeatureType",
                                                                     e.target.value,
@@ -447,7 +449,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                                     </option>
                                                                 </select>
                                                             ) : (
-                                                                feature.FeatureType
+                                                                translate(feature.FeatureType)
                                                             )}
                                                         </td>
                                                         <td>{feature.diameter !== 0 ? feature.diameter.toFixed(3) : feature.perimeter.toFixed(3)}</td>
