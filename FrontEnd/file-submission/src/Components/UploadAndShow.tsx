@@ -131,7 +131,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                         <div className="table-data">
                             {jsonResponse && ( // Conditionally render the JSON response
                                 <QuoteSubmission
-                                    featureGroups={translateJSON(jsonResponse["_featureGroups"])}
+                                    featureGroups={jsonResponse["_featureGroups"]}
                                     backToUpload={backToUpload}
                                 />
                             )}
