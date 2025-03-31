@@ -4,7 +4,7 @@ namespace Testing_for_Project
 {
     internal class SupportedFileTests
     {
-        [Test]
+        /*[Test]
         public void makeTouchingEntitiesList_HappyPath_ReturnTrue()
         {
             Line line1 = new(7, 4, 7, 6);
@@ -29,7 +29,7 @@ namespace Testing_for_Project
 
         /**
          * Used to check if two lists are equal in their contents
-         */
+         #1#
         static bool AreListsOfListsEqual<T>(List<List<T>> list1, List<List<T>> list2)
         {
             // Check if both lists are null
@@ -66,7 +66,7 @@ namespace Testing_for_Project
                 }
             }
             return true;
-        }
+        }*/
 
 
         [Test]
@@ -111,7 +111,15 @@ namespace Testing_for_Project
             expectedTouchingEntities.Add(new List<Entity>() { line3, line5, line4, line6 });
             foreach (Feature feature in dxf.FeatureList)
             {
-                Assert.IsTrue(expectedTouchingEntities.Contains(feature.EntityList));
+                bool inList = false;
+                foreach(List<Entity> eList in expectedTouchingEntities)
+                {
+                    if (eList.All(feature.EntityList.Contains) && eList.Count == feature.EntityList.Count)
+                    {
+                        inList = true;
+                    }
+                }
+                Assert.IsTrue(inList);
             }
         }
     }

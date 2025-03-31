@@ -163,7 +163,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         // Send the form data to the server
         try {
             const res = await fetch(
-                "https://localhost:44373/api/Pricing/estimatePrice",
+                `${process.env.REACT_APP_API_BASEURL}api/Pricing/EstimatePrice`,
                 {
                     method: "POST",
                     body: formJSON,
