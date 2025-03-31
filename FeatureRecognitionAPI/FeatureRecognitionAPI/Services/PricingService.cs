@@ -19,7 +19,8 @@ namespace FeatureRecognitionAPI.Services
         // Not entirely sure when this comes into play. Looks like it is involved in the final price calc 
         private const double PLUG_RATE = 95.17;
         
-        private const double BASE = 130;
+        //private const double BASE = 130; This is the main1 number
+        private const double BASE = 60; 
         private const double DISCOUNT = 1;
         private readonly List<PunchPrice> _tubePunchList, _soPunchList, _hdsoPunchList,
             _ftPunchList, _swPunchList, _retractList;
@@ -88,7 +89,7 @@ namespace FeatureRecognitionAPI.Services
                         RunCost = 1 * mMain.Shoprate * 0.04 * 4
                     */
                     
-                    FeaturePrice featureData =
+                    FeaturePrice? featureData =
                         _featurePriceList.Find(element => element.Type == feature.FeatureType);
                     
                     // If the current feature is a Punch featureData will be null, and we must use punch pricing rules
@@ -119,6 +120,7 @@ namespace FeatureRecognitionAPI.Services
                             runCost += (tempCost / 2);
                         }
 
+                        // Includes a discount depending on the quantity of the feature
                         double costSub1 = runCost;
                         double minCost = runCost * 0.25;
                         for (int i = 0; i < quantity; i++)
@@ -127,10 +129,9 @@ namespace FeatureRecognitionAPI.Services
                             {
                                 featureCost += costSub1;
 
-                                var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); // 
-
-                                var costSub2 = costSub1 * efficiencySlope;
-                                costSub1 = costSub2;
+                               // var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); this is the main 1 number
+                               var efficiencySlope = 0.98; 
+                               costSub1 *= efficiencySlope;
                             }
                             else
                             {
@@ -141,11 +142,11 @@ namespace FeatureRecognitionAPI.Services
                         }
                     
                         featureCost *= ruleFactor;
-                        var featureSetup = setupCost * SetupDiscount(feature.Count);
+                        var featureSetup = setupCost * SetupDiscount(quantity);
                         totalFeatureCost += featureCost;
                         setupCostTotal += featureSetup;
 
-                        totalPerimeter += (feature.Perimeter * feature.Count);
+                        totalPerimeter += (feature.Perimeter * quantity);
                     }
                     else
                     { 
@@ -154,7 +155,7 @@ namespace FeatureRecognitionAPI.Services
                         switch (feature.FeatureType)
                         { 
                             case PossibleFeatureTypes.StdTubePunch:
-                                punch = _tubePunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                punch = _tubePunchList.OrderBy(x => (Math.Abs(x.CutSize - feature.Perimeter))).First();
                                 break;
                             case PossibleFeatureTypes.SideOutlet:
                                 punch = _soPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
@@ -176,14 +177,12 @@ namespace FeatureRecognitionAPI.Services
                             default:
                                 continue;
                         }
-                        
                             setupCost = punch.SetupCost * 1.2;
                             runCost = punch.RunCost;
 
-                            var punchCost = quantity * runCost;
+                            var punchCost = quantity * runCost;// * PunchPrice.PunchDiscount(feature.FeatureType, quantity);
                             featureCost = punchCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost * PunchPrice.PunchDiscount(feature.FeatureType, quantity);
-                            continue;
+                            totalFeatureCost += featureCost;
                     }
                   
                 }
