@@ -18,7 +18,7 @@ namespace FeatureRecognitionAPI.Controllers
             _pricingService = pricingService;
         }
 
-        [HttpPost("estimatePrice", Name = nameof(EstimatePrice))]
+        [HttpPost("[action]")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -31,7 +31,7 @@ namespace FeatureRecognitionAPI.Controllers
                 if (quoteSubmissionDto == null)
                     return BadRequest("Invalid payload.");
 
-                var (status, msg, output) = await _pricingService.EstimatePrice(quoteSubmissionDto);
+                var (status, msg, output) =  _pricingService.EstimatePrice(quoteSubmissionDto);
 
                 if (status != OperationStatus.OK || output == null)
                     return BadRequest(msg);
