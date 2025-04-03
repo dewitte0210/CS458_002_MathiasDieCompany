@@ -56,3 +56,38 @@ $dP$ then becomes:
 \
 \
 As for the number of lines at the unit ellipse, 360 is used which gives 4 decimal places of precision in the perimeter calculation.
+
+# Ellipse Bound Calculations
+These functions aim at calculating the bounding box of the ellipse and returns the relevant coordinate values for each coordinate along the box. Rotated ellipses are taken into account, so a different form of the ellipse equation (shown below) is used.
+
+### $\frac{((x-h)cos(\theta) + (y-k)sin(\theta))^2}{a^2} + \frac{((x-h)sin(\theta) - (y-k)cos(\theta))^2}{b^2} - 1 = 0$
+
+Calculating the bounds is done by taking the partial derivatives of x and y respectively in the ellipse equation
+
+### $\frac{\delta}{\delta x}\space [\frac{((x-h)cos(\theta) + (y-k)sin(\theta))^2}{a^2} + \frac{((x-h)sin(\theta) - (y-k)cos(\theta))^2}{b^2} - 1 = 0]$
+### $\frac{\delta}{\delta y}\space [\frac{((x-h)cos(\theta) + (y-k)sin(\theta))^2}{a^2} + \frac{((x-h)sin(\theta) - (y-k)cos(\theta))^2}{b^2} - 1 = 0]$
+
+which results in the corresponding equations:
+### $\frac{\delta}{\delta x} = \varDelta_x x + \beta$
+#### $\varDelta_x = \frac{(a^2 - b^2)sin(\theta)cos(\theta)}{b^2 sin^2(\theta) + a^2 cos^2(\theta)}$
+#### $\beta = \frac{b^2 h sin(\theta)cos(\theta) - a^2 h sin(\theta)cos(\theta)}{b^2 sin^2(\theta) + a^2 cos^2(\theta)} + k$
+<br><br/>
+### $\frac{\delta}{\delta y} = \varDelta_y x + \gamma$
+#### $\varDelta_y = \frac{a^2 sin^2(\theta) + b^2 cos^2(\theta)}{sin(\theta)cos(\theta)(b^2 - a^2)}$
+#### $\gamma = \frac{h(a^2 sin^2(\theta) + b^2 cos^2(\theta))}{sin(\theta)cos(\theta)(b^2 - a^2)} + k$
+
+\
+The ellipse equation is then refactored to the form
+
+### $Ax^2 + Bx + Cy^2 + Dy + Exy + \alpha = 0$
+#### $A = \frac{cos^2 (\theta)}{a^2} + \frac{sin^2 (\theta)}{b^2}$
+#### $B = ksin (2\theta)(\frac{1}{b^2} - \frac{1}{a^2}) - 2h(\frac{cos^2 (\theta)}{a^2} + \frac{sin^2 (\theta)}{b^2})$
+#### $C = \frac{sin^2 (\theta)}{a^2} + \frac{cos^2 (\theta)}{b^2}$
+#### $D = hsin (2\theta)(\frac{1}{b^2} - \frac{1}{a^2}) - 2k(\frac{sin^2 (\theta)}{a^2} + \frac{cos^2 (\theta)}{b^2})$
+#### $E = sin(2\theta)(\frac{1}{a^2} - \frac{1}{b^2})$
+#### $\alpha = h^2 (\frac{cos^2 (\theta)}{a^2} + \frac{sin^2 (\theta)}{b^2}) + hksin(2\theta)(\frac{1}{a^2} - \frac{1}{b^2}) + k^2 (\frac{sin^2 (\theta)}{a^2} + \frac{cos^2 (\theta)}{b^2}) - 1$
+
+and the results of each derivative are then substitued into the equation for their corresponding bound calculation. Plugging the partial derivatives into the general ellipse equation results in the following quadratic:
+### $(A + \delta (C \delta + E))x^2 + (\beta (2C\delta + E) - B - D\delta)x + \beta (C\beta - D) + \alpha = 0$
+
+This can then be plugged into the quadratic formula to find the x values of the bounds, which then get plugged back into the partial derivative equation to get coordinates.
