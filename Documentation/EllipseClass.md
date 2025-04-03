@@ -24,7 +24,10 @@ After all iterations, the perimeter is calculated as follows:
 # partialPerimeterCalc()
 numLines is calculated to scale by the perimeter size of the full ellipse. A "Unit Ellipse" is used as a baseline ellipse for this calculation.
 
+
 ## Unit Ellipse
+<img width="285" alt="Unit Ellipse" src="https://github.com/user-attachments/assets/804d0d41-c5d1-4b63-a935-7ffc5491f3e8" /><br/>
+
 ### $\frac{x^2}{4}+\frac{y^2}{1}=1$
 <br><br/>
 A 3D regression was made on a set of data points in the form (semi-major axis, semi-minor axis, full perimeter estimation). The values of the semi-major and semi-minor axis' 
@@ -37,6 +40,7 @@ The partial derivatives of $a$ and $b$ are performed on the regression to find t
 ### $dP= \frac{\delta P}{\delta a}da + \frac{\delta P}{\delta b}db$
 
 where
+
 
 ### $\frac{\delta P}{\delta a} = -0.0339a^2 + 0.0144ab + 0.0075b^2 + 0.7278a + 0.4526b + 1.5975$  
 ### $\frac{\delta P}{\delta b} = 0.0072a^2 + 0.015ab + 0.0312b^2 + 0.4526a + 2.0306$
@@ -56,9 +60,10 @@ $dP$ then becomes:
 \
 \
 As for the number of lines at the unit ellipse, 360 is used which gives 4 decimal places of precision in the perimeter calculation.
-
-# Ellipse Bound Calculations
-These functions aim at calculating the bounding box of the ellipse and returns the relevant coordinate values for each coordinate along the box. Rotated ellipses are taken into account, so a different form of the ellipse equation (shown below) is used.
+<br><br/>
+# Ellipse Bounds Calculations
+<img width="264" alt="Ellipse Boundary Graph" src="https://github.com/user-attachments/assets/53cd5c5e-db8c-4988-879c-766a8e6575b7" />\
+These functions aim at calculating the bounding box (in red) of the ellipse and returns the relevant coordinate values for each coordinate along the box. The partial derivatives with respect to x and y are lines that go through the points on that bounding box (blue and green). Rotated ellipses are taken into account, so a different form of the ellipse equation (shown below) is used.
 
 ### $\frac{((x-h)cos(\theta) + (y-k)sin(\theta))^2}{a^2} + \frac{((x-h)sin(\theta) - (y-k)cos(\theta))^2}{b^2} - 1 = 0$
 
