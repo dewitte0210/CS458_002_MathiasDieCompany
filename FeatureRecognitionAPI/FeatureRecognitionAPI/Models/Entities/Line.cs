@@ -75,6 +75,11 @@ namespace FeatureRecognitionAPI.Models
             Length = Point.Distance(StartPoint, EndPoint);
         }
 
+        public Line swapStartEnd()
+        {
+            return new Line(EndPoint.X, EndPoint.Y, StartPoint.X, StartPoint.Y);
+        }
+
         public bool hasPoint(Point point)
         {
             return (StartPoint.Equals(point) || EndPoint.Equals(point));

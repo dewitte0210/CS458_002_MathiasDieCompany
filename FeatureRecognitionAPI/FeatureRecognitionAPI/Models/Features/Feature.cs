@@ -991,6 +991,44 @@ public class Feature
         return lineList;
     }
 
+    //line adjacency list can point to other non line geometry
+    private List<List<Line>> GetOrderedLines(List<Line> lineList)
+    {
+        List<List<Line>> orderedLineList = [];
+
+        foreach (Line lineOrigin in lineList)
+        {
+            Line origin = lineList[0];
+            List<Line> lineGroup = [lineOrigin];
+
+            bool hasConnectedLine = false;
+            // if end meets start or end of another line, add to line group
+            foreach (Line line in lineList)
+            {
+                if (origin.EndPoint == line.StartPoint)
+                {
+                    hasConnectedLine = true;
+                    lineGroup.Add(line);
+                    lineList.Remove(line);
+                    break;
+                }
+                else if (origin.EndPoint == line.EndPoint)
+                {
+                    hasConnectedLine = true;
+                    lineGroup.Add(line.swapStartEnd());
+                    lineList.Remove(line);
+                    break;
+                }
+            }
+            
+            
+            //remove origin
+            lineList.RemoveAt(0);
+            orderedLineList.Add(lineGroup);
+        }
+        return orderedLineList;        
+    }
+
     // TODO: make sure this handles unordered lines
     
     /// <summary>

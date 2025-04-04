@@ -10,7 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c53808f-85d7-4b06-9a22-5de316511b8e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Entities/Line.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Entities/Line.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs" afterDir="false" />
     </list>
@@ -38,14 +40,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/fdb8f28825de42b798b40ec81e89afa911938/27/2a2eb52f/02000005.il" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fdb8f28825de42b798b40ec81e89afa911938/56/993cb3f9/IFormFile.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/46a322d26154b982566e1817203e5452c91223f93b0e392d9c5b4806696fdc1/Assert.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4e1e7b1aeb19f3b3b5a3b150e879a64f10ee683abbc477d6d053e77ff1b07f48/FormFile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/866641eb1561663e1e3cf301a8978b9bad8a050bbb6616220a38a9d3df447/HostingAbstractionsHostExtensions.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f16564c8c4b61e6ea398fe412680c6b795b266584ccf6a362aed712dc4d2b387/WebApplication.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Programming/CS458_002_MathiasDieCompany/FeatureRecognitionAPI/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Programming/CS458_002_MathiasDieCompany/FeatureRecognitionAPI/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9a6b1457cbcf17db31a383ba49ef9bcc786cf3ef77146d997eee499b27a46d/Object.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -58,13 +54,14 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.FeatureRecognitionAPI: http.executor": "Debug",
+    ".NET Launch Settings Profile.FeatureRecognitionAPI: http.executor": "Run",
     ".NET Launch Settings Profile.FeatureRecognitionAPI: https.executor": "Run",
     "359b1f47-76d3-44e9-b19f-aa223f1b32f9.executor": "Debug",
     "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "XThreadsFramesViewSplitterKey": "0.39968896",
+    "daeed699-85d5-4b39-9425-c0fd37e2b1d8.executor": "Debug",
     "git-widget-placeholder": "corner-features-2",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
@@ -74,7 +71,7 @@
     "nodejs_package_manager_path": "npm",
     "npm.start Frontend.executor": "Run",
     "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "editor.preferences.tabs",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -192,67 +189,33 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Controllers/FeatureRecognitionController.cs</url>
           <line>37</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Controllers\FeatureRecognitionController.cs" containingFunctionPresentation="Method 'UploadFile'">
-            <startOffsets>
-              <option value="1488" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1505" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Controllers\FeatureRecognitionController.cs" containingFunctionPresentation="Method 'UploadFile'" />
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Program.cs</url>
           <line>44</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Program.cs" containingFunctionPresentation="">
-            <startOffsets>
-              <option value="1302" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1312" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Program.cs" containingFunctionPresentation="" />
           <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs</url>
-          <line>1085</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'CheckGroup3'">
-            <startOffsets>
-              <option value="41197" />
-            </startOffsets>
-            <endOffsets>
-              <option value="41198" />
-            </endOffsets>
-          </properties>
+          <line>1123</line>
+          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'CheckGroup3'" />
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
-          <line>359</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3OneChamfer'">
+          <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs</url>
+          <line>990</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'GetLinesFromEntityList'">
             <startOffsets>
-              <option value="17111" />
+              <option value="37563" />
             </startOffsets>
             <endOffsets>
-              <option value="17275" />
+              <option value="37579" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
-          <line>356</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3OneChamfer'">
-            <startOffsets>
-              <option value="16935" />
-            </startOffsets>
-            <endOffsets>
-              <option value="17098" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="33" />
+          <option name="timeStamp" value="37" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -421,6 +421,52 @@ namespace Testing_for_Project
                 Is.EqualTo(0));
         }
 
+        [Test]
+        public void CheckGroup3NoChamferFromFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Custom\\square.dxf";
+            DXFFile squareFile = new DXFFile(path);
+            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
+            squareFile.DetectAllFeatureTypes();
+
+            bool hasChamfers = false;
+            foreach (Entity entity in squareFile.GetEntities())
+            {
+                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
+                {
+                    hasChamfers = true;
+                }
+            }
+            Assert.That(hasChamfers, Is.False);
+            Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(0));
+        }
+        
+        [Test]
+        public void CheckGroup3OneChamferFromFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Custom\\one-chamfer-square.dxf";
+            DXFFile squareFile = new DXFFile(path);
+            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
+            squareFile.DetectAllFeatureTypes();
+
+            bool hasChamfers = false;
+            foreach (Entity entity in squareFile.GetEntities())
+            {
+                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
+                {
+                    hasChamfers = true;
+                }
+            }
+            Assert.That(hasChamfers, Is.True);
+            Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(1));
+        }
+
         #endregion
 
         #region CheckGroup5
