@@ -14,6 +14,7 @@ namespace FeatureRecognitionAPI.Models
 
         public DXFFile(Stream stream)
         {
+            FileType = SupportedExtensions.dxf;
             DxfReader reader = new DxfReader(stream);
             doc = reader.Read();
             ParseFile();
