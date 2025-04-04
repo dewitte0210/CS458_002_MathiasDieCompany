@@ -12,6 +12,14 @@ namespace FeatureRecognitionAPI.Models
 
         public DXFFile(List<Entity> entities) : base(entities) {}
 
+        public DXFFile(Stream stream)
+        {
+            DxfReader reader = new DxfReader(stream);
+            doc = reader.Read();
+            _fileVersion = GetFileVersion(doc.Header.VersionString);
+            ReadEntities(doc);
+        }
+
         public DXFFile(string path) : base(path)
         {
             FileType = SupportedExtensions.dxf;

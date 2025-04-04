@@ -76,39 +76,27 @@ namespace FeatureRecognitionAPI.Services
                     return (OperationStatus.BadRequest, null);
                 }
 
-                // maybe change ExampleFiles directory
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
 
-                if (!File.Exists(path))
+                SupportedFile supportedFile;
+                using (Stream stream = file.OpenReadStream())
                 {
-                    using (Stream stream = new FileStream(path, FileMode.Create))
+                    switch (ext)
                     {
-                        await file.CopyToAsync(stream);
+                        case ".dxf":
+                            supportedFile = new DXFFile(stream);
+
+                            break;
+                        case ".dwg":
+                            supportedFile = new DWGFile(stream);
+
+                            break;
+                        default:
+                            Console.WriteLine("ERROR detecting file extension");
+                            return (OperationStatus.BadRequest, null);
                     }
                 }
 
 
-                SupportedFile supportedFile;
-                switch (ext)
-                {
-                    case ".dxf":
-                        using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                             supportedFile = new DXFFile(dxfStream.Name);
-                        }
-
-                        break;
-                    case ".dwg":
-                        using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                             supportedFile = new DWGFile(dwgStream.Name);
-                        }
-
-                        break;
-                    default:
-                        Console.WriteLine("ERROR detecting file extension");
-                        return (OperationStatus.BadRequest, null);
-                }
                 
                 // supportedFile.GroupFeatureEntities();
                 

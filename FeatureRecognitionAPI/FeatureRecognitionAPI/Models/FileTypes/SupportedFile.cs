@@ -30,6 +30,7 @@ namespace FeatureRecognitionAPI.Models
         {
             EntityList = new List<Entity>();
             FeatureList = new List<Feature>();
+            FeatureGroups = new List<FeatureGroup>();
         }
 
         protected SupportedFile(string path)

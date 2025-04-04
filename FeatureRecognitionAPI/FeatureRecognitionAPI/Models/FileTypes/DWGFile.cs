@@ -32,6 +32,14 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
+        public DWGFile(Stream stream)
+        {
+            DwgReader reader = new DwgReader(stream);
+            doc = reader.Read();
+            _fileVersion = GetFileVersion(doc.Header.VersionString);
+            ReadEntities(doc);
+        }
+
 
         /*If there is an error with the ACadSharp library reader it throws an exception with 
             message "Attempted to read past the end of the stream." */
