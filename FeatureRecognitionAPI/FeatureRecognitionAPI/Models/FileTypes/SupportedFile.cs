@@ -260,28 +260,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
-       
-        protected void ReadEntities(CadDocument doc)
-        {
-            List<Entity> returned = new List<Entity>();
-            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
-            {
-                if (entity is Insert insert)
-                {
-                    returned.AddRange(UnwrapInsert(insert));
-                }
-                else
-                {
-                    Entity? castedEntity = CadObjectToInternalEntity(entity);
-                    if (!(castedEntity is null))
-                    {
-                        returned.Add(castedEntity);
-                    }
-                }
-            }
 
-            EntityList.AddRange(returned);
-        }
         private static List<Entity> UnwrapInsert(Insert insert)
         {
             List<Entity> returned = new List<Entity>();
@@ -363,7 +342,26 @@ namespace FeatureRecognitionAPI.Models
             }
         }
         
-        public abstract void ParseFile();
+        public void ParseFile()
+        {
+            _fileVersion = GetFileVersion(doc.Header.VersionString);
+            
+            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
+            {
+                if (entity is Insert insert)
+                {
+                    EntityList.AddRange(UnwrapInsert(insert));
+                }
+                else
+                {
+                    Entity? castedEntity = CadObjectToInternalEntity(entity);
+                    if (!(castedEntity is null))
+                    {
+                        EntityList.Add(castedEntity);
+                    }
+                }
+            }
+        }
 
         public  List<Entity> GetEntities() {return EntityList;}
         public void SetEntities(List<Entity> entities) { EntityList = entities; }

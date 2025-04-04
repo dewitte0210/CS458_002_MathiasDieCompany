@@ -16,8 +16,7 @@ namespace FeatureRecognitionAPI.Models
         {
             DxfReader reader = new DxfReader(stream);
             doc = reader.Read();
-            _fileVersion = GetFileVersion(doc.Header.VersionString);
-            ReadEntities(doc);
+            ParseFile();
         }
 
         public DXFFile(string path) : base(path)
@@ -26,18 +25,12 @@ namespace FeatureRecognitionAPI.Models
 
             if (File.Exists(path))
             {
+                DxfReader reader = new DxfReader(Path);
+                doc = reader.Read();
                 ParseFile();
             }
             else
                 throw new FileNotFoundException();
-        }
-
-        public override void ParseFile()
-        {
-            DxfReader reader = new DxfReader(Path);
-            doc = reader.Read();
-            _fileVersion = GetFileVersion(doc.Header.VersionString);
-            ReadEntities(doc);
         }
     }
 }
