@@ -48,7 +48,7 @@
         alt: "Group5",
         description: "Group 5",
         longDescription:
-            "Group 5 is compriesed of mitered notches (perimeter features).",
+            "Group 5 is comprised of mitered notches (perimeter features).",
     },
     {
         src: "/Grp6.ico",

@@ -1,328 +1,319 @@
-//TODO: verify that getMinorAngle always calculates interior angle and rename
-//TODO: decide what to do with polygon class
+using System.Security.Policy;
+using static FeatureRecognitionAPI.Models.Utility.MDCMath;
 
-/// Author: Andrew Schmidt
-/// <summary>
-/// This file is used for calculating the angle between lines and on what side they lay
-/// </summary>
+// This file is used for calculating the angle between lines and on what side they lay
 namespace FeatureRecognitionAPI.Models.Utility
 {
-    /// <summary>
-    /// Angles contains classes and functions for calculating angles
-    /// Not to be used directly, use Angle class, Side and Orientation enums, etc
-    /// </summary>
-    class Angles
-    {
+	/// <summary>
+	/// Angles contains classes and functions for calculating angles
+	/// Not to be used directly, use Angle class, Side and Orientation enums, etc
+	/// </summary>
+	public static class Angles
+	{
+		private const double AngleTolDeg = 0.001;
+		private const double AngleTolRad = AngleTolDeg * Math.PI / 180;
+
+		/// <summary>
+		/// The side an angle lies in relation to the rest of the shape
+		/// </summary>
+		public enum Side
+		{
+			Interior,
+			Exterior,
+			Unknown
+		}
+
+		/// <summary>
+		/// The general orientation of a polygon
+		/// This is the direction its lines are drawn
+		/// Ideally all lines of a polygon should have a consistent direction to them
+		/// </summary>
+		public enum Orientation
+		{
+			Counter,
+			Clockwise,
+			Unknown
+		}
+
+		public class Degrees(double value)
+		{
+			//set internal, only use through implicit cast to double
+			internal readonly double Value = value;
+
+			public Degrees GetOppositeAngle()
+			{
+				return new Degrees(360 - Value);
+			}
+
+			public Radians ToRadians()
+			{
+				return new Radians(Value * Math.PI / 180);
+			}
+			
+			#region Overrides
+
+			public override bool Equals(object? obj)
+			{
+				if (obj == null) return false;
+				
+				if (obj is Degrees objD)
+				{
+					return DoubleEquals(objD, Value);
+				}
+				return false;
+			}
+
+			public static bool operator ==(Degrees a, Degrees b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Degrees a, Degrees b)
+			{
+				return !a.Equals(b);
+			}
+			
+			public static implicit operator double(Degrees d) => d.Value;
+			
+			public override int GetHashCode()
+			{
+				return HashCode.Combine(Value);
+			}
+
+			#endregion
+		}
+
+		public class Radians(double value)
+		{
+			//set internal, only use through implicit cast to double
+			internal readonly double Value = value;
+
+			public Radians GetOppositeAngle()
+			{
+				return new Radians((2 * Math.PI) - Value);
+			}
+
+			public Degrees ToDegrees()
+			{
+				return new Degrees(Value * 180 / Math.PI);
+			}
+			
+			#region Overrides
+
+			public override bool Equals(object? obj)
+			{
+				if (obj == null) return false;
+				
+				if (obj is Degrees objR)
+				{
+					return DoubleEquals(objR, Value, AngleTolRad);
+				}
+				return false;
+			}
+
+			public static bool operator ==(Radians a, Radians b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Radians a, Radians b)
+			{
+				return !a.Equals(b);
+			}
+			
+			public static implicit operator double(Radians r) => r.Value;
+			
+			public override int GetHashCode()
+			{
+				return HashCode.Combine(Value);
+			}
+			
+			#endregion
+		}
+
+		/// <summary>
+		/// The angle and side that angle is on between two lines
+		/// </summary>
+		public class Angle
+		{
+			private readonly Degrees _angle;
+			private readonly Side _side;
+
+			public Angle(Degrees angle, Side side)
+			{
+				_angle = angle;
+				_side = side;
+			}
+
+			public Angle(Radians angle, Side side)
+			{
+				_angle = angle.ToDegrees();
+				_side = side;
+			}
+
+			public Degrees GetDegrees()
+			{
+				return _angle;
+			}
+
+			public Radians GetRadians()
+			{
+				return _angle.ToRadians();
+			}
+
+			public Side GetSide()
+			{
+				return _side;
+			}
+
+			#region Overrides
+			public override bool Equals(object? obj)
+			{
+				if (obj == null) { return false; }
+
+                if (obj is Angle objA 
+					&& _side != Side.Unknown 
+					&& objA._side != Side.Unknown)
+                {
+                    if (objA._side == this._side && objA._angle == this._angle)
+                    {
+                        return true;
+                    }
+                    //sides are opposite
+                    if (objA._side != this._side && objA._angle.GetOppositeAngle() == _angle)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+			}
+			
+			public static bool operator ==(Angle a, Angle b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Angle a, Angle b)
+			{
+				return !a.Equals(b);
+			}
+
+			public override int GetHashCode()
+			{
+				return HashCode.Combine(this._angle.GetHashCode(), this._side.GetHashCode());
+			}
+			#endregion
+		}
+
+		public static double CrossProduct(Point a, Point b)
+		{
+			return a.X * b.Y - a.Y * b.X;
+		}
+
+		/// <summary>
+		/// Calculates the cross product of two lines using their deltas
+		/// </summary>
+		public static double CrossProduct(Line a, Line b)
+		{
+			Point aDelta = a.GetDelta();
+			Point bDelta = b.GetDelta();
+			return aDelta.X * bDelta.Y - aDelta.Y * bDelta.X;
+		}
+
+        public static double RadToDegrees(double radians)
+        {
+            return radians * 180 / Math.PI;
+        }
+        
+        public static double DegToRadians(double degrees)
+        {
+            return degrees *  Math.PI / 180;
+        }
+
+		/// <summary>
+		/// Calculates the dot product of two lines using their deltas
+		/// </summary>
+		public static double DotProduct(Line a, Line b)
+		{
+			Point aDelta = a.GetDelta();
+			Point bDelta = b.GetDelta();
+			return aDelta.X * bDelta.X + aDelta.Y * bDelta.Y;
+		}
+
         /// <summary>
-        /// The side an angle lies in relation to the rest of the shape
+        /// Calculates the dot product of two points treated as vectors
         /// </summary>
-        public enum Side
-        {
-            INTERIOR,
-            EXTERIOR,
-            UNKNOWN
-        }
-
-        /// <summary>
-        /// The general orientation of a polygon
-        /// This is the direction its lines are drawn
-        /// Ideally all lines of a polygon should have a consistent direction to them
-        /// </summary>
-        public enum Orientation
-        {
-            COUNTERCLOCKWISE,
-            CLOCKWISE,
-            UNKNOWN
-        }
-
-        public class Degrees(double angle)
-        {
-            public double angle = angle;
-
-            public Degrees GetOppositeAngle()
-            {
-                return new Degrees(360 - angle);
-            }
-
-            public void SetToOpposite()
-            {
-                angle = 360 - angle;
-            }
-
-            public Radians ToRadians()
-            {
-                return new Radians(angle * Math.PI / 180);
-            }
-            
-        }
-
-        public class Radians(double angle)
-        {
-            public double angle = angle;
-
-            public Radians GetOppositeAngle()
-            {
-                return new Radians((2 * Math.PI) - angle);
-            }
-
-            public void SetToOpposite()
-            {
-                angle = (2 * Math.PI) - angle;
-            }
-
-            public Degrees ToDegrees()
-            {
-                return new Degrees(Angles.ToDegrees(angle));
-            }
-
-        }
-
-        /// <summary>
-        /// The angle and side that angle is on between two lines
-        /// </summary>
-        public class Angle
-        {
-            private readonly Degrees angle;
-            private readonly Side side;
-
-            public Angle(Degrees angle, Side side)
-            {
-                this.angle = angle;
-                this.side = side;
-            }
-
-            public Angle(Radians angle, Side side)
-            {
-                this.angle = angle.ToDegrees();
-                this.side = side;
-            }
-
-            public Degrees GetDegrees()
-            {
-                return angle;
-            }
-
-            public Radians GetRadians()
-            {
-                return angle.ToRadians();
-            }
-
-            public Side GetSide()
-            {
-                return side;
-            }
-        }
-
-
-        public static double CrossProduct(Point a, Point b)
-        {
-            return a.X * b.Y - a.Y * b.X;
-        }
-
-        /// <summary>
-        /// Calculates the cross product of two lines using their deltas
-        /// </summary>
-        public static double CrossProduct(Line a, Line b)
-        {
-            Point aDelta = a.GetDelta();
-            Point bDelta = b.GetDelta();
-            return aDelta.X * bDelta.Y - aDelta.Y * bDelta.X;
-        }
-
         public static double DotProduct(Point a, Point b)
         {
             return a.X * b.X + a.Y * b.Y;
         }
 
-        public static double ToDegrees(double radians)
-        {
-            return radians * 180 / Math.PI;
-        }
-        
-        public static double ToRadians(double degrees)
-        {
-            return degrees *  Math.PI / 180;
-        }
-
-        /// <summary>
-        /// Calculates the dot product of two lines using their deltas
-        /// </summary>
-        public static double DotProduct(Line a, Line b)
-        {
-            Point aDelta = a.GetDelta();
-            Point bDelta = b.GetDelta();
-            return aDelta.X * bDelta.X + aDelta.Y * bDelta.Y;
-        }
-
         // may not handle all cases yet, to be tested
-        public static Angle GetAngle(Line a, Line b, Side targetSide = Side.INTERIOR)
-        {
-            double cross = CrossProduct(a, b);
-            double dot = DotProduct(a, b);
-            Side side = Side.UNKNOWN;
+        public static Angle GetAngle(Line a, Line b, Side targetSide = Side.Interior, Orientation ori = Orientation.Counter)
+		{
+			if (DoubleEquals(a.Length, 0) || DoubleEquals(b.Length, 0))
+			{
+				return new Angle(new Degrees(0), Side.Unknown);
+			}
 
-            double cos_theta = dot / (a.Length * b.Length);
-            cos_theta = Math.Max(-1, Math.Min(1, cos_theta));
+			double cross = CrossProduct(a, b);
+			double dot = DotProduct(a, b);
+			Side side = Side.Unknown;
 
-            double angle = Math.Acos(cos_theta) * (180 / Math.PI);
+			double cosTheta = dot / (a.Length * b.Length);
+			cosTheta = Math.Max(-1, Math.Min(1, cosTheta));
 
-            if (cross < 0)
-            {
-                angle = 360 - angle;
-            }
+			double angle = Math.Acos(cosTheta) * (180 / Math.PI);
 
-            if (cross > 0)
-            {
-                side = Side.INTERIOR;
-            }
-            else if (cross < 0)
-            {
-                side = Side.EXTERIOR;
-            }
+			if (cross >= 0)
+			{
+				side = Side.Interior;
+			}
+			else if (cross < 0)
+			{
+				side = Side.Exterior;
+				angle = 360 - angle;
+			}
 
-            Degrees returnAngle = new Degrees(Math.Abs(180 - angle));
-            if (side != Side.UNKNOWN && side != targetSide)
-            {
-                returnAngle.SetToOpposite();
-                side = targetSide;
-            }
+			//initially calculates interior angle
+			//return opposite if wanting exterior
+			Degrees returnAngle = new(Math.Abs(180 - angle));
 
-            return new Angle(returnAngle, side);
-        }
+			//prefer 0 degrees interior over 360 for opposite facing parallel lines
+			//since it can return 0 or 360 depending on orientation
+			if ((DoubleEquals(returnAngle, 360) 
+			     || DoubleEquals(returnAngle, 0)) 
+			    && ori == Orientation.Clockwise)
+			{
+				returnAngle = returnAngle.GetOppositeAngle();
+			}
 
-        /// <summary>
-        /// Checks if a polygon is closed.
-        /// The polygon must be entirely made of lines.
-        /// </summary>
-        /// <param name="lineList"></param>
-        /// <returns></returns>
-        public static bool PolygonIsClosed(List<Line> lineList)
-        {
-            //check if closed
-            for (int i = 0; i < lineList.Count; i++)
-            {
-                if (lineList[0].EndPoint != lineList[(i + 1) % lineList.Count].StartPoint)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+			if (side != Side.Unknown && side != targetSide)
+			{
+				returnAngle = returnAngle.GetOppositeAngle();
+				side = targetSide;
+			}
 
-        /// <summary>
-        /// Calculates the area of a polygon.
-        /// If the area is positive the area is counterclockwise.
-        /// Only works for polygons made entirely up of lines.
-        /// Make sure to do absolute value if all you need is the area.
-        /// </summary>
-        /// <param name="lineList"></param>
-        /// <returns></returns>
-        public static double GetShoelaceArea(List<Line> lineList)
-        {
-            if (!PolygonIsClosed(lineList))
-            {
-                return 0;
-            }
+			//default orientation is assumed to be counterclockwise
+			//flip the angle if it is not
+			if (ori == Orientation.Clockwise)
+			{
+				returnAngle = returnAngle.GetOppositeAngle();
+			}
 
-            double area = 0;
-            for (int i = 0; i < lineList.Count; i++)
-            {
-                area += CrossProduct(lineList[i], lineList[(i + 1) % lineList.Count]);
-            }
-            if (area != 0)
-            {
-                area /= 2;
-            }
-            return area;
-        }
+			return new Angle(returnAngle, side);
+		}
 
-        /// <summary>
-        /// Uses shoelace area to determine the orientation of a polygon.
-        /// The same conditions apply as GetShoelaceArea
-        /// </summary>
-        /// <param name="lineList"></param>
-        /// <returns></returns>
-        public static Orientation GetOrientation(List<Line> lineList)
-        {
-            double area = GetShoelaceArea(lineList);
+		public static bool IsPerpendicular(Line a, Line b)
+		{
+			Degrees angle = GetAngle(a, b).GetDegrees();
+			return DoubleEquals((angle + 90) % 180, 0);
+		}
 
-            if (area > 0)
-            {
-                return Orientation.COUNTERCLOCKWISE;
-            }
-            else if (area < 0)
-            {
-                return Orientation.CLOCKWISE;
-            }
-            else
-            {
-                return Orientation.UNKNOWN;
-            }
-        }
-
-        public class Polygon
-        {
-            List<Line> lineList;
-
-            public double area;
-            public Orientation orientation;
-
-            public Polygon(List<Line> newLineList)
-            {
-                lineList = newLineList;
-
-                area = Math.Abs(GetShoelaceArea(lineList));
-                orientation = GetOrientation(lineList);
-            }
-        }
-    }
+		public static bool IsParallel(Line a, Line b)
+		{
+			Degrees angle = GetAngle(a, b).GetDegrees();
+			return DoubleEquals(angle % 180, 0);
+		}
+	}
 }
-
-    //    static void Main(string[] args)
-    //    {
-    //        //counterclockwise
-    //        List<Line> ll = new List<Line>();
-    //        ll.Add(new Line(new Point(0, 0), new Point(5, 0)));
-    //        ll.Add(new Line(new Point(5, 0), new Point(3, 3)));
-    //        ll.Add(new Line(new Point(3, 3), new Point(0, 0)));
-
-    //        Polygon poly = new Polygon(ll);
-    //        Angle ang = getMinorAngle(ll[0], ll[1]);
-    //        Console.WriteLine(ang.getDegrees());
-
-    //        //clockwise
-    //        List<Line> llc = new List<Line>();
-    //        llc.Add(new Line(new Point(0, 0), new Point(3, 3)));
-    //        llc.Add(new Line(new Point(3, 3), new Point(5, 0)));
-    //        llc.Add(new Line(new Point(5, 0), new Point(0, 0)));
-
-    //        Console.WriteLine(getMinorAngle(llc[0], llc[1]).getDegrees());
-
-    //        //180
-    //        Line l1 = new Line(new Point(0, 0), new Point(0, 9));
-    //        Line l2 = new Line(new Point(0, 9), new Point(0, 0));
-    //        Console.WriteLine(getMinorAngle(l1, l2).getDegrees());
-
-    //        //parallel
-    //        Console.WriteLine(getMinorAngle(l1, l1).getDegrees());
-
-    //        //seperated
-    //        Line l3 = new Line(new Point(0, 0), new Point(0, 9));
-    //        Line l4 = new Line(new Point(5, 5), new Point(15, 15));
-    //        Console.WriteLine(getMinorAngle(l3, l4).getDegrees());
-
-    //        Console.Write("end");
-    //    }
-
-//cases to test
-// touching lines
-//	good!
-// reversed
-//	negative angle
-// 180 touching
-//	good!
-// parallel touching
-//	good!
-// seperated for each
-//clockwise for each
-//obtuse angles

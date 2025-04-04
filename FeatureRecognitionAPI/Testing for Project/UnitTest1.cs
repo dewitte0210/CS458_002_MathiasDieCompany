@@ -1,6 +1,7 @@
 using ACadSharp;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models;
+using NuGet.Frameworks;
 
 namespace Testing_for_Project
 {
@@ -92,6 +93,37 @@ namespace Testing_for_Project
             Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
 
         }
+
+        [Test]
+        public void TestEllipseBoundsNotRotated()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
+            Assert.That(ellipse1.MinX(), Is.EqualTo(-3));
+            Assert.That(ellipse1.MinY(), Is.EqualTo(-2));
+            Assert.That(ellipse1.MaxX(), Is.EqualTo(3));
+            Assert.That(ellipse1.MaxY(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestEllipseBoundsRotated90Degrees()
+        {
+            Ellipse ellipse1 = new Ellipse(0, 0, 0, 3, 2.0 / 3.0, 0, 2 * Math.PI);
+            Assert.That(ellipse1.MinX(), Is.EqualTo(-2));
+            Assert.That(ellipse1.MinY(), Is.EqualTo(-3));
+            Assert.That(ellipse1.MaxX(), Is.EqualTo(2));
+            Assert.That(ellipse1.MaxY(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestEllipseBoundsRotated45Degrees()
+        {
+            Ellipse ellipse1 = new Ellipse(1, 1, 3 / Math.Sqrt(2), 3 / Math.Sqrt(2), 2.0 / 3.0, 0, 2 * Math.PI);
+            Assert.That(Math.Round(ellipse1.MinX(), 4), Is.EqualTo(-1.5495));
+            Assert.That(Math.Round(ellipse1.MinY(), 4), Is.EqualTo(-1.5495));
+            Assert.That(Math.Round(ellipse1.MaxX(), 4), Is.EqualTo(3.5495));
+            Assert.That(Math.Round(ellipse1.MaxY(), 4), Is.EqualTo(3.5495));
+        }
+
         #endregion
 
         [Test]
@@ -108,7 +140,7 @@ namespace Testing_for_Project
             Line test = new Line(0, 0, 0, 0);
             List<double> solutions1 = new List<double>() { 2, 5 };
             List<double> solutions2 = new List<double>() { 5, 2 };
-            List<double> actual = test.QuadraticFormula(1, -7, 10);
+            List<double> actual = Entity.QuadraticFormula(1, -7, 10);
             Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
         }
 

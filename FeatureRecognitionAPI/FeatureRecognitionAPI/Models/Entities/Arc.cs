@@ -41,32 +41,21 @@ public class Arc : Entity
     }
 
     /**
-     * Function for calculating radians for cos and sin calculations.
-     *
-     * @param degrees is the amount of degrees being converted
-     * @return the radian value of degrees
-     */
-    internal double degreesToRadians(double degrees)
-    {
-        return (degrees * Math.PI / 180);
-    }
-
-    /**
      * Function to calculate the x coordinate given the center point, Radius
      * and an angle.
      */
-    private double calcXCoord(double x, double radius, double angle)
+    private static double calcXCoord(double x, double radius, double angle)
     {
-        return (radius * Math.Cos(degreesToRadians(angle)) + x);
+        return (radius * Math.Cos(Angles.DegToRadians(angle)) + x);
     }
 
     /**
      * Function to calculate the y coordinate given the center point, Radius
      * and an angle.
      */
-    private double calcYCoord(double y, double radius, double angle)
+    private static double calcYCoord(double y, double radius, double angle)
     {
-        return (radius * Math.Sin(degreesToRadians(angle)) + y);
+        return (radius * Math.Sin(Angles.DegToRadians(angle)) + y);
     }
 
         /**
@@ -76,7 +65,7 @@ public class Arc : Entity
          * @param endAngle the end angle of the arc being calculated
          * @return the calculated the length of the arc
          */
-        internal double calcCentralAngle(double startAngle, double endAngle)
+        internal static double calcCentralAngle(double startAngle, double endAngle)
         {
             //The subtraction result would be negative, need to add 360 to get correct value
             if (endAngle < startAngle)
@@ -91,7 +80,7 @@ public class Arc : Entity
      * @param centralAngle the central angle for the arc being calculated
      * @return the calculated length (partial circumference) of the arc
      */
-    private double calcLength(double radius, double centralAngle)
+    private static double calcLength(double radius, double centralAngle)
     {
         return (2 * Math.PI * radius * (centralAngle / 360));
     }
@@ -161,7 +150,7 @@ public class Arc : Entity
         else
         {
             double tan = Math.Atan2(y, x);
-            degrees = tan * (180 / Math.PI);
+            degrees = Angles.RadToDegrees(tan);
         }
 
         // rotate start and end angles to start at 0
@@ -387,23 +376,15 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-            Point transformedBoundary1 = transform * new Point(MinX(), MinY());
-            Point transformedBoundary2 = transform * new Point(MaxX(), MinY());
-            Point transformedBoundary3 = transform * new Point(MinX(), MaxY());
-            Point transformedBoundary4 = transform * new Point(MaxX(), MaxY());
-
             Point newCenter = transform * Center;
+            Point newStart = transform * Start;
             
-            double a = Point.Distance(newCenter, transformedBoundary1);
-            double b = Point.Distance(newCenter, transformedBoundary2);
-            double c = Point.Distance(newCenter, transformedBoundary3);
-            double d = Point.Distance(newCenter, transformedBoundary4);
+            double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+            
+            double newRadius = Point.Distance(newStart, newCenter);
+            double newAngleStart = StartAngle - rotation;
+            double newAngleEnd = EndAngle - rotation;
 
-            double newWidth = Math.Max(a, Math.Max(b, Math.Max(c, d)));
-
-            double rotation = Angles.ToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
-
-            //divide by sqrt(2) because newWidth is distance from center to bounding box corner, not arc edge
-            return new Arc(newCenter.X, newCenter.Y, newWidth / Math.Sqrt(2), StartAngle - rotation, EndAngle - rotation);
+            return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
     }
 }

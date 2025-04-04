@@ -75,16 +75,5 @@ namespace FeatureRecognitionAPI.Models
             ReadEntities(doc);
 
         }
-
-        //May need to be refactored depending on if c# handles this by copy or by reference
-        public override List<Entity> GetEntities()
-        {
-            return EntityList;
-        }
-
-        public void SetEntities(List<Entity> entities)
-        {
-            EntityList = entities;
-        }
     }
 }
