@@ -104,7 +104,7 @@ namespace FeatureRecognitionAPI.Services
 
                     break;
                 default:
-                    throw new Exception("Error detecting file extension");
+                    throw new Exception("Invalid file extension: " + ext);
             }
 
             // supportedFile.GroupFeatureEntities();

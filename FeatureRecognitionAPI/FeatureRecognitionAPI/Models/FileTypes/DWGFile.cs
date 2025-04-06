@@ -15,21 +15,8 @@ namespace FeatureRecognitionAPI.Models
                 throw new FileNotFoundException();
             }
 
-            try
-            {
-                //Also sets file version
-                ParseFile();
-            }
-            catch (Exception ex)
-            {
-                //If there is an error reading entities there is a problem w/ dwg file
-                if (ex.Message == "Attempted to read past the end of the stream.")
-                    //Corrupt / broken file
-                    throw new Exception("Error: Issue with DWG File");
-                else
-                    //Unsuported file type
-                    throw new Exception("Error with DWG File");
-            }
+            //Also sets file version
+            ParseFile();
         }
 
 
@@ -38,15 +25,14 @@ namespace FeatureRecognitionAPI.Models
         public override void ParseFile()
         {
             DwgReader reader = new DwgReader(Path);
+            //Throws exception if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
             CadDocument doc = reader.Read();
             _fileVersion = GetFileVersion(doc.Header.VersionString);
             ReadEntities(doc);
         }
-        //Throws exception if file version is unsupported, formatted as "File version not supported: VERSIONHERE"
-
+        
         public FileVersion GetFileVersion(string version)
         {
-
             switch (version)
             {
                 case "AC1006":
