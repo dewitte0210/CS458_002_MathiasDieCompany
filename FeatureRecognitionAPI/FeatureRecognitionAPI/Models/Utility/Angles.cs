@@ -312,8 +312,9 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 		public static bool IsParallel(Line a, Line b)
 		{
-			Degrees angle = GetAngle(a, b).GetDegrees();
-			return DoubleEquals(angle % 180, 0);
+			// round because angle can be 179.999 and modulus wont work
+			double angle = Double.Round(GetAngle(a, b).GetDegrees());
+			return DoubleEquals((angle % 180), 0);
 		}
 	}
 }

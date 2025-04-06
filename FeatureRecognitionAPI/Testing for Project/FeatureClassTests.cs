@@ -245,6 +245,69 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void TestGetTouchingLineNoTouching()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(99, 99, 100, 100);
+            List<Line> ll = [line1, line2];
+
+            Line? touchingLine = Feature.GetTouchingLine(line1, ll).Item1;
+            Assert.That(touchingLine, Is.EqualTo(null));
+        }
+        
+        [Test]
+        public void TestGetTouchingLineOneTouching()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            List<Line> ll = [line1, line2];
+
+            Line? touchingLine = Feature.GetTouchingLine(line1, ll).Item1;
+            Assert.That(touchingLine, Is.Not.Null);
+        }
+
+        [Test]
+        public void TestGetOrderedLinesSquare()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            Line line3 = new Line(5, 5, 0, 5);
+            Line line4 = new Line(0, 5, 0, 0);
+            List<Line> ll = [line1, line2, line3, line4];
+            
+            List<List<Line>> orderedLines = Feature.GetOrderedLines(ll);
+            
+            Assert.That(orderedLines.Count, Is.EqualTo(1));
+            Assert.That(orderedLines[0].Count, Is.EqualTo(4));
+            Assert.That(orderedLines[0], Is.EqualTo(ll));
+        }
+        
+        [Test]
+        public void TestGetOrderedLinesTwoSquare()
+        {
+            Line line1A = new Line(0, 0, 5, 0);
+            Line line2A = new Line(5, 0, 5, 5);
+            Line line3A = new Line(5, 5, 0, 5);
+            Line line4A = new Line(0, 5, 0, 0);
+            List<Line> lla = [line1A, line2A, line3A, line4A];
+            
+            Line line1B = new Line(10, 10, 15, 10);
+            Line line2B = new Line(15, 10, 15, 15);
+            Line line3B = new Line(15, 15, 10, 15);
+            Line line4B = new Line(10, 15, 10, 10);
+            List<Line> llb = [line1B, line2B, line3B, line4B];
+            
+            List<Line> ll = [line1A, line2A, line3A, line4A, line1B, line2B, line3B, line4B];
+            List<List<Line>> orderedLines = Feature.GetOrderedLines(ll);
+            
+            Assert.That(orderedLines.Count, Is.EqualTo(2));
+            Assert.That(orderedLines[0].Count, Is.EqualTo(4));
+            Assert.That(orderedLines[1].Count, Is.EqualTo(4));
+            Assert.That(orderedLines[0], Is.EqualTo(lla));
+            Assert.That(orderedLines[1], Is.EqualTo(llb));
+        }
+        
+        [Test]
         public void TestGetPossibleChamfersOneChamfer()
         {
             // counterclockwise
@@ -256,7 +319,7 @@ namespace Testing_for_Project
             Line line5 = new Line(0, 3, 0, 0);
             List<Line> ll = [line1, line2, line3, lineCham, line5];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            List<Line> possibleChamList = Feature.GetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(1));
             Assert.That(possibleChamList[0], Is.EqualTo(lineCham));
@@ -277,7 +340,7 @@ namespace Testing_for_Project
             Line line6 = new Line(0, 3, 0, 0);
             List<Line> ll = [line1, line2, lineCham3, line4, lineCham5, line6];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            List<Line> possibleChamList = Feature.GetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(3));
             Assert.Contains(lineCham3, possibleChamList);
@@ -303,7 +366,7 @@ namespace Testing_for_Project
             Line line8 = new Line(0, 2, 2, 0);
             List<Line> ll = [line1, line2, line3, line4, line5, line6, line7, line8];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            List<Line> possibleChamList = Feature.GetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(8));
             Assert.Contains(line1, possibleChamList);
@@ -427,7 +490,7 @@ namespace Testing_for_Project
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) 
-                          + "FeatureRecognitionAPI\\ExampleFiles\\Custom\\square.dxf";
+                          + "FeatureRecognitionAPI\\test-files\\square.dxf";
             DXFFile squareFile = new DXFFile(path);
             //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             squareFile.DetectAllFeatureTypes();
@@ -450,13 +513,13 @@ namespace Testing_for_Project
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) 
-                          + "FeatureRecognitionAPI\\ExampleFiles\\Custom\\one-chamfer-square.dxf";
+                          + "FeatureRecognitionAPI\\test-files\\one-chamfer-square.dxf";
             DXFFile squareFile = new DXFFile(path);
             //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             squareFile.DetectAllFeatureTypes();
 
             bool hasChamfers = false;
-            foreach (Entity entity in squareFile.GetEntities())
+            foreach (Entity entity in squareFile.FeatureList[0].baseEntityList)
             {
                 if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
                 {
@@ -465,6 +528,29 @@ namespace Testing_for_Project
             }
             Assert.That(hasChamfers, Is.True);
             Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(1));
+        }
+        
+        [Test]
+        public void CheckGroup3TwoChamfersWithRadiusesFromFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\test-files\\square-two-radius-two-chamfer.dxf";
+            DXFFile squareFile = new DXFFile(path);
+            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
+            squareFile.DetectAllFeatureTypes();
+
+            bool hasChamfers = false;
+            foreach (Entity entity in squareFile.FeatureList[0].baseEntityList)
+            {
+                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
+                {
+                    hasChamfers = true;
+                }
+            }
+            Assert.That(hasChamfers, Is.True);
+            Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(2));
         }
 
         #endregion

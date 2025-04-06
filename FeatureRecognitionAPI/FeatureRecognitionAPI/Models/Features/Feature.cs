@@ -966,20 +966,13 @@ public class Feature
         returns true if no problems??
     */
 
+    /// <summary>
+    /// Gets a list of only lines from a list of entities
+    /// </summary>
+    /// <param name="entityList"></param>
+    /// <returns>list of lines</returns>
     internal static List<Line> GetLinesFromEntityList(List<Entity> entityList)
     {
-        // current assumptions made:
-        // orientation is consistent
-        
-        // assumptions that can be made
-        // the three checked lines must be touching
-        
-        /*
-         *  TODO: seperate entity list into groups of touching lines
-         *  or transition to adjacency list but how to do efficiently
-         *  trying to fight the urge to scorched earth refactor
-         */
-        
         List<Line> lineList = [];
         foreach (Entity entity in entityList)
         {
@@ -991,74 +984,149 @@ public class Feature
         return lineList;
     }
 
-    //line adjacency list can point to other non line geometry
-    private List<List<Line>> GetOrderedLines(List<Line> lineList)
+    /// <summary>
+    /// Searches for a line that shares start/end points with a given line
+    /// </summary>
+    /// <param name="originLine">the original line</param>
+    /// <param name="lineList">list of lines to search through to find another line</param>
+    /// <param name="fromStart">whether to search from start or end of line</param>
+    /// <returns>null if no line is found, otherwise the touching line</returns>
+    internal static (Line?, bool) GetTouchingLine(Line originLine, List<Line> lineList, bool fromStart = false)
     {
-        List<List<Line>> orderedLineList = [];
+        Line? touchingLine = null;
+        bool wasFlipped = false;
 
-        foreach (Line lineOrigin in lineList)
+        foreach (Line searchLine in lineList)
         {
-            Line origin = lineList[0];
-            List<Line> lineGroup = [lineOrigin];
+            // ignore the origin line and flipped version
+            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
+    
+            Point originPoint = fromStart? originLine.StartPoint : originLine.EndPoint;
 
-            bool hasConnectedLine = false;
-            // if end meets start or end of another line, add to line group
-            foreach (Line line in lineList)
+            // if end meets start or start meets end
+            if (originPoint.Equals(fromStart ? searchLine.EndPoint : searchLine.StartPoint))
             {
-                if (origin.EndPoint == line.StartPoint)
+                touchingLine = searchLine;
+                break;
+            }
+            // if end meets end or start meets start
+            else if (originPoint.Equals(fromStart ? searchLine.StartPoint : searchLine.EndPoint))
+            {
+                touchingLine = searchLine.swapStartEnd();
+                wasFlipped = true;
+                break;
+            }
+        }
+        return (touchingLine, wasFlipped);
+    }
+    
+    /// <summary>
+    /// Breaks up a 1D line list into groups of touching lines that are ordered.
+    /// Ordering is important because consistent line orientation is needed
+    /// for accurate angle detection
+    /// </summary>
+    /// <param name="lineList">1D list of lines</param>
+    /// <returns>list of line groups that are touching</returns>
+    internal static List<List<Line>> GetOrderedLines(List<Line> lineList)
+    {
+        List<Line> baseLineList = lineList.ToList();
+        List<List<Line>> orderedLineList = [];
+        
+        while (baseLineList.Count > 0)
+        {
+            // search from end
+            Line currentEndLine = baseLineList[0];
+            Line currentStartLine = baseLineList[0];
+            baseLineList.RemoveAt(0);
+            List<Line> lineGroup = [currentEndLine];
+            bool exhaustedEndSearch = false;
+            bool exhaustedStartSearch = false;
+
+            while (!exhaustedEndSearch)
+            {
+                (Line?, bool) endTouchingReturn = GetTouchingLine(currentEndLine, lineList);
+                Line? possibleLine = endTouchingReturn.Item1;
+                bool wasFlipped = endTouchingReturn.Item2;
+                
+                //if null or already in linegroup, meaning found end of line loop
+                if (possibleLine == null 
+                    || lineGroup.Contains(possibleLine)
+                    || lineGroup.Contains(possibleLine.swapStartEnd()))
                 {
-                    hasConnectedLine = true;
-                    lineGroup.Add(line);
-                    lineList.Remove(line);
+                    exhaustedEndSearch = true;
                     break;
                 }
-                else if (origin.EndPoint == line.EndPoint)
+                
+                currentEndLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
+                lineGroup.Add(possibleLine);
+            }
+            while (!exhaustedStartSearch)
+            {
+                (Line?, bool) startTouchingReturn = GetTouchingLine(currentEndLine, lineList);
+                Line? possibleLine = startTouchingReturn.Item1;
+                bool wasFlipped = startTouchingReturn.Item2;
+                
+                //if null or already in linegroup, meaning found end of line loop
+                if (possibleLine == null 
+                    || lineGroup.Contains(possibleLine)
+                    || lineGroup.Contains(possibleLine.swapStartEnd()))
                 {
-                    hasConnectedLine = true;
-                    lineGroup.Add(line.swapStartEnd());
-                    lineList.Remove(line);
+                    exhaustedStartSearch = true;
                     break;
                 }
+                
+                currentEndLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
+                lineGroup.Append(possibleLine);
             }
             
-            
-            //remove origin
-            lineList.RemoveAt(0);
-            orderedLineList.Add(lineGroup);
+            orderedLineList.Add(lineGroup);            
         }
-        return orderedLineList;        
+        return orderedLineList;
     }
-
-    // TODO: make sure this handles unordered lines
     
     /// <summary>
     /// Gets a list of possible chamfer lines from a base list of lines
     /// </summary>
-    /// <param name="lineList"> list of lines, possible chamfers in this list
+    /// <param name="orderedLineList"> list of lines, possible chamfers in this list
     /// will be flagged as such</param>
     /// <returns>list of lines where each line has a chamfer type of possible</returns>
-    internal static List<Line> GetPossibleChamfers(List<Line> lineList)
+    internal static List<Line> GetPossibleChamfers(List<List<Line>> orderedLineList)
     {
         List<Line> possibleChamferList = [];
-        
-        if (lineList.Count >= 3)
+
+        foreach (List<Line> lineGroup in orderedLineList)
         {
-            for (int i = 0; i < lineList.Count; i++)
+            if (lineGroup.Count >= 3)
             {
-                Line lineA = lineList[i];
-                Line lineB = lineList[(i + 1) % lineList.Count];
-                Line lineC = lineList[(i + 2) % lineList.Count];
-
-                //need to verify orientation of lines
-                Angle angleAB = GetAngle(lineA, lineB);
-                Angle angleBC = GetAngle(lineB, lineC);
-                Angle angleAC = GetAngle(lineA, lineC);
-
-                //meets single chamfer conditions
-                if (angleAB.Equals(angleBC) && angleAC.GetDegrees() < 180 && angleAB.GetDegrees() > 90)
+                for (int i = 0; i < lineGroup.Count; i++)
                 {
-                    lineB.ChamferType = ChamferTypeEnum.Possible;
-                    possibleChamferList.Add(lineB);
+                    Line lineA = lineGroup[i];
+                    Line lineB = lineGroup[(i + 1) % lineGroup.Count];
+                    Line lineC = lineGroup[(i + 2) % lineGroup.Count];
+
+                    //need to verify orientation of lines
+                    Angle angleAB = GetAngle(lineA, lineB);
+                    Angle angleBC = GetAngle(lineB, lineC);
+                    Angle angleAC = GetAngle(lineA, lineC);
+
+                    //meets single chamfer conditions
+                    if (angleAB.Equals(angleBC))
+                    {
+                        // measuring counterclockwise
+                        if (angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
+                        {
+                            lineB.ChamferType = ChamferTypeEnum.Possible;
+                            possibleChamferList.Add(lineB);                            
+                        }
+                        // measuring clockwise
+                        else if (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360)
+                        {
+                            lineB.ChamferType = ChamferTypeEnum.Possible;
+                            possibleChamferList.Add(lineB);
+                        }
+                    }
                 }
             }
         }
@@ -1067,11 +1135,11 @@ public class Feature
 
     private void CheckGroup3()
     {
-        if (FeatureType != PossibleFeatureTypes.Group1A1) return;
+        if (!(FeatureType == PossibleFeatureTypes.Group1A1 || FeatureType == PossibleFeatureTypes.Group1A2)) return;
         
         // copy of base entity list with just lines
         List<Line> lineList = GetLinesFromEntityList(baseEntityList).ToList();
-        List<Line> possibleChamferList = GetPossibleChamfers(lineList);
+        List<Line> possibleChamferList = GetPossibleChamfers(GetOrderedLines(lineList));
         
         if (lineList.Count < 3) return;
         if (possibleChamferList.Count <= 0) return;
@@ -1091,6 +1159,12 @@ public class Feature
             {
                 foreach (Line line in lineList)
                 {
+                    // ignore same line
+                    if (possibleChamfer.Equals(line))
+                    {
+                        continue;
+                    }
+                    
                     if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
                     {
                         hasPallelChamfer = true;
@@ -1118,6 +1192,21 @@ public class Feature
         else
         {
             NumChamfers = possibleChamferList.Count;
+        }
+
+        //update base entity list based on found possible chamfers
+        foreach (Line possibleChamfer in possibleChamferList)
+        {
+            foreach (Entity entity in baseEntityList)
+            {
+                if (entity is Line line)
+                {
+                    if (line.Equals(possibleChamfer) || line.Equals(possibleChamfer.swapStartEnd()))
+                    {
+                        line.ChamferType = possibleChamfer.ChamferType;
+                    }
+                }
+            }            
         }
     }
 
