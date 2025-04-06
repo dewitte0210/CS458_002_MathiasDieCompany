@@ -1,6 +1,7 @@
 ﻿using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Controllers
 {
@@ -38,12 +39,15 @@ namespace FeatureRecognitionAPI.Controllers
             if (file == null)
                 return BadRequest("File cannot be null.");
 
-            var (status, output) = await _featureRecognitionService.UploadFile(file);
-
-            if (status != OperationStatus.OK || output == null)
-                return BadRequest($"Error uploading file. OperationStatus: {status}, output: {output}");
-
-            return Ok(output);
+            try
+            {
+                return Ok(await _featureRecognitionService.UploadFile(file));
+            }
+            catch(Exception e)
+            {
+                //Send error message as JSON so we can access it easier in the front end using await .json()
+                return BadRequest(JsonConvert.SerializeObject($"Error uploading file. {e.Message}"));
+            }
         }
     }
 }

@@ -64,83 +64,67 @@ namespace FeatureRecognitionAPI.Services
          * Exceptions:
          * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
          */
-        public async Task<(OperationStatus, string?)> UploadFile(IFormFile file)
+        public async Task<string?> UploadFile(IFormFile file)
         {
-            try
+            var (status, ext) = await GetFileExtension(file.FileName);
+
+            if (status != OperationStatus.OK || ext == null)
             {
-                var (status, ext) = await GetFileExtension(file.FileName);
+                //TODO: better exception here
+                throw new Exception("Error detecting file extension");
+            }
 
-                if (status != OperationStatus.OK || ext == null)
+            // maybe change ExampleFiles directory
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
+
+            if (!File.Exists(path))
+            {
+                using (Stream stream = new FileStream(path, FileMode.Create))
                 {
-                    Console.WriteLine("ERROR detecting file extension");
-                    return (OperationStatus.BadRequest, null);
+                    await file.CopyToAsync(stream);
                 }
+            }
 
-                // maybe change ExampleFiles directory
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
 
-                if (!File.Exists(path))
-                {
-                    using (Stream stream = new FileStream(path, FileMode.Create))
+            SupportedFile supportedFile;
+            switch (ext)
+            {
+                case ".dxf":
+                    using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        await file.CopyToAsync(stream);
+                        supportedFile = new DXFFile(dxfStream.Name);
                     }
-                }
 
+                    break;
+                case ".dwg":
+                    using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        supportedFile = new DWGFile(dwgStream.Name);
+                    }
 
-                SupportedFile supportedFile;
-                switch (ext)
-                {
-                    case ".dxf":
-                        using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                             supportedFile = new DXFFile(dxfStream.Name);
-                        }
-
-                        break;
-                    case ".dwg":
-                        using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                             supportedFile = new DWGFile(dwgStream.Name);
-                        }
-
-                        break;
-                    default:
-                        Console.WriteLine("ERROR detecting file extension");
-                        return (OperationStatus.BadRequest, null);
-                }
-                
-                // supportedFile.GroupFeatureEntities();
-                
-                supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
-
-                supportedFile.DetectAllFeatureTypes();
-                
-                // Set the feature groups
-                List<List<Entity>> touchingEntityList = new List<List<Entity>>();
-                foreach (Feature feature in supportedFile.FeatureList)
-                {
-                    touchingEntityList.Add(feature.EntityList);
-                }
-                
-                // Create JSON that will be sent to the frontend
-                var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
-                settings.Converters.Add(new StringEnumConverter());
-                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
-
-                return (OperationStatus.OK, json);
+                    break;
+                default:
+                    throw new Exception("Error detecting file extension");
             }
-            catch (Exception ex)
+
+            // supportedFile.GroupFeatureEntities();
+
+            supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
+
+            supportedFile.DetectAllFeatureTypes();
+
+            // Set the feature groups
+            List<List<Entity>> touchingEntityList = new List<List<Entity>>();
+            foreach (Feature feature in supportedFile.FeatureList)
             {
-                if (ex.Message == "Unsupported DWG File")
-                    return (OperationStatus.UnsupportedFileType, ex.Message);
-                if (ex.Message == "Error: Issue with DXF File")
-                    return (OperationStatus.CorruptFile, ex.Message);
-                if (ex.Message == "Error: Issue with DWG File")
-                    return (OperationStatus.CorruptFile, ex.Message);
-
-                return (OperationStatus.ExternalApiFailure, ex.ToString());
+                touchingEntityList.Add(feature.EntityList);
             }
+
+            // Create JSON that will be sent to the frontend
+            var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+            settings.Converters.Add(new StringEnumConverter());
+
+            return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);;
         }
 
         private static List<Entity> CondenseArcs(List<Entity> entities)
