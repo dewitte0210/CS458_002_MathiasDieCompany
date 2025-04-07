@@ -74,37 +74,23 @@ namespace FeatureRecognitionAPI.Services
                 throw new Exception("Error detecting file extension");
             }
 
-            // maybe change ExampleFiles directory
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
-
-            if (!File.Exists(path))
-            {
-                using (Stream stream = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-
 
             SupportedFile supportedFile;
-            switch (ext)
+            using (Stream stream = file.OpenReadStream())
             {
-                case ".dxf":
-                    using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        supportedFile = new DXFFile(dxfStream.Name);
-                    }
+                switch (ext)
+                {
+                    case ".dxf":
+                        supportedFile = new DXFFile(stream);
 
-                    break;
-                case ".dwg":
-                    using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        supportedFile = new DWGFile(dwgStream.Name);
-                    }
+                        break;
+                    case ".dwg":
+                        supportedFile = new DWGFile(stream);
 
-                    break;
-                default:
-                    throw new Exception("Invalid file extension: " + ext);
+                        break;
+                    default:
+                        throw new Exception("Invalid file extension: " + ext);
+                }
             }
 
             // supportedFile.GroupFeatureEntities();
@@ -124,7 +110,7 @@ namespace FeatureRecognitionAPI.Services
             var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
             settings.Converters.Add(new StringEnumConverter());
 
-            return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);;
+            return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
         }
 
         private static List<Entity> CondenseArcs(List<Entity> entities)
