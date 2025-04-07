@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using FeatureRecognitionAPI.Models.Pricing;
+using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Services
 {
@@ -28,16 +29,71 @@ namespace FeatureRecognitionAPI.Services
         
         public PricingService()
         {
-                //Get Feature Price Data
-                _featurePriceList = GetFeaturePriceList();
-                
-                //Get Punch Lists
-                _tubePunchList = GetTubePunchList();
-                _soPunchList = GetSoPunchList();
-                _hdsoPunchList = GetHdsoPunchList();
-                _ftPunchList = GetFtPunchList();
-                _swPunchList = GetSwPunchList();
-                _retractList = GetRetractList();
+            var featurePriceReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "FeaturePrices.json"));
+            var tubePunchReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "TubePunchPrices.json"));
+            var soPunchReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "SoPunchPrices.json"));
+            var hdsoPunchReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "HdsoPunchPrices.json"));
+            var ftPunchReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "FtPunchPrices.json"));
+            var swPunchReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "SwPunchPrices.json"));
+            var retractReader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "PricingData",
+                "RetractPrices.json"));
+           
+            string featureJson = featurePriceReader.ReadToEnd();
+            string tubePunchJson = tubePunchReader.ReadToEnd();
+            string soPunchJson = soPunchReader.ReadToEnd();
+            string hdsoPunchJson = hdsoPunchReader.ReadToEnd();
+            string ftPunchJson = ftPunchReader.ReadToEnd();
+            string swPunchJson = swPunchReader.ReadToEnd();
+            string retractJson = retractReader.ReadToEnd();
+            
+            _featurePriceList = JsonConvert.DeserializeObject<List<FeaturePrice>>(featureJson);
+            _tubePunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(tubePunchJson); 
+            _soPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(soPunchJson);
+            _hdsoPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(hdsoPunchJson);
+            _ftPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(ftPunchJson);
+            _swPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(swPunchJson);
+            _retractList = JsonConvert.DeserializeObject<List<PunchPrice>>(retractJson);
+            
+            featurePriceReader.Close();
+            tubePunchReader.Close();
+            soPunchReader.Close();
+            hdsoPunchReader.Close();
+            ftPunchReader.Close();
+            swPunchReader.Close();
+            retractReader.Close();
+            
+            /* Leaving this commented out for now in case we need to remake the lists
+            //Get Feature Price Data
+            _featurePriceList = GetFeaturePriceList();
+            
+            //Get Punch Lists
+            _tubePunchList = GetTubePunchList();
+            _soPunchList = GetSoPunchList();
+            _hdsoPunchList = GetHdsoPunchList();
+            _ftPunchList = GetFtPunchList();
+            _swPunchList = GetSwPunchList();
+            _retractList = GetRetractList();
+            string featureJson = JsonConvert.SerializeObject(_featurePriceList);
+            string tubePunchJson = JsonConvert.SerializeObject(_tubePunchList);
+            string soPunchJson = JsonConvert.SerializeObject(_soPunchList);
+            string hdsoPunchJson = JsonConvert.SerializeObject(_hdsoPunchList);
+            string ftPunchJson = JsonConvert.SerializeObject(_ftPunchList);
+            string swPunchJson = JsonConvert.SerializeObject(_swPunchList);
+            string retractJson = JsonConvert.SerializeObject(_retractList);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "FeaturePrices.json"), featureJson);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "FtPunchPrices.json"), ftPunchJson);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "HdsoPunchPrices.json"), hdsoPunchJson);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "RetractPrices.json"), retractJson);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "SwPunchPrices.json"), swPunchJson);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "SoPunchPrices.json"), soPunchJson);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(),"PricingData", "TubePunchPrices.json"), tubePunchJson);
+            */ 
         }
 
         public (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param)
@@ -196,6 +252,20 @@ namespace FeatureRecognitionAPI.Services
             {
                 return (OperationStatus.ExternalApiFailure, ex.Message, null);
             }
+        }
+        public List<FeaturePrice> GetFeaturePrices(){ return _featurePriceList; }
+
+        public PunchPriceReturn GetPunchPrices()
+        {
+            return new PunchPriceReturn()
+            {
+                TubePunchList = _tubePunchList,
+                SoPunchList = _soPunchList,
+                HdsoPunchList = _hdsoPunchList,
+                FtPunchList = _ftPunchList,
+                SwPunchList = _swPunchList,
+                RetractList = _retractList,
+            };
         }
         private double SetupDiscount(int count)
         {
@@ -605,6 +675,5 @@ namespace FeatureRecognitionAPI.Services
              
             return retractList;
         }
-        
     }
 }

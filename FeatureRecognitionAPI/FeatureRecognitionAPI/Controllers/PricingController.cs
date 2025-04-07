@@ -4,6 +4,7 @@ using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text.Json;
+using FeatureRecognitionAPI.Models.Pricing;
 
 namespace FeatureRecognitionAPI.Controllers
 {
@@ -42,6 +43,24 @@ namespace FeatureRecognitionAPI.Controllers
             {
                 return BadRequest($"Invalid JSON format: {ex.Message}");
             }
+        }
+        
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)] 
+        public async Task<List<FeaturePrice>> GetFeaturePrices()
+        {
+            return _pricingService.GetFeaturePrices();
+        }
+
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        public async Task<PunchPriceReturn> GetPunchPrices()
+        {
+            return _pricingService.GetPunchPrices();
         }
     }
 }
