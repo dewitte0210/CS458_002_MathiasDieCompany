@@ -2,6 +2,7 @@
 using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.Utility;
 using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -552,6 +553,81 @@ namespace Testing_for_Project
             Assert.That(hasChamfers, Is.True);
             Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(2));
         }
+        
+        [Test]
+        public void CheckGroup3ExampleOneFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
+            exampleFile.DetectAllFeatureTypes();
+
+            bool hasChamferEntities = false;
+            foreach (Entity entity in exampleFile.FeatureList[0].baseEntityList)
+            {
+                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
+                {
+                    hasChamferEntities = true;
+                }
+            }
+            bool hasChamferFeatures = false;
+            foreach (Feature feature in exampleFile.FeatureList)
+            {
+                if (feature.NumChamfers != 0)
+                {
+                    hasChamferFeatures = true;
+                }
+            }
+            
+            Assert.That(hasChamferEntities, Is.False);
+            Assert.That(hasChamferFeatures, Is.False);
+        }
+        
+        [Test]
+        public void CheckGroup3ExampleTwoFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
+            exampleFile.DetectAllFeatureTypes();
+
+            int numC = 0;
+            foreach (Entity entity in exampleFile.EntityList)
+            {
+                if (entity is Line line && MDCMath.DoubleEquals(line.Length, 0.144))
+                {
+                    numC++;
+                }
+            }
+            
+            int numChamferEntities = 0;
+            foreach (Entity entity in exampleFile.EntityList)
+            {
+                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
+                {
+                    numChamferEntities++;
+                }
+            }
+            int numChamferFeatures = 0;
+            foreach (Feature feature in exampleFile.FeatureList)
+            {
+                if (feature.NumChamfers != 0)
+                {
+                    numChamferFeatures++;
+                }
+            }
+            
+            Assert.That(numChamferEntities, Is.GreaterThan(0));
+            Assert.That(numChamferFeatures, Is.GreaterThan(0));
+        }
+        
+        
 
         #endregion
 

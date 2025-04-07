@@ -1044,10 +1044,8 @@ public class Feature
 
             while (!exhaustedEndSearch)
             {
-                (Line?, bool) endTouchingReturn = GetTouchingLine(currentEndLine, lineList);
-                Line? possibleLine = endTouchingReturn.Item1;
-                bool wasFlipped = endTouchingReturn.Item2;
-                
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentEndLine, lineList);
+
                 //if null or already in linegroup, meaning found end of line loop
                 if (possibleLine == null 
                     || lineGroup.Contains(possibleLine)
@@ -1063,11 +1061,9 @@ public class Feature
             }
             while (!exhaustedStartSearch)
             {
-                (Line?, bool) startTouchingReturn = GetTouchingLine(currentEndLine, lineList);
-                Line? possibleLine = startTouchingReturn.Item1;
-                bool wasFlipped = startTouchingReturn.Item2;
-                
-                //if null or already in linegroup, meaning found end of line loop
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList);
+
+                //if null or already in lineGroup, meaning found end of line loop
                 if (possibleLine == null 
                     || lineGroup.Contains(possibleLine)
                     || lineGroup.Contains(possibleLine.swapStartEnd()))
@@ -1076,11 +1072,10 @@ public class Feature
                     break;
                 }
                 
-                currentEndLine = possibleLine;
-                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
-                lineGroup.Append(possibleLine);
+                currentStartLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentStartLine.swapStartEnd() : currentStartLine);
+                lineGroup.Insert(0, possibleLine);
             }
-            
             orderedLineList.Add(lineGroup);            
         }
         return orderedLineList;
@@ -1098,34 +1093,32 @@ public class Feature
 
         foreach (List<Line> lineGroup in orderedLineList)
         {
-            if (lineGroup.Count >= 3)
+            if (lineGroup.Count < 3) continue;
+            for (int i = 0; i < lineGroup.Count; i++)
             {
-                for (int i = 0; i < lineGroup.Count; i++)
+                Line lineA = lineGroup[i];
+                Line lineB = lineGroup[(i + 1) % lineGroup.Count];
+                Line lineC = lineGroup[(i + 2) % lineGroup.Count];
+
+                //need to verify orientation of lines
+                Angle angleAB = GetAngle(lineA, lineB);
+                Angle angleBC = GetAngle(lineB, lineC);
+                Angle angleAC = GetAngle(lineA, lineC);
+
+                //meets single chamfer conditions
+                if (angleAB.Equals(angleBC))
                 {
-                    Line lineA = lineGroup[i];
-                    Line lineB = lineGroup[(i + 1) % lineGroup.Count];
-                    Line lineC = lineGroup[(i + 2) % lineGroup.Count];
-
-                    //need to verify orientation of lines
-                    Angle angleAB = GetAngle(lineA, lineB);
-                    Angle angleBC = GetAngle(lineB, lineC);
-                    Angle angleAC = GetAngle(lineA, lineC);
-
-                    //meets single chamfer conditions
-                    if (angleAB.Equals(angleBC))
+                    // measuring counterclockwise
+                    if (angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
                     {
-                        // measuring counterclockwise
-                        if (angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
-                        {
-                            lineB.ChamferType = ChamferTypeEnum.Possible;
-                            possibleChamferList.Add(lineB);                            
-                        }
-                        // measuring clockwise
-                        else if (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360)
-                        {
-                            lineB.ChamferType = ChamferTypeEnum.Possible;
-                            possibleChamferList.Add(lineB);
-                        }
+                        lineB.ChamferType = ChamferTypeEnum.Possible;
+                        possibleChamferList.Add(lineB);                            
+                    }
+                    // measuring clockwise
+                    else if (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360)
+                    {
+                        lineB.ChamferType = ChamferTypeEnum.Possible;
+                        possibleChamferList.Add(lineB);
                     }
                 }
             }
@@ -1135,64 +1128,61 @@ public class Feature
 
     private void CheckGroup3()
     {
-        if (!(FeatureType == PossibleFeatureTypes.Group1A1 || FeatureType == PossibleFeatureTypes.Group1A2)) return;
+        if (FeatureType is not (PossibleFeatureTypes.Group1A1 or PossibleFeatureTypes.Group1A2)) return;
         
         // copy of base entity list with just lines
         List<Line> lineList = GetLinesFromEntityList(baseEntityList).ToList();
         List<Line> possibleChamferList = GetPossibleChamfers(GetOrderedLines(lineList));
         
         if (lineList.Count < 3) return;
-        if (possibleChamferList.Count <= 0) return;
-
-        // check potential chamfers
-        // if only one chamfer, it is confirmed to be chamfer
-        if (possibleChamferList.Count == 1)
+        switch (possibleChamferList.Count)
         {
-            possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
-        }
-        // if 2 to 3 chamfers, only confirm if a parallel line to it
-        // is also possible/confirmed chamfers
-        else if (possibleChamferList.Count is >= 2 and <= 3)
-        {
-            bool hasPallelChamfer = false;
-            foreach (Line possibleChamfer in possibleChamferList)
+            case <= 0:
+                return;
+            // check potential chamfers
+            // if only one chamfer, it is confirmed to be a chamfer
+            case 1:
+                possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
+                break;
+            // if 2 to 3 chamfers, only confirm if a parallel line to it
+            // is also possible/confirmed chamfers
+            case >= 2 and <= 3:
             {
-                foreach (Line line in lineList)
+                bool hasParallelChamfer = false;
+                foreach (Line possibleChamfer in possibleChamferList)
                 {
-                    // ignore same line
-                    if (possibleChamfer.Equals(line))
+                    foreach (Line line in lineList)
                     {
-                        continue;
-                    }
+                        // ignore same line
+                        if (possibleChamfer.Equals(line))
+                        {
+                            continue;
+                        }
                     
-                    if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                        if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                        {
+                            hasParallelChamfer = true;
+                        }
+                    }
+                    if (!hasParallelChamfer)
                     {
-                        hasPallelChamfer = true;
+                        possibleChamferList.Remove(possibleChamfer);
+                        break;
                     }
                 }
-                if (!hasPallelChamfer)
+                // remaining possible chamfers meet above case so confirm
+                foreach (Line line in possibleChamferList)
                 {
-                    possibleChamferList.Remove(possibleChamfer);
-                    break;
+                    line.ChamferType = ChamferTypeEnum.Confirmed;
                 }
-            }
-            // remaining possible chamfers meet above case so confirm
-            foreach (Line line in possibleChamferList)
-            {
-                line.ChamferType = ChamferTypeEnum.Confirmed;
+                break;
             }
         }
+
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
         // TODO: implement better check for octagon problem, perhaps with frontend
-        if (possibleChamferList.Count > 4)
-        {
-            NumChamfers =  possibleChamferList.Count / 2;
-        }
-        else
-        {
-            NumChamfers = possibleChamferList.Count;
-        }
+        NumChamfers = possibleChamferList.Count > 4 ? possibleChamferList.Count / 2 : possibleChamferList.Count;
 
         //update base entity list based on found possible chamfers
         foreach (Line possibleChamfer in possibleChamferList)

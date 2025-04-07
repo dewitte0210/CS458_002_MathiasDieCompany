@@ -11,10 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7c53808f-85d7-4b06-9a22-5de316511b8e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FeatureRecognitionAPI/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Custom/one-chamfer-square.DXF" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Custom/square.DXF" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/Angles.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/Utility/Angles.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FeatureRecognitionAPI/Models/FileTypes/SupportedFile.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,28 +53,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.FeatureRecognitionAPI: http.executor": "Run",
-    ".NET Launch Settings Profile.FeatureRecognitionAPI: https.executor": "Run",
-    "359b1f47-76d3-44e9-b19f-aa223f1b32f9.executor": "Debug",
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "daeed699-85d5-4b39-9425-c0fd37e2b1d8.executor": "Debug",
-    "git-widget-placeholder": "corner-features-2",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.start Frontend.executor": "Run",
-    "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "SolutionBuilderPresentationOptionsPageId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.FeatureRecognitionAPI: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.FeatureRecognitionAPI: https.executor&quot;: &quot;Run&quot;,
+    &quot;359b1f47-76d3-44e9-b19f-aa223f1b32f9.executor&quot;: &quot;Debug&quot;,
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;daeed699-85d5-4b39-9425-c0fd37e2b1d8.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;corner-features-2&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.start Frontend.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;SolutionBuilderPresentationOptionsPageId&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.FeatureRecognitionAPI: http">
     <configuration name="FeatureRecognitionAPI: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/FeatureRecognitionAPI/FeatureRecognitionAPI.csproj" />
@@ -159,11 +157,22 @@
       <workItem from="1743174463701" duration="6512000" />
       <workItem from="1743889601679" duration="1034000" />
       <workItem from="1743891347082" duration="14376000" />
+      <workItem from="1744038335882" duration="6806000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnitTestsCoverage.Settings">
+    <option name="coveragePercentColumnWidth" value="111" />
+    <option name="sortOrder" value="DESCENDING" />
+    <option name="sortedColumn" value="1" />
+    <option name="symbolColumnWidth" value="58" />
+    <coverage-tree-state>
+      <expand />
+      <select />
+    </coverage-tree-state>
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
@@ -225,42 +234,152 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs</url>
-          <line>1248</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'CheckGroup5'">
-            <startOffsets>
-              <option value="47618" />
-            </startOffsets>
-            <endOffsets>
-              <option value="47619" />
-            </endOffsets>
-          </properties>
+          <line>1327</line>
+          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'CheckGroup5'" />
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
-          <line>279</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'TestGetOrderedLinesSquare'">
+          <line>343</line>
+          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'TestGetPossibleChamfersThreeChamfer'">
             <startOffsets>
-              <option value="13439" />
+              <option value="16211" />
             </startOffsets>
             <endOffsets>
-              <option value="13486" />
+              <option value="16298" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
-          <line>254</line>
-          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'TestGetTouchingLineNoTouching'">
+          <line>318</line>
+          <properties documentPath="E:\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'TestGetPossibleChamfersOneChamfer'">
             <startOffsets>
-              <option value="12590" />
+              <option value="15114" />
             </startOffsets>
             <endOffsets>
-              <option value="12634" />
+              <option value="15151" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
+          <line>584</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3ExampleOneFile'">
+            <startOffsets>
+              <option value="26541" />
+            </startOffsets>
+            <endOffsets>
+              <option value="26583" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
+          <line>626</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3ExampleTwoFile'">
+            <startOffsets>
+              <option value="28086" />
+            </startOffsets>
+            <endOffsets>
+              <option value="28137" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
+          <line>621</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3ExampleTwoFile'">
+            <startOffsets>
+              <option value="27943" />
+            </startOffsets>
+            <endOffsets>
+              <option value="27964" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
+          <line>613</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3ExampleTwoFile'">
+            <startOffsets>
+              <option value="27686" />
+            </startOffsets>
+            <endOffsets>
+              <option value="27707" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="72" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
+          <line>608</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3ExampleTwoFile'">
+            <startOffsets>
+              <option value="27459" />
+            </startOffsets>
+            <endOffsets>
+              <option value="27486" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="73" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Testing for Project/FeatureClassTests.cs</url>
+          <line>604</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\Testing for Project\FeatureClassTests.cs" containingFunctionPresentation="Method 'CheckGroup3ExampleTwoFile'">
+            <startOffsets>
+              <option value="27394" />
+            </startOffsets>
+            <endOffsets>
+              <option value="27401" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="74" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs</url>
+          <line>1093</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'GetPossibleChamfers'">
+            <startOffsets>
+              <option value="41850" />
+            </startOffsets>
+            <endOffsets>
+              <option value="41899" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs</url>
+          <line>1096</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'GetPossibleChamfers'">
+            <startOffsets>
+              <option value="41969" />
+            </startOffsets>
+            <endOffsets>
+              <option value="42010" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="76" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs</url>
+          <line>1111</line>
+          <properties documentPath="C:\Users\schmidta0742\Documents\Programming\CS458_002_MathiasDieCompany\FeatureRecognitionAPI\FeatureRecognitionAPI\Models\Features\Feature.cs" containingFunctionPresentation="Method 'GetPossibleChamfers'">
+            <startOffsets>
+              <option value="42609" />
+            </startOffsets>
+            <endOffsets>
+              <option value="42698" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="77" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -273,7 +392,7 @@
       <configuration name="RiderUnitTests">
         <watch expression="this._angle" />
       </configuration>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" line="1167">
+      <inline-watch fileUrl="file://$PROJECT_DIR$/FeatureRecognitionAPI/Models/Features/Feature.cs" line="1246">
         <watch expression="Angles.IsParallel()" language="C#" />
       </inline-watch>
     </watches-manager>

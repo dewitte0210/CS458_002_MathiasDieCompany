@@ -18,7 +18,7 @@ namespace FeatureRecognitionAPI.Models
         protected string Path { get; set; }
         protected SupportedExtensions FileType { get; set; }
         internal List<Feature> FeatureList { get; set; }
-        protected List<Entity> EntityList;
+        protected internal List<Entity> EntityList;
         internal List<FeatureGroup> FeatureGroups { get; }
         protected FileVersion _fileVersion;
 
