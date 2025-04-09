@@ -7,7 +7,5 @@ namespace FeatureRecognitionAPI.Services
     public interface IPricingService
     {
         (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param);
-        List<FeaturePrice> GetFeaturePrices();
-        PunchPriceReturn GetPunchPrices();
     }
 }

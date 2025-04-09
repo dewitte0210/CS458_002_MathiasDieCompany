@@ -10,15 +10,9 @@ namespace FeatureRecognitionAPI.Controllers
 {
     [Route("api/Pricing")]
     [ApiController]
-    public class PricingController : ControllerBase
+    public class PricingController(IPricingService pricingService, IPricingDataService dataService)
+        : ControllerBase
     {
-        private readonly IPricingService _pricingService;
-
-        public PricingController(IPricingService pricingService)
-        {
-            _pricingService = pricingService;
-        }
-
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -32,7 +26,7 @@ namespace FeatureRecognitionAPI.Controllers
                 if (quoteSubmissionDto == null)
                     return BadRequest("Invalid payload.");
 
-                var (status, msg, output) =  _pricingService.EstimatePrice(quoteSubmissionDto);
+                var (status, msg, output) =  pricingService.EstimatePrice(quoteSubmissionDto);
 
                 if (status != OperationStatus.OK || output == null)
                     return BadRequest(msg);
@@ -51,7 +45,7 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)] 
         public async Task<List<FeaturePrice>> GetFeaturePrices()
         {
-            return _pricingService.GetFeaturePrices();
+            return dataService.GetFeaturePrices();
         }
 
         [HttpGet("[action]")]
@@ -60,7 +54,7 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<PunchPriceReturn> GetPunchPrices()
         {
-            return _pricingService.GetPunchPrices();
+            return dataService.GetPunchPrices();
         }
     }
 }

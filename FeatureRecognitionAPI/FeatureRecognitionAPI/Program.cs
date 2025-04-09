@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IFeatureRecognitionService, FeatureRecognitionService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<IPricingDataService, PricingDataService>();
 
 builder.Services.AddCors(options =>
 {
