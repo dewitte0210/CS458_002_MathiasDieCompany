@@ -52,6 +52,16 @@ namespace FeatureRecognitionAPI.Models.Utility
 			
 			#region Overrides
 
+			public static bool operator ==(Degrees a, Degrees b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Degrees a, Degrees b)
+			{
+				return !a.Equals(b);
+			}
+			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) return false;
@@ -90,6 +100,16 @@ namespace FeatureRecognitionAPI.Models.Utility
 			
 			#region Overrides
 
+			public static bool operator ==(Radians a, Radians b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Radians a, Radians b)
+			{
+				return !a.Equals(b);
+			}
+			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) return false;
@@ -147,6 +167,17 @@ namespace FeatureRecognitionAPI.Models.Utility
 			}
 
 			#region Overrides
+			
+			public static bool operator ==(Angle a, Angle b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Angle a, Angle b)
+			{
+				return !a.Equals(b);
+			}
+			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) { return false; }

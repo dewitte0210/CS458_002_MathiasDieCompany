@@ -1109,17 +1109,12 @@ public class Feature
                 //meets single chamfer conditions
                 if (angleAB.Equals(angleBC))
                 {
-                    // measuring counterclockwise
-                    if (angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
+                    // measuring counterclockwise or clockwise
+                    if ((angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
+                        || (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360))
                     {
                         lineB.ChamferType = ChamferTypeEnum.Possible;
                         possibleChamferList.Add(lineB);                            
-                    }
-                    // measuring clockwise
-                    else if (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360)
-                    {
-                        lineB.ChamferType = ChamferTypeEnum.Possible;
-                        possibleChamferList.Add(lineB);
                     }
                 }
             }
