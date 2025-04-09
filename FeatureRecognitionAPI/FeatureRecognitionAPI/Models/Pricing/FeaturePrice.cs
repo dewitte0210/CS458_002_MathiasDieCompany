@@ -2,7 +2,13 @@ using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Models.Pricing;
 
-public class FeaturePrice(PossibleFeatureTypes type, double setupRate, double runRate, double difficultyFactor, int maxRadius, int quantity)
+public class FeaturePrice(
+    PossibleFeatureTypes type,
+    double setupRate,
+    double runRate,
+    double difficultyFactor,
+    int maxRadius,
+    int quantity)
 {
     /// <summary>
     ///  Denotes the hour/part rate of setting up the cut
@@ -21,7 +27,7 @@ public class FeaturePrice(PossibleFeatureTypes type, double setupRate, double ru
     /// </summary>
     public int Quantity { get; set; } = quantity;
 
-    public int MaxRadius { get; set; } = maxRadius; 
-    
+    public int MaxRadius { get; set; } = maxRadius;
+
     public PossibleFeatureTypes Type { get; set; } = type;
 }
