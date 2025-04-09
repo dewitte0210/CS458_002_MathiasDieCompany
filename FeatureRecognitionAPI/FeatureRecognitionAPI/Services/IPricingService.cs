@@ -5,6 +5,6 @@ namespace FeatureRecognitionAPI.Services
 {
     public interface IPricingService
     {
-        Task<(OperationStatus, string, string?)> EstimatePrice(QuoteSubmissionDto param);
+        (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param);
     }
 }

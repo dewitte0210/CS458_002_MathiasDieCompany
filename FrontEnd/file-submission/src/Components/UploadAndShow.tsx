@@ -75,16 +75,6 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
         setJsonResponse(null); // Clear the JSON response on going back
     };
 
-    function translateJSON(jsonResponseElement: any) {
-        return jsonResponseElement.map((element) => {
-            element.features = element.features.map((feature) =>{
-                feature.FeatureType = translate(feature.FeatureType);
-                return feature;
-            })
-            return element;
-        });
-    }
-
     return (
         <div className="upload-and-show">
             {isLoading ? ( // Display loading screen during file upload
@@ -131,7 +121,7 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                         <div className="table-data">
                             {jsonResponse && ( // Conditionally render the JSON response
                                 <QuoteSubmission
-                                    featureGroups={translateJSON(jsonResponse["_featureGroups"])}
+                                    featureGroups={jsonResponse["_featureGroups"]}
                                     backToUpload={backToUpload}
                                 />
                             )}

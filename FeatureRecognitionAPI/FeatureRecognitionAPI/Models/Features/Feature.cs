@@ -268,6 +268,7 @@ public class Feature
                 bool gotArc2 = false;
                 bool gotLine = false;
                 int index = 0;
+               
                 //Get one of the 2 lines and arcs to run isArcConcave
                 while (!gotArc1 || !gotLine || !gotArc2)
                 {
@@ -692,7 +693,7 @@ public class Feature
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        double maxLength = Point.Distance(maxPoint, minPoint);
+        double maxLength = 2 * Point.Distance(maxPoint, minPoint);
         Line ray;
 
         int numIntersections = 0;
