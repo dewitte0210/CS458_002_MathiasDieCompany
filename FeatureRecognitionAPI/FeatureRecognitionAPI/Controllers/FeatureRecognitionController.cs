@@ -23,7 +23,7 @@ namespace FeatureRecognitionAPI.Controllers
 
             var (status, ext) = await _featureRecognitionService.GetFileExtension(fileName);
 
-            if (status != OperationStatus.OK || ext == null)
+            if (status != OperationStatus.Ok || ext == null)
                 return BadRequest("Error detecting file extension.");
 
             return Ok(ext);
@@ -40,7 +40,7 @@ namespace FeatureRecognitionAPI.Controllers
 
             var (status, output) = await _featureRecognitionService.UploadFile(file);
 
-            if (status != OperationStatus.OK || output == null)
+            if (status != OperationStatus.Ok || output == null)
                 return BadRequest($"Error uploading file. OperationStatus: {status}, output: {output}");
 
             return Ok(output);

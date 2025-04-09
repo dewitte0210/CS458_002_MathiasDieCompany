@@ -35,17 +35,17 @@ namespace FeatureRecognitionAPI.Services
                 switch (ext)
                 {
                     case ".dxf":
-                        return (OperationStatus.OK, ext);
+                        return (OperationStatus.Ok, ext);
                     case ".dwg":
-                        return (OperationStatus.OK, ext);
+                        return (OperationStatus.Ok, ext);
                     default:
                         Console.WriteLine("ERROR detecting file extension");
-                        return (OperationStatus.OK, null);
+                        return (OperationStatus.Ok, null);
                 }
             }
 
             Console.WriteLine("ERROR File does not exist");
-            return (OperationStatus.OK, null);
+            return (OperationStatus.Ok, null);
         }
 
         /*
@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Services
             {
                 var (status, ext) = await GetFileExtension(file.FileName);
 
-                if (status != OperationStatus.OK || ext == null)
+                if (status != OperationStatus.Ok || ext == null)
                 {
                     Console.WriteLine("ERROR detecting file extension");
                     return (OperationStatus.BadRequest, null);
@@ -128,7 +128,7 @@ namespace FeatureRecognitionAPI.Services
                 settings.Converters.Add(new StringEnumConverter());
                 string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
 
-                return (OperationStatus.OK, json);
+                return (OperationStatus.Ok, json);
             }
             catch (Exception ex)
             {

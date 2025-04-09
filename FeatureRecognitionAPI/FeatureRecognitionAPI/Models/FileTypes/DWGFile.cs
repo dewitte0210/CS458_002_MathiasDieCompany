@@ -8,7 +8,7 @@ namespace FeatureRecognitionAPI.Models
     {
         public DWGFile(string path) : base(path)
         {
-            FileType = SupportedExtensions.dwg;
+            FileType = SupportedExtensions.Dwg;
 
             if (!File.Exists(path))
             {

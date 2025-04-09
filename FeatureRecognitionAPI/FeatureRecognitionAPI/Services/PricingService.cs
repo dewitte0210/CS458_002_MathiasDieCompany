@@ -57,16 +57,16 @@ namespace FeatureRecognitionAPI.Services
                 //Set rule factor based on rule type
                 ruleFactor = param.RuleType switch
                 {
-                    RuleTypeEnum.TwoPtCB937 => 1,
-                    RuleTypeEnum.TwoPtSB937 => 1.3,
-                    RuleTypeEnum.TwoPtDDB937 => 1.1,
-                    RuleTypeEnum.TwoPtCB1125 => 1.25,
-                    RuleTypeEnum.ThreePtCB937 => 1.3,
-                    RuleTypeEnum.ThreePtSB937 => 1.5,
-                    RuleTypeEnum.ThreePtDDB937 => 1.3,
-                    RuleTypeEnum.ThreePtDSB927 => 1.5,
-                    RuleTypeEnum.FourTwelveCB472 => 1.3,
-                    RuleTypeEnum.FiveTwelveCB472 => 1.3,
+                    RuleType.TwoPtCB937 => 1,
+                    RuleType.TwoPtSB937 => 1.3,
+                    RuleType.TwoPtDDB937 => 1.1,
+                    RuleType.TwoPtCB1125 => 1.25,
+                    RuleType.ThreePtCB937 => 1.3,
+                    RuleType.ThreePtSB937 => 1.5,
+                    RuleType.ThreePtDDB937 => 1.3,
+                    RuleType.ThreePtDSB927 => 1.5,
+                    RuleType.FourTwelveCB472 => 1.3,
+                    RuleType.FiveTwelveCB472 => 1.3,
                     _ => ruleFactor
                 };
 
@@ -190,7 +190,7 @@ namespace FeatureRecognitionAPI.Services
                 double perimeterCost = totalPerimeter * 0.46;    
                 totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost)) + perimeterCost;
 
-                return (OperationStatus.OK, "Successfully estimated price", totalEstimate.ToString(CultureInfo.CurrentCulture));
+                return (OperationStatus.Ok, "Successfully estimated price", totalEstimate.ToString(CultureInfo.CurrentCulture));
             }
             catch (Exception ex)
             {
