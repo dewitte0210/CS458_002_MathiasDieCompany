@@ -517,12 +517,12 @@ namespace Testing_for_Project
 
             testFeature.SeperatePerimeterEntities();
 
-            Assert.IsTrue(testFeature.PerimeterEntityList.Count == 1);
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Count == 3);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 1);
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Count == 3);
 
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line2));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line3));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line4));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line2));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line3));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line4));
         }
 
         [Test]
@@ -555,30 +555,30 @@ namespace Testing_for_Project
 
             testFeature.SeperatePerimeterEntities();
 
-            Assert.IsTrue(testFeature.PerimeterEntityList.Count == 2);
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Count == 3 && testFeature.PerimeterEntityList[1].Count == 3);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 2);
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Count == 3 && testFeature.PerimeterFeatureList[1].EntityList.Count == 3);
 
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line2) || testFeature.PerimeterEntityList[1].Contains(line2));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line3) || testFeature.PerimeterEntityList[1].Contains(line3));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line4) || testFeature.PerimeterEntityList[1].Contains(line4));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line6) || testFeature.PerimeterEntityList[1].Contains(line6));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line7) || testFeature.PerimeterEntityList[1].Contains(line7));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line8) || testFeature.PerimeterEntityList[1].Contains(line8));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line2) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line2));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line3) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line3));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line4) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line4));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line6) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line6));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line7) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line7));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line8) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line8));
 
             Assert.IsTrue(
-                (testFeature.PerimeterEntityList[0].Contains(line2)
-                && testFeature.PerimeterEntityList[0].Contains(line3)
-                && testFeature.PerimeterEntityList[0].Contains(line4)
-                && testFeature.PerimeterEntityList[1].Contains(line6)
-                && testFeature.PerimeterEntityList[1].Contains(line7)
-                && testFeature.PerimeterEntityList[1].Contains(line8))
+                (testFeature.PerimeterFeatureList[0].EntityList.Contains(line2)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line3)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line4)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line6)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line7)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line8))
                 ||
-                ((testFeature.PerimeterEntityList[1].Contains(line2)
-                && testFeature.PerimeterEntityList[1].Contains(line3)
-                && testFeature.PerimeterEntityList[1].Contains(line4)
-                && testFeature.PerimeterEntityList[0].Contains(line6)
-                && testFeature.PerimeterEntityList[0].Contains(line7)
-                && testFeature.PerimeterEntityList[0].Contains(line8)))
+                ((testFeature.PerimeterFeatureList[1].EntityList.Contains(line2)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line3)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line4)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line6)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line7)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line8)))
                 );
         }
 
@@ -612,32 +612,32 @@ namespace Testing_for_Project
 
             testFeature.SeperatePerimeterEntities();
 
-            Assert.IsTrue(testFeature.PerimeterEntityList.Count == 2);
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Count == 3 && testFeature.PerimeterEntityList[1].Count == 3);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 2);
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Count == 3 && testFeature.PerimeterFeatureList[1].EntityList.Count == 3);
 
             // Checks that the needed lines are contained in either perimeter feature
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line2) || testFeature.PerimeterEntityList[1].Contains(line2));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line3) || testFeature.PerimeterEntityList[1].Contains(line3));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line4) || testFeature.PerimeterEntityList[1].Contains(line4));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line6) || testFeature.PerimeterEntityList[1].Contains(line6));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line7) || testFeature.PerimeterEntityList[1].Contains(line7));
-            Assert.IsTrue(testFeature.PerimeterEntityList[0].Contains(line8) || testFeature.PerimeterEntityList[1].Contains(line8));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line2) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line2));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line3) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line3));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line4) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line4));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line6) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line6));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line7) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line7));
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Contains(line8) || testFeature.PerimeterFeatureList[1].EntityList.Contains(line8));
 
             // Check that the entities are grouped together
             Assert.IsTrue(
-                (testFeature.PerimeterEntityList[0].Contains(line2)
-                && testFeature.PerimeterEntityList[0].Contains(line3)
-                && testFeature.PerimeterEntityList[0].Contains(line4)
-                && testFeature.PerimeterEntityList[1].Contains(line6)
-                && testFeature.PerimeterEntityList[1].Contains(line7)
-                && testFeature.PerimeterEntityList[1].Contains(line8))
+                (testFeature.PerimeterFeatureList[0].EntityList.Contains(line2)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line3)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line4)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line6)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line7)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line8))
                 ||
-                ((testFeature.PerimeterEntityList[1].Contains(line2)
-                && testFeature.PerimeterEntityList[1].Contains(line3)
-                && testFeature.PerimeterEntityList[1].Contains(line4)
-                && testFeature.PerimeterEntityList[0].Contains(line6)
-                && testFeature.PerimeterEntityList[0].Contains(line7)
-                && testFeature.PerimeterEntityList[0].Contains(line8)))
+                ((testFeature.PerimeterFeatureList[1].EntityList.Contains(line2)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line3)
+                && testFeature.PerimeterFeatureList[1].EntityList.Contains(line4)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line6)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line7)
+                && testFeature.PerimeterFeatureList[0].EntityList.Contains(line8)))
                 );
         }
         #endregion
@@ -738,15 +738,14 @@ namespace Testing_for_Project
             int count = 0; // number of features with 2 perimeter features
             foreach (Feature feature in featureList)
             {
-                if (feature.PerimeterEntityList.Count == 2)
+                if (feature.PerimeterFeatureList.Count == 2)
                 {
                     oneFeatureWithTwoPerimeterFeatures = true;
                     count++;
                     Assert.IsTrue(count == 1); // there should be only 1 feature with two perimeter features
                     bool inBaseList = false;
-                    foreach (List<Entity> perimeterFeatureEntities in feature.PerimeterEntityList)
+                    foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
                     {
-                        Feature perimeterFeature = new Feature(perimeterFeatureEntities);
                         foreach (Entity entity in perimeterFeature.EntityList)
                         {
                             if (feature.EntityList.Contains(entity)) { inBaseList = true; }
@@ -762,7 +761,7 @@ namespace Testing_for_Project
                 }
                 else
                 {
-                    Assert.IsTrue(feature.PerimeterEntityList.Count == 0); // if the feature does not have 2 perimeter features, it should have none
+                    Assert.IsTrue(feature.PerimeterFeatureList.Count == 0); // if the feature does not have 2 perimeter features, it should have none
                 }
             }
             Assert.IsTrue(oneFeatureWithTwoPerimeterFeatures);

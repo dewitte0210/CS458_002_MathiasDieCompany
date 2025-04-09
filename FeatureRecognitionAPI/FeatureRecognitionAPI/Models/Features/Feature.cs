@@ -44,7 +44,7 @@ public class Feature
     // the original feature
     //EXAMPLE: <[list for Mitered notch], [list for radius notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
-    internal List<List<Entity>> PerimeterEntityList;
+    internal List<Feature> PerimeterFeatureList;
 
     public int GetNumLines() { return numLines; }
     public int GetNumArcs() { return numArcs; }
@@ -78,8 +78,8 @@ public class Feature
         this.multipleRadius = multipleRadius;
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
-        PerimeterEntityList = new List<List<Entity>>();
-        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
+        PerimeterFeatureList = new List<Feature>();
+        PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         CalcPerimeter();
     }
@@ -93,9 +93,9 @@ public class Feature
      * of the feature, including the perimeter features entities, unless the feature is just a
      * perimeter one
      */
-    public Feature(List<Entity> EntityList)
+    public Feature(List<Entity> entityList)
     {
-        this.EntityList = EntityList;
+        EntityList = entityList;
         ConstructFromEntityList();
     }
 
@@ -110,7 +110,7 @@ public class Feature
         this.baseEntityList = EntityList;
         this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
-        PerimeterEntityList = new List<List<Entity>>();
+        PerimeterFeatureList = new List<Feature>();
 
         CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
 
@@ -1099,10 +1099,10 @@ public class Feature
             return;
         }
 
-        foreach (List<Entity> entityList in PerimeterEntityList)
+        foreach (Feature feature in PerimeterFeatureList)
         {
             Line tempLine = null;
-            foreach (Entity entity in entityList)
+            foreach (Entity entity in feature.EntityList)
             {
                 if (entity is Line && tempLine == null)
                 {
@@ -1507,7 +1507,7 @@ public class Feature
 
     /*
      * Function that uses finds the Path from the two parents of all extended lines and adds the Path as a group of
-     * entities at new index in PerimeterEntityList
+     * entities at new index in PerimeterFeatureList
      *
      * @Return true if a valid Path is found and seperated successfully
      */
@@ -1533,7 +1533,7 @@ public class Feature
             GetTouchingList(path, unusedEntities, null);
             if (path.Count > 0)
             {
-                PerimeterEntityList.Add(new List<Entity>(path));
+                PerimeterFeatureList.Add(new Feature(path));
             }
 
             path.Clear();
