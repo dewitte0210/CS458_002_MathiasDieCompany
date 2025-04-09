@@ -376,23 +376,15 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-            Point transformedBoundary1 = transform * new Point(MinX(), MinY());
-            Point transformedBoundary2 = transform * new Point(MaxX(), MinY());
-            Point transformedBoundary3 = transform * new Point(MinX(), MaxY());
-            Point transformedBoundary4 = transform * new Point(MaxX(), MaxY());
-
             Point newCenter = transform * Center;
+            Point newStart = transform * Start;
             
-            double a = Point.Distance(newCenter, transformedBoundary1);
-            double b = Point.Distance(newCenter, transformedBoundary2);
-            double c = Point.Distance(newCenter, transformedBoundary3);
-            double d = Point.Distance(newCenter, transformedBoundary4);
-
-            double newWidth = Math.Max(a, Math.Max(b, Math.Max(c, d)));
-
             double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+            
+            double newRadius = Point.Distance(newStart, newCenter);
+            double newAngleStart = StartAngle - rotation;
+            double newAngleEnd = EndAngle - rotation;
 
-            //divide by sqrt(2) because newWidth is distance from center to bounding box corner, not arc edge
-            return new Arc(newCenter.X, newCenter.Y, newWidth / Math.Sqrt(2), StartAngle - rotation, EndAngle - rotation);
+            return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
     }
 }
