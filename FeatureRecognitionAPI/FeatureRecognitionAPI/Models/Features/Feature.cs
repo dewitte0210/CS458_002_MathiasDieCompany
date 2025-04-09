@@ -106,8 +106,7 @@ public class Feature
     {
         this.count = 1;
         this.multipleRadius = 1;
-        this.EntityList = EntityList;
-        this.baseEntityList = EntityList;
+        this.baseEntityList = new(EntityList);
         this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
@@ -325,7 +324,8 @@ public class Feature
             type = PossibleFeatureTypes.Unknown;
             return false;
         }
-
+        
+        // TODO: This is wrong
         //If there are 3 lines and zero arcs then it should be a triangle
         else if (arcs == 0)
         {
@@ -1533,7 +1533,7 @@ public class Feature
             GetTouchingList(path, unusedEntities, null);
             if (path.Count > 0)
             {
-                PerimeterFeatureList.Add(new Feature(path));
+                PerimeterFeatureList.Add(new Feature(new(path)));
             }
 
             path.Clear();
