@@ -7,10 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//builder.Services.AddSwaggerGen();
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IFeatureRecognitionService, FeatureRecognitionService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<IPricingDataService, PricingDataService>();
 
 builder.Services.AddCors(options =>
 {
