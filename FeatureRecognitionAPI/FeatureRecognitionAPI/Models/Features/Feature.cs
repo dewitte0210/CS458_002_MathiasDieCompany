@@ -1112,7 +1112,7 @@ public class Feature
                 {
                     if (tempLine.DoesIntersect(entity))
                     {
-                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);     
+                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);
                     }
                 }
             }
