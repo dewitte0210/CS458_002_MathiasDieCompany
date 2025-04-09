@@ -1,5 +1,5 @@
 using System.Security.Policy;
-using static FeatureRecognitionAPI.Models.Utility.MDCMath;
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
 // This file is used for calculating the angle between lines and on what side they lay
 namespace FeatureRecognitionAPI.Models.Utility
@@ -62,16 +62,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 				}
 				return false;
 			}
-
-			public static bool operator ==(Degrees a, Degrees b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Degrees a, Degrees b)
-			{
-				return !a.Equals(b);
-			}
 			
 			public static implicit operator double(Degrees d) => d.Value;
 			
@@ -111,16 +101,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 				return false;
 			}
 
-			public static bool operator ==(Radians a, Radians b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Radians a, Radians b)
-			{
-				return !a.Equals(b);
-			}
-			
 			public static implicit operator double(Radians r) => r.Value;
 			
 			public override int GetHashCode()
@@ -188,16 +168,6 @@ namespace FeatureRecognitionAPI.Models.Utility
                 return false;
 			}
 			
-			public static bool operator ==(Angle a, Angle b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Angle a, Angle b)
-			{
-				return !a.Equals(b);
-			}
-
 			public override int GetHashCode()
 			{
 				return HashCode.Combine(this._angle.GetHashCode(), this._side.GetHashCode());

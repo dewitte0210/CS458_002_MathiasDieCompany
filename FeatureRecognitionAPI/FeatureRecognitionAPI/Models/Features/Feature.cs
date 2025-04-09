@@ -1131,7 +1131,7 @@ public class Feature
         if (FeatureType is not (PossibleFeatureTypes.Group1A1 or PossibleFeatureTypes.Group1A2)) return;
         
         // copy of base entity list with just lines
-        List<Line> lineList = GetLinesFromEntityList(baseEntityList).ToList();
+        List<Line> lineList = GetLinesFromEntityList(EntityList).ToList();
         List<Line> possibleChamferList = GetPossibleChamfers(GetOrderedLines(lineList));
         
         if (lineList.Count < 3) return;
