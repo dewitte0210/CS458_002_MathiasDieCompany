@@ -1,21 +1,18 @@
-import React from "react";
-import styles from "./PricingConfig.module.css"
-
+import React, {useState} from "react";
+import ConfigBar from "./ConfigBar.jsx";
+import FeatureConfig from "./FeatureConfig.jsx";
+import PunchConfig from "./PunchConfig.jsx";
+import RulesConfig from "./RulesConfig.jsx";
 
 export default function PricingConfig(props) {
-    
+    const [activeSection, setActiveSection] = useState("features");
     
     return (
-        <div className={styles["nav-bar"]}>
-            <div className={styles["nav-items"]}>
-                Feature Configuration
-            </div>
-            <div className={styles["nav-items"]}>
-                Punch Configuration
-            </div>
-            <div className={styles["nav-items"]}>
-                Rules configuration
-            </div>
+        <div>
+            <ConfigBar setActiveSection={setActiveSection} />
+            {activeSection === "features" && (<FeatureConfig />)}
+            {activeSection === "punches" && (<PunchConfig />)}
+            {activeSection === "rules" && (<RulesConfig />)}
         </div>
     );
 }

@@ -1,0 +1,25 @@
+.navBar {
+    background-color: #262262;
+    border-bottom-color: #131131;
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
+}
+
+.navItems {
+    color: white;
+    display: inline-block;
+    padding: 5px;
+    border-right-width: 2px;
+    border-right-color: #131131;
+    border-right-style: solid;
+    
+}
+
+.navText {
+    text-decoration: none;
+    color: inherit;
+}
+
+.navItems:hover{
+    background-color: #383383;
+}
