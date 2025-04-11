@@ -8,8 +8,7 @@ public interface IPricingDataService
 {
     PunchPriceReturn GetPunchPrices();
     List<FeaturePrice> GetFeaturePrices();
-    bool UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices);
-    bool UpdateFeaturePrice(List<FeaturePrice> prices);
-    bool deletePunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice);
-    bool AddPunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice);
+    Task<bool> UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices);
+    Task<bool> UpdateFeaturePrice(List<FeaturePrice> prices);
+    Task<bool> AddPunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice);
 }

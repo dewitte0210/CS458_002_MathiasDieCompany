@@ -11,12 +11,12 @@ using FromBody = System.Web.Http.FromBodyAttribute;
 
 namespace FeatureRecognitionAPI.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("api/Pricing")]
+    [Microsoft.AspNetCore.Mvc.Route("api/Pricing/[action]")]
     [ApiController]
     public class PricingController(IPricingService pricingService, IPricingDataService dataService)
         : ControllerBase
     {
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -42,7 +42,7 @@ namespace FeatureRecognitionAPI.Controllers
             }
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet("[action]")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -51,7 +51,7 @@ namespace FeatureRecognitionAPI.Controllers
             return Ok(dataService.GetFeaturePrices());
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet("[action]")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -60,7 +60,7 @@ namespace FeatureRecognitionAPI.Controllers
             return Ok(dataService.GetPunchPrices());
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("{type}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -74,34 +74,22 @@ namespace FeatureRecognitionAPI.Controllers
                 return BadRequest();
             }
 
-            bool success = dataService.UpdatePunchPrice(type, punches);
+            bool success = await dataService.UpdatePunchPrice(type, punches);
             return success ? Ok() : StatusCode(500);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateFeaturePrice([FromBody] List<FeaturePrice> features)
         {
             // type <= 7 is if a punch price was sent to the feature method
-            bool success = dataService.UpdateFeaturePrice(features);
+            bool success = await dataService.UpdateFeaturePrice(features);
             return success ? Ok() : StatusCode(500);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeletePunchPrice(PossibleFeatureTypes type, [FromBody] PunchPrice price)
-        {
-            if (type is PossibleFeatureTypes.Unknown or PossibleFeatureTypes.Punch
-                || (int)type >= 7) { return BadRequest(); }
-            bool success = dataService.deletePunchPrice(type, price);
-            return success ? Ok() : StatusCode(500);
-        }
-        
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("{type}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -109,7 +97,7 @@ namespace FeatureRecognitionAPI.Controllers
         {
             if (type is PossibleFeatureTypes.Unknown or PossibleFeatureTypes.Punch
                 || (int)type >= 7) { return BadRequest(); }
-            bool success = dataService.AddPunchPrice(type, price);
+            bool success = await dataService.AddPunchPrice(type, price);
             return success ? Ok() : StatusCode(500);
         }
     }

@@ -7,20 +7,21 @@ namespace FeatureRecognitionAPI.Services;
 
 public class PricingDataService : IPricingDataService
 {
-    private readonly string FEATURE_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "FeaturePrices.json");
-    private readonly string TUBE_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "TubePunchPrices.json");
-    private readonly string SO_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "SoPunchPrices.json");
-    private readonly string HDSO_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "HdsoPunchPrices.json");
-    private readonly string FT_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "FtPunchPrices.json");
-    private readonly string SW_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "SwPunchPrices.json");
-    private readonly string RETRACT_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData", "RetractPrices.json");
+    private static readonly string BASE_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData");
+    private readonly string FEATURE_PATH = Path.Combine(BASE_PATH, "FeaturePrices.json");
+    private readonly string TUBE_PATH = Path.Combine(BASE_PATH, "TubePunchPrices.json");
+    private readonly string SO_PATH = Path.Combine(BASE_PATH, "SoPunchPrices.json");
+    private readonly string HDSO_PATH = Path.Combine(BASE_PATH, "HdsoPunchPrices.json");
+    private readonly string FT_PATH = Path.Combine(BASE_PATH, "FtPunchPrices.json");
+    private readonly string SW_PATH = Path.Combine(BASE_PATH, "SwPunchPrices.json");
+    private readonly string RETRACT_PATH = Path.Combine(BASE_PATH, "RetractPrices.json");
     public List<PunchPrice> _tubePunchList { get; set; }
     public List<PunchPrice> _soPunchList { get; set; }
     public List<PunchPrice> _hdsoPunchList { get; set; }
     public List<PunchPrice> _ftPunchList { get; set; }
     public List<PunchPrice> _swPunchList { get; set; }
     public List<PunchPrice> _retractList { get; set; }
-    private readonly List<FeaturePrice> _featurePriceList;
+    public List<FeaturePrice> _featurePriceList { get; set; }
 
     public PricingDataService()
     {
@@ -72,47 +73,127 @@ public class PricingDataService : IPricingDataService
         };
     }
     
-    public bool UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices)
+    public async Task<bool> UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices)
     {
-        return false;
+        bool success = false;
+        switch (type)
+        {
+            case PossibleFeatureTypes.StdTubePunch:
+                _tubePunchList = prices;
+                success = await WriteToDBFile("TubePunchPrices", _tubePunchList);
+                break;
+            case PossibleFeatureTypes.SideOutlet:
+                _soPunchList = prices;
+                success = await WriteToDBFile("SoPunchPrices", _soPunchList);
+                break;
+            case PossibleFeatureTypes.HDSideOutlet:
+                _hdsoPunchList = prices;
+                success = await WriteToDBFile("HdsoPunchPrices", _hdsoPunchList);
+                break;
+            case PossibleFeatureTypes.StdFTPunch:
+                _ftPunchList = prices;
+                success = await WriteToDBFile("FtPunchPrices", _ftPunchList);
+                break;
+            case PossibleFeatureTypes.StdSWPunch:
+                _swPunchList = prices;
+                success = await WriteToDBFile("SwPunchPrices", _swPunchList);
+                break;
+            case PossibleFeatureTypes.StdRetractPins:
+                _retractList = prices;
+                success = await WriteToDBFile("RetractPrices", _retractList);
+                break;
+            default:
+                success = false;
+                break;
+        }
+        return success;
     }
 
-    public bool UpdateFeaturePrice(List<FeaturePrice> prices)
+    public async Task<bool> UpdateFeaturePrice(List<FeaturePrice> prices)
     {
-        return false;
+        _featurePriceList = prices;
+        bool success = await WriteToDBFile("FeaturePrices", _featurePriceList); 
+        return success;
     }
 
-    public bool deletePunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice)
+    public async Task<bool> AddPunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice)
     {
-        return false;
+        bool success = false;
+        switch (type)
+        {
+            case PossibleFeatureTypes.StdTubePunch:
+                _tubePunchList.Add(punchPrice);
+                success = await WriteToDBFile("TubePunchPrices", _tubePunchList);
+                break;
+            case PossibleFeatureTypes.SideOutlet:
+                _soPunchList.Add(punchPrice);
+                success = await WriteToDBFile("SoPunchPrices", _soPunchList);
+                break;
+            case PossibleFeatureTypes.HDSideOutlet:
+                _hdsoPunchList.Add(punchPrice);
+                success = await WriteToDBFile("HdsoPunchPrices", _hdsoPunchList);
+                break;
+            case PossibleFeatureTypes.StdFTPunch:
+                _ftPunchList.Add(punchPrice);
+                success = await WriteToDBFile("FtPunchPrices", _ftPunchList);
+                break;
+            case PossibleFeatureTypes.StdSWPunch:
+                _swPunchList.Add(punchPrice);
+                success = await WriteToDBFile("SwPunchPrices", _swPunchList);
+                break;
+            case PossibleFeatureTypes.StdRetractPins:
+                _retractList.Add(punchPrice);
+                success = await WriteToDBFile("RetractPrices", _retractList);
+                break;
+            default:
+                success = false; 
+                break;
+        }
+        return success;
     }
 
-    public bool AddPunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice)
-    {
-        return false;
-    }
-
-    public bool UpdatePunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice)
-    {
-        return false;
-    }
-
-    public bool UpdateFeaturePrice(PossibleFeatureTypes type, FeaturePrice featurePrice)
-    {
-        return false;
-    }
-    
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="path"></param>
+    /// <param name="fileName">filename without extenstion</param>
     /// <param name="obj"></param>
     /// <returns></returns>
-    private bool WriteToDBFile(string path, Object obj)
-    {   
-        StreamReader sr = new StreamReader(path);
-        string jsonCopy = sr.ReadToEnd();
-          
+    private async Task<bool> WriteToDBFile(string fileName, Object obj)
+    {
+        object writeLock = new(); 
+        try
+        {
+            lock (writeLock)
+            {
+                // Get current data and save it 
+                string path = Path.Combine(BASE_PATH, fileName + ".json");
+                var sr = new StreamReader(path);
+                string jsonCopy = sr.ReadToEnd();
+                sr.Close();
+                
+                // Backup current data
+                string backupPath = Path.Combine(BASE_PATH, fileName + "backup.json");
+                var backupWriter = new StreamWriter(backupPath);
+                Task backupTask = backupWriter.WriteLineAsync(jsonCopy);
+                
+                // Finally write new data to file
+                var fileWriter = new StreamWriter(path);
+                string toWrite = JsonConvert.SerializeObject(obj);
+                Task writeTask = fileWriter.WriteLineAsync(toWrite);
+
+                backupTask.Wait();
+                writeTask.Wait();
+                 
+                fileWriter.Close();
+                backupWriter.Close();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+            return false;
+        } 
         return true;
     }
 }
