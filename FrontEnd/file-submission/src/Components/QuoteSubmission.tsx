@@ -455,11 +455,15 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                             {feature.multipleRadius}
                                                         </td>
                                                         <td>
-                                                            {feature.kissCut ? (
-                                                                <span className="checkmark">&#10003;</span>
-                                                            ) : (
-                                                                <span className="crossmark">&#10005;</span>
-                                                            )}
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={feature.kissCut}
+                                                                onChange={(e) => handleChange(
+                                                                    "kissCut",
+                                                                    e.target.checked,
+                                                                    groupIndex,
+                                                                    featureIndex
+                                                                )}/>
                                                         </td>
                                                         <td>
                                                             <Button
