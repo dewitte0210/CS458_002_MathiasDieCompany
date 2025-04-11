@@ -17,10 +17,7 @@ using static FeatureRecognitionAPI.Models.Utility.Angles;
 public class Feature
 {
     [JsonProperty] public PossibleFeatureTypes FeatureType { get; set; }
-
-    // A list of all the perimeter features attached to these features.
-    [JsonProperty] public List<PerimeterFeatureTypes> PerimeterFeatures { get; set; }
-
+    
     [JsonProperty] public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty] public bool kissCut;
     [JsonProperty] public int multipleRadius;
@@ -79,7 +76,6 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
-        PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         CalcPerimeter();
     }
@@ -104,10 +100,9 @@ public class Feature
     // This got moved out so Initialization can be called after populating its EntityList
     public void ConstructFromEntityList()
     {
-        this.count = 1;
-        this.multipleRadius = 1;
-        this.baseEntityList = new(EntityList);
-        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
+        count = 1;
+        multipleRadius = 1;
+        baseEntityList = new(EntityList);
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
 
@@ -179,46 +174,23 @@ public class Feature
      */
     public void DetectFeatures()
     {
-        //check two conditions possible to make Group1B (with no perimeter features)
-        if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
+        // BASE SHAPE DETECTION:
+        if (!CheckGroup1B()
+            && !CheckGroup1C() 
+            && !CheckGroup6Base()
+            && !CheckGroup1A()
+            && !CheckGroup2A())
         {
-            FeatureType = type;
-        }
-        else if (CheckGroup1C(out type))
-        {
-            FeatureType = type;
-        }
-        else if (CheckGroup6Base())
-        {
-            FeatureType = PossibleFeatureTypes.Group6;
-        }
-        //check two conditions possible to make Group1A (with no perimeter features)
-        else if (numLines >= 4)
-        {
-            if (numArcs == 0)
-            {
-                FeatureType = PossibleFeatureTypes.Group1A1;
-            }
-            else FeatureType = PossibleFeatureTypes.Group1A2;
-        }
-        else if (CheckGroup2A(out type))
-        {
-            FeatureType = type;
-        }
-        else if (CheckGroup17())
-        {
-            FeatureType = PossibleFeatureTypes.Group17;
-        }
-        else
-        {
-            Console.WriteLine("Error: Cannot assign feature type.");
+            Console.WriteLine("Error: Cannot assign base feature type.");
+            FeatureType = PossibleFeatureTypes.Unknown;
         }
         
-        // Perimeter Feature Detection
+        // PERIMETER DETECTION:
         CheckGroup3();
         CheckGroup4();
         CheckGroup5();
         CheckGroup6Perimeter();
+        CheckGroup17();
             
         //calculate and set the perimeter of the feature
         CalcPerimeter();
@@ -227,7 +199,27 @@ public class Feature
         CheckMultipleRadius();
     }
 
+    #region BaseDetection
+    
+    #region Group1A
 
+    public bool CheckGroup1A()
+    {
+        if (numLines >= 4)
+        {
+            if (numArcs == 0)
+            {
+                FeatureType = PossibleFeatureTypes.Group1A1;
+                return true;
+            }
+            FeatureType = PossibleFeatureTypes.Group1A2;
+            return true;
+        }
+        return false;
+    }
+    
+    #endregion
+    
     #region Group1B
 
     /*
@@ -237,7 +229,7 @@ public class Feature
      * @Param type is used as a return value with the out keyword
      * @Return true if the type was detected
      */
-    internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
+    internal bool CheckGroup1B()
     {
         // Entity is just a circle
         if (numCircles == 1 && numLines == 0 && numArcs == 0)
@@ -245,18 +237,18 @@ public class Feature
             Circle c = baseEntityList[0] as Circle;
             if (c.Radius * 2 <= 1.75)
             {
-                type = PossibleFeatureTypes.Punch;
+                FeatureType = PossibleFeatureTypes.Punch;
             }
             else
             {
-                type = PossibleFeatureTypes.Group1B1;
+                FeatureType = PossibleFeatureTypes.Group1B1;
             }
 
             return true;
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if (numArcs == 2 && numLines == 2 && IsSubshapeRectangle())
+        if (numArcs == 2 && numLines == 2 && IsSubshapeRectangle())
         {
             if (DoAnglesAddTo360())
             {
@@ -295,14 +287,14 @@ public class Feature
 
                 if (!IsArcConcave(arc1, line) && !IsArcConcave(arc2, line))
                 {
-                    type = PossibleFeatureTypes.Group1B2;
+                    FeatureType = PossibleFeatureTypes.Group1B2;
                     return true;
                 }
             }
         }
 
         // set a dummy type and return false.
-        type = PossibleFeatureTypes.Punch;
+        FeatureType = PossibleFeatureTypes.Punch;
         return false;
     }
 
@@ -310,38 +302,27 @@ public class Feature
 
     #region Group1C
 
-    public bool CheckGroup1C(out PossibleFeatureTypes type)
+    public bool CheckGroup1C()
     {
-        //Use local variables for lines cirlces arcs and elipses
-        int lines, circles, arcs, elipses;
-
-        //gives the count of lines arcs circles and elipses
-        CountEntities(baseEntityList, out lines, out arcs, out circles, out elipses);
-
         //Triange base shape needs 3 lines
-        if (lines != 3)
+        if (numLines != 3)
         {
-            type = PossibleFeatureTypes.Unknown;
             return false;
         }
         
         // TODO: This is wrong
         //If there are 3 lines and zero arcs then it should be a triangle
-        else if (arcs == 0)
+        if (numArcs == 0)
         {
-            type = PossibleFeatureTypes.Group1C;
-            this.FeatureType = PossibleFeatureTypes.Group1C;
+            FeatureType = PossibleFeatureTypes.Group1C;
             return true;
         }
-        else if (arcs > 3)
+        if (numArcs > 3)
         {
-            type = PossibleFeatureTypes.Unknown;
             return false;
         }
         //At this point arcs is between 1-3 and lines = 3
-        else
-        {
-            switch (arcs)
+            switch (numArcs)
             {
                 case 1:
                     {
@@ -372,24 +353,21 @@ public class Feature
                             }
                         }
 
-                            if (eIndex == 2)
-                            {
-                                break;
-                            }
+                        if (eIndex == 2)
+                        {
+                            break;
                         }
+                    }
 
                     if (touchingArc[0] is Line && touchingArc[1] is Line)
                     {
                         if (!Entity.IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
                         {
-                            type = PossibleFeatureTypes.Group1C;
-                            this.FeatureType = PossibleFeatureTypes.Group1C;
+                            FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
                         }
                     }
-
-                        type = PossibleFeatureTypes.Unknown;
-                        return false;
+                    return false;
                     }
                 case 2:
                     {
@@ -437,12 +415,9 @@ public class Feature
 
                         if (touchingArc[0] is Line && touchingArc[1] is Line)
                         {
-                            type = PossibleFeatureTypes.Group1C;
-                            this.FeatureType = PossibleFeatureTypes.Group1C;
+                            FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
                         }
-
-                        type = PossibleFeatureTypes.Unknown;
                         return false;
                     }
                 case 3:
@@ -502,29 +477,25 @@ public class Feature
                         {
                             if (entity is Arc)
                             {
-                                type = PossibleFeatureTypes.Unknown;
                                 return false;
                             }
                         }
 
-                        this.FeatureType = PossibleFeatureTypes.Group1C;
-                        type = PossibleFeatureTypes.Group1C;
+                        FeatureType = PossibleFeatureTypes.Group1C;
                         return true;
                     }
                 default:
-                    type = PossibleFeatureTypes.Unknown;
                     return false;
             }
         }
 
         //If somehow there is no decision made by this point then there is an error
-    }
 
     #endregion
 
     #region Group2A
 
-    internal bool CheckGroup2A(out PossibleFeatureTypes type)
+    internal bool CheckGroup2A()
     {
         if ((numArcs >= 2 || numEllipses >= 2) && numCircles == 0)
         {
@@ -535,7 +506,7 @@ public class Feature
                 {
                     if (IsEllipse())
                     {
-                        type = PossibleFeatureTypes.Group2A1;
+                        FeatureType = PossibleFeatureTypes.Group2A1;
                         return true;
                     }
                 }
@@ -545,7 +516,7 @@ public class Feature
             {
                 if (IsBowtie() && IsSubshapeRectangle())
                 {
-                    type = PossibleFeatureTypes.Group2A2;
+                    FeatureType = PossibleFeatureTypes.Group2A2;
                     return true;
                 }
             }
@@ -555,12 +526,12 @@ public class Feature
         {
             if ((baseEntityList[0] as Ellipse).IsFullEllipse)
             {
-                type = PossibleFeatureTypes.Group2A1;
+                FeatureType = PossibleFeatureTypes.Group2A1;
                 return true;
             }
         }
 
-        type = PossibleFeatureTypes.Punch;
+        FeatureType = PossibleFeatureTypes.Punch;
         return false;
     }
 
@@ -944,7 +915,10 @@ public class Feature
 
     #endregion
 
+    #endregion
 
+    #region PerimeterDetection
+    
     #region Group3
 
     /*  chamfered corner detection
@@ -1094,25 +1068,15 @@ public class Feature
      */
     public void CheckGroup4()
     {
-        if (numLines != 2 || (numArcs != 2 && numArcs != 0))
-        {
-            return;
-        }
-
         foreach (Feature feature in PerimeterFeatureList)
         {
-            Line tempLine = null;
-            foreach (Entity entity in feature.EntityList)
+            if (!(feature.numLines != 2 || (feature.numArcs != 2 && feature.numArcs != 0)))
             {
-                if (entity is Line && tempLine == null)
+                foreach (Entity entity in feature.EntityList)
                 {
-                    tempLine = (entity as Line);
-                }
-                else if (entity is Line)
-                {
-                    if (tempLine.DoesIntersect(entity))
+                    if (entity is Line tempLine && tempLine.DoesIntersect(entity))
                     {
-                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);
+                        feature.FeatureType = PossibleFeatureTypes.Group4;
                     }
                 }
             }
@@ -1127,22 +1091,24 @@ public class Feature
     /// </summary>
     internal void CheckGroup5()
     {
-        if (numLines < 2 || numLines > 3 || numCircles != 0 || numArcs > 2)
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return;
-        }
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
+            if (!(feature is not { numLines: 2, numArcs: 1 } && feature is not { numLines: 3, numArcs: 0 or 2 }))
             {
-                return;
-            }
-        }
+                bool con = true;
+                foreach (Entity entity in feature.EntityList)
+                {
+                    if (entity is Arc arc && (arc.CentralAngle != 90 && arc.CentralAngle != 180))
+                    {
+                        con = false;
+                    }
+                }
 
-        if (HasTwoParalellLine(EntityList))
-        {
-            PerimeterFeatures.Add(PerimeterFeatureTypes.Group5); 
+                if (con && HasTwoParalellLine(feature.EntityList))
+                {
+                    feature.FeatureType = PossibleFeatureTypes.Group5;
+                }
+            }
         }
     }
 
@@ -1154,22 +1120,24 @@ public class Feature
     /// </summary>
     internal void CheckGroup6Perimeter()
     {
-        if (numLines < 2 || numCircles != 0 || numArcs < 2 || numArcs > 4)
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return;
-        }
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
+            if (!(feature.numLines < 2 || feature.numCircles != 0 || feature.numArcs < 3 || feature.numArcs > 4))
             {
-                return;
-            }
-        }
+                bool con = true;
+                foreach (Entity entity in feature.EntityList)
+                {
+                    if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
+                    {
+                        con = false;
+                    }
+                }
 
-        if (HasTwoParalellLine(EntityList))
-        {
-            PerimeterFeatures.Add(PerimeterFeatureTypes.Group6); 
+                if (con && HasTwoParalellLine(feature.EntityList))
+                {
+                    feature.FeatureType = PossibleFeatureTypes.Group6;
+                }
+            }
         }
     }
 
@@ -1182,26 +1150,33 @@ public class Feature
      *
      * @return True if it is Group 17, false if not
      */
-    internal bool CheckGroup17()
+    internal void CheckGroup17()
     {
-        if (numLines != 2 || numCircles != 0 || numArcs != 1)
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return false;
-        }
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity is Arc && ((entity as Arc).CentralAngle <= 180))
+            if (!(feature.numLines != 2 || numCircles != 0 || numArcs != 1))
             {
-                return false;
+                bool con = true;
+                foreach (Entity entity in feature.EntityList)
+                {
+                    if (entity is Arc arc && WithinTolerance(arc.CentralAngle, 180))
+                    {
+                        con = false;
+                    }
+                }
+
+                if (con)
+                {
+                    feature.FeatureType = PossibleFeatureTypes.Group17;
+                }
             }
         }
-
-        return true;
     }
 
     #endregion
 
+    #endregion
+    
     #endregion
 
     #region OverrideFunctions

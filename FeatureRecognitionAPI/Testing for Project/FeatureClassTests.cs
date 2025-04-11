@@ -60,7 +60,7 @@ namespace Testing_for_Project
 
             Feature feature = new Feature(entities);
             PossibleFeatureTypes test;
-            bool isTriangle = feature.CheckGroup1C(out test);
+            bool isTriangle = feature.CheckGroup1C();
 
             Assert.That(isTriangle, Is.True);
         }
@@ -76,13 +76,13 @@ namespace Testing_for_Project
 
             Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 });
             PossibleFeatureTypes test;
-            bool squareCheck = square.CheckGroup1C(out test);
+            bool squareCheck = square.CheckGroup1C();
 
             //Circle
             Circle circle1 = new(1, 1, 4.5);
 
             Feature circle = new Feature(new List<Entity>() { circle1 });
-            bool circleCheck = circle.CheckGroup1C(out test);
+            bool circleCheck = circle.CheckGroup1C();
 
             //3 Arcs + 3 lines that are not triangle
             Line line5 = new(1, 1, 1, 4);
@@ -94,7 +94,7 @@ namespace Testing_for_Project
 
 
             Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6, line7, arc1, arc2, arc3 });
-            bool fakeCheck = fakeTriangle.CheckGroup1C(out test);
+            bool fakeCheck = fakeTriangle.CheckGroup1C();
             //Assert all are expected
 
             Assert.That(squareCheck, Is.False);
@@ -122,7 +122,7 @@ namespace Testing_for_Project
             Feature baseShape = fList[1];
 
             PossibleFeatureTypes pType;
-            Assert.IsTrue(baseShape.CheckGroup1C(out pType));
+            Assert.IsTrue(baseShape.CheckGroup1C());
 
         }
 
@@ -433,7 +433,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2, line3 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
 
         [Test]
@@ -445,7 +445,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
 
         [Test]
@@ -459,7 +459,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
         #endregion
 
@@ -472,7 +472,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
 
         [Test]
@@ -486,7 +486,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { arc1, line1, line2, arc2 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
 
         [Test]
@@ -497,7 +497,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity> { line1, line2 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
         #endregion
         #region CheckGroup6
@@ -515,7 +515,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, arc4, line1, line2, line3 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group6));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group6));
         }
 
         [Test]
@@ -529,7 +529,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, line1, line2 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group6));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group6));
         }
 
         [Test]
@@ -543,7 +543,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
             Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.Not.EqualTo(PossibleFeatureTypes.Group6));
         }
         #endregion
 
