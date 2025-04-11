@@ -1,9 +1,19 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
+import PunchTable from "./PunchTable.jsx";
 
 
 export default function PunchConfig() {
     const [activePunchSection, setActivePunchSection] = useState("SO");
-    
+    const [punchData, setPunchData] = useState({});
+    useEffect(() => {
+        async function loadPunchData() {
+            const apiData = await fetch(`${process.env.REACT_APP_API_BASEURL}api/Pricing/GetPunchPrices`)
+            const data = await apiData.json();
+            console.log(data)
+            setPunchData(data)
+        }
+        loadPunchData();
+    }, [])
     const punchTypes = {
         textDecoration: 'none',
         color: '#e0e0e0'
@@ -15,8 +25,9 @@ export default function PunchConfig() {
         backgroundColor: '#606060',
         width: 'fit-content',
         padding: '5px',
-        height: '100vh'
+        height: '94vh'
     }
+    
     const contentDiv = {
         padding: '5px'
     }
@@ -86,34 +97,41 @@ export default function PunchConfig() {
                     </div>
                 </a>
             </div>
+            
             {activePunchSection === "SO" && (
                 <div style={contentDiv}>
                     Side Outlet Punches
+                    <PunchTable tableData={punchData?.soPunchList} />
                 </div>
             )}
             {activePunchSection === "FT" && (
                 <div style={contentDiv}>
                     Feed Through Punches
+                    <PunchTable tableData={punchData?.ftPunchList} />
                 </div>
             )}
             {activePunchSection === "SW" && (
                 <div style={contentDiv}>
                     Side Wall Punches
+                    <PunchTable tableData={punchData?.swPunchList} />
                 </div>
             )}
             {activePunchSection === "Tube" && (
                 <div style={contentDiv}>
                     Tube Punches
+                    <PunchTable tableData={punchData?.tubePunchList} />
                 </div>
             )}
             {activePunchSection === "HDSO" && (
                 <div style={contentDiv}>
                     Heavy Duty Side Outlet Punches
+                    <PunchTable tableData={punchData?.hdsoPunchList} />
                 </div>
             )}
             {activePunchSection === "STD" && (
                 <div style={contentDiv}>
                     Standard retractable Pins
+                    <PunchTable tableData={punchData?.retractList} />
                 </div>
             )}
             
