@@ -1154,7 +1154,7 @@ public class Feature
     {
         foreach (Feature feature in PerimeterFeatureList)
         {
-            if (!(feature.numLines != 2 || numCircles != 0 || numArcs != 1))
+            if (!(feature.numLines != 2 || feature.numCircles != 0 || feature.numArcs != 1))
             {
                 bool con = true;
                 foreach (Entity entity in feature.EntityList)
