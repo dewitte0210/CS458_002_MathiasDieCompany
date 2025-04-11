@@ -500,6 +500,7 @@ namespace Testing_for_Project
             Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
         }
         #endregion
+
         #region CheckGroup6
 
         [Test]
@@ -544,6 +545,49 @@ namespace Testing_for_Project
             Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6));
+        }
+        #endregion
+
+        #region CheckGroup10
+        [Test]
+        public void CheckGroup10_ReturnsTrue()
+        {
+            Line line1a = new Line(3, 5, 3, 6);
+            Line line1b = new Line(3, 1, 3, 0);
+            Arc arc1a = new Arc(3, 3, 2, 270, 90);
+            Arc arc1b = new Arc(3, 3, 3, 270, 90);
+            List<Entity> entities1 = new List<Entity>() { line1a, line1b, arc1a, arc1b };
+            Feature feature1 = new(entities1) { baseEntityList = entities1 };
+            feature1.DetectFeatures();
+
+            Line line2a = new Line(3, 5, 3, 6);
+            Line line2b = new Line(0, 3, 1, 3);
+            Arc arc2a = new Arc(3, 3, 2, 180, 90);
+            Arc arc2b = new Arc(3, 3, 3, 180, 90);
+            List<Entity> entities2 = new List<Entity>() { line2a, line2b, arc2a, arc2b };
+            Feature feature2 = new(entities2) { baseEntityList = entities2 };
+            feature2.DetectFeatures();
+
+            Line line3a = new Line(0, 3, 1, 3);
+            Line line3b = new Line(3, 1, 3, 0);
+            Arc arc3a = new Arc(3, 3, 2, 270, 180);
+            Arc arc3b = new Arc(3, 3, 3, 270, 180);
+            List<Entity> entities3 = new List<Entity>() { line3a, line3b, arc3a, arc3b };
+            Feature feature3 = new(entities3) { baseEntityList = entities3 };
+            feature3.DetectFeatures();
+
+            Line line4a = new Line(0, 3, 1, 3);
+            Line line4b = new Line(5, 3, 6, 3);
+            Arc arc4a = new Arc(3, 3, 2, 0, 180);
+            Arc arc4b = new Arc(3, 3, 3, 0, 180);
+            List<Entity> entities4 = new List<Entity>() { line4a, line4b, arc4a, arc4b };
+            Feature feature4 = new(entities4) { baseEntityList = entities4 };
+            feature4.DetectFeatures();
+
+            Assert.That(feature1.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
+            Assert.That(feature2.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
+            Assert.That(feature3.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
+            Assert.That(feature4.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
         }
         #endregion
 
