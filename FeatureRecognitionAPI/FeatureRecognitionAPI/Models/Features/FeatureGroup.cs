@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using FeatureRecognitionAPI.Models.Entities;
+using FeatureRecognitionAPI.Models.Enums;
+using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features
 {
@@ -33,20 +35,52 @@ namespace FeatureRecognitionAPI.Models.Features
                 features[i].DetectFeatures();
                 if (features[i].PerimeterEntityList != null)
                 {
-                    for (int j = 0; j < features[i].PerimeterEntityList.Count(); j++)
+                    for (int j = 0; j < features[i].PerimeterEntityList.Count; j++)
                     {
-                        Feature newFeat = new Feature(features[i].PerimeterEntityList[j]);
+                        Feature newFeat = new(features[i].PerimeterEntityList[j]);
                         newFeat.DetectFeatures();
                         features.Add(newFeat);
                     }
                 }
             }
+                        
+            // todo: extend the two lines the chamfer was touching to clean up the shape
+            // todo: make so it works with more than one chamfer
+
+            // break out chamfers
+            foreach (Feature feature in features)
+            {
+                if (feature.ChamferList.Count <= 0) continue;
+
+                foreach (ChamferGroup cg in feature.ChamferList)
+                {
+                    features.Add(new Feature(PossibleFeatureTypes.Group3, [cg.Chamfer]));
+                    feature.EntityList.Remove(cg.Chamfer);
+                    feature.ExtendTwoLines(cg.LineA, cg.LineB);
+                    feature.ChamferList.Remove(cg);
+                }
+                
+                // foreach (Entity ent in feature.EntityList)
+                // {
+                //     //feature contains a chamfer so break it out
+                //     if (ent is Line { ChamferType: ChamferTypeEnum.Confirmed } line)
+                //     {
+                //         features.Add(new Feature(PossibleFeatureTypes.Group3, [line]));
+                //         feature.EntityList.Remove(ent);
+                //         
+                //         
+                //         
+                //
+                //         feature.NumChamfers--;
+                //     }
+                // }
+            }
 
 
             // Group identical features together
-            for (int i = 0; i < features.Count(); i++)
+            for (int i = 0; i < features.Count; i++)
             {
-                for (int j = i + 1; j < features.Count(); j++)
+                for (int j = i + 1; j < features.Count; j++)
                 {
                     if (features[i].Equals(features[j]))
                     {

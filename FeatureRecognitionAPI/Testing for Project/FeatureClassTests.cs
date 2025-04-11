@@ -316,14 +316,14 @@ namespace Testing_for_Project
             Line line1 = new Line(0, 0, 5, 0);
             Line line2 = new Line(5, 0, 5, 5);
             Line line3 = new Line(5, 5, 2, 5);
-            Line lineCham = new Line(2, 5, 0, 3);
+            Line lineChamfer = new Line(2, 5, 0, 3);
             Line line5 = new Line(0, 3, 0, 0);
-            List<Line> ll = [line1, line2, line3, lineCham, line5];
+            List<Line> ll = [line1, line2, line3, lineChamfer, line5];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(Feature.GetOrderedLines(ll));
+            List<Line> possibleChamList = Feature.SetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(1));
-            Assert.That(possibleChamList[0], Is.EqualTo(lineCham));
+            Assert.That(possibleChamList[0], Is.EqualTo(lineChamfer));
         }
         
         [Test]
@@ -341,7 +341,7 @@ namespace Testing_for_Project
             Line line6 = new Line(0, 3, 0, 0);
             List<Line> ll = [line1, line2, lineCham3, line4, lineCham5, line6];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(Feature.GetOrderedLines(ll));
+            List<Line> possibleChamList = Feature.SetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(3));
             Assert.Contains(lineCham3, possibleChamList);
@@ -367,7 +367,7 @@ namespace Testing_for_Project
             Line line8 = new Line(0, 2, 2, 0);
             List<Line> ll = [line1, line2, line3, line4, line5, line6, line7, line8];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(Feature.GetOrderedLines(ll));
+            List<Line> possibleChamList = Feature.SetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(8));
             Assert.Contains(line1, possibleChamList);

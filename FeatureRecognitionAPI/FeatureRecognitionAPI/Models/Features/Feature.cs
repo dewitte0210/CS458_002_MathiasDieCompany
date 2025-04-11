@@ -7,6 +7,7 @@
  */
 
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
@@ -28,7 +29,8 @@ public class Feature
     [JsonProperty] public double perimeter;
     [JsonProperty] public double diameter;
     [JsonProperty] public int count;
-    [JsonProperty] public int NumChamfers = 0;
+    //[JsonProperty] public int NumChamfers = 0;
+    public List<ChamferGroup> ChamferList = new List<ChamferGroup>();
 
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -79,7 +81,7 @@ public class Feature
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
-        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
+        PerimeterFeatures = new List<PerimeterFeatureTypes>();
 
         CalcPerimeter();
     }
@@ -99,16 +101,28 @@ public class Feature
         ConstructFromEntityList();
     }
 
+    /// <summary>
+    /// create a feature when the feature type is known
+    /// </summary>
+    /// <param name="pft">PossibleFeatureType when known</param>
+    /// <param name="entityList">Entity list that makes up the feature</param>
+    public Feature(PossibleFeatureTypes pft, List<Entity> entityList)
+    {
+        FeatureType = pft;
+        EntityList = entityList;
+        ConstructFromEntityList();
+    }
+
     #endregion
 
     // This got moved out so Initialization can be called after populating its EntityList
     public void ConstructFromEntityList()
     {
-        this.count = 1;
-        this.multipleRadius = 1;
-        this.EntityList = EntityList;
-        this.baseEntityList = EntityList;
-        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
+        count = 1;
+        multipleRadius = 1;
+        EntityList = EntityList;
+        baseEntityList = EntityList;
+        PerimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
         PerimeterEntityList = new List<List<Entity>>();
 
@@ -216,7 +230,7 @@ public class Feature
         }
         
         // Perimeter Feature Detection
-        CheckGroup3();
+        FlagGroup3();
         CheckGroup4();
         CheckGroup5();
         CheckGroup6Perimeter();
@@ -945,6 +959,14 @@ public class Feature
     #endregion
 
 
+    /*  todo: break out chamfered lines from parent feature
+     *  remove chamfered line entity from parent feature and extend the lines
+     *  to make the parent shape clean
+     *
+     *  then we can make group 1 rectangle detection better and front end
+     *  will read the new chamfer feature
+     */
+    
     #region Group3
 
     /*  chamfered corner detection
@@ -1088,9 +1110,9 @@ public class Feature
     /// <param name="orderedLineList"> list of lines, possible chamfers in this list
     /// will be flagged as such</param>
     /// <returns>list of lines where each line has a chamfer type of possible</returns>
-    internal static List<Line> GetPossibleChamfers(List<List<Line>> orderedLineList)
+    internal void SetPossibleChamfers(List<List<Line>> orderedLineList)
     {
-        List<Line> possibleChamferList = [];
+        //List<Line> possibleChamferList = [];
 
         foreach (List<Line> lineGroup in orderedLineList)
         {
@@ -1113,63 +1135,70 @@ public class Feature
                     if ((angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
                         || (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360))
                     {
-                        lineB.ChamferType = ChamferTypeEnum.Possible;
-                        possibleChamferList.Add(lineB);                            
+                        ChamferList.Add(new ChamferGroup(lineA, lineB, lineC));
+                        //lineB.ChamferType = ChamferTypeEnum.Possible;
+                        //possibleChamferList.Add(lineB);                            
                     }
                 }
             }
         }
-        return possibleChamferList;
+        //return possibleChamferList;
     }
 
-    private void CheckGroup3()
+    private void FlagGroup3()
     {
         if (FeatureType is not (PossibleFeatureTypes.Group1A1 or PossibleFeatureTypes.Group1A2)) return;
         
         // copy of base entity list with just lines
         List<Line> lineList = GetLinesFromEntityList(EntityList).ToList();
-        List<Line> possibleChamferList = GetPossibleChamfers(GetOrderedLines(lineList));
+        //List<Line> possibleChamferList = SetPossibleChamfers(GetOrderedLines(lineList));
+        SetPossibleChamfers(GetOrderedLines(lineList));
         
         if (lineList.Count < 3) return;
-        switch (possibleChamferList.Count)
+        switch (ChamferList.Count)
         {
             case <= 0:
                 return;
             // check potential chamfers
             // if only one chamfer, it is confirmed to be a chamfer
             case 1:
-                possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
+                //possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
+                ChamferList[0].Confirmed = true;
                 break;
             // if 2 to 3 chamfers, only confirm if a parallel line to it
             // is also possible/confirmed chamfers
             case >= 2 and <= 3:
             {
                 bool hasParallelChamfer = false;
-                foreach (Line possibleChamfer in possibleChamferList)
+                //foreach (Line possibleChamfer in possibleChamferList)
+                foreach (ChamferGroup chamferGroup in ChamferList)
                 {
                     foreach (Line line in lineList)
                     {
                         // ignore same line
-                        if (possibleChamfer.Equals(line))
+                        if (chamferGroup.Chamfer.Equals(line))
                         {
                             continue;
                         }
                     
-                        if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                        if (IsParallel(chamferGroup.Chamfer, line) && line.ChamferType != ChamferTypeEnum.None)
                         {
                             hasParallelChamfer = true;
                         }
                     }
                     if (!hasParallelChamfer)
                     {
-                        possibleChamferList.Remove(possibleChamfer);
+                        //possibleChamferList.Remove(possibleChamfer);
+                        ChamferList.Remove(chamferGroup);
                         break;
                     }
                 }
                 // remaining possible chamfers meet above case so confirm
-                foreach (Line line in possibleChamferList)
+                //foreach (Line line in possibleChamferList)
+                foreach (ChamferGroup chamferGroup in ChamferList)
                 {
-                    line.ChamferType = ChamferTypeEnum.Confirmed;
+                    //line.ChamferType = ChamferTypeEnum.Confirmed;
+                    chamferGroup.Confirmed = true;
                 }
                 break;
             }
@@ -1178,22 +1207,23 @@ public class Feature
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
         // TODO: implement better check for octagon problem, perhaps with frontend
-        NumChamfers = possibleChamferList.Count > 4 ? possibleChamferList.Count / 2 : possibleChamferList.Count;
+        //NumChamfers = possibleChamferList.Count > 4 ? possibleChamferList.Count / 2 : possibleChamferList.Count;
 
         //update base entity list based on found possible chamfers
-        foreach (Line possibleChamfer in possibleChamferList)
-        {
-            foreach (Entity entity in baseEntityList)
-            {
-                if (entity is Line line)
-                {
-                    if (line.Equals(possibleChamfer) || line.Equals(possibleChamfer.swapStartEnd()))
-                    {
-                        line.ChamferType = possibleChamfer.ChamferType;
-                    }
-                }
-            }            
-        }
+        //foreach (Line possibleChamfer in possibleChamferList)
+        // foreach (ChamferGroup chamferGroup in ChamferList)
+        // {
+        //     foreach (Entity entity in baseEntityList)
+        //     {
+        //         if (entity is Line line)
+        //         {
+        //             if (line.Equals(chamferGroup.Chamfer) || line.Equals(chamferGroup.Chamfer.swapStartEnd()))
+        //             {
+        //                 line.ChamferType = possibleChamfer.ChamferType;
+        //             }
+        //         }
+        //     }            
+        // }
     }
 
     #endregion
@@ -1483,22 +1513,17 @@ public class Feature
      * @Return true if successfully extended. Could be false if the two lines don't have an intersect point,
      * aren't the same infinite line, or already touch
      */
-    private bool ExtendTwoLines(Line line1, Line line2)
+    public bool ExtendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2))
-            //makes sure you're not extending lines that already touch
-        {
-            if (line1.isSameInfiniteLine(line2))
-            {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
-                ExtendedEntityList.Remove(line1);
-                ExtendedEntityList.Remove(line2);
-                ExtendedEntityList.Add(tempLine);
-                return true; // extended two parallel lines into 1
-            }
-        }
+        //makes sure you're not extending lines that already touch
+        if (line1.DoesIntersect(line2)) return false;
 
-        return false;
+        if (!line1.isSameInfiniteLine(line2)) return false;
+        ExtendedLine tempLine = new(line1, line2); // makes a new extended line object     
+        ExtendedEntityList.Remove(line1);
+        ExtendedEntityList.Remove(line2);
+        ExtendedEntityList.Add(tempLine);
+        return true; // extended two parallel lines into 1
     }
 
     #endregion
