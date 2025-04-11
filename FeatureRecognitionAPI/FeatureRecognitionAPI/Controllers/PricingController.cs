@@ -82,16 +82,10 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateFeaturePrice(PossibleFeatureTypes type,
-            [FromBody] List<FeaturePrice> features)
+        public async Task<ActionResult> UpdateFeaturePrice([FromBody] List<FeaturePrice> features)
         {
             // type <= 7 is if a punch price was sent to the feature method
-            if (type is PossibleFeatureTypes.Unknown || (int)type <= 7)
-            {
-                return BadRequest();
-            }
-
-            bool success = dataService.UpdateFeaturePrice(type, features);
+            bool success = dataService.UpdateFeaturePrice(features);
             return success ? Ok() : StatusCode(500);
         }
 
