@@ -55,20 +55,17 @@ namespace FeatureRecognitionAPI.Services
          * Supported file types: .dxf, .dwg
          *
          * @param file The uploaded file as an IFormFile object.
-         * @return A tuple containing:
-         *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
-         *   - string: The resulting JSON string if successful; null otherwise.
+         * @return 
+         *   - string: The resulting JSON string if successful;
          *
          * Note: PDF support is currently commented out and will be implemented in the future.
          *
-         * Exceptions:
-         * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
          */
         public async Task<string?> UploadFile(IFormFile file)
         {
-            var (status, ext) = await GetFileExtension(file.FileName);
+            string? ext = Path.GetExtension(file.FileName);
 
-            if (status != OperationStatus.OK || ext == null)
+            if (ext == null)
             {
                 //TODO: better exception here
                 throw new Exception("Error detecting file extension");

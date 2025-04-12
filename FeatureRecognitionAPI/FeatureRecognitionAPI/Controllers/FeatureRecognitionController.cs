@@ -16,20 +16,6 @@ namespace FeatureRecognitionAPI.Controllers
             _featureRecognitionService = featureRecognitionService;
         }
 
-        [HttpGet("getFileExtension", Name = nameof(GetFileExtension))]
-        public async Task<IActionResult> GetFileExtension([FromQuery] string fileName)
-        {
-            if (fileName == null)
-                return BadRequest("File name cannot be null.");
-
-            var (status, ext) = await _featureRecognitionService.GetFileExtension(fileName);
-
-            if (status != OperationStatus.OK || ext == null)
-                return BadRequest("Error detecting file extension.");
-
-            return Ok(ext);
-        }
-
         [HttpPost("uploadFile", Name = nameof(UploadFile))]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
