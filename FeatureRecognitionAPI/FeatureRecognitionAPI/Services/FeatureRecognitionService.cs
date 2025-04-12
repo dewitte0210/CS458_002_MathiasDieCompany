@@ -32,8 +32,7 @@ namespace FeatureRecognitionAPI.Services
 
             if (ext == null)
             {
-                //TODO: better exception here
-                throw new Exception("Error detecting file extension");
+                throw new IOException("Error detecting file extension");
             }
 
 
@@ -51,7 +50,7 @@ namespace FeatureRecognitionAPI.Services
 
                         break;
                     default:
-                        throw new Exception("Invalid file extension: " + ext);
+                        throw new IOException("Invalid file extension: " + ext);
                 }
             }
 
