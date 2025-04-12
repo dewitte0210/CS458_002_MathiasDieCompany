@@ -206,6 +206,10 @@ public class Feature
         {
             FeatureType = type;
         }
+        else if (CheckGroup10(out type))
+        {
+            FeatureType = type;
+        }
         else if (CheckGroup17())
         {
             FeatureType = PossibleFeatureTypes.Group17;
@@ -524,6 +528,11 @@ public class Feature
 
     #region Group2A
 
+    /**
+     * Checks if a feature is Group 2A (elliptical features).
+     * 
+     * Returns the possible feature type.
+     */
     internal bool CheckGroup2A(out PossibleFeatureTypes type)
     {
         if ((numArcs >= 2 || numEllipses >= 2) && numCircles == 0)
@@ -693,7 +702,7 @@ public class Feature
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        double maxLength = Point.Distance(maxPoint, minPoint);
+        double maxLength = 2 * Point.Distance(maxPoint, minPoint);
         Line ray;
 
         int numIntersections = 0;
@@ -897,6 +906,104 @@ public class Feature
             return true;
         }
 
+        return false;
+    }
+
+    #endregion
+
+    #region Group10
+
+    /**
+     * Checks the feature to see if it is group 10.
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup10(out PossibleFeatureTypes type)
+    {
+        if (numLines == 2 && numArcs == 2)
+        {
+            // Fetch the lines and arcs
+            List<Line> lines = new List<Line>();
+            List<Arc> arcs = new List<Arc>();
+            for (int i = 0; i < baseEntityList.Count; i++)
+            {
+                if (baseEntityList[i] is Line) { lines.Add((Line)baseEntityList[i]); }
+                else if (baseEntityList[i] is Arc) { arcs.Add((Arc)baseEntityList[i]); }
+            }
+            // Find the bigger arc for correct end point orientation for math calcs
+            Arc biggerArc;
+            if (arcs[0].Radius > arcs[1].Radius)
+            {
+                biggerArc = arcs[0];
+            }
+            else
+            {
+                biggerArc = arcs[1];
+            }
+            // Flip end points for calc if they are touching the smaller arc
+            for (int i = 0; i < lines.Count; i++)
+            {
+                Point intersect = Entity.GetIntersectPoint(lines[i], biggerArc);
+                if (!lines[i].EndPoint.Equals(intersect))
+                {
+                    Point temp = lines[i].StartPoint;
+                    lines[i].StartPoint = lines[i].EndPoint;
+                    lines[i].EndPoint = temp;
+                }
+            }
+
+            // Runs only if the arcs start and end at the same angle
+            if (arcs[0].StartAngle.Equals(arcs[1].StartAngle) && arcs[0].EndAngle.Equals(arcs[1].EndAngle))
+            {
+                // Start and end angles stored in variables for readability
+                double startAngle = Math.Round(Angles.DegToRadians(arcs[0].StartAngle), 4);
+                double endAngle = Math.Round(Angles.DegToRadians(arcs[0].EndAngle), 4);
+                // Case 1: Both lines are vertical
+                if (Math.Round(lines[0].SlopeX, 4) == 0 && Math.Round(lines[1].SlopeX, 4) == 0)
+                {
+                    if (Math.Round(startAngle + endAngle, 4) == Math.Round(2 * Math.PI, 4))
+                    {
+                        type = PossibleFeatureTypes.Group10;
+                        return true;
+                    }
+                }
+                // Case 2: Only one is vertical
+                else if (Math.Round(lines[0].SlopeX, 4) == 0 || Math.Round(lines[1].SlopeX, 4) == 0)
+                {
+                    // Angle of line stored in variable for readability
+                    double lineAngle;
+                    if (Math.Round(lines[0].SlopeX, 4) == 0)
+                    {
+                        lineAngle = Math.Round(Math.Atan2(lines[1].EndPoint.Y - lines[1].StartPoint.Y, lines[1].EndPoint.X - lines[1].StartPoint.X), 4);
+                    }
+                    else
+                    {
+                        lineAngle = Math.Round(Math.Atan2(lines[0].EndPoint.Y - lines[0].StartPoint.Y, lines[0].EndPoint.X - lines[0].StartPoint.X), 4);
+                    }
+                    if (((startAngle == Math.Round(Math.PI / 2, 4) || endAngle == Math.Round(Math.PI / 2, 4))
+                        || (endAngle == Math.Round(3 * Math.PI / 2, 4) || startAngle == Math.Round(3 * Math.PI / 2, 4)))
+                        && (lineAngle == startAngle
+                        || lineAngle == endAngle))
+                    {
+                        type = PossibleFeatureTypes.Group10;
+                        return true;
+                    }
+                }
+                // Case 3: Lines are not vertical, can run Atan() function
+                else
+                {
+                    if ((Math.Round(Math.Atan2(lines[0].EndPoint.Y - lines[0].StartPoint.Y, lines[0].EndPoint.X - lines[0].StartPoint.X), 4) == startAngle
+                        || Math.Round(Math.Atan2(lines[0].EndPoint.Y - lines[0].StartPoint.Y, lines[0].EndPoint.X - lines[0].StartPoint.X), 4) == endAngle)
+                        && (Math.Round(Math.Atan2(lines[1].EndPoint.Y - lines[1].StartPoint.Y, lines[1].EndPoint.X - lines[1].StartPoint.X), 4) == startAngle
+                        || Math.Round(Math.Atan2(lines[1].EndPoint.Y - lines[1].StartPoint.Y, lines[1].EndPoint.X - lines[1].StartPoint.X), 4) == endAngle))
+                    {
+                        type = PossibleFeatureTypes.Group10;
+                        return true;
+                    }
+                }
+            }
+        }
+        type = PossibleFeatureTypes.Unknown;
         return false;
     }
 

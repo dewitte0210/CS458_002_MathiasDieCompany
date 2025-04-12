@@ -1,16 +1,24 @@
 using FeatureRecognitionAPI.Models.Enums;
 namespace FeatureRecognitionAPI.Models.Pricing;
 
-public class PunchPrice(double cutSize, double baseSize, double cost, double installCharge)
+public class PunchPrice
 {
-    public double CutSize {get; set;} = cutSize;
-    public double BaseSize { get; set; } = baseSize;
+    public PunchPrice()
+    {
+    }
 
-    // Marked as Cost in the VB6 app - Renamed for improved readability matching Riley's names
-    public double SetupCost { get; set; } = cost;
+    public PunchPrice(double cutSize, double baseSize, double cost, double installCharge)
+    {
+        CutSize = cutSize;
+        BaseSize = baseSize;
+        SetupCost = cost;
+        RunCost = installCharge;
+    }
 
-    // Marked as Install in the VB6 app
-    public double RunCost{ get; set; } = installCharge;
+    public double CutSize {get; set;} 
+    public double BaseSize { get; set; } 
+    public double SetupCost { get; set; }
+    public double RunCost{ get; set; }
 
     public static double PunchDiscount(PossibleFeatureTypes punchType, int count)
     {
