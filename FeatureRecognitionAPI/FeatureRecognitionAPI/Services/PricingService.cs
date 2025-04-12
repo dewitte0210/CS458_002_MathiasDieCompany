@@ -212,6 +212,5 @@ namespace FeatureRecognitionAPI.Services
                 _ => 1,
             };
         }
-       
-        }
+    }
 }
