@@ -23,8 +23,6 @@ namespace FeatureRecognitionAPI.Services
          * @return 
          *   - string: The resulting JSON string if successful;
          *
-         * Note: PDF support is currently commented out and will be implemented in the future.
-         *
          */
         public async Task<string?> UploadFile(IFormFile file)
         {
