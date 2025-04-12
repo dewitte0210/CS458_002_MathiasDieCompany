@@ -13,41 +13,6 @@ namespace FeatureRecognitionAPI.Services
         {
         }
 
-        public async Task<(OperationStatus, string?)> GetFileExtension(string fileName)
-        {
-            if (fileName != null)
-            {
-                string ext = "";
-                bool extBool = false;
-                for (int i = 0; i < fileName.Length; i++)
-                {
-                    if (fileName[i] == '.')
-                    {
-                        extBool = true;
-                    }
-
-                    if (extBool)
-                    {
-                        ext += char.ToLower(fileName[i]);
-                    }
-                }
-
-                switch (ext)
-                {
-                    case ".dxf":
-                        return (OperationStatus.OK, ext);
-                    case ".dwg":
-                        return (OperationStatus.OK, ext);
-                    default:
-                        Console.WriteLine("ERROR detecting file extension");
-                        return (OperationStatus.OK, null);
-                }
-            }
-
-            Console.WriteLine("ERROR File does not exist");
-            return (OperationStatus.OK, null);
-        }
-
         /*
          * Handles an uploaded file by performing feature detection based on its extension
          * and returning the results in JSON format for the frontend.
@@ -75,7 +40,7 @@ namespace FeatureRecognitionAPI.Services
             SupportedFile supportedFile;
             using (Stream stream = file.OpenReadStream())
             {
-                switch (ext)
+                switch (ext.ToLower())
                 {
                     case ".dxf":
                         supportedFile = new DXFFile(stream);
