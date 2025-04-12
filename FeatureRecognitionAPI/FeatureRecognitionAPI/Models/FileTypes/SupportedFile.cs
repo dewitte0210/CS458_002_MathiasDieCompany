@@ -348,6 +348,15 @@ namespace FeatureRecognitionAPI.Models
             
             foreach (ACadSharp.Entities.Entity entity in doc.Entities)
             {
+                if (entity is Spline)
+                {
+                    throw new NotImplementedException("Splines are not yet supported.");
+                }
+                if (entity is LwPolyline)
+                {
+                    throw new NotImplementedException("Polylines are not yet supported.");
+                }
+                
                 if (entity is Insert insert)
                 {
                     EntityList.AddRange(UnwrapInsert(insert));
