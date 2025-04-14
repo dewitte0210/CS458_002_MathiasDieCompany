@@ -180,7 +180,9 @@ public class Feature
             && !CheckGroup6Base()
             && !CheckGroup1A()
             && !CheckGroup2A()
-            && !CheckGroup10())
+            && !CheckGroup10()
+            && !CheckGroup11()
+            && !CheckGroup12())
         {
             Console.WriteLine("Error: Cannot assign base feature type.");
             FeatureType = PossibleFeatureTypes.Unknown;
@@ -968,6 +970,139 @@ public class Feature
                         FeatureType = PossibleFeatureTypes.Group10;
                         return true;
                     }
+                }
+            }
+        }
+        FeatureType = PossibleFeatureTypes.Unknown;
+        return false;
+    }
+
+    #endregion
+
+    #region Group11
+
+    /**
+     * Checks the feature to see if it is group 11.
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup11()
+    {
+        if (numEllipses == 0 && numCircles == 0)
+        {
+            // Case 1
+            if (numArcs == 2 && numLines == 0)
+            {
+                // Keeps track of the bigger/smaller arc for the concavity check
+                Arc bigArc = baseEntityList[0] as Arc;
+                int bigIndex = 0;
+                Arc smallArc = baseEntityList[1] as Arc;
+                int smallIndex = 1;
+                if (bigArc.Radius < smallArc.Radius)
+                {
+                    Arc temp = bigArc;
+                    bigArc = smallArc;
+                    bigIndex = 1;
+                    smallArc = temp;
+                    smallIndex = 0;
+                }
+                if (bigArc.Start.Equals(smallArc.Start) && bigArc.End.Equals(smallArc.End) && DetermineConcavity(bigArc, bigIndex) && !DetermineConcavity(smallArc, smallIndex))
+                {
+                    FeatureType = PossibleFeatureTypes.Group11;
+                    return true;
+                }
+            }
+            // Case 2
+            else if (numArcs == 1 && numLines == 1)
+            {
+                // Fetch arc and line
+                Arc arc1;
+                Line line1;
+                if (baseEntityList[0] is Arc)
+                {
+                    arc1 = (Arc)baseEntityList[0];
+                    line1 = (Line)baseEntityList[1];
+                }
+                else
+                {
+                    arc1 = (Arc)baseEntityList[1];
+                    line1 = (Line)baseEntityList[0];
+                }
+                // Check that end points connect
+                if ((line1.StartPoint.Equals(arc1.Start) || line1.EndPoint.Equals(arc1.Start))
+                    && (line1.StartPoint.Equals(arc1.End) || line1.EndPoint.Equals(arc1.End)))
+                {
+                    FeatureType = PossibleFeatureTypes.Group11;
+                    return true;
+                }
+            }
+            // Case 3
+            else if (numArcs == 3 && numLines == 1)
+            {
+                // Fetch arcs and line
+                // keeps track of index for concavity and endpoint checks
+                Arc bigArc = null;
+                int bigArcIndex = -1;
+                Arc side1 = null;
+                int side1Index = -1;
+                Arc side2 = null;
+                int side2Index = -1;
+                Line line1 = null;
+                for (int i = 0; i < baseEntityList.Count; i++)
+                {
+                    if (baseEntityList[i] is Arc)
+                    {
+                        if (bigArc is null)
+                        {
+                            bigArc = (Arc)baseEntityList[i];
+                            bigArcIndex = i;
+                        }
+                        else if (side1 is null)
+                        {
+                            side1 = (Arc)baseEntityList[i];
+                            side1Index = i;
+                        }
+                        else if (side2 is null)
+                        {
+                            side2 = (Arc)baseEntityList[i];
+                            side2Index = i;
+                        }
+                    }
+                    else
+                    {
+                        line1 = (Line)baseEntityList[i];
+                    }
+                }
+                // Swap the arcs to get the correct one under the correct label
+                Arc temp;
+                int tempIndex;
+                if (bigArc.Radius < side1.Radius)
+                {
+                    temp = bigArc;
+                    tempIndex = bigArcIndex;
+                    bigArc = side1;
+                    bigArcIndex = side1Index;
+                    side1 = temp;
+                    side1Index = tempIndex;
+                }
+                if (bigArc.Radius < side2.Radius)
+                {
+                    temp = bigArc;
+                    tempIndex = bigArcIndex;
+                    bigArc = side2;
+                    bigArcIndex = side2Index;
+                    side2 = temp;
+                    side2Index = tempIndex;
+                }
+                bool isSide1Convex = !DetermineConcavity(side1, side1Index);
+                bool isSide2Convex = !DetermineConcavity(side2, side2Index);
+                bool isBigArcConvex = !DetermineConcavity(bigArc, bigArcIndex);
+                if (isSide1Convex && isSide2Convex && isBigArcConvex
+                    && line1.EntityPointsAreTouching(side1) && line1.EntityPointsAreTouching(side2)
+                    && bigArc.EntityPointsAreTouching(side1) && bigArc.EntityPointsAreTouching(side2))
+                {
+                    FeatureType = PossibleFeatureTypes.Group11;
+                    return true;
                 }
             }
         }
