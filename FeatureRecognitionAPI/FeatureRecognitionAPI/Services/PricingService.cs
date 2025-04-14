@@ -13,16 +13,13 @@ namespace FeatureRecognitionAPI.Services
     public class PricingService : IPricingService
     {
         // Change these as necessary
-        private const double BASE_SHOP_RATE = 139.10;
-        
+        private double BaseShopRate = 139.10;
         // This only appears to be used for some sort of report calc that we are not doing
-        private const double DIE_CUTTING_SHOP_RATE = 126.45;
-        // Not entirely sure when this comes into play. Looks like it is involved in the final price calc 
-        private const double PLUG_RATE = 95.17;
+        private double DieCuttingShopRate = 126.45;
+        private double PlugRate = 95.17;
+        private double BASE = 60; 
+        private double DISCOUNT = 1;
         
-        //private const double BASE = 130; This is the main1 number
-        private const double BASE = 60; 
-        private const double DISCOUNT = 1;
         private readonly List<PunchPrice> _tubePunchList, _soPunchList, _hdsoPunchList,
             _ftPunchList, _swPunchList, _retractList;
         private readonly List<FeaturePrice> _featurePriceList;
@@ -39,6 +36,13 @@ namespace FeatureRecognitionAPI.Services
             _ftPunchList = punches.FtPunchList;
             _swPunchList = punches.SwPunchList;
             _retractList = punches.RetractList;
+            
+            RatesPrices rates = _dataService.GetRates();
+            BaseShopRate = rates.BaseShopRate;
+            DieCuttingShopRate = rates.DieCuttingShopRate;
+            PlugRate = rates.PlugRate;
+            BASE = rates.BasePrice;
+            DISCOUNT = rates.Discount;
         }
 
         public (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param)
@@ -96,8 +100,8 @@ namespace FeatureRecognitionAPI.Services
                     // If the current feature is a Punch featureData will be null, and we must use punch pricing rules
                     if (featureData != null)
                     {
-                        setupCost = featureData.SetupRate * BASE_SHOP_RATE;
-                        runCost = featureData.DifficultyFactor * BASE_SHOP_RATE * featureData.RunRate * featureData.Quantity;
+                        setupCost = featureData.SetupRate * BaseShopRate;
+                        runCost = featureData.DifficultyFactor * BaseShopRate * featureData.RunRate * featureData.Quantity;
                        
                         if (feature.MultipleRadius > 1)
                         {

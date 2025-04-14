@@ -15,6 +15,7 @@ public class PricingDataService : IPricingDataService
     private readonly string FT_PATH = Path.Combine(BASE_PATH, "FtPunchPrices.json");
     private readonly string SW_PATH = Path.Combine(BASE_PATH, "SwPunchPrices.json");
     private readonly string RETRACT_PATH = Path.Combine(BASE_PATH, "RetractPrices.json");
+    private readonly string RATES_PATH = Path.Combine(BASE_PATH, "BasePrices.json"); 
     public List<PunchPrice> _tubePunchList { get; set; }
     public List<PunchPrice> _soPunchList { get; set; }
     public List<PunchPrice> _hdsoPunchList { get; set; }
@@ -22,6 +23,8 @@ public class PricingDataService : IPricingDataService
     public List<PunchPrice> _swPunchList { get; set; }
     public List<PunchPrice> _retractList { get; set; }
     public List<FeaturePrice> _featurePriceList { get; set; }
+
+    private RatesPrices _ratesPrices { get; set; }
 
     public PricingDataService()
     {
@@ -32,7 +35,8 @@ public class PricingDataService : IPricingDataService
         var ftPunchReader = new StreamReader(FT_PATH);
         var swPunchReader = new StreamReader(SW_PATH);
         var retractReader = new StreamReader(RETRACT_PATH);
-       
+        var ratesReader = new StreamReader(RATES_PATH); 
+        
         string featureJson = featurePriceReader.ReadToEnd();
         string tubePunchJson = tubePunchReader.ReadToEnd();
         string soPunchJson = soPunchReader.ReadToEnd();
@@ -40,6 +44,7 @@ public class PricingDataService : IPricingDataService
         string ftPunchJson = ftPunchReader.ReadToEnd();
         string swPunchJson = swPunchReader.ReadToEnd();
         string retractJson = retractReader.ReadToEnd();
+        string ratesJson = ratesReader.ReadToEnd();
         
         _featurePriceList = JsonConvert.DeserializeObject<List<FeaturePrice>>(featureJson);
         _tubePunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(tubePunchJson); 
@@ -48,6 +53,7 @@ public class PricingDataService : IPricingDataService
         _ftPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(ftPunchJson);
         _swPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(swPunchJson);
         _retractList = JsonConvert.DeserializeObject<List<PunchPrice>>(retractJson);
+        _ratesPrices = JsonConvert.DeserializeObject<RatesPrices>(ratesJson);
         
         featurePriceReader.Close();
         tubePunchReader.Close();
@@ -56,10 +62,11 @@ public class PricingDataService : IPricingDataService
         ftPunchReader.Close();
         swPunchReader.Close();
         retractReader.Close();
+        ratesReader.Close();
     }
     
     public List<FeaturePrice> GetFeaturePrices(){ return _featurePriceList; }
-
+    public RatesPrices GetRates(){ return _ratesPrices; }
     public PunchPriceReturn GetPunchPrices()
     {
         return new PunchPriceReturn()
@@ -152,6 +159,12 @@ public class PricingDataService : IPricingDataService
         return success;
     }
 
+    public async Task<bool> UpdateRates(RatesPrices newRates)
+    {
+        _ratesPrices = newRates;
+         return await WriteToDBFile("BasePrices", _ratesPrices);
+    }
+    
     /// <summary>
     /// 
     /// </summary>
