@@ -5,6 +5,7 @@ import QuoteSubmission from "./QuoteSubmission";
 import ParentModal from "./SupportedFeaturesModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import VisualDisplay from "./VisualDisplay";
+import {translate} from "../translator";
 
 /*
   Defines the shape of the props that the UploadAndShow component accepts.
@@ -12,6 +13,7 @@ import VisualDisplay from "./VisualDisplay";
 interface UploadAndShowProps {
     onFilesSelected?: (files: File[]) => void;
 }
+
 
 /*
   Main component that handles drag-and-drop and file submission.

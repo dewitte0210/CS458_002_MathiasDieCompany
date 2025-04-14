@@ -142,7 +142,6 @@ namespace Testing_for_Project
             bool test2 = fg1.Equals(fg3);
             Assert.That(test1, Is.EqualTo(true));
             Assert.That(test2, Is.EqualTo(false));
-
         }
     }
 }
