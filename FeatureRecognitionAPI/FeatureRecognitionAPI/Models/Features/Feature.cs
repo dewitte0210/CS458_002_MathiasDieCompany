@@ -1480,17 +1480,13 @@ public class Feature
      */
     public bool SeperateBaseEntities()
     {
-        if (ExtendedEntityList[0] is Circle) // case where the feature contains a circle
+        if (ExtendedEntityList[0] is Circle or Ellipse) // case where the feature contains a circle
         {
             if (ExtendedEntityList.Count == 1 && baseEntityList.Count == 0) // it should be the only entity in the list
             {
-                baseEntityList.Add((Circle)ExtendedEntityList[0]); // adds the circle to the baseEntityList
+                baseEntityList.Add(ExtendedEntityList[0]); // adds the circle to the baseEntityList
                 return true;
             }
-            else
-            {
-                return false;
-            } // means that it contains a circle but is not the only entity
         }
 
         // lists to pass to the helper function

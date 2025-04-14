@@ -478,7 +478,6 @@ namespace Testing_for_Project
         [Test]
         public void CheckGroup4_2Arc2Line_ReturnsTrue()
         {
-
             Arc arc1 = new(0.0, 3.0, 2, 0, 90);
             Line line1 = new(1.0, 2.0, 1.0, 1.0);
             Line line2 = new(1.0, 1.0, 2.0, 1.0);
