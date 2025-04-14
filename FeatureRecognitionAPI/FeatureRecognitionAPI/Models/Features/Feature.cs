@@ -1146,6 +1146,40 @@ public class Feature
 
     #endregion
 
+    #region Group12
+
+    /**
+     * Checks the feature to see if it is group 12.
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup12()
+    {
+        if (numCircles == 0 && numEllipses == 0 && numLines == 2)
+        {
+            if (numArcs == 2)
+            {
+                if (IsSubshapeRectangle())
+                {
+                    FeatureType = PossibleFeatureTypes.Group12a;
+                    return true;
+                }
+            }
+            else if (numArcs == 0)
+            {
+                if (Angles.IsPerpendicular((Line)baseEntityList[0], (Line)baseEntityList[1]))
+                {
+                    FeatureType = PossibleFeatureTypes.Group12b;
+                    return true;
+                }
+            }
+        }
+        FeatureType = PossibleFeatureTypes.Unknown;
+        return false;
+    }
+
+    #endregion
+
     #region Group6base
 
     /*

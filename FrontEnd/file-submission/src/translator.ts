@@ -11,7 +11,9 @@
     "Group5" : "Mitered Notch",
     "Group6" : "Radius Notch",
     "Group10" : "C-Spacer",
-    "Group11" : "Pac-Man",
+    "Group11": "Pac-Man",
+    "Group12a": "Double D",
+    "Group12b": "Cross-Hair",
     "Group17" : "Freehand",
 };
 
