@@ -222,35 +222,35 @@ namespace Testing_for_Project
         [Test]
         public void IntersectLineWithEllipse_TwoIntersects_ReturnsTrue()
         {
-            Ellipse ellipse1 = new Ellipse(1, 1, 4, 1, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(1, 1, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-4, -2, 4, 2);
             Assert.That(ellipse1.DoesIntersect(line1), Is.True);
         }
         [Test]
         public void IntersectLineWithEllipse_OneIntersect_ReturnsTrue()
         {
-            Ellipse ellipse1 = new Ellipse(1, 1, 4, 1, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(1, 1, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(4, -2, 4, 4);
             Assert.That(ellipse1.DoesIntersect(line1), Is.True);
         }
         [Test]
         public void IntersectLineWithEllipse_NoIntersects_ReturnsFalse()
         {
-            Ellipse ellipse1 = new Ellipse(1, 1, 4, 1, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(1, 1, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-6, 3, 5, 6);
             Assert.That(ellipse1.DoesIntersect(line1), Is.False);
         }
         [Test]
         public void IntersectLineWithEllipse_OneIntersectWithRotation_ReturnsTrue()
         {
-            Ellipse ellipse1 = new Ellipse(1, 1, 1, 4, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(1, 1, 0, 3, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-2, 4, 2, 4);
             Assert.That(ellipse1.DoesIntersect(line1), Is.True);
         }
         [Test]
         public void IntersectLineWithEllipse_OneIntersectWithRotationLineStartingInsideEllipse_ReturnsTrue()
         {
-            Ellipse ellipse1 = new Ellipse(1, 1, 1, 4, 2.0 / 3.0, 0, 2 * Math.PI);
+            Ellipse ellipse1 = new Ellipse(1, 1, 0, 3, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-2, 2, 2, 2);
             Assert.That(ellipse1.DoesIntersect(line1), Is.True);
         }

@@ -46,7 +46,7 @@ public class Arc : Entity
      */
     private static double calcXCoord(double x, double radius, double angle)
     {
-        return (radius * Math.Cos(Angles.ToRadians(angle)) + x);
+        return (radius * Math.Cos(Angles.DegToRadians(angle)) + x);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Arc : Entity
      */
     private static double calcYCoord(double y, double radius, double angle)
     {
-        return (radius * Math.Sin(Angles.ToRadians(angle)) + y);
+        return (radius * Math.Sin(Angles.DegToRadians(angle)) + y);
     }
 
         /**
@@ -150,7 +150,7 @@ public class Arc : Entity
         else
         {
             double tan = Math.Atan2(y, x);
-            degrees = Angles.ToDegrees(tan);
+            degrees = Angles.RadToDegrees(tan);
         }
 
         // rotate start and end angles to start at 0
@@ -376,23 +376,15 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-            Point transformedBoundary1 = transform * new Point(MinX(), MinY());
-            Point transformedBoundary2 = transform * new Point(MaxX(), MinY());
-            Point transformedBoundary3 = transform * new Point(MinX(), MaxY());
-            Point transformedBoundary4 = transform * new Point(MaxX(), MaxY());
-
             Point newCenter = transform * Center;
+            Point newStart = transform * Start;
             
-            double a = Point.Distance(newCenter, transformedBoundary1);
-            double b = Point.Distance(newCenter, transformedBoundary2);
-            double c = Point.Distance(newCenter, transformedBoundary3);
-            double d = Point.Distance(newCenter, transformedBoundary4);
+            double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+            
+            double newRadius = Point.Distance(newStart, newCenter);
+            double newAngleStart = StartAngle - rotation;
+            double newAngleEnd = EndAngle - rotation;
 
-            double newWidth = Math.Max(a, Math.Max(b, Math.Max(c, d)));
-
-            double rotation = Angles.ToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
-
-            //divide by sqrt(2) because newWidth is distance from center to bounding box corner, not arc edge
-            return new Arc(newCenter.X, newCenter.Y, newWidth / Math.Sqrt(2), StartAngle - rotation, EndAngle - rotation);
+            return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
     }
 }
