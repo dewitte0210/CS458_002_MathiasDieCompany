@@ -10,6 +10,8 @@
     "Group4" : "V Notch/Corner Notch",
     "Group5" : "Mitered Notch - 6",
     "Group6" : "Radius Notch - 6",
+    "Group10" : "C-Spacer",
+    "Group11" : "Pac-Man",
     "Group17" : "Radius Notch - 17",
 };
 
