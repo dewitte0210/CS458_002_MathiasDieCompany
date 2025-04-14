@@ -15,7 +15,8 @@ namespace FeatureRecognitionAPI.Models
                 throw new FileNotFoundException();
             }
 
-            //Also sets file version
+            DwgReader reader = new DwgReader(path);
+            doc = reader.Read();
             ParseFile();
         }
 
