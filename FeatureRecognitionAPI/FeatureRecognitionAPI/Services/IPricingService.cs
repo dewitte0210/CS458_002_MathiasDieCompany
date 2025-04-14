@@ -1,5 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models.Dtos;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Pricing;
 
 namespace FeatureRecognitionAPI.Services
 {

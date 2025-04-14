@@ -21,6 +21,7 @@ namespace FeatureRecognitionAPI.Models
         protected List<Entity> EntityList;
         internal List<FeatureGroup> FeatureGroups { get; }
         protected FileVersion _fileVersion;
+        protected CadDocument doc;
 
         #region Constructors
 
@@ -29,6 +30,7 @@ namespace FeatureRecognitionAPI.Models
         {
             EntityList = new List<Entity>();
             FeatureList = new List<Feature>();
+            FeatureGroups = new List<FeatureGroup>();
         }
 
         protected SupportedFile(string path)
@@ -258,28 +260,7 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
         }
-       
-        protected void ReadEntities(CadDocument doc)
-        {
-            List<Entity> returned = new List<Entity>();
-            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
-            {
-                if (entity is Insert insert)
-                {
-                    returned.AddRange(UnwrapInsert(insert));
-                }
-                else
-                {
-                    Entity? castedEntity = CadObjectToInternalEntity(entity);
-                    if (!(castedEntity is null))
-                    {
-                        returned.Add(castedEntity);
-                    }
-                }
-            }
 
-            EntityList.AddRange(returned);
-        }
         private static List<Entity> UnwrapInsert(Insert insert)
         {
             List<Entity> returned = new List<Entity>();
@@ -332,7 +313,64 @@ namespace FeatureRecognitionAPI.Models
             return null;
         }
         
-        public abstract void ParseFile();
+        protected static FileVersion GetFileVersion(string version)
+        {
+            switch (version)
+            {
+                case "AC1006":
+                    return FileVersion.AutoCad10;
+                case "AC1009":
+                    return FileVersion.AutoCad12;
+                case "AC1012":
+                    return FileVersion.AutoCad13;
+                case "AC1014":
+                    return FileVersion.AutoCad14;
+                case "AC1015":
+                    return FileVersion.AutoCad2000;
+                case "AC1018":
+                    return FileVersion.AutoCad2004;
+                case "AC1021":
+                    return FileVersion.AutoCad2007;
+                case "AC1024":
+                    return FileVersion.AutoCad2010;
+                case "AC1027":
+                    return FileVersion.AutoCad2013;
+                case "AC1032":
+                    return FileVersion.AutoCad2018;
+                default:
+                    return FileVersion.Unknown;
+            }
+        }
+        
+        public void ParseFile()
+        {
+            _fileVersion = GetFileVersion(doc.Header.VersionString);
+            
+            foreach (ACadSharp.Entities.Entity entity in doc.Entities)
+            {
+                if (entity is Spline)
+                {
+                    throw new NotImplementedException("Splines are not yet supported.");
+                }
+                if (entity is LwPolyline)
+                {
+                    throw new NotImplementedException("Polylines are not yet supported.");
+                }
+                
+                if (entity is Insert insert)
+                {
+                    EntityList.AddRange(UnwrapInsert(insert));
+                }
+                else
+                {
+                    Entity? castedEntity = CadObjectToInternalEntity(entity);
+                    if (!(castedEntity is null))
+                    {
+                        EntityList.Add(castedEntity);
+                    }
+                }
+            }
+        }
 
         public  List<Entity> GetEntities() {return EntityList;}
         public void SetEntities(List<Entity> entities) { EntityList = entities; }
