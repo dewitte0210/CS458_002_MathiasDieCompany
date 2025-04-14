@@ -10,7 +10,8 @@
     "Group4" : "Perimeter Feature",
     "Group5" : "Mitered Notch",
     "Group6" : "Radius Notch",
-    "Group10" : "C-Spacer", 
+    "Group10" : "C-Spacer",
+    "Group11" : "Pac-Man",
     "Group17" : "Freehand",
 };
 
