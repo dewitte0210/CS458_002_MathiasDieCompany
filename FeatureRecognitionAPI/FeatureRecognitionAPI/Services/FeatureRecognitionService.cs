@@ -112,7 +112,7 @@ namespace FeatureRecognitionAPI.Services
                 
                 // supportedFile.GroupFeatureEntities();
                 
-                supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
+                //supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
 
                 supportedFile.DetectAllFeatureTypes();
                 
@@ -143,7 +143,7 @@ namespace FeatureRecognitionAPI.Services
             }
         }
 
-        private static List<Entity> CondenseArcs(List<Entity> entities)
+        internal static List<Entity> CondenseArcs(List<Entity> entities)
         {
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
 

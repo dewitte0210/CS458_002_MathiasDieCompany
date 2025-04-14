@@ -1110,10 +1110,8 @@ public class Feature
     /// <param name="orderedLineList"> list of lines, possible chamfers in this list
     /// will be flagged as such</param>
     /// <returns>list of lines where each line has a chamfer type of possible</returns>
-    internal void SetPossibleChamfers(List<List<Line>> orderedLineList)
+    private void SetPossibleChamfers(List<List<Line>> orderedLineList)
     {
-        //List<Line> possibleChamferList = [];
-
         foreach (List<Line> lineGroup in orderedLineList)
         {
             if (lineGroup.Count < 3) continue;
@@ -1136,13 +1134,10 @@ public class Feature
                         || (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360))
                     {
                         ChamferList.Add(new ChamferGroup(lineA, lineB, lineC));
-                        //lineB.ChamferType = ChamferTypeEnum.Possible;
-                        //possibleChamferList.Add(lineB);                            
                     }
                 }
             }
         }
-        //return possibleChamferList;
     }
 
     private void FlagGroup3()
@@ -1151,7 +1146,6 @@ public class Feature
         
         // copy of base entity list with just lines
         List<Line> lineList = GetLinesFromEntityList(EntityList).ToList();
-        //List<Line> possibleChamferList = SetPossibleChamfers(GetOrderedLines(lineList));
         SetPossibleChamfers(GetOrderedLines(lineList));
         
         if (lineList.Count < 3) return;
@@ -1162,17 +1156,20 @@ public class Feature
             // check potential chamfers
             // if only one chamfer, it is confirmed to be a chamfer
             case 1:
-                //possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
                 ChamferList[0].Confirmed = true;
                 break;
             // if 2 to 3 chamfers, only confirm if a parallel line to it
             // is also possible/confirmed chamfers
             case >= 2 and <= 3:
             {
-                bool hasParallelChamfer = false;
+                List<ChamferGroup> chamferGroupsToRemove = new List<ChamferGroup>();
                 //foreach (Line possibleChamfer in possibleChamferList)
                 foreach (ChamferGroup chamferGroup in ChamferList)
                 {
+                    bool isParallelToSomething = false;
+                    bool hasParallelChamfer = false;
+                    
+                    // if parallel to a line... 
                     foreach (Line line in lineList)
                     {
                         // ignore same line
@@ -1181,23 +1178,37 @@ public class Feature
                             continue;
                         }
                     
-                        if (IsParallel(chamferGroup.Chamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                        if (IsParallel(chamferGroup.Chamfer, line)) // && line.ChamferType != ChamferTypeEnum.None
                         {
-                            hasParallelChamfer = true;
+                            isParallelToSomething = true;
                         }
                     }
-                    if (!hasParallelChamfer)
+                    // and it is not a chamfer...
+                    if (isParallelToSomething)
                     {
-                        //possibleChamferList.Remove(possibleChamfer);
-                        ChamferList.Remove(chamferGroup);
+                        foreach (ChamferGroup compChamferGroup in ChamferList)
+                        {
+                            if (chamferGroup != compChamferGroup && IsParallel(chamferGroup.Chamfer, compChamferGroup.Chamfer))
+                            {
+                                hasParallelChamfer = true;
+                            }
+                        }
+                    }
+                    // it is not a chamfer
+                    if (isParallelToSomething && !hasParallelChamfer)
+                    {
+                        chamferGroupsToRemove.Add(chamferGroup);
                         break;
                     }
+                }
+                foreach (ChamferGroup cgToRemove in chamferGroupsToRemove)
+                {
+                    ChamferList.Remove(cgToRemove);
                 }
                 // remaining possible chamfers meet above case so confirm
                 //foreach (Line line in possibleChamferList)
                 foreach (ChamferGroup chamferGroup in ChamferList)
                 {
-                    //line.ChamferType = ChamferTypeEnum.Confirmed;
                     chamferGroup.Confirmed = true;
                 }
                 break;

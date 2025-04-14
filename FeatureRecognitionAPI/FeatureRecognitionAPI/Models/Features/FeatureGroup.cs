@@ -46,19 +46,22 @@ namespace FeatureRecognitionAPI.Models.Features
                         
             // todo: extend the two lines the chamfer was touching to clean up the shape
             // todo: make so it works with more than one chamfer
+            // todo: just make Count return length of feature list
 
             // break out chamfers
+            List<Feature> featuresToAdd = new List<Feature>();
             foreach (Feature feature in features)
             {
                 if (feature.ChamferList.Count <= 0) continue;
 
                 foreach (ChamferGroup cg in feature.ChamferList)
                 {
-                    features.Add(new Feature(PossibleFeatureTypes.Group3, [cg.Chamfer]));
-                    feature.EntityList.Remove(cg.Chamfer);
-                    feature.ExtendTwoLines(cg.LineA, cg.LineB);
-                    feature.ChamferList.Remove(cg);
+                    featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [cg.Chamfer]));
+                    Count++;
+                    //feature.EntityList.Remove(cg.Chamfer);
+                    //feature.ExtendTwoLines(cg.LineA, cg.LineB);
                 }
+                feature.ChamferList.Clear();
                 
                 // foreach (Entity ent in feature.EntityList)
                 // {
@@ -75,14 +78,16 @@ namespace FeatureRecognitionAPI.Models.Features
                 //     }
                 // }
             }
-
+            features.AddRange(featuresToAdd);
+            featuresToAdd.Clear();
 
             // Group identical features together
             for (int i = 0; i < features.Count; i++)
             {
                 for (int j = i + 1; j < features.Count; j++)
                 {
-                    if (features[i].Equals(features[j]))
+                    //ignore group 3 chamfer check because equals sees them as the same even though they are not
+                    if (features[i].Equals(features[j]) && features[i].FeatureType != PossibleFeatureTypes.Group3)
                     {
                         features[i].count += features[j].count;
                         features.RemoveAt(j);

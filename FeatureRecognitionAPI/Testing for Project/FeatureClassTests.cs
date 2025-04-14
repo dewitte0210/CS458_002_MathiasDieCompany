@@ -1,5 +1,6 @@
 ﻿using FeatureRecognitionAPI.Controllers;
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
@@ -308,6 +309,7 @@ namespace Testing_for_Project
             Assert.That(orderedLines[1], Is.EqualTo(llb));
         }
         
+        /*
         [Test]
         public void TestGetPossibleChamfersOneChamfer()
         {
@@ -379,6 +381,7 @@ namespace Testing_for_Project
             Assert.Contains(line7, possibleChamList);
             Assert.Contains(line8, possibleChamList);
         }
+        */
         
         [Test]
         public void CheckGroup3NoChamferSquare()
@@ -390,14 +393,7 @@ namespace Testing_for_Project
             List<Entity> eList = [line1, line2, line3, line4];
             Feature f = new(eList);
             
-            Assert.That(f.NumChamfers, Is.EqualTo(0));
-            //check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Any(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }),
-                Is.EqualTo(false));
-            Assert.That(f.baseEntityList.Any(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }),
-                Is.EqualTo(false));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(0));
         }
         
         [Test]
@@ -416,14 +412,8 @@ namespace Testing_for_Project
             //detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.NumChamfers, Is.EqualTo(1));
-            //check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
-                Is.EqualTo(0));
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
-                Is.EqualTo(1));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(1));
+            Assert.That(f.ChamferList[0].Chamfer, Is.EqualTo(lineCham));
         }
         
         [Test]
@@ -445,14 +435,9 @@ namespace Testing_for_Project
             //detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.NumChamfers, Is.EqualTo(2));
-            //check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
-                Is.EqualTo(1));
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
-                Is.EqualTo(2));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(2));
+            Assert.That(f.ChamferList[0].Chamfer, Is.EqualTo(lineCham3));
+            Assert.That(f.ChamferList[1].Chamfer, Is.EqualTo(lineCham5));
         }
         
         [Test]
@@ -475,14 +460,7 @@ namespace Testing_for_Project
             // detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.NumChamfers, Is.EqualTo(4));
-            // check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
-                Is.EqualTo(8));
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
-                Is.EqualTo(0));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(8));
         }
 
         [Test]
@@ -493,19 +471,9 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\test-files\\square.dxf";
             DXFFile squareFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             squareFile.DetectAllFeatureTypes();
 
-            bool hasChamfers = false;
-            foreach (Entity entity in squareFile.GetEntities())
-            {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    hasChamfers = true;
-                }
-            }
-            Assert.That(hasChamfers, Is.False);
-            Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(0));
+            Assert.That(squareFile.FeatureList[0].ChamferList.Count, Is.EqualTo(0));
         }
         
         [Test]
@@ -516,19 +484,15 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\test-files\\one-chamfer-square.dxf";
             DXFFile squareFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             squareFile.DetectAllFeatureTypes();
 
-            bool hasChamfers = false;
-            foreach (Entity entity in squareFile.FeatureList[0].baseEntityList)
+            int numChamfers = 0;
+            foreach (FeatureGroup fg in squareFile.FeatureGroups)
             {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    hasChamfers = true;
-                }
+                numChamfers += GetNumChamferFeatures(fg.GetFeatures());
             }
-            Assert.That(hasChamfers, Is.True);
-            Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(1));
+            
+            Assert.That(numChamfers, Is.EqualTo(1));
         }
         
         [Test]
@@ -539,19 +503,38 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\test-files\\square-two-radius-two-chamfer.dxf";
             DXFFile squareFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             squareFile.DetectAllFeatureTypes();
 
-            bool hasChamfers = false;
-            foreach (Entity entity in squareFile.FeatureList[0].baseEntityList)
+            int numChamfers = 0;
+            foreach (FeatureGroup fg in squareFile.FeatureGroups)
             {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
+                numChamfers += GetNumChamferFeatures(fg.GetFeatures());
+            }
+            
+            Assert.That(numChamfers, Is.EqualTo(2));
+        }
+
+        private static int GetNumChamferFeatures(List<Feature> featureList)
+        {
+            int numChamfers = 0;
+            foreach (Feature f in featureList)
+            {
+                if (f.FeatureType == PossibleFeatureTypes.Group3)
                 {
-                    hasChamfers = true;
+                    numChamfers++;
                 }
             }
-            Assert.That(hasChamfers, Is.True);
-            Assert.That(squareFile.FeatureList[0].NumChamfers, Is.EqualTo(2));
+            return numChamfers;
+        }
+        
+        private static int GetNumChamferFeatures(List<FeatureGroup> featureGroupList)
+        {
+            int numChamfers = 0;
+            foreach (FeatureGroup f in featureGroupList)
+            {
+                numChamfers += GetNumChamferFeatures(f.GetFeatures());
+            }
+            return numChamfers;
         }
         
         [Test]
@@ -562,28 +545,9 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
             DXFFile exampleFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             exampleFile.DetectAllFeatureTypes();
 
-            bool hasChamferEntities = false;
-            foreach (Entity entity in exampleFile.FeatureList[0].baseEntityList)
-            {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    hasChamferEntities = true;
-                }
-            }
-            bool hasChamferFeatures = false;
-            foreach (Feature feature in exampleFile.FeatureList)
-            {
-                if (feature.NumChamfers != 0)
-                {
-                    hasChamferFeatures = true;
-                }
-            }
-            
-            Assert.That(hasChamferEntities, Is.False);
-            Assert.That(hasChamferFeatures, Is.False);
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(0));
         }
         
         [Test]
@@ -594,38 +558,9 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
             DXFFile exampleFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             exampleFile.DetectAllFeatureTypes();
-
-            int numC = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && MdcMath.DoubleEquals(line.Length, 0.144))
-                {
-                    numC++;
-                }
-            }
             
-            int numChamferEntities = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    numChamferEntities++;
-                }
-            }
-            int numChamferFeatures = 0;
-            foreach (Feature feature in exampleFile.FeatureList)
-            {
-                if (feature.NumChamfers != 0)
-                {
-                    numChamferFeatures++;
-                }
-            }
-            
-            // num chamfers should be 1 because original group is copied 6 times
-            Assert.That(numChamferEntities, Is.EqualTo(1));
-            Assert.That(numChamferFeatures, Is.EqualTo(1));
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(1));
         }
         
         [Test]
@@ -636,37 +571,9 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
             DXFFile exampleFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             exampleFile.DetectAllFeatureTypes();
-
-            int numC = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && MdcMath.DoubleEquals(line.Length, 0.144))
-                {
-                    numC++;
-                }
-            }
             
-            int numChamferEntities = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    numChamferEntities++;
-                }
-            }
-            int numChamferFeatures = 0;
-            foreach (Feature feature in exampleFile.FeatureList)
-            {
-                if (feature.NumChamfers != 0)
-                {
-                    numChamferFeatures++;
-                }
-            }
-            
-            Assert.That(numChamferEntities, Is.EqualTo(0));
-            Assert.That(numChamferFeatures, Is.EqualTo(0));
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(0));
         }
         
         [Test]
@@ -677,37 +584,9 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\ExampleFiles\\Example-004.dxf";
             DXFFile exampleFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             exampleFile.DetectAllFeatureTypes();
-
-            int numC = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && MdcMath.DoubleEquals(line.Length, 0.144))
-                {
-                    numC++;
-                }
-            }
             
-            int numChamferEntities = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    numChamferEntities++;
-                }
-            }
-            int numChamferFeatures = 0;
-            foreach (Feature feature in exampleFile.FeatureList)
-            {
-                if (feature.NumChamfers != 0)
-                {
-                    numChamferFeatures++;
-                }
-            }
-            
-            Assert.That(numChamferEntities, Is.EqualTo(0));
-            Assert.That(numChamferFeatures, Is.EqualTo(0));
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(0));
         }
         
         [Test]
@@ -718,37 +597,9 @@ namespace Testing_for_Project
             string path = path2.Substring(0, stringTrim) 
                           + "FeatureRecognitionAPI\\ExampleFiles\\Example-LilBitOfEverything.dxf";
             DXFFile exampleFile = new DXFFile(path);
-            //squareFile.SetEntities(CondenseArcs(squareFile.GetEntities()));
             exampleFile.DetectAllFeatureTypes();
 
-            int numC = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && MdcMath.DoubleEquals(line.Length, 0.144))
-                {
-                    numC++;
-                }
-            }
-            
-            int numChamferEntities = 0;
-            foreach (Entity entity in exampleFile.EntityList)
-            {
-                if (entity is Line line && line.ChamferType != ChamferTypeEnum.None)
-                {
-                    numChamferEntities++;
-                }
-            }
-            int numChamferFeatures = 0;
-            foreach (Feature feature in exampleFile.FeatureList)
-            {
-                if (feature.NumChamfers != 0)
-                {
-                    numChamferFeatures++;
-                }
-            }
-            
-            Assert.That(numChamferEntities, Is.EqualTo(1));
-            Assert.That(numChamferFeatures, Is.EqualTo(1));
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(1));
         }
 
         #endregion

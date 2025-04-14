@@ -9,6 +9,7 @@ using ACadSharp.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
+using FeatureRecognitionAPI.Services;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -48,6 +49,7 @@ namespace FeatureRecognitionAPI.Models
         
         public void DetectAllFeatureTypes()
         {
+            SetEntities(FeatureRecognitionService.CondenseArcs(GetEntities()));
             GroupFeatureEntities();
             SetFeatureGroups();
 
