@@ -8,7 +8,7 @@
     "Group2A2" : "Bowtie",
     "Group3" : "Chamfered Corner",
     "Group4" : "V Notch/Corner Notch",
-    "Group5" : "Mitered Notch - 6",
+    "Group5" : "Mitered Notch - 5",
     "Group6" : "Radius Notch - 6",
     "Group10" : "C-Spacer",
     "Group11": "Pac-Man",
