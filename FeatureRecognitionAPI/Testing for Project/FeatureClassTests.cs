@@ -204,8 +204,6 @@ namespace Testing_for_Project
 
         #region CheckGroup3
 
-        // TODO: test with unordered lines
-        
         [Test]
         public void TestGetLinesFromEntityListSquare()
         {
