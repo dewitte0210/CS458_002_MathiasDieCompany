@@ -623,7 +623,7 @@ public class Feature
             }
             else
             {
-                if (DetermineConcavity(baseEntityList[i], i))
+                if (DetermineConcavity(baseEntityList[i]))
                 {
                     //  If previous curve was convex, there is a switch in concavity
                     if (tempConvexCount > 0)
@@ -665,7 +665,7 @@ public class Feature
      * Combs through the base entity list to determine if the entity is concave to the shape or not
      * @param index - The index of the entity being checked
      */
-    private bool DetermineConcavity(Entity entity, int index)
+    private bool DetermineConcavity(Entity entity)
     {
         if (!(entity is Arc || entity is Ellipse)) { return false; }
         //  Variables used to extend the line that is used for concavity detection to ensure it passes through
@@ -698,35 +698,51 @@ public class Feature
         //  per actual intersection
         for (int i = 0; i < baseEntityList.Count; i++)
         {
-            if (baseEntityList[i].DoesIntersect(ray))
+            if (!baseEntityList[i].DoesIntersect(ray))
             {
-                numIntersections++;
-                if (baseEntityList[i] is Line)
+                continue;
+            }
+
+            numIntersections++;
+            if (baseEntityList[i] is Line line)
+            {
+                Point? intersection = Entity.GetIntersectPoint(ray, line);
+                if (intersection == null)
                 {
-                    Line currEntity = (baseEntityList[i] as Line);
-                    if (Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
-                    {
-                        numEndPointIntersections++;
-                    }
+                    continue;
                 }
-                else if (baseEntityList[i] is Arc)
+
+                if (intersection.Equals(line.StartPoint) || intersection.Equals(line.EndPoint))
+                    numEndPointIntersections++;
+            }
+            else if (baseEntityList[i] is Arc arc1)
+            {
+                Point? intersection = Entity.GetIntersectPoint(ray, arc1);
+                if (intersection == null)
                 {
-                    Arc currEntity = (baseEntityList[i] as Arc);
-                    if (Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.Start) || Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.End))
-                    {
-                        numEndPointIntersections++;
-                    }
+                    continue;
                 }
-                else if(baseEntityList[i] is Ellipse ellipse)
+
+                if (intersection.Equals(arc1.Start) || intersection.Equals(arc1.End))
                 {
-                    double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
-                    if (Entity.GetIntersectPoint(ray, ellipse).Equals(ellipse.StartPoint) || Entity.GetIntersectPoint(ray, ellipse).Equals(ellipse.EndPoint))
-                    {
-                        numEndPointIntersections++;
-                    }
+                    numEndPointIntersections++;
+                }
+            }
+
+            else if (baseEntityList[i] is Ellipse ellipse)
+            {
+                Point? intersection = Entity.GetIntersectPoint(ray, ellipse);
+                if (intersection == null)
+                {
+                    continue;
+                }
+
+                if (intersection.Equals(ellipse.StartPoint) || intersection.Equals(ellipse.EndPoint)){
+                    numEndPointIntersections++;
                 }
             }
         }
+
         //  Even num of intersections = concave
         return (numIntersections - (numEndPointIntersections / 2)) % 2 == 0;
     }
@@ -1006,7 +1022,7 @@ public class Feature
                     smallArc = temp;
                     smallIndex = 0;
                 }
-                if (bigArc.Start.Equals(smallArc.Start) && bigArc.End.Equals(smallArc.End) && DetermineConcavity(bigArc, bigIndex) && !DetermineConcavity(smallArc, smallIndex))
+                if (bigArc.Start.Equals(smallArc.Start) && bigArc.End.Equals(smallArc.End) && DetermineConcavity(bigArc) && !DetermineConcavity(smallArc))
                 {
                     FeatureType = PossibleFeatureTypes.Group11;
                     return true;
@@ -1094,9 +1110,9 @@ public class Feature
                     side2 = temp;
                     side2Index = tempIndex;
                 }
-                bool isSide1Convex = !DetermineConcavity(side1, side1Index);
-                bool isSide2Convex = !DetermineConcavity(side2, side2Index);
-                bool isBigArcConvex = !DetermineConcavity(bigArc, bigArcIndex);
+                bool isSide1Convex = !DetermineConcavity(side1);
+                bool isSide2Convex = !DetermineConcavity(side2);
+                bool isBigArcConvex = !DetermineConcavity(bigArc);
                 if (isSide1Convex && isSide2Convex && isBigArcConvex
                     && line1.EntityPointsAreTouching(side1) && line1.EntityPointsAreTouching(side2)
                     && bigArc.EntityPointsAreTouching(side1) && bigArc.EntityPointsAreTouching(side2))
@@ -1649,7 +1665,7 @@ public class Feature
      */
     public bool SeperateBaseEntities()
     {
-        if (ExtendedEntityList[0] is Circle or Ellipse) // case where the feature contains a circle
+        if (ExtendedEntityList[0] is Circle or Ellipse) // case where the feature contains a circle or ellipse
         {
             if (ExtendedEntityList.Count == 1 && baseEntityList.Count == 0) // it should be the only entity in the list
             {
