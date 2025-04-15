@@ -1747,6 +1747,10 @@ public class Feature
         {
             foreach (Entity entity in ExtendedEntityList)
             {
+                if (entity is Ellipse)
+                {
+                    continue;
+                }
                 if (!testedEntities
                         .Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {

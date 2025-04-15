@@ -65,76 +65,85 @@ namespace FeatureRecognitionAPI.Models
         {
             if (FeatureList.Count > 0) {return;}
             
-            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
+            // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
+            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); 
             FeatureList.Add(new Feature(new List<Entity>()));
             
             FeatureList[0].EntityList.Add(EntityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
             listMap[0] = 0;
             
-            for (int i = 0; i < EntityList.Count()-1; i++)
+            for (int i = 0; i < EntityList.Count; i++)
             {
                 int count = 0;
-                for (int j = i+1; j < EntityList.Count(); j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                for (int j = i+1; j < EntityList.Count; j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 {
-                    if (i != j && EntityList[i].DoesIntersect(EntityList[j])) // if i==j they are checking the same object and would return true for intersecting
+                    if (!EntityList[i].DoesIntersect(EntityList[j]))
                     {
-                        // adds each entity to their AdjList. This should not happen twice because of the j=i+1
-                        EntityList[i].AdjList.Add(EntityList[j]);
-                        EntityList[j].AdjList.Add(EntityList[i]);
-                        
-                        // Check to flag an entity as Kisscut
-                        count++;
-                        if (count == 4 && EntityList[i] is Line tempLine)
+                        continue;
+                    }
+
+                    // adds each entity to their AdjList. This should not happen twice because of the j=i+1
+                    EntityList[i].AdjList.Add(EntityList[j]);
+                    EntityList[j].AdjList.Add(EntityList[i]);
+
+                    // Check to flag an entity as Kisscut
+                    count++;
+                    if (count == 4 && EntityList[i] is Line tempLine)
+                    {
+                        // TODO: tempLine.Kisscut = True;
+                    }
+
+                    if (listMap[i] == -1 || listMap[j] == -1) // checks that either i or j still needs to be mapped
+                        // say there is a third entity k that touches i and j. i and j was already checked for k and added to entitylist. when i is checked against j it would attempt to add them again.
+                    {
+                        if (listMap[i] != -1) // means entity i is mapped to a feature
                         {
-                            // TODO: tempLine.Kisscut = True;
+                            FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
+                            listMap[j] = listMap[i];
+                        }
+                        else if (listMap[j] != -1) // means entity j is mapped to a feature
+                        {
+                            FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
+                            listMap[i] = listMap[j];
+                        }
+                        else // both i and j is not mapped to a feature
+                        {
+                            // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
+                            FeatureList.Add(new Feature(new List<Entity>()));
+                            int index = FeatureList.Count - 1;
+                            FeatureList[index].EntityList.Add(EntityList[i]);
+                            FeatureList[index].EntityList.Add(EntityList[j]);
+                            // maps i and j to the index of that new feature in FeatureList
+                            listMap[i] = index;
+                            listMap[j] = index;
+                        }
+                    }
+                    else // both i and j are already mapped
+                    {
+                        if (listMap[i] == listMap[j]) 
+                        {
+                            continue;
                         }
 
-                        if (listMap[i] == -1 || listMap[j] == -1) // checks that either i or j still needs to be mapped
-                        // say there is a third entitiy k that touches i and j. i and j was already checked for k and added to entitylist. when i is checked against j it would attempt to add them again.
+                        //they should become the same feature
+                        FeatureList[listMap[i]].EntityList
+                            .AddRange(FeatureList[listMap[j]].EntityList); // combines the EntityLists
+                        FeatureList.RemoveAt(listMap[j]); // removed the feature with entity j
+
+                        // this for loop corrects the mapping after a feature was removed
+                        for (int k = 0; k < listMap.Count; k++)
                         {
-                            if (listMap[i] != -1) // means entitiy i is mapped to a feature
+                            if (k != j && listMap[k] == listMap[j])
                             {
-                                FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
-                                listMap[j] = listMap[i];
+                                listMap[k] = listMap[i];
                             }
-                            else if (listMap[j] != -1) // means entitiy j is mapped to a feature
+                            else if (listMap[k] > listMap[j])
                             {
-                                FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
-                                listMap[i] = listMap[j];
-                            }
-                            else // both i and j is not mapped to a feature
-                            {
-                                // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
-                                FeatureList.Add(new Feature(new List<Entity>()));
-                                int index = FeatureList.Count - 1;
-                                FeatureList[index].EntityList.Add(EntityList[i]);
-                                FeatureList[index].EntityList.Add(EntityList[j]);
-                                // maps i and j to the index of that new feature in FeatureList
-                                listMap[i] = index;
-                                listMap[j] = index;
+                                listMap[k]--;
                             }
                         }
-                        else // both i and j are already mapped
-                        {
-                            if (listMap[i] != listMap[j]) // means they should become the same feature
-                            {
-                                FeatureList[listMap[i]].EntityList.AddRange(FeatureList[listMap[j]].EntityList); // combines the EntityLists
-                                FeatureList.RemoveAt(listMap[j]); // removed the feature with entity j
-                                
-                                for (int k = 0; k < listMap.Count; k++) // this for loop corrects the mapping after a feature was removed
-                                {
-                                    if (k!=j && listMap[k] == listMap[j])
-                                    {
-                                        listMap[k] = listMap[i];
-                                    }
-                                    else if (listMap[k] > listMap[j])
-                                    {
-                                        listMap[k]--;
-                                    }
-                                }
-                                listMap[j] = listMap[i];
-                            }
-                        }
+
+                        listMap[j] = listMap[i];
                     }
                 }
 
