@@ -174,7 +174,11 @@ public class Feature
      */
     public void DetectFeatures()
     {
-        if (baseEntityList.Count == 0) {baseEntityList = new(EntityList);} // should only happen if line extension and separation were skipped
+        if (baseEntityList.Count == 0)
+        {
+            baseEntityList = new(EntityList);
+            PerimeterFeatureList.Clear();
+        } // should only happen if line extension and separation were skipped
         
         // BASE SHAPE DETECTION:
         if (!CheckGroup1B()

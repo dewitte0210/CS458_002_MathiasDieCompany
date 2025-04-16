@@ -390,6 +390,24 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
+        public void CornerNotchFlag()
+        {
+            foreach (Feature feature in FeatureList)
+            {
+            }
+        }
+
+        public void CornerNotchFlagHelper(Line entity)
+        {
+            foreach (Entity adjEntity in entity.AdjList)
+            {
+                if (adjEntity is Line e && entity.Length == e.Length)
+                {
+                     Angles.Angle innerAngle = Angles.GetAngle(entity, e);
+                     
+                }
+            }
+        }
         public  List<Entity> GetEntities() {return EntityList;}
         public void SetEntities(List<Entity> entities) { EntityList = entities; }
     }
