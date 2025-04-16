@@ -102,7 +102,7 @@ public class Feature
     {
         count = 1;
         multipleRadius = 1;
-        baseEntityList = new(EntityList);
+        baseEntityList = new();
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
 
