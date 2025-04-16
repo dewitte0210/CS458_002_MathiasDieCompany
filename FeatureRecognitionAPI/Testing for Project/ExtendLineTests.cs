@@ -214,6 +214,58 @@ namespace Testing_for_Project
             Assert.IsTrue(finalTestLine1 == arc1);
             Assert.IsTrue(finalTestLine2 == circle1);
         }
+
+        [Test]
+        public void ChangeBackAdjList()
+        {
+            // two Lines that should be extended properly with the adjacency list being changed
+            Line line1 = new(0, 0, .5, 0); // has line5
+            Line line2 = new(1, 0, 2, 0); // has line3 and line6
+            // exLine should have line3, line5, and line6
+            
+            // filler feature entities
+            Line line3 = new(2, 0, 2, 2); // has line4 and exLine 
+            Line line4 = new(2, 2, 0, 2); // has line3, line5, and line7
+            Line line5 = new(0, 2, 0, 0); // has line4 and exLine
+            
+            // two lines that will be extended but should be added pack for perimeterList with the adjacency list being changed back
+            // These will appear as two separate perimeter features in the end
+            Line line6 = new(1, 0, 1, 1); // has exLine
+            Line line7 = new(1, 1.5, 1, 2);// has line4
+
+            DXFFile testFile = new (new List<Entity>() { line1, line2, line3, line4, line5, line6, line7 });
+            testFile.GroupFeatureEntities();
+            testFile.FeatureList[0].ExtendAllEntities();
+            // Check lines were extended properly (just to be sure)
+            Assert.IsTrue(testFile.FeatureList[0].ExtendedEntityList.Count == 5);
+            testFile.FeatureList[0].SeperateBaseEntities();
+            testFile.FeatureList[0].SeperatePerimeterEntities();
+            Assert.IsTrue(testFile.FeatureList[0].PerimeterFeatureList.Count == 2);
+            Assert.IsTrue(testFile.FeatureList[0].PerimeterFeatureList[0].EntityList.Count == 1);
+            Assert.IsTrue(testFile.FeatureList[0].PerimeterFeatureList[1].EntityList.Count == 1);
+
+            // AdjList checks:
+            Assert.IsTrue(line1.AdjList.Count == 1 && line1.AdjList.Contains(line5));
+            Assert.IsTrue(line2.AdjList.Count == 2 && line2.AdjList.Contains(line3) && line2.AdjList.Contains(line6));
+            Assert.IsTrue(line3.AdjList.Count == 2 && line3.AdjList.Contains(line4) &&(line3.AdjList[0] is ExtendedLine || line3.AdjList[1] is ExtendedLine));
+            // get exLine from line3 (easiest way without changing protection level of baseEntityList)
+            ExtendedLine exLine;
+            if (line3.AdjList[0] is ExtendedLine)
+            {
+                exLine = (ExtendedLine)line3.AdjList[0];
+            }
+            else
+            {
+                exLine = (ExtendedLine)line3.AdjList[1];
+            }
+            Assert.IsTrue(line4.AdjList.Count == 3 && line4.AdjList.Contains(line3) && line4.AdjList.Contains(line5) && line4.AdjList.Contains(line7));
+            Assert.IsTrue(line5.AdjList.Count == 2 && line5.AdjList.Contains(line4) && line5.AdjList.Contains(exLine));
+            Assert.IsTrue(line6.AdjList.Count == 1 && line6.AdjList.Contains(exLine));
+            Assert.IsTrue(line7.AdjList.Count == 1 && line7.AdjList.Contains(line4));
+            
+            // exLine AdjList check
+            Assert.IsTrue(exLine.AdjList.Count == 3 && exLine.AdjList.Contains(line3) && exLine.AdjList.Contains(line5) && exLine.AdjList.Contains(line6));
+        }
         #endregion
 
         #region seperationTests

@@ -1457,7 +1457,8 @@ public class Feature
         {
             if (line1.isSameInfiniteLine(line2))
             {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
+                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object
+                ChangeAdjListForExtendedLine(tempLine, line1, line2);
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
@@ -1466,6 +1467,27 @@ public class Feature
         }
 
         return false;
+    }
+
+    private void ChangeAdjListForExtendedLine(ExtendedLine exLine, Line line1, Line line2)
+    {
+        // maeke the extended line's adjacency list
+        exLine.AdjList = new List<Entity>(line1.AdjList);
+        exLine.AdjList.AddRange(line2.AdjList);
+        exLine.AdjList.Remove(line1);
+        exLine.AdjList.Remove(line2);
+        
+        // replace line1 and line2 with exLine in the adjacency lists for entities touching line1 and line2
+        foreach (Entity e in line1.AdjList)
+        {
+            e.AdjList.Remove(line1);
+            e.AdjList.Add(exLine);
+        }
+        foreach (Entity e in line2.AdjList)
+        {
+            e.AdjList.Remove(line2);
+            e.AdjList.Add(exLine);
+        }
     }
 
     #endregion
@@ -1665,6 +1687,7 @@ public class Feature
 
     private void AddBackParentsHelper(ExtendedLine exLine, List<Entity> targetList)
     {
+        bool addedParent = false;
         if (exLine.Parent1 is ExtendedLine)
         {
             AddBackParentsHelper((ExtendedLine)exLine.Parent1, targetList);
@@ -1672,6 +1695,7 @@ public class Feature
         else
         {
             targetList.Add(exLine.Parent1);
+            addedParent = true;
         }
 
         if (exLine.Parent2 is ExtendedLine)
@@ -1681,8 +1705,26 @@ public class Feature
         else
         {
             targetList.Add(exLine.Parent2);
+            addedParent = true;
         }
 
+        if (addedParent)
+        {
+            foreach (Entity e in exLine.AdjList)
+            {
+                if (e.DoesIntersect(exLine.Parent1))
+                {
+                    e.AdjList.Add(exLine.Parent1);
+                }
+                else
+                {
+                    e.AdjList.Add(exLine.Parent2);
+                }
+
+                e.AdjList.Remove(exLine);
+            }
+        }
+        
         targetList.Remove(exLine); // targetList will not have a parent that is an extended line in it
     }
 
