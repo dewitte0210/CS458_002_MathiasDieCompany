@@ -1121,21 +1121,80 @@ public class Feature
                 Line lineB = lineGroup[(i + 1) % lineGroup.Count];
                 Line lineC = lineGroup[(i + 2) % lineGroup.Count];
 
-                Angle angleAB = GetAngle(lineA, lineB);
-                Angle angleBC = GetAngle(lineB, lineC);
-                Angle angleAC = GetAngle(lineA, lineC);
+                //need to verify orientation of lines
+                Angle ab = GetAngle(lineA, lineB);
+                Angle bc = GetAngle(lineB, lineC);
+                Angle ac = GetAngle(lineA, lineC);
 
                 //meets single chamfer conditions
-                if (angleAB.Equals(angleBC))
+                if (ab.Equals(bc))
                 {
                     // measuring counterclockwise or clockwise
-                    if ((angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
-                        || (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360))
+                    if ((ab.GetDegrees() < 180 && ac.GetDegrees() < 180 && ac.GetDegrees() > 0)
+                        || (ab.GetDegrees() > 180 && ac.GetDegrees() > 180 && ac.GetDegrees() < 360))
                     {
                         ChamferList.Add(new ChamferGroup(ref lineA, ref lineB, ref lineC));
                     }
                 }
             }
+        }
+    }
+    
+    /// <summary>
+    /// Processes and removes possible chamfers if they do not meet the criteria.
+    /// If a chamfer has no chamfers parallel to it but does have lines parallel
+    /// then it is not a chamfer and is removed from the chamfer list.
+    /// </summary>
+    /// <param name="lineList"> unordered list of lines </param>
+    private void RemoveFalseChamfers(List<Line> lineList)
+    {
+        List<ChamferGroup> chamferGroupsToRemove = new();
+        foreach (ChamferGroup chamferGroup in ChamferList)
+        {
+            bool isParallelToSomething = false;
+            bool hasParallelChamfer = false;
+                    
+            // if parallel to a line... 
+            foreach (Line line in lineList)
+            {
+                // ignore same line
+                if (chamferGroup.Chamfer.Equals(line))
+                {
+                    continue;
+                }
+                    
+                if (IsParallel(chamferGroup.Chamfer, line))
+                {
+                    isParallelToSomething = true;
+                }
+            }
+            // and it is not a chamfer...
+            if (isParallelToSomething)
+            {
+                foreach (ChamferGroup compChamferGroup in ChamferList)
+                {
+                    if (chamferGroup != compChamferGroup && IsParallel(chamferGroup.Chamfer, compChamferGroup.Chamfer))
+                    {
+                        hasParallelChamfer = true;
+                    }
+                }
+            }
+            // it is not a chamfer
+            if (isParallelToSomething && !hasParallelChamfer)
+            {
+                chamferGroupsToRemove.Add(chamferGroup);
+                break;
+            }
+        }
+        foreach (ChamferGroup cgToRemove in chamferGroupsToRemove)
+        {
+            ChamferList.Remove(cgToRemove);
+        }
+        // remaining possible chamfers meet above case so confirm
+        //foreach (Line line in possibleChamferList)
+        foreach (ChamferGroup chamferGroup in ChamferList)
+        {
+            chamferGroup.Confirmed = true;
         }
     }
 
@@ -1161,55 +1220,7 @@ public class Feature
             // is also possible/confirmed chamfers
             case >= 2 and <= 3:
             {
-                List<ChamferGroup> chamferGroupsToRemove = new List<ChamferGroup>();
-                //foreach (Line possibleChamfer in possibleChamferList)
-                foreach (ChamferGroup chamferGroup in ChamferList)
-                {
-                    bool isParallelToSomething = false;
-                    bool hasParallelChamfer = false;
-                    
-                    // if parallel to a line... 
-                    foreach (Line line in lineList)
-                    {
-                        // ignore same line
-                        if (chamferGroup.Chamfer.Equals(line))
-                        {
-                            continue;
-                        }
-                    
-                        if (IsParallel(chamferGroup.Chamfer, line)) // && line.ChamferType != ChamferTypeEnum.None
-                        {
-                            isParallelToSomething = true;
-                        }
-                    }
-                    // and it is not a chamfer...
-                    if (isParallelToSomething)
-                    {
-                        foreach (ChamferGroup compChamferGroup in ChamferList)
-                        {
-                            if (chamferGroup != compChamferGroup && IsParallel(chamferGroup.Chamfer, compChamferGroup.Chamfer))
-                            {
-                                hasParallelChamfer = true;
-                            }
-                        }
-                    }
-                    // it is not a chamfer
-                    if (isParallelToSomething && !hasParallelChamfer)
-                    {
-                        chamferGroupsToRemove.Add(chamferGroup);
-                        break;
-                    }
-                }
-                foreach (ChamferGroup cgToRemove in chamferGroupsToRemove)
-                {
-                    ChamferList.Remove(cgToRemove);
-                }
-                // remaining possible chamfers meet above case so confirm
-                //foreach (Line line in possibleChamferList)
-                foreach (ChamferGroup chamferGroup in ChamferList)
-                {
-                    chamferGroup.Confirmed = true;
-                }
+                RemoveFalseChamfers(lineList);
                 break;
             }
         }
@@ -1217,23 +1228,6 @@ public class Feature
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
         // TODO: implement better check for octagon problem, perhaps with frontend
-        //NumChamfers = possibleChamferList.Count > 4 ? possibleChamferList.Count / 2 : possibleChamferList.Count;
-
-        //update base entity list based on found possible chamfers
-        //foreach (Line possibleChamfer in possibleChamferList)
-        // foreach (ChamferGroup chamferGroup in ChamferList)
-        // {
-        //     foreach (Entity entity in baseEntityList)
-        //     {
-        //         if (entity is Line line)
-        //         {
-        //             if (line.Equals(chamferGroup.Chamfer) || line.Equals(chamferGroup.Chamfer.swapStartEnd()))
-        //             {
-        //                 line.ChamferType = possibleChamfer.ChamferType;
-        //             }
-        //         }
-        //     }            
-        // }
     }
 
     #endregion
