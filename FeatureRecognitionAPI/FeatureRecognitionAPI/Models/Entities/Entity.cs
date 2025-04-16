@@ -531,6 +531,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        // todo: remove redundant get touching functions and move to entityTools
         /**
          * Function to check if any points of this entity is touching any points of another entity
          * 
@@ -632,6 +633,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        // todo: move to entityTools
         /**
          * Function that finds at what point two lines intersect when they are treated as infinite
          * this is mostly for the perpendicular line check, which is commented out

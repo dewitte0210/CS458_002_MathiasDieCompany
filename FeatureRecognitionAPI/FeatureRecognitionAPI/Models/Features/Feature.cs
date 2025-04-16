@@ -1121,7 +1121,6 @@ public class Feature
                 Line lineB = lineGroup[(i + 1) % lineGroup.Count];
                 Line lineC = lineGroup[(i + 2) % lineGroup.Count];
 
-                //need to verify orientation of lines
                 Angle angleAB = GetAngle(lineA, lineB);
                 Angle angleBC = GetAngle(lineB, lineC);
                 Angle angleAC = GetAngle(lineA, lineC);
@@ -1133,7 +1132,7 @@ public class Feature
                     if ((angleAB.GetDegrees() < 180 && angleAC.GetDegrees() < 180 && angleAC.GetDegrees() > 0)
                         || (angleAB.GetDegrees() > 180 && angleAC.GetDegrees() > 180 && angleAC.GetDegrees() < 360))
                     {
-                        ChamferList.Add(new ChamferGroup(lineA, lineB, lineC));
+                        ChamferList.Add(new ChamferGroup(ref lineA, ref lineB, ref lineC));
                     }
                 }
             }
@@ -1528,8 +1527,8 @@ public class Feature
     {
         //makes sure you're not extending lines that already touch
         if (line1.DoesIntersect(line2)) return false;
-
         if (!line1.isSameInfiniteLine(line2)) return false;
+        
         ExtendedLine tempLine = new(line1, line2); // makes a new extended line object     
         ExtendedEntityList.Remove(line1);
         ExtendedEntityList.Remove(line2);

@@ -492,7 +492,7 @@ namespace Testing_for_Project
                 numChamfers += GetNumChamferFeatures(fg.GetFeatures());
             }
             
-            Assert.That(numChamfers, Is.EqualTo(1));
+            Assert.That(GetNumChamferFeatures(squareFile.FeatureGroups), Is.EqualTo(1));
         }
         
         [Test]

@@ -1,5 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features
@@ -49,34 +50,29 @@ namespace FeatureRecognitionAPI.Models.Features
             // todo: just make Count return length of feature list
 
             // break out chamfers
-            List<Feature> featuresToAdd = new List<Feature>();
+            List<Feature> featuresToAdd = new();
             foreach (Feature feature in features)
             {
                 if (feature.ChamferList.Count <= 0) continue;
 
                 foreach (ChamferGroup cg in feature.ChamferList)
                 {
+                    // make new chamfer feature
                     featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [cg.Chamfer]));
                     Count++;
-                    //feature.EntityList.Remove(cg.Chamfer);
-                    //feature.ExtendTwoLines(cg.LineA, cg.LineB);
+                    
+                    // todo: check if not removing breaks group1A and entity count numbers
+                    // remove chamfer from original feature
+                    // if (feature.EntityList.Remove(cg.Chamfer))
+                    // {
+                    //     if (!EntityTools.ExtendTwoLines(cg.LineA, cg.LineB))
+                    //     {
+                    //         //problem if this runs
+                    //         break;
+                    //     }
+                    // }
                 }
                 feature.ChamferList.Clear();
-                
-                // foreach (Entity ent in feature.EntityList)
-                // {
-                //     //feature contains a chamfer so break it out
-                //     if (ent is Line { ChamferType: ChamferTypeEnum.Confirmed } line)
-                //     {
-                //         features.Add(new Feature(PossibleFeatureTypes.Group3, [line]));
-                //         feature.EntityList.Remove(ent);
-                //         
-                //         
-                //         
-                //
-                //         feature.NumChamfers--;
-                //     }
-                // }
             }
             features.AddRange(featuresToAdd);
             featuresToAdd.Clear();
