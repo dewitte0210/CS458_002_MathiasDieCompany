@@ -19,7 +19,6 @@ namespace FeatureRecognitionAPI.Models
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
         
-        public bool KissCut { get; set; }
 
         public ChamferTypeEnum ChamferType { get; set; }
 
@@ -47,7 +46,6 @@ namespace FeatureRecognitionAPI.Models
             EndPoint = new Point(endX, endY);
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
-            KissCut = false;
             ChamferType = ChamferTypeEnum.None;
 
             this.Length = Point.Distance(StartPoint, EndPoint);
@@ -73,7 +71,6 @@ namespace FeatureRecognitionAPI.Models
 
             SlopeY = EndPoint.Y - StartPoint.Y;
             SlopeX = EndPoint.X - StartPoint.X;
-            KissCut = false;
             ChamferType = ChamferTypeEnum.None;
 
             Length = Point.Distance(StartPoint, EndPoint);

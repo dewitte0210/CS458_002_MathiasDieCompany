@@ -19,7 +19,7 @@ public class Feature
     [JsonProperty] public PossibleFeatureTypes FeatureType { get; set; }
     
     [JsonProperty] public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
-    [JsonProperty] public bool kissCut;
+    [JsonProperty] public bool KissCut;
     [JsonProperty] public int multipleRadius;
     [JsonProperty] public bool roundedCorner;
     [JsonProperty] public double perimeter;
@@ -68,10 +68,10 @@ public class Feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whether the feature has multiple radiuses for rounded corners
      */
-    public Feature(List<Entity> entityList, bool kissCut, int multipleRadius)
+    public Feature(List<Entity> entityList, bool KissCut, int multipleRadius)
     {
         EntityList = entityList;
-        this.kissCut = kissCut;
+        this.KissCut = KissCut;
         this.multipleRadius = multipleRadius;
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
@@ -195,6 +195,7 @@ public class Feature
         CheckGroup4();
         CheckGroup5();
         CheckGroup6Perimeter();
+        CheckGroup9();
         CheckGroup17();
             
         //calculate and set the perimeter of the feature
@@ -1375,6 +1376,30 @@ public class Feature
     }
 
     #endregion
+    
+    #region Group9
+
+    internal void CheckGroup9()
+    {
+
+        foreach (Feature feature in PerimeterFeatureList)
+        {
+            for (int i = 0; i < feature.EntityList.Count; i++)
+            {
+                for (int j = 0; j < feature.EntityList[i].AdjList.Count; j++)
+                {
+                    if (feature.EntityList[i].AdjList[j].KissCut)
+                    {
+                        feature.KissCut = true;
+                        feature.FeatureType = PossibleFeatureTypes.Group9;
+
+                    }
+                }
+            }
+        }
+    }
+
+    #endregion
 
     #region Group5
     /// <summary>
@@ -1384,7 +1409,7 @@ public class Feature
     {
         foreach (Feature feature in PerimeterFeatureList)
         {
-            if (!(feature is not { numLines: 2, numArcs: 1 } && feature is not { numLines: 3, numArcs: 0 or 2 }))
+            if (!(feature is not { numLines: 2, numArcs: 1 } && feature is not { numLines: 3, numArcs: 0 or 2 }) && !feature.KissCut)
             {
                 bool con = true;
                 foreach (Entity entity in feature.EntityList)
@@ -1429,30 +1454,6 @@ public class Feature
                     feature.FeatureType = PossibleFeatureTypes.Group6;
                 }
             }
-        }
-    }
-
-    #endregion
-    
-    #region Group9
-
-    internal void CheckGroup9()
-    {
-        // check if a line that is not in base shape is touching kiss-cut line in adjacency list
-
-        for (int i = 0; i < baseEntityList.Count() - 1; i++)
-        {
-            if (baseEntityList[i] is Line && ((Line)baseEntityList[i]).KissCut)
-            {
-                for (int j = 0; j < baseEntityList[i].AdjList.Count() - 1; j++)
-                {
-                    if(!baseEntityList.Contains(baseEntityList[i].AdjList[j]))
-                    {
-                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group9);
-                    }
-                }
-            }
-
         }
     }
 
