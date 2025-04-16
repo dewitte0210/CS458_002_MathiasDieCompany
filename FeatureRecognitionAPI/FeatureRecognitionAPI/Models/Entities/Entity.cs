@@ -13,19 +13,22 @@ namespace FeatureRecognitionAPI.Models
      */
     public abstract class Entity
     {
-        public double Length { get; set; }//length of the entity
+        // todo: make length a get function because it should never change
+        // without underlying properties changing
+        public double Length { get; set; }
         [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
+
+        //Precision for x and y intersect values to
+        //account for inaccurate calculated values
+        private const int intersectTolerance = 4;
 
         //Enables the use of a default constructor
         protected Entity()
         {
             AdjList = new List<Entity>();
         }
-
-        private const int intersectTolerance = 4;//Precision for x and y intersect values to
-                                                 //account for inaccurate calculated values
-
+                                                 
         /**
          * Function that checks if this entity intersects with another entity
          * 
@@ -891,6 +894,8 @@ namespace FeatureRecognitionAPI.Models
             return null;
         }
 
+        // todo: move to MDCMath
+        
         /**
          * Solves the quadratic formula
          * 
