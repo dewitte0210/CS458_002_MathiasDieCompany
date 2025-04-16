@@ -9,7 +9,6 @@ export default function PunchConfig() {
         async function loadPunchData() {
             const apiData = await fetch(`${process.env.REACT_APP_API_BASEURL}api/Pricing/GetPunchPrices`)
             const data = await apiData.json();
-            console.log(data)
             setPunchData(data)
         }
         loadPunchData();
