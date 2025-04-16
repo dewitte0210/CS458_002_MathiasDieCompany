@@ -158,6 +158,15 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
+            if (listMap[listMap.Count - 1] == -1) // checks if the last entity was not added to a feature
+            // At this point the entity has been checked against every other entity so we can make a new feature
+            {
+                Feature tempFeature = new Feature(new List<Entity>());
+                tempFeature.EntityList.Add(EntityList[EntityList.Count - 1]);
+                FeatureList.Add(tempFeature);
+                listMap[listMap.Count - 1] = FeatureList.Count - 1;
+            }
+            
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
