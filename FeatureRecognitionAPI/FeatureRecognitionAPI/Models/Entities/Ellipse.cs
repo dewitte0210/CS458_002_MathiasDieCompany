@@ -246,19 +246,29 @@ namespace FeatureRecognitionAPI.Models
             return pointAngle >= Math.Round(StartParameter, 4) && pointAngle <= Math.Round(EndParameter, 4);
         }
 
+        //TODO: finish this
         public override bool Equals(object? obj)
         {
             if (obj is Ellipse)
             {
-
+                //intentional reference comparison
+                if (this == obj)
+                {
+                    return true;
+                }
             }
             return false;
         }
+        //TODO: finish this
         public override bool Compare(object? obj)
         {
             if (obj is Ellipse)
             {
-
+                //intentional reference comparison
+                if (this == obj)
+                {
+                    return true;
+                }
             }
             return false;
         }

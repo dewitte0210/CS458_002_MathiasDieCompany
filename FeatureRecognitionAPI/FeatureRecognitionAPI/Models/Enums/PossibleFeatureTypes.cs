@@ -30,7 +30,8 @@ namespace FeatureRecognitionAPI.Models.Enums
         Group9,
         Group10,
         Group11,
-        Group12,
+        Group12a, // Double D
+        Group12b, // Cross-Hairs
         Group13,
         Group14,
         Group17,
