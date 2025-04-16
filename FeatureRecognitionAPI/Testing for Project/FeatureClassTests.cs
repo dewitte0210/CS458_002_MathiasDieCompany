@@ -59,7 +59,6 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2, line3 };
 
             Feature feature = new Feature(entities);
-            PossibleFeatureTypes test;
             bool isTriangle = feature.CheckGroup1C();
 
             Assert.That(isTriangle, Is.True);
@@ -94,6 +93,7 @@ namespace Testing_for_Project
 
 
             Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6, line7, arc1, arc2, arc3 });
+            fakeTriangle.baseEntityList = fakeTriangle.EntityList;
             bool fakeCheck = fakeTriangle.CheckGroup1C();
             //Assert all are expected
 

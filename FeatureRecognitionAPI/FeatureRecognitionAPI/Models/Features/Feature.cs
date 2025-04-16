@@ -106,7 +106,7 @@ public class Feature
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
 
-        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
+        CountEntities(EntityList, out numLines, out numArcs, out numCircles, out numEllipses);
 
         //calculate and set the perimeter of the feature
         CalcPerimeter();
@@ -174,6 +174,8 @@ public class Feature
      */
     public void DetectFeatures()
     {
+        if (baseEntityList.Count == 0) {baseEntityList = new(EntityList);} // should only happen if line extension and separation were skipped
+        
         // BASE SHAPE DETECTION:
         if (!CheckGroup1B()
             && !CheckGroup1C() 

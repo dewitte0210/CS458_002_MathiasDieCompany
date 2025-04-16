@@ -707,14 +707,17 @@ namespace Testing_for_Project
             exampleOne.DetectAllFeatureTypes();
 
             List<Feature> featureList = exampleOne.FeatureList;
-            foreach (Feature feature in featureList)
+            for (int i = 0; i < 8; i++) // Only the firt 8 features should fulfill this since the
+                                        // later half will be recognized as equal features and wont
+                                        // have feature detection ran on them, meaning the
+                                        // baseEntityList wont be initialized
             {
                 bool equalLists = false;
-                if (feature.EntityList.Count == feature.baseEntityList.Count)
+                if (featureList[i].EntityList.Count == featureList[i].baseEntityList.Count)
                 {
-                    for (int i = 0; i < feature.EntityList.Count; i++)
+                    for (int j = 0; j < featureList[i].EntityList.Count; j++)
                     {
-                        if (feature.baseEntityList.Contains(feature.EntityList[i]))
+                        if (featureList[i].baseEntityList.Contains(featureList[i].EntityList[j]))
                         {
                             equalLists = true;
                         }
@@ -722,9 +725,9 @@ namespace Testing_for_Project
                 }
 
                 Assert.IsTrue(equalLists);//base entity list and normal entity list is the same (only works for example 1)
-                Feature testFeature = new Feature(feature.baseEntityList);
+                Feature testFeature = new Feature(featureList[i].baseEntityList);
                 testFeature.DetectFeatures();
-                Assert.IsTrue(feature.Equals(testFeature));
+                Assert.IsTrue(featureList[i].Equals(testFeature));
             }
         }
 
