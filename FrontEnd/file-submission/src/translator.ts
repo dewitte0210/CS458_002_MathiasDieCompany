@@ -11,6 +11,7 @@
     "Group5" : "Mitered Notch - 5",
     "Group6" : "Radius Notch - 6",
     "Group10" : "C-Spacer",
+    "Group9" : "Kiss-Cut Tab",
     "Group11": "Pac-Man",
     "Group12a": "Double D",
     "Group12b": "Cross-Hair",

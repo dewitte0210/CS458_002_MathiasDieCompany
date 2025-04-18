@@ -90,7 +90,7 @@ namespace FeatureRecognitionAPI.Models
                     count++;
                     if (count == 4 && EntityList[i] is Line tempLine)
                     {
-                        // TODO: tempLine.Kisscut = True;
+                        tempLine.KissCut = true;
                     }
 
                     if (listMap[i] == -1 || listMap[j] == -1) // checks that either i or j still needs to be mapped
@@ -158,15 +158,6 @@ namespace FeatureRecognitionAPI.Models
                 }
             }
 
-            if (listMap[listMap.Count - 1] == -1) // checks if the last entity was not added to a feature
-            // At this point the entity has been checked against every other entity so we can make a new feature
-            {
-                Feature tempFeature = new Feature(new List<Entity>());
-                tempFeature.EntityList.Add(EntityList[EntityList.Count - 1]);
-                FeatureList.Add(tempFeature);
-                listMap[listMap.Count - 1] = FeatureList.Count - 1;
-            }
-            
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
@@ -176,7 +167,7 @@ namespace FeatureRecognitionAPI.Models
         
         /*
          * Groups features together and stores how many of each feature group are present in the file
-         * Initliazes class variable featuresList
+         * Initializes class variable featuresList
          */
         public void SetFeatureGroups()
         {

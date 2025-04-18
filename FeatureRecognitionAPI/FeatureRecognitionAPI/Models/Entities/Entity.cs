@@ -16,11 +16,13 @@ namespace FeatureRecognitionAPI.Models
         public double Length { get; set; }//length of the entity
         [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
+        public bool KissCut { get; set; }
 
         //Enables the use of a default constructor
         protected Entity()
         {
             AdjList = new List<Entity>();
+            KissCut = false;
         }
 
         private const int intersectTolerance = 4;//Precision for x and y intersect values to
