@@ -7,10 +7,10 @@ namespace FeatureRecognitionAPI.Models.Dtos
     public class QuoteSubmissionDto
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public RuleTypeEnum RuleType { get; set; }
+        public RuleType RuleType { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public EjectionMethodTypeEnum EjectionMethod { get; set; }
+        public EjectionMethodType EjectionMethod { get; set; }
         public List<DieDto> FeatureGroups { get; set; }
 
     }
