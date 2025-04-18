@@ -11,12 +11,12 @@ using FromBody = System.Web.Http.FromBodyAttribute;
 
 namespace FeatureRecognitionAPI.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("api/Pricing")]
+    [Microsoft.AspNetCore.Mvc.Route("api/Pricing/[action]")]
     [ApiController]
     public class PricingController(IPricingService pricingService, IPricingDataService dataService)
         : ControllerBase
     {
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -42,25 +42,28 @@ namespace FeatureRecognitionAPI.Controllers
             }
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet("[action]")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<FeaturePrice>>> GetFeaturePrices()
         {
             return Ok(dataService.GetFeaturePrices());
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet("[action]")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PunchPriceReturn>> GetPunchPrices()
         {
             return Ok(dataService.GetPunchPrices());
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetBaseRates()
+        {
+            return Ok(dataService.GetRates());
+        }
+        
+        [Microsoft.AspNetCore.Mvc.HttpPost("{type}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -69,54 +72,48 @@ namespace FeatureRecognitionAPI.Controllers
             // Punch is included here because we do not have prices for generic punches
             // type > 7 is if a feature price was sent to the punch method
             if (type is PossibleFeatureTypes.Unknown or PossibleFeatureTypes.Punch
-                || (int)type > 7)
+                || (int)type > 7 || punches is null || punches.Count == 0)
             {
                 return BadRequest();
             }
 
-            bool success = dataService.UpdatePunchPrice(type, punches);
+            bool success = await dataService.UpdatePunchPrice(type, punches);
             return success ? Ok() : StatusCode(500);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateFeaturePrice(PossibleFeatureTypes type,
-            [FromBody] List<FeaturePrice> features)
+        public async Task<ActionResult> UpdateFeaturePrice([FromBody] List<FeaturePrice> features)
         {
-            // type <= 7 is if a punch price was sent to the feature method
-            if (type is PossibleFeatureTypes.Unknown || (int)type <= 7)
-            {
-                return BadRequest();
-            }
+            if (features.Count == 0 || features is null) { return BadRequest(); }
 
-            bool success = dataService.UpdateFeaturePrice(type, features);
+            bool success = await dataService.UpdateFeaturePrice(features);
             return success ? Ok() : StatusCode(500);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeletePunchPrice(PossibleFeatureTypes type, [FromBody] PunchPrice price)
-        {
-            if (type is PossibleFeatureTypes.Unknown or PossibleFeatureTypes.Punch
-                || (int)type >= 7) { return BadRequest(); }
-            bool success = dataService.deletePunchPrice(type, price);
-            return success ? Ok() : StatusCode(500);
-        }
-        
-        [Microsoft.AspNetCore.Mvc.HttpPost("[action]/{type}")]
+        [Microsoft.AspNetCore.Mvc.HttpPost("{type}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> AddPunchPrice(PossibleFeatureTypes type, [FromBody] PunchPrice price)
         {
             if (type is PossibleFeatureTypes.Unknown or PossibleFeatureTypes.Punch
-                || (int)type >= 7) { return BadRequest(); }
-            bool success = dataService.AddPunchPrice(type, price);
+                || (int)type >= 7 || price is null) { return BadRequest(); }
+            bool success = await dataService.AddPunchPrice(type, price);
             return success ? Ok() : StatusCode(500);
+        }
+
+        [Microsoft.AspNetCore.Mvc.HttpPost("")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdateRates([FromBody] RatesPrices rates)
+        {
+            if(rates is null) { return BadRequest(); }
+           bool success = await dataService.UpdateRates(rates); 
+           return success ? Ok() : StatusCode(500);
         }
     }
 }

@@ -39,9 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("FeatureRecognitionPolicy");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
