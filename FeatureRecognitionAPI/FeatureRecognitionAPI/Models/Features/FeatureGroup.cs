@@ -71,6 +71,7 @@ public class FeatureGroup
         List<Feature> featToAdd = new List<Feature>();
         for (int i = 0; i < features.Count; i++)
         {
+
             features[i].ExtendAllEntities();
             features[i].SeperateBaseEntities();
             features[i].SeperatePerimeterEntities();

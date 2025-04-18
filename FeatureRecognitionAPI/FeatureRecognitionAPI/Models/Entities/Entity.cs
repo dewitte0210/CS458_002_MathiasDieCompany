@@ -666,6 +666,7 @@ namespace FeatureRecognitionAPI.Models
 
             // Lines are parallel and thus cannot intersect
             intersectPoint.intersect = MdcMath.DoubleEquals(delta, 0);
+
             if (!intersectPoint.intersect)
             {
                 return null;

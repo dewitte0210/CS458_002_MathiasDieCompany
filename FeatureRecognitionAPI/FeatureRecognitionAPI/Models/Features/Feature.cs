@@ -106,6 +106,7 @@ public class Feature
     {
         FeatureType = pft;
         EntityList = entityList;
+
         ConstructFromEntityList();
     }
 
@@ -1225,6 +1226,7 @@ public class Feature
 
     #region PerimeterDetection
     
+
     /*  todo: break out chamfered lines from parent feature
      *  remove chamfered line entity from parent feature and extend the lines
      *  to make the parent shape clean
@@ -1232,7 +1234,6 @@ public class Feature
      *  then we can make group 1 rectangle detection better and front end
      *  will read the new chamfer feature
      */
-    
     #region Group3
 
     /*  chamfered corner detection
@@ -1528,7 +1529,6 @@ public class Feature
 
     internal void CheckGroup9()
     {
-
         foreach (Feature feature in PerimeterFeatureList)
         {
             for (int i = 0; i < feature.EntityList.Count; i++)
