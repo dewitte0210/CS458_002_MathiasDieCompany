@@ -128,25 +128,23 @@ namespace FeatureRecognitionAPI.Services
                         // Includes a discount depending on the quantity of the feature
                         double costSub1 = runCost;
                         double minCost = runCost * 0.25;
-                        for (int i = 0; i < quantity; i++)
+                        for (int i = 1; i <= quantity; i++)
                         {
                             if (costSub1 > minCost)
                             {
                                 featureCost += costSub1;
 
-                               // var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); this is the main 1 number
-                               var efficiencySlope = 0.98; 
+                                var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); 
                                costSub1 *= efficiencySlope;
                             }
                             else
                             {
                                 featureCost += minCost;
                             }
-
-                            i++;
                         }
                     
                         featureCost *= ruleFactor;
+                        var setupDiscount = SetupDiscount(quantity);
                         var featureSetup = setupCost * SetupDiscount(quantity);
                         totalFeatureCost += featureCost;
                         setupCostTotal += featureSetup;
@@ -160,22 +158,22 @@ namespace FeatureRecognitionAPI.Services
                         switch (feature.FeatureType)
                         { 
                             case PossibleFeatureTypes.StdTubePunch:
-                                punch = _tubePunchList.OrderBy(x => (Math.Abs(x.CutSize - feature.Perimeter))).First();
+                                punch = _tubePunchList.OrderBy(x => (Math.Abs(x.CutSize - feature.Diameter))).First();
                                 break;
                             case PossibleFeatureTypes.SideOutlet:
-                                punch = _soPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                punch = _soPunchList.OrderBy(x => (Math.Abs(x.CutSize - feature.Diameter))).First();
                                 break;
                             case PossibleFeatureTypes.HDSideOutlet:
-                                punch = _hdsoPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                punch = _hdsoPunchList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
                                 break;
                             case PossibleFeatureTypes.StdFTPunch:
-                                punch = _ftPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                punch = _ftPunchList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
                                 break;
                             case PossibleFeatureTypes.StdSWPunch:
-                                punch = _swPunchList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                punch = _swPunchList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
                                 break; 
                             case PossibleFeatureTypes.StdRetractPins:
-                                punch = _retractList.OrderBy(x => (x.CutSize - feature.Perimeter)).First();
+                                punch = _retractList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
                                 break;
                             // Not sure if Punch is even valid for pricing 
                             case PossibleFeatureTypes.Punch:

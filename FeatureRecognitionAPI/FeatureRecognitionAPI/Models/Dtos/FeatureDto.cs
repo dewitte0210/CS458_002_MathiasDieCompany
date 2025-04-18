@@ -12,6 +12,8 @@ namespace FeatureRecognitionAPI.Models.Dtos
         public List<EntityDto>? EntityList { get; set; } // At least some properties will not be null, depending on the entity type
         public int Count { get; set; }
         public double Perimeter { get; set; }
+        
+        public double Diameter { get; set; }
         public int MultipleRadius { get; set; }
         public bool KissCut { get; set; }
     }
