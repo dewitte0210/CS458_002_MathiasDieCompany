@@ -1,6 +1,6 @@
 namespace FeatureRecognitionAPI.Models.Utility
 {
-	public static class MDCMath
+	public static class MdcMath
 	{
 		/// <summary>
 		/// Compare if two doubles are equal within a tolerance

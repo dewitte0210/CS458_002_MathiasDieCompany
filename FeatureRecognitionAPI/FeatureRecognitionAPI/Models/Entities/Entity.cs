@@ -13,10 +13,16 @@ namespace FeatureRecognitionAPI.Models
      */
     public abstract class Entity
     {
-        public double Length { get; set; }//length of the entity
+        // todo: make length a get function because it should never change
+        // without underlying properties changing
+        public double Length { get; set; }
         [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
         public bool KissCut { get; set; }
+
+        //Precision for x and y intersect values to
+        //account for inaccurate calculated values
+        private const int intersectTolerance = 4;
 
         //Enables the use of a default constructor
         protected Entity()
@@ -25,15 +31,16 @@ namespace FeatureRecognitionAPI.Models
             KissCut = false;
         }
 
-        private const int intersectTolerance = 4;//Precision for x and y intersect values to
-                                                 //account for inaccurate calculated values
-
         /**
          * Function that checks if this entity intersects with another entity
-         * 
+         *
          * @param other is the entity being checked against this
          * @return true if they intersect, otherwise false
          */
+
+        // todo: implement getLength()
+        //public abstract double GetLength();
+        
         public bool DoesIntersect(Entity other)
         {
             if (this is Circle || other is Circle) { return false; }
@@ -533,6 +540,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        // todo: remove redundant get touching functions and move to entityTools
         /**
          * Function to check if any points of this entity is touching any points of another entity
          * 
@@ -634,6 +642,7 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
+        // todo: move to entityTools
         /**
          * Function that finds at what point two lines intersect when they are treated as infinite
          * this is mostly for the perpendicular line check, which is commented out
@@ -645,25 +654,26 @@ namespace FeatureRecognitionAPI.Models
         public static Point? GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
-            double A1 = line1.EndPoint.Y - line1.StartPoint.Y;
-            double B1 = line1.EndPoint.X - line1.StartPoint.X;
-            double C1 = A1 * line1.StartPoint.X + B1 * line1.StartPoint.Y;
+            double y1 = line1.EndPoint.Y - line1.StartPoint.Y;
+            double x1 = line1.EndPoint.X - line1.StartPoint.X;
+            double C1 = y1 * line1.StartPoint.X + x1 * line1.StartPoint.Y;
 
-            double A2 = line2.EndPoint.Y - line2.StartPoint.Y;
-            double B2 = line2.EndPoint.X - line2.StartPoint.X;
-            double C2 = A2 * line2.StartPoint.X + B2 * line2.StartPoint.Y;
+            double y2 = line2.EndPoint.Y - line2.StartPoint.Y;
+            double x2 = line2.EndPoint.X - line2.StartPoint.X;
+            double C2 = y2 * line2.StartPoint.X + x2 * line2.StartPoint.Y;
 
-            double delta = A1 * B2 - A2 * B1;
+            double delta = y1 * x2 - y2 * x1;
 
             // Lines are parallel and thus cannot intersect
-            intersectPoint.intersect = MDCMath.DoubleEquals(delta, 0);
+            intersectPoint.intersect = MdcMath.DoubleEquals(delta, 0);
+
             if (!intersectPoint.intersect)
             {
                 return null;
             }
 
             // Intersection point
-            intersectPoint.setPoint(((B1 * C2 - B2 * C1) / delta), ((A1 * C2 - A2 * C1) / delta));
+            intersectPoint.setPoint(((x1 * C2 - x2 * C1) / delta), ((y1 * C2 - y2 * C1) / delta));
             return intersectPoint;
         }
 
@@ -908,6 +918,8 @@ namespace FeatureRecognitionAPI.Models
             return null;
         }
 
+        // todo: move to MDCMath
+        
         /**
          * Solves the quadratic formula
          * 

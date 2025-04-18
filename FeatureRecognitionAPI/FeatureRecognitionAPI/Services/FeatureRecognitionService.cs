@@ -72,7 +72,7 @@ namespace FeatureRecognitionAPI.Services
             return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
         }
 
-        private static List<Entity> CondenseArcs(List<Entity> entities)
+        internal static List<Entity> CondenseArcs(List<Entity> entities)
         {
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
 
