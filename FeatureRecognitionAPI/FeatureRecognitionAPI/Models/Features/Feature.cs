@@ -1696,15 +1696,19 @@ public class Feature
         exLine.AdjList.Remove(line2);
         
         // replace line1 and line2 with exLine in the adjacency lists for entities touching line1 and line2
-        foreach (Entity e in line1.AdjList)
+        for (int i = 0; i < line1.AdjList.Count; i++)
         {
-            e.AdjList.Remove(line1);
-            e.AdjList.Add(exLine);
+            List<Entity> tempList = new List<Entity>(line1.AdjList[i].AdjList);
+            tempList.Remove(line1);
+            tempList.Add(exLine);
+            line1.AdjList[i].AdjList = tempList;
         }
-        foreach (Entity e in line2.AdjList)
+        for (int i = 0; i < line2.AdjList.Count; i++)
         {
-            e.AdjList.Remove(line2);
-            e.AdjList.Add(exLine);
+            List<Entity> tempList = new List<Entity>(line2.AdjList[i].AdjList);
+            tempList.Remove(line2);
+            tempList.Add(exLine);
+            line2.AdjList[i].AdjList = tempList;
         }
     }
 
