@@ -652,21 +652,21 @@ namespace FeatureRecognitionAPI.Models
         public static Point GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
-            double A1 = line1.EndPoint.Y - line1.StartPoint.Y;
-            double B1 = line1.EndPoint.X - line1.StartPoint.X;
-            double C1 = A1 * line1.StartPoint.X + B1 * line1.StartPoint.Y;
+            double y1 = line1.EndPoint.Y - line1.StartPoint.Y;
+            double x1 = line1.EndPoint.X - line1.StartPoint.X;
+            double C1 = y1 * line1.StartPoint.X + x1 * line1.StartPoint.Y;
 
-            double A2 = line2.EndPoint.Y - line2.StartPoint.Y;
-            double B2 = line2.EndPoint.X - line2.StartPoint.X;
-            double C2 = A2 * line2.StartPoint.X + B2 * line2.StartPoint.Y;
+            double y2 = line2.EndPoint.Y - line2.StartPoint.Y;
+            double x2 = line2.EndPoint.X - line2.StartPoint.X;
+            double C2 = y2 * line2.StartPoint.X + x2 * line2.StartPoint.Y;
 
-            double delta = A1 * B2 - A2 * B1;
+            double delta = y1 * x2 - y2 * x1;
 
             // Lines are parallel and thus cannot intersect
-            intersectPoint.intersect = !(delta == 0);
+            intersectPoint.intersect = !MdcMath.DoubleEquals(delta, 0.0);
 
             // Intersection point
-            intersectPoint.setPoint(((B1 * C2 - B2 * C1) / delta), ((A1 * C2 - A2 * C1) / delta));
+            intersectPoint.setPoint(((x1 * C2 - x2 * C1) / delta), ((y1 * C2 - y2 * C1) / delta));
             return intersectPoint;
         }
 

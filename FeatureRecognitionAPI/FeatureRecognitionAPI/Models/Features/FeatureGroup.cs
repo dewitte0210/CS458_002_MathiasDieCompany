@@ -30,41 +30,41 @@ public class FeatureGroup
     
     private void BreakOutChamfers()
     {
-        // todo: extend the two lines the chamfer was touching to clean up the shape
         // todo: make so it works with more than one chamfer
+        // todo: check if not removing breaks group1A and entity count numbers
             
         List<Feature> featuresToAdd = new();
         foreach (Feature feature in features)
         {
             if (feature.ChamferList.Count <= 0) continue;
 
-            List<Entity> linesToExtend = new();
             List<Line> chamfersToRemove = new();
-                
+            List<Entity> newEntityList = feature.EntityList.ToList();
             foreach (ChamferGroup cg in feature.ChamferList)
             {
                 // make new chamfer feature
-                featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [cg.Chamfer]));
-                Count++;
+                featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [new Line(cg.Chamfer)]));
                 
                 // add to a new list so that the indexes in entity list stay the same
                 chamfersToRemove.Add(cg.Chamfer);
 
-                EntityTools.ExtendTwoLines(feature.EntityList[cg.LineAIndex] as Line,
-                    feature.EntityList[cg.LineBIndex] as Line);
-
-                // todo: check if not removing breaks group1A and entity count numbers
-                // remove chamfer from original feature
+                // todo: decide whether to remove the chamfers because it shows up in front end weird
+                //EntityTools.ExtendTwoLines(newEntityList[cg.LineAIndex] as Line,
+                //    newEntityList[cg.LineBIndex] as Line);
             }
 
-            // actually remove the chamfer
-            foreach (Line chamfer in chamfersToRemove)
-            {
-                feature.EntityList.Remove(chamfer);
-            }
+            // actually remove the chamfers
+            //foreach (Line chamfer in chamfersToRemove)
+            //{
+            //    newEntityList.Remove(chamfer);
+            //}
             feature.ChamferList.Clear();
+            chamfersToRemove.Clear();
+            feature.EntityList = newEntityList;
         }
+        // add the new chamfer features to the group
         features.AddRange(featuresToAdd);
+        Count += featuresToAdd.Count;
         featuresToAdd.Clear();
     }
 

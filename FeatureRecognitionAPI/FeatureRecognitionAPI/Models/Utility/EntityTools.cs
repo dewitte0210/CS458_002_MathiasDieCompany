@@ -2,31 +2,54 @@ using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 namespace FeatureRecognitionAPI.Models.Utility;
 
-public class EntityTools
+public static class EntityTools
 {
-    public class ExtendTwoLinesResult(Line line1, Line line2, bool success)
-    {
-        public readonly Line Line1 = line1;
-        public readonly Line Line2 = line2;
-        public readonly bool Success = success;
-    };
-
     /// <summary>
-    /// Extends two lines to their intersect point. Changes the value of the lines passed through.
+    /// find the intersect point of two lines
     /// </summary>
     /// <param name="line1"></param>
     /// <param name="line2"></param>
-    /// <returns> returns whether the lines were extended or not </returns>
+    /// <returns> returns the intersection point of two lines, null if not possible </returns>
+    public static Point? GetIntersection(Line line1, Line line2)
+    {
+        Point l1Delta = line1.GetDelta();
+        Point l2Delta = line2.GetDelta();
+        
+        Point xDiff = new(-l1Delta.X, -l2Delta.X);
+        Point yDiff = new(-l1Delta.Y, -l2Delta.Y);
+
+        double diffCross = CrossProduct(xDiff, yDiff);
+        
+        //lines are parallel
+        if (MdcMath.DoubleEquals(diffCross, 0)) return null;
+        
+        Point d = new(CrossProduct(line1.StartPoint, line1.EndPoint), CrossProduct(line2.StartPoint, line2.EndPoint));
+        double x = CrossProduct(d, xDiff) / diffCross;
+        double y = CrossProduct(d, yDiff) / diffCross;
+        
+        return new Point(x, y);
+    }
+    
+    /// <summary>
+    /// Extends two lines to their intersect point. Changes the value of the lines passed through.
+    /// Only tested for non-touching line segments for chamfered line extension,
+    /// change if you need advanced behavior
+    /// </summary>
+    /// <param name="line1"> nullable line A </param>
+    /// <param name="line2"> nullable line B </param>
+    /// <returns> returns whether the lines were successfully extended or not </returns>
     public static bool ExtendTwoLines(Line? line1, Line? line2)
     {
         if (line1 == null || line2 == null) return false;
         
+        // todo: if collinear merge into one line
+        // todo: update line adjacency lists
         //if parallel do not extend 
         if (IsParallel(line1, line2)) return false;
 
-        Point intPoint = Entity.GetIntersectPoint(line1, line2);
+        Point intPoint = GetIntersection(line1, line2);
+        if (intPoint == null) return false;
         
-        //Line extended1 = new(line1.StartPoint, line1.EndPoint);
         double line1StartDistance = Point.Distance(line1.StartPoint, intPoint);
         double line1EndDistance = Point.Distance(line1.EndPoint, intPoint);
         //if start is closer to intersect set that as new start
@@ -39,7 +62,6 @@ public class EntityTools
             line1.EndPoint = intPoint;
         }
         
-        //Line extended2 = new(line2.StartPoint, line2.EndPoint);
         double line2StartDistance = Point.Distance(line2.StartPoint, intPoint);
         double line2EndDistance = Point.Distance(line2.EndPoint, intPoint);
         if (line2StartDistance < line2EndDistance)
@@ -50,6 +72,10 @@ public class EntityTools
         {
             line2.EndPoint = intPoint;
         }
+
+        // update Length because for some reason it isn't a function
+        line1.Length = Point.Distance(line1.StartPoint, line1.EndPoint);
+        line2.Length = Point.Distance(line2.StartPoint, line2.EndPoint);
 
         return true;
     }

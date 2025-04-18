@@ -120,7 +120,6 @@ public class Feature
     {
         count = 1;
         multipleRadius = 1;
-        EntityList = EntityList;
         baseEntityList = EntityList;
         PerimeterFeatures = new List<PerimeterFeatureTypes>();
         ExtendedEntityList = new List<Entity>();
@@ -1134,7 +1133,7 @@ public class Feature
                         || (ab.GetDegrees() > 180 && ac.GetDegrees() > 180 && ac.GetDegrees() < 360))
                     {
                         ChamferList.Add(new ChamferGroup(EntityList.IndexOf(lineA), 
-                            EntityList.IndexOf(lineB), EntityList.IndexOf(lineC), lineA, lineB, lineC));
+                            EntityList.IndexOf(lineB), EntityList.IndexOf(lineC), lineB));
                     }
                 }
             }
