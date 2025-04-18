@@ -177,7 +177,7 @@ public class Feature
         if (baseEntityList.Count == 0)
         {
             baseEntityList = new(EntityList);
-            PerimeterFeatureList.Clear();
+            // PerimeterFeatureList.Clear();
         } // should only happen if line extension and separation were skipped
         
         // BASE SHAPE DETECTION:
