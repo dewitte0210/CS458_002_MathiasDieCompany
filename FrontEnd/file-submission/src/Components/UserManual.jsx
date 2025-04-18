@@ -187,7 +187,7 @@ export default function UserManual (){
                     <div className="info-section">
                       <div className="info-item">
                         <div className="icon-circle">
-                          <i class="fa-solid fa-phone"></i> {/* Phone Icon */}
+                          <i className="fa-solid fa-phone"></i> {/* Phone Icon */}
                         </div>
                         <div className="info-text">
                           <h4>Customer Support</h4>
@@ -197,7 +197,7 @@ export default function UserManual (){
 
                       <div className="info-item">
                         <div className="icon-circle">
-                          <i class="fa-solid fa-location-dot"></i> {/* Location Icon */}
+                          <i className="fa-solid fa-location-dot"></i> {/* Location Icon */}
                         </div>
                         <div className="info-text">
                           <h4>Our Location</h4>

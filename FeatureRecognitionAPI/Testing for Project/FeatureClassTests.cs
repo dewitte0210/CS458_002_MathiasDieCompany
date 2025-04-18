@@ -1,7 +1,9 @@
 ﻿using FeatureRecognitionAPI.Controllers;
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.Utility;
 using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -59,8 +61,7 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2, line3 };
 
             Feature feature = new Feature(entities);
-            PossibleFeatureTypes test;
-            bool isTriangle = feature.CheckGroup1C(out test);
+            bool isTriangle = feature.CheckGroup1C();
 
             Assert.That(isTriangle, Is.True);
         }
@@ -76,13 +77,13 @@ namespace Testing_for_Project
 
             Feature square = new Feature(new List<Entity>() { line1, line2, line3, line4 });
             PossibleFeatureTypes test;
-            bool squareCheck = square.CheckGroup1C(out test);
+            bool squareCheck = square.CheckGroup1C();
 
             //Circle
             Circle circle1 = new(1, 1, 4.5);
 
             Feature circle = new Feature(new List<Entity>() { circle1 });
-            bool circleCheck = circle.CheckGroup1C(out test);
+            bool circleCheck = circle.CheckGroup1C();
 
             //3 Arcs + 3 lines that are not triangle
             Line line5 = new(1, 1, 1, 4);
@@ -94,7 +95,8 @@ namespace Testing_for_Project
 
 
             Feature fakeTriangle = new Feature(new List<Entity>() { line5, line6, line7, arc1, arc2, arc3 });
-            bool fakeCheck = fakeTriangle.CheckGroup1C(out test);
+            fakeTriangle.baseEntityList = fakeTriangle.EntityList;
+            bool fakeCheck = fakeTriangle.CheckGroup1C();
             //Assert all are expected
 
             Assert.That(squareCheck, Is.False);
@@ -122,7 +124,7 @@ namespace Testing_for_Project
             Feature baseShape = fList[1];
 
             PossibleFeatureTypes pType;
-            Assert.IsTrue(baseShape.CheckGroup1C(out pType));
+            Assert.IsTrue(baseShape.CheckGroup1C());
 
         }
 
@@ -202,8 +204,6 @@ namespace Testing_for_Project
 
         #region CheckGroup3
 
-        // TODO: test with unordered lines
-        
         [Test]
         public void TestGetLinesFromEntityListSquare()
         {
@@ -245,6 +245,70 @@ namespace Testing_for_Project
         }
 
         [Test]
+        public void TestGetTouchingLineNoTouching()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(99, 99, 100, 100);
+            List<Line> ll = [line1, line2];
+
+            Line? touchingLine = Feature.GetTouchingLine(line1, ll).Item1;
+            Assert.That(touchingLine, Is.EqualTo(null));
+        }
+        
+        [Test]
+        public void TestGetTouchingLineOneTouching()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            List<Line> ll = [line1, line2];
+
+            Line? touchingLine = Feature.GetTouchingLine(line1, ll).Item1;
+            Assert.That(touchingLine, Is.Not.Null);
+        }
+
+        [Test]
+        public void TestGetOrderedLinesSquare()
+        {
+            Line line1 = new Line(0, 0, 5, 0);
+            Line line2 = new Line(5, 0, 5, 5);
+            Line line3 = new Line(5, 5, 0, 5);
+            Line line4 = new Line(0, 5, 0, 0);
+            List<Line> ll = [line1, line2, line3, line4];
+            
+            List<List<Line>> orderedLines = Feature.GetOrderedLines(ll);
+            
+            Assert.That(orderedLines.Count, Is.EqualTo(1));
+            Assert.That(orderedLines[0].Count, Is.EqualTo(4));
+            Assert.That(orderedLines[0], Is.EqualTo(ll));
+        }
+        
+        [Test]
+        public void TestGetOrderedLinesTwoSquare()
+        {
+            Line line1A = new Line(0, 0, 5, 0);
+            Line line2A = new Line(5, 0, 5, 5);
+            Line line3A = new Line(5, 5, 0, 5);
+            Line line4A = new Line(0, 5, 0, 0);
+            List<Line> lla = [line1A, line2A, line3A, line4A];
+            
+            Line line1B = new Line(10, 10, 15, 10);
+            Line line2B = new Line(15, 10, 15, 15);
+            Line line3B = new Line(15, 15, 10, 15);
+            Line line4B = new Line(10, 15, 10, 10);
+            List<Line> llb = [line1B, line2B, line3B, line4B];
+            
+            List<Line> ll = [line1A, line2A, line3A, line4A, line1B, line2B, line3B, line4B];
+            List<List<Line>> orderedLines = Feature.GetOrderedLines(ll);
+            
+            Assert.That(orderedLines.Count, Is.EqualTo(2));
+            Assert.That(orderedLines[0].Count, Is.EqualTo(4));
+            Assert.That(orderedLines[1].Count, Is.EqualTo(4));
+            Assert.That(orderedLines[0], Is.EqualTo(lla));
+            Assert.That(orderedLines[1], Is.EqualTo(llb));
+        }
+        
+        /*
+        [Test]
         public void TestGetPossibleChamfersOneChamfer()
         {
             // counterclockwise
@@ -252,14 +316,14 @@ namespace Testing_for_Project
             Line line1 = new Line(0, 0, 5, 0);
             Line line2 = new Line(5, 0, 5, 5);
             Line line3 = new Line(5, 5, 2, 5);
-            Line lineCham = new Line(2, 5, 0, 3);
+            Line lineChamfer = new Line(2, 5, 0, 3);
             Line line5 = new Line(0, 3, 0, 0);
-            List<Line> ll = [line1, line2, line3, lineCham, line5];
+            List<Line> ll = [line1, line2, line3, lineChamfer, line5];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            List<Line> possibleChamList = Feature.SetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(1));
-            Assert.That(possibleChamList[0], Is.EqualTo(lineCham));
+            Assert.That(possibleChamList[0], Is.EqualTo(lineChamfer));
         }
         
         [Test]
@@ -277,7 +341,7 @@ namespace Testing_for_Project
             Line line6 = new Line(0, 3, 0, 0);
             List<Line> ll = [line1, line2, lineCham3, line4, lineCham5, line6];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            List<Line> possibleChamList = Feature.SetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(3));
             Assert.Contains(lineCham3, possibleChamList);
@@ -303,7 +367,7 @@ namespace Testing_for_Project
             Line line8 = new Line(0, 2, 2, 0);
             List<Line> ll = [line1, line2, line3, line4, line5, line6, line7, line8];
             
-            List<Line> possibleChamList = Feature.GetPossibleChamfers(ll);
+            List<Line> possibleChamList = Feature.SetPossibleChamfers(Feature.GetOrderedLines(ll));
             
             Assert.That(possibleChamList.Count, Is.EqualTo(8));
             Assert.Contains(line1, possibleChamList);
@@ -315,6 +379,7 @@ namespace Testing_for_Project
             Assert.Contains(line7, possibleChamList);
             Assert.Contains(line8, possibleChamList);
         }
+        */
         
         [Test]
         public void CheckGroup3NoChamferSquare()
@@ -326,14 +391,7 @@ namespace Testing_for_Project
             List<Entity> eList = [line1, line2, line3, line4];
             Feature f = new(eList);
             
-            Assert.That(f.NumChamfers, Is.EqualTo(0));
-            //check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Any(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }),
-                Is.EqualTo(false));
-            Assert.That(f.baseEntityList.Any(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }),
-                Is.EqualTo(false));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(0));
         }
         
         [Test]
@@ -352,14 +410,8 @@ namespace Testing_for_Project
             //detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.NumChamfers, Is.EqualTo(1));
-            //check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
-                Is.EqualTo(0));
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
-                Is.EqualTo(1));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(1));
+            //Assert.That(f.ChamferList[0].ChamferIndex, Is.EqualTo(lineCham));
         }
         
         [Test]
@@ -381,14 +433,9 @@ namespace Testing_for_Project
             //detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.NumChamfers, Is.EqualTo(2));
-            //check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
-                Is.EqualTo(1));
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
-                Is.EqualTo(2));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(2));
+            //Assert.That(f.ChamferList[0].ChamferIndex, Is.EqualTo(lineCham3));
+            //Assert.That(f.ChamferList[1].ChamferIndex, Is.EqualTo(lineCham5));
         }
         
         [Test]
@@ -411,14 +458,151 @@ namespace Testing_for_Project
             // detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.NumChamfers, Is.EqualTo(4));
-            // check if there is a baseEntity with chamfer type
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Possible }).ToList().Count(),
-                Is.EqualTo(8));
-            Assert.That(f.baseEntityList.Where(
-                    x => x is Line { ChamferType: ChamferTypeEnum.Confirmed }).ToList().Count(),
-                Is.EqualTo(0));
+            Assert.That(f.ChamferList.Count, Is.EqualTo(8));
+        }
+
+        [Test]
+        public void CheckGroup3NoChamferFromFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\test-files\\square.dxf";
+            DXFFile squareFile = new DXFFile(path);
+            squareFile.DetectAllFeatureTypes();
+
+            Assert.That(squareFile.FeatureList[0].ChamferList.Count, Is.EqualTo(0));
+        }
+        
+        [Test]
+        public void CheckGroup3OneChamferFromFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\test-files\\one-chamfer-square.dxf";
+            DXFFile squareFile = new DXFFile(path);
+            squareFile.DetectAllFeatureTypes();
+
+            int numChamfers = 0;
+            foreach (FeatureGroup fg in squareFile.FeatureGroups)
+            {
+                numChamfers += GetNumChamferFeatures(fg.GetFeatures());
+            }
+            
+            Assert.That(GetNumChamferFeatures(squareFile.FeatureGroups), Is.EqualTo(1));
+            foreach (Entity entity in squareFile.FeatureGroups[0].GetFeatures()[0].EntityList)
+            {
+                // todo: actually test for this when getLength function is implemented
+                //Assert.That(entity.);
+            }
+        }
+        
+        [Test]
+        public void CheckGroup3TwoChamfersWithRadiusesFromFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\test-files\\square-two-radius-two-chamfer.dxf";
+            DXFFile squareFile = new DXFFile(path);
+            squareFile.DetectAllFeatureTypes();
+
+            int numChamfers = 0;
+            foreach (FeatureGroup fg in squareFile.FeatureGroups)
+            {
+                numChamfers += GetNumChamferFeatures(fg.GetFeatures());
+            }
+            
+            Assert.That(numChamfers, Is.EqualTo(2));
+        }
+
+        private static int GetNumChamferFeatures(List<Feature> featureList)
+        {
+            int numChamfers = 0;
+            foreach (Feature f in featureList)
+            {
+                if (f.FeatureType == PossibleFeatureTypes.Group3)
+                {
+                    numChamfers++;
+                }
+            }
+            return numChamfers;
+        }
+        
+        private static int GetNumChamferFeatures(List<FeatureGroup> featureGroupList)
+        {
+            int numChamfers = 0;
+            foreach (FeatureGroup f in featureGroupList)
+            {
+                numChamfers += GetNumChamferFeatures(f.GetFeatures());
+            }
+            return numChamfers;
+        }
+        
+        [Test]
+        public void CheckGroup3ExampleOneFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-001.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            exampleFile.DetectAllFeatureTypes();
+
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(0));
+        }
+        
+        [Test]
+        public void CheckGroup3ExampleTwoFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            exampleFile.DetectAllFeatureTypes();
+            
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(1));
+        }
+        
+        [Test]
+        public void CheckGroup3ExampleThreeFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-003.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            exampleFile.DetectAllFeatureTypes();
+            
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(0));
+        }
+        
+        [Test]
+        public void CheckGroup3ExampleFourFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-004.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            exampleFile.DetectAllFeatureTypes();
+            
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(0));
+        }
+        
+        [Test]
+        public void CheckGroup3ExampleEverythingFile()
+        {
+            string path2 = Directory.GetCurrentDirectory();
+            int stringTrim = path2.IndexOf("Testing");
+            string path = path2.Substring(0, stringTrim) 
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-LilBitOfEverything.dxf";
+            DXFFile exampleFile = new DXFFile(path);
+            exampleFile.DetectAllFeatureTypes();
+
+            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(1));
         }
 
         #endregion
@@ -431,9 +615,9 @@ namespace Testing_for_Project
             Line line2 = new(0.0, 5.0, 5.0, 5.0);
             Line line3 = new(5.0, 5.0, 5.0, 0.0);
             List<Entity> entities = new List<Entity>() { line1, line2, line3 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
 
         [Test]
@@ -443,9 +627,9 @@ namespace Testing_for_Project
             Arc arc1 = new(0.0, 0.0, 1.0, 180, 360);
             Line line2 = new(1.0, 0.0, 1.0, 5.0);
             List<Entity> entities = new List<Entity>() { line1, arc1, line2 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
 
         [Test]
@@ -457,9 +641,9 @@ namespace Testing_for_Project
             Arc arc2 = new(4.0, 1.0, 1.0, 270, 360);
             Line line3 = new(5.0, 1.0, 5.0, 5.0);
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group5));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
         #endregion
 
@@ -470,23 +654,22 @@ namespace Testing_for_Project
             Line line1 = new(0.0, 1.0, 1.0, 0.0);
             Line line2 = new(1.0, 0.0, 2.0, 1.0);
             List<Entity> entities = new List<Entity>() { line1, line2 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
 
         [Test]
         public void CheckGroup4_2Arc2Line_ReturnsTrue()
         {
-
             Arc arc1 = new(0.0, 3.0, 2, 0, 90);
             Line line1 = new(1.0, 2.0, 1.0, 1.0);
             Line line2 = new(1.0, 1.0, 2.0, 1.0);
             Arc arc2 = new(3.0, 0.0, 2, 0, 90);
             List<Entity> entities = new List<Entity> { arc1, line1, line2, arc2 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
 
         [Test]
@@ -495,11 +678,12 @@ namespace Testing_for_Project
             Line line1 = new(0.0, 1.0, 0.0, 0.0);
             Line line2 = new(0.0, 0.0, 1.0, 0.0);
             List<Entity> entities = new List<Entity> { line1, line2 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group4));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
         #endregion
+
         #region CheckGroup6
 
         [Test]
@@ -513,9 +697,9 @@ namespace Testing_for_Project
             Line line3 = new(4.0, 1.0, 4.0, 3.0);
             Arc arc4 = new(4.0, 3.0, 1.0, 90, 180);
             List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, arc4, line1, line2, line3 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>> { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group6));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group6));
         }
 
         [Test]
@@ -527,9 +711,9 @@ namespace Testing_for_Project
             Line line2 = new(3.0, 1.0, 3.0, 3.0);
             Arc arc3 = new(4.0, 3.0, 1.0, 90, 180);
             List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, line1, line2 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.EqualTo(PerimeterFeatureTypes.Group6));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group6));
         }
 
         [Test]
@@ -541,9 +725,52 @@ namespace Testing_for_Project
             Arc arc2 = new(4.0, 1.0, 1.0, 270, 360);
             Line line3 = new(5.0, 1.0, 5.0, 5.0);
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
-            Feature testFeature = new(entities) { PerimeterEntityList = new List<List<Entity>>() { entities } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
             testFeature.DetectFeatures();
-            Assert.That(testFeature.PerimeterFeatures[0], Is.Not.EqualTo(PerimeterFeatureTypes.Group6));
+            Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.Not.EqualTo(PossibleFeatureTypes.Group6));
+        }
+        #endregion
+
+        #region CheckGroup10
+        [Test]
+        public void CheckGroup10_ReturnsTrue()
+        {
+            Line line1a = new Line(3, 5, 3, 6);
+            Line line1b = new Line(3, 1, 3, 0);
+            Arc arc1a = new Arc(3, 3, 2, 270, 90);
+            Arc arc1b = new Arc(3, 3, 3, 270, 90);
+            List<Entity> entities1 = new List<Entity>() { line1a, line1b, arc1a, arc1b };
+            Feature feature1 = new(entities1) { baseEntityList = entities1 };
+            feature1.DetectFeatures();
+
+            Line line2a = new Line(3, 5, 3, 6);
+            Line line2b = new Line(0, 3, 1, 3);
+            Arc arc2a = new Arc(3, 3, 2, 180, 90);
+            Arc arc2b = new Arc(3, 3, 3, 180, 90);
+            List<Entity> entities2 = new List<Entity>() { line2a, line2b, arc2a, arc2b };
+            Feature feature2 = new(entities2) { baseEntityList = entities2 };
+            feature2.DetectFeatures();
+
+            Line line3a = new Line(0, 3, 1, 3);
+            Line line3b = new Line(3, 1, 3, 0);
+            Arc arc3a = new Arc(3, 3, 2, 270, 180);
+            Arc arc3b = new Arc(3, 3, 3, 270, 180);
+            List<Entity> entities3 = new List<Entity>() { line3a, line3b, arc3a, arc3b };
+            Feature feature3 = new(entities3) { baseEntityList = entities3 };
+            feature3.DetectFeatures();
+
+            Line line4a = new Line(0, 3, 1, 3);
+            Line line4b = new Line(5, 3, 6, 3);
+            Arc arc4a = new Arc(3, 3, 2, 0, 180);
+            Arc arc4b = new Arc(3, 3, 3, 0, 180);
+            List<Entity> entities4 = new List<Entity>() { line4a, line4b, arc4a, arc4b };
+            Feature feature4 = new(entities4) { baseEntityList = entities4 };
+            feature4.DetectFeatures();
+
+            Assert.That(feature1.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
+            Assert.That(feature2.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
+            Assert.That(feature3.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
+            Assert.That(feature4.FeatureType, Is.EqualTo(PossibleFeatureTypes.Group10));
         }
         #endregion
 

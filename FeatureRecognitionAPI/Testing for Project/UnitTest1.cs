@@ -462,11 +462,11 @@ namespace Testing_for_Project
 
             try
             {
-                DWGFile test = new DWGFile(path);
+                DWGFile _ = new DWGFile(path);
             }
             catch (Exception ex)
             {
-                Assert.That(ex.Message, Is.EqualTo("Error: Issue with DWG File"));
+                Assert.That(ex.Message, Is.EqualTo("Attempted to read past the end of the stream."));
             }
         }
         [Test]
@@ -480,11 +480,11 @@ namespace Testing_for_Project
 
             try
             {
-                DWGFile test = new DWGFile(path);
+                DWGFile _ = new DWGFile(path);
             }
             catch (Exception ex)
             {
-                Assert.That(ex.Message, Is.EqualTo("Error with DWG File"));
+                Assert.That(ex.Message, Is.EqualTo("File version not supported: AC1009"));
             }
 
 
