@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Runtime.Versioning;
+using System.Web;
 using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models
@@ -61,6 +62,13 @@ namespace FeatureRecognitionAPI.Models
 
             Length = Point.Distance(StartPoint, EndPoint);
         }
+
+        // todo: implement getLength()
+        // public override double GetLength()
+        // {
+        //     Point delta = GetDelta();
+        //     return double.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
+        // }
 
         public Line swapStartEnd()
         {

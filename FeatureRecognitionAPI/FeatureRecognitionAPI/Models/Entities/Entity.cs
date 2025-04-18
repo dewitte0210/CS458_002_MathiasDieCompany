@@ -28,13 +28,17 @@ namespace FeatureRecognitionAPI.Models
         {
             AdjList = new List<Entity>();
         }
-                                                 
+
         /**
          * Function that checks if this entity intersects with another entity
-         * 
+         *
          * @param other is the entity being checked against this
          * @return true if they intersect, otherwise false
          */
+
+        // todo: implement getLength()
+        //public abstract double GetLength();
+        
         public bool DoesIntersect(Entity other)
         {
             if (this is Circle || other is Circle) { return false; }

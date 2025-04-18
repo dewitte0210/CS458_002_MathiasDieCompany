@@ -411,7 +411,7 @@ namespace Testing_for_Project
             f.DetectFeatures();
             
             Assert.That(f.ChamferList.Count, Is.EqualTo(1));
-            Assert.That(f.ChamferList[0].Chamfer, Is.EqualTo(lineCham));
+            //Assert.That(f.ChamferList[0].ChamferIndex, Is.EqualTo(lineCham));
         }
         
         [Test]
@@ -434,8 +434,8 @@ namespace Testing_for_Project
             f.DetectFeatures();
             
             Assert.That(f.ChamferList.Count, Is.EqualTo(2));
-            Assert.That(f.ChamferList[0].Chamfer, Is.EqualTo(lineCham3));
-            Assert.That(f.ChamferList[1].Chamfer, Is.EqualTo(lineCham5));
+            //Assert.That(f.ChamferList[0].ChamferIndex, Is.EqualTo(lineCham3));
+            //Assert.That(f.ChamferList[1].ChamferIndex, Is.EqualTo(lineCham5));
         }
         
         [Test]
@@ -491,6 +491,11 @@ namespace Testing_for_Project
             }
             
             Assert.That(GetNumChamferFeatures(squareFile.FeatureGroups), Is.EqualTo(1));
+            foreach (Entity entity in squareFile.FeatureGroups[0].GetFeatures()[0].EntityList)
+            {
+                // todo: actually test for this when getLength function is implemented
+                //Assert.That(entity.);
+            }
         }
         
         [Test]

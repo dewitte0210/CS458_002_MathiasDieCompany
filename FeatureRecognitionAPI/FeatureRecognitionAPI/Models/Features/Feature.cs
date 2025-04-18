@@ -1133,7 +1133,8 @@ public class Feature
                     if ((ab.GetDegrees() < 180 && ac.GetDegrees() < 180 && ac.GetDegrees() > 0)
                         || (ab.GetDegrees() > 180 && ac.GetDegrees() > 180 && ac.GetDegrees() < 360))
                     {
-                        ChamferList.Add(new ChamferGroup(ref lineA, ref lineB, ref lineC));
+                        ChamferList.Add(new ChamferGroup(EntityList.IndexOf(lineA), 
+                            EntityList.IndexOf(lineB), EntityList.IndexOf(lineC), lineA, lineB, lineC));
                     }
                 }
             }
@@ -1158,7 +1159,7 @@ public class Feature
             foreach (Line line in lineList)
             {
                 // ignore same line
-                if (chamferGroup.Chamfer.Equals(line))
+                if (chamferGroup.ChamferIndex.Equals(line))
                 {
                     continue;
                 }

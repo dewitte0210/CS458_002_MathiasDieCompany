@@ -8,6 +8,7 @@ namespace FeatureRecognitionAPI.Models.Features;
 
 public class FeatureGroup
 {
+    // todo: just make Count return length of feature list
     public int Count { get; set; } //Track how many feature groups of this type are found
     private int totalArcs;
     private int totalLines;
@@ -31,7 +32,6 @@ public class FeatureGroup
     {
         // todo: extend the two lines the chamfer was touching to clean up the shape
         // todo: make so it works with more than one chamfer
-        // todo: just make Count return length of feature list
             
         List<Feature> featuresToAdd = new();
         foreach (Feature feature in features)
@@ -39,36 +39,30 @@ public class FeatureGroup
             if (feature.ChamferList.Count <= 0) continue;
 
             List<Entity> linesToExtend = new();
+            List<Line> chamfersToRemove = new();
                 
             foreach (ChamferGroup cg in feature.ChamferList)
             {
                 // make new chamfer feature
                 featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [cg.Chamfer]));
                 Count++;
-                    
+                
+                // add to a new list so that the indexes in entity list stay the same
+                chamfersToRemove.Add(cg.Chamfer);
+
+                EntityTools.ExtendTwoLines(feature.EntityList[cg.LineAIndex] as Line,
+                    feature.EntityList[cg.LineBIndex] as Line);
+
                 // todo: check if not removing breaks group1A and entity count numbers
                 // remove chamfer from original feature
-                if (feature.EntityList.Remove(cg.Chamfer))
-                {
-                    linesToExtend.Add(cg.LineA);
-                    linesToExtend.Add(cg.LineB);
-                }
+            }
+
+            // actually remove the chamfer
+            foreach (Line chamfer in chamfersToRemove)
+            {
+                feature.EntityList.Remove(chamfer);
             }
             feature.ChamferList.Clear();
-
-            // step every 2 because the lines touching chamfers come in pairs
-            // because there are duplicates in the real line list
-            // all lines that need to be extended will be
-            for (int i = 0; i < linesToExtend.Count; i += 2)
-            {
-                Line realLine1 = feature.EntityList.Find(linesToExtend[i]) as Line;
-                Line realLine2 = feature.EntityList.Find(linesToExtend[i + 1]) as Line;
-                
-                if (realLine1 == null || realLine2 == null) continue;
-                
-                //directly extends lines from entity list
-                EntityTools.ExtendTwoLines(realLine1, realLine2);
-            }
         }
         features.AddRange(featuresToAdd);
         featuresToAdd.Clear();
