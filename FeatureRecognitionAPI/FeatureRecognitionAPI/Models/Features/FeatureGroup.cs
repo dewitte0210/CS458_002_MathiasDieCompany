@@ -25,23 +25,19 @@ namespace FeatureRecognitionAPI.Models.Features
 
         public void FindFeatureTypes()
         {
+            List<Feature> featToAdd = new List<Feature>();
             for (int i = 0; i < features.Count; i++)
             {
                 features[i].ExtendAllEntities();
                 features[i].SeperateBaseEntities();
                 features[i].SeperatePerimeterEntities();
                 features[i].DetectFeatures();
-                if (features[i].PerimeterEntityList != null)
+                for (int j = 0; j < features[i].PerimeterFeatureList.Count(); j++)
                 {
-                    for (int j = 0; j < features[i].PerimeterEntityList.Count(); j++)
-                    {
-                        Feature newFeat = new Feature(features[i].PerimeterEntityList[j]);
-                        newFeat.DetectFeatures();
-                        features.Add(newFeat);
-                    }
+                    featToAdd.Add(features[i].PerimeterFeatureList[j]);
                 }
             }
-
+            features.AddRange(featToAdd);
 
             // Group identical features together
             for (int i = 0; i < features.Count(); i++)

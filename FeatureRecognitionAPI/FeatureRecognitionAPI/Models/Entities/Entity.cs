@@ -16,11 +16,13 @@ namespace FeatureRecognitionAPI.Models
         public double Length { get; set; }//length of the entity
         [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
+        public bool KissCut { get; set; }
 
         //Enables the use of a default constructor
         protected Entity()
         {
             AdjList = new List<Entity>();
+            KissCut = false;
         }
 
         private const int intersectTolerance = 4;//Precision for x and y intersect values to
@@ -640,7 +642,7 @@ namespace FeatureRecognitionAPI.Models
          * @param line2 is the second line being checked
          * @return the point that line1 and line2 intersects. The points intersect field will be false if they are parallel
          */
-        public static Point GetIntersectPoint(Line line1, Line line2)
+        public static Point? GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
             double A1 = line1.EndPoint.Y - line1.StartPoint.Y;
@@ -654,7 +656,11 @@ namespace FeatureRecognitionAPI.Models
             double delta = A1 * B2 - A2 * B1;
 
             // Lines are parallel and thus cannot intersect
-            intersectPoint.intersect = !(delta == 0);
+            intersectPoint.intersect = MDCMath.DoubleEquals(delta, 0);
+            if (!intersectPoint.intersect)
+            {
+                return null;
+            }
 
             // Intersection point
             intersectPoint.setPoint(((B1 * C2 - B2 * C1) / delta), ((A1 * C2 - A2 * C1) / delta));
@@ -684,7 +690,16 @@ namespace FeatureRecognitionAPI.Models
             }
             else
             {
-                slope = (line.EndPoint.Y - line.StartPoint.Y) / (line.EndPoint.X - line.StartPoint.X);
+                double xDif = line.EndPoint.X - line.StartPoint.X;
+                if (xDif == 0)
+                {
+                    slope = 0;
+                }
+                else
+                {
+                    slope = (line.EndPoint.Y - line.StartPoint.Y) / xDif;
+                }
+
                 if (slope > 1000000 || slope < -1000000)
                 {
                     slope = 0;
@@ -714,11 +729,15 @@ namespace FeatureRecognitionAPI.Models
                 //  Special case for vertical line
                 if (line.EndPoint.X == line.StartPoint.X)
                 {
-                    decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.Center.Y), (decimal)(Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2)));
+                    double[] tempSolns = QuadraticFormula(
+                        1, 
+                        (-2 * arc.Center.Y), 
+                        (Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2))
+                        ).ToArray();
 
-                    foreach (decimal number in tempSolns)
+                    foreach (double number in tempSolns)
                     {
-                        solns.Add((double)number);
+                        solns.Add(number);
                     }
                     //  Checks if each solution is on the arc, if one is on it return true
                     for (int i = 0; i < solns.Count(); i++)

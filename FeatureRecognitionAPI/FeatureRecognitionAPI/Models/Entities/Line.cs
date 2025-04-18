@@ -18,6 +18,7 @@ namespace FeatureRecognitionAPI.Models
         public Point EndPoint { get; set; }
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
+        
 
         public ChamferTypeEnum ChamferType { get; set; }
 

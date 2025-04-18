@@ -7,10 +7,15 @@
     "Group2A1" : "Ellipse",
     "Group2A2" : "Bowtie",
     "Group3" : "Chamfered Corner",
-    "Group4" : "Perimeter Feature",
-    "Group5" : "Mitered Notch",
-    "Group6" : "Radius Notch",
-    "Group17" : "Freehand",
+    "Group4" : "V Notch/Corner Notch",
+    "Group5" : "Mitered Notch - 5",
+    "Group6" : "Radius Notch - 6",
+    "Group10" : "C-Spacer",
+    "Group9" : "Kiss-Cut Tab",
+    "Group11": "Pac-Man",
+    "Group12a": "Double D",
+    "Group12b": "Cross-Hair",
+    "Group17" : "Radius Notch - 17",
 };
 
 export function translate(groupName: string) {
