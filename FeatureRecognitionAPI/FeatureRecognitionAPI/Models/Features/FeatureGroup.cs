@@ -1,8 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
-using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
-using NHibernate.Event.Default;
 
 namespace FeatureRecognitionAPI.Models.Features;
 
@@ -70,23 +68,20 @@ public class FeatureGroup
 
     public void FindFeatureTypes()
     {
+        List<Feature> featToAdd = new List<Feature>();
         for (int i = 0; i < features.Count; i++)
         {
             features[i].ExtendAllEntities();
             features[i].SeperateBaseEntities();
             features[i].SeperatePerimeterEntities();
             features[i].DetectFeatures();
-            if (features[i].PerimeterEntityList != null)
+            for (int j = 0; j < features[i].PerimeterFeatureList.Count(); j++)
             {
-                for (int j = 0; j < features[i].PerimeterEntityList.Count; j++)
-                {
-                    Feature newFeat = new(features[i].PerimeterEntityList[j]);
-                    newFeat.DetectFeatures();
-                    features.Add(newFeat);
-                }
+                featToAdd.Add(features[i].PerimeterFeatureList[j]);
             }
         }
-
+        features.AddRange(featToAdd);
+        
         // break out chamfers
         BreakOutChamfers();
 

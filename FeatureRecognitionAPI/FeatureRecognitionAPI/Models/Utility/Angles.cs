@@ -10,6 +10,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 	/// </summary>
 	public static class Angles
 	{
+		private const double TOLERANCE = 0.001;
 		private const double AngleTolDeg = 0.001;
 		private const double AngleTolRad = AngleTolDeg * Math.PI / 180;
 
@@ -33,6 +34,11 @@ namespace FeatureRecognitionAPI.Models.Utility
 			Counter,
 			Clockwise,
 			Unknown
+		}
+
+		public static bool WithinTolerance(double value, double target)
+		{
+			return Math.Abs(value - target) < TOLERANCE;
 		}
 
 		public class Degrees(double value)
