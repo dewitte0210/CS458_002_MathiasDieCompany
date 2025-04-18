@@ -100,37 +100,37 @@ export default function PunchConfig() {
             {activePunchSection === "SO" && (
                 <div style={contentDiv}>
                     Side Outlet Punches
-                    <PunchTable tableData={punchData?.soPunchList} />
+                    <PunchTable tableData={punchData?.soPunchList} tableID={2}/>
                 </div>
             )}
             {activePunchSection === "FT" && (
                 <div style={contentDiv}>
                     Feed Through Punches
-                    <PunchTable tableData={punchData?.ftPunchList} />
+                    <PunchTable tableData={punchData?.ftPunchList} tableID={4}/>
                 </div>
             )}
             {activePunchSection === "SW" && (
                 <div style={contentDiv}>
                     Side Wall Punches
-                    <PunchTable tableData={punchData?.swPunchList} />
+                    <PunchTable tableData={punchData?.swPunchList} tableID={5}/>
                 </div>
             )}
             {activePunchSection === "Tube" && (
                 <div style={contentDiv}>
                     Tube Punches
-                    <PunchTable tableData={punchData?.tubePunchList} />
+                    <PunchTable tableData={punchData?.tubePunchList} tableID={1}/>
                 </div>
             )}
             {activePunchSection === "HDSO" && (
                 <div style={contentDiv}>
                     Heavy Duty Side Outlet Punches
-                    <PunchTable tableData={punchData?.hdsoPunchList} />
+                    <PunchTable tableData={punchData?.hdsoPunchList} tableID={3}/>
                 </div>
             )}
             {activePunchSection === "STD" && (
                 <div style={contentDiv}>
                     Standard retractable Pins
-                    <PunchTable tableData={punchData?.retractList} />
+                    <PunchTable tableData={punchData?.retractList} tableID={6}/>
                 </div>
             )}
             
