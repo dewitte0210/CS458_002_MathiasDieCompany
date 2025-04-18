@@ -399,13 +399,31 @@ namespace FeatureRecognitionAPI.Models
 
         public void CornerNotchFlagHelper(Line entity)
         {
-            foreach (Entity adjEntity in entity.AdjList)
+            if (entity.AdjList.Count != 2) { return; }
+
+            Angles.Angle innerAngle = null;
+            Angles.Angle outerAngleClose = null;
+            Angles.Angle outerAngleFar = null;
+            for (int i = 0; i < entity.AdjList.Count; i++)
             {
-                if (adjEntity is Line e && entity.Length == e.Length)
+                if (entity.AdjList[i] is Line { AdjList.Count: 2 } e && entity.Length == e.Length)
                 {
-                     Angles.Angle innerAngle = Angles.GetAngle(entity, e);
-                     
+                    innerAngle = Angles.GetAngle(entity, e);
+                    outerAngleClose = Angles.GetAngle(entity, (Line)entity.AdjList[1-i]);
+
+                    for (int j = i + 1; j < e.AdjList.Count; j++)
+                    {
+                        if (!e.AdjList[j].Equals(entity))
+                        {
+                            outerAngleFar = Angles.GetAngle(e, (Line)e.AdjList[j]);
+                        }
+                    }
                 }
+            }
+
+            if (innerAngle != null && outerAngleClose != null && outerAngleFar != null)
+            {
+                
             }
         }
         public  List<Entity> GetEntities() {return EntityList;}
