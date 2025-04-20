@@ -9,6 +9,7 @@ using ACadSharp.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
+using FeatureRecognitionAPI.Services;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -18,7 +19,7 @@ namespace FeatureRecognitionAPI.Models
         protected string Path { get; set; }
         protected SupportedExtensions FileType { get; set; }
         internal List<Feature> FeatureList { get; set; }
-        protected List<Entity> EntityList;
+        protected internal List<Entity> EntityList;
         internal List<FeatureGroup> FeatureGroups { get; }
         protected FileVersion _fileVersion;
         protected CadDocument doc;
@@ -50,6 +51,7 @@ namespace FeatureRecognitionAPI.Models
         
         public void DetectAllFeatureTypes()
         {
+            SetEntities(FeatureRecognitionService.CondenseArcs(GetEntities()));
             GroupFeatureEntities();
             SetFeatureGroups();
 

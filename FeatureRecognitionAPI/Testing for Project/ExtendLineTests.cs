@@ -832,23 +832,23 @@ namespace Testing_for_Project
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
-            DXFFile exampleOne = new DXFFile(path);
+            DXFFile exampleTwo = new DXFFile(path);
 
-            exampleOne.DetectAllFeatureTypes();
+            exampleTwo.DetectAllFeatureTypes();
 
-            Assert.IsTrue(exampleOne.FeatureGroups.Count == 1); // one overall feature when combined
-            Assert.IsTrue(exampleOne.FeatureGroups[0].Count == 6); // 6 identical features
-            List<Feature> singleFeatureList = exampleOne.FeatureGroups[0].GetFeatures();
+            Assert.IsTrue(exampleTwo.FeatureGroups.Count == 1); // one overall feature when combined
+            Assert.IsTrue(exampleTwo.FeatureGroups[0].Count == 7); // 6 identical features
+            List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].GetFeatures();
 
-            Assert.IsTrue(singleFeatureList.Count == 6); // 6 features make up the die
+            Assert.IsTrue(singleFeatureList.Count == 7); // 6 features make up the die
             
             int totalFeatures = 0;
             foreach (Feature feature in singleFeatureList)
             {
                 totalFeatures += feature.count;
             }
-            totalFeatures *= exampleOne.FeatureGroups[0].Count;
-            Assert.IsTrue(totalFeatures == 48); // number of features accounting for combined features
+            totalFeatures *= exampleTwo.FeatureGroups[0].Count;
+            Assert.IsTrue(totalFeatures == 63); // number of features accounting for combined features
         }
 
         #endregion

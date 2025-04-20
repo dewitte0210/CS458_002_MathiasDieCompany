@@ -1,5 +1,5 @@
 using System.Security.Policy;
-using static FeatureRecognitionAPI.Models.Utility.MDCMath;
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
 // This file is used for calculating the angle between lines and on what side they lay
 namespace FeatureRecognitionAPI.Models.Utility
@@ -58,6 +58,16 @@ namespace FeatureRecognitionAPI.Models.Utility
 			
 			#region Overrides
 
+			public static bool operator ==(Degrees a, Degrees b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Degrees a, Degrees b)
+			{
+				return !a.Equals(b);
+			}
+			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) return false;
@@ -67,16 +77,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 					return DoubleEquals(objD, Value);
 				}
 				return false;
-			}
-
-			public static bool operator ==(Degrees a, Degrees b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Degrees a, Degrees b)
-			{
-				return !a.Equals(b);
 			}
 			
 			public static implicit operator double(Degrees d) => d.Value;
@@ -106,6 +106,16 @@ namespace FeatureRecognitionAPI.Models.Utility
 			
 			#region Overrides
 
+			public static bool operator ==(Radians a, Radians b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Radians a, Radians b)
+			{
+				return !a.Equals(b);
+			}
+			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) return false;
@@ -117,16 +127,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 				return false;
 			}
 
-			public static bool operator ==(Radians a, Radians b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Radians a, Radians b)
-			{
-				return !a.Equals(b);
-			}
-			
 			public static implicit operator double(Radians r) => r.Value;
 			
 			public override int GetHashCode()
@@ -173,6 +173,17 @@ namespace FeatureRecognitionAPI.Models.Utility
 			}
 
 			#region Overrides
+			
+			public static bool operator ==(Angle a, Angle b)
+			{
+				return a.Equals(b);
+			}
+			
+			public static bool operator !=(Angle a, Angle b)
+			{
+				return !a.Equals(b);
+			}
+			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) { return false; }
@@ -194,16 +205,6 @@ namespace FeatureRecognitionAPI.Models.Utility
                 return false;
 			}
 			
-			public static bool operator ==(Angle a, Angle b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Angle a, Angle b)
-			{
-				return !a.Equals(b);
-			}
-
 			public override int GetHashCode()
 			{
 				return HashCode.Combine(this._angle.GetHashCode(), this._side.GetHashCode());
@@ -318,8 +319,9 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 		public static bool IsParallel(Line a, Line b)
 		{
-			Degrees angle = GetAngle(a, b).GetDegrees();
-			return DoubleEquals(angle % 180, 0);
+			// round because angle can be 179.999 and modulus wont work
+			double angle = Double.Round(GetAngle(a, b).GetDegrees());
+			return DoubleEquals((angle % 180), 0);
 		}
 	}
 }
