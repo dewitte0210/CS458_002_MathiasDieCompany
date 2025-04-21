@@ -667,7 +667,7 @@ namespace Testing_for_Project
             Line line2 = new(1.0, 1.0, 2.0, 1.0);
             Arc arc2 = new(3.0, 0.0, 2, 0, 90);
             List<Entity> entities = new List<Entity> { arc1, line1, line2, arc2 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)}};
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
