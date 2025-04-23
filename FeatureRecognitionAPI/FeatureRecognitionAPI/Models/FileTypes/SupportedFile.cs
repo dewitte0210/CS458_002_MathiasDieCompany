@@ -361,11 +361,11 @@ namespace FeatureRecognitionAPI.Models
             {
                 if (entity is Spline)
                 {
-                    throw new NotImplementedException("Splines are not yet supported.");
+                    throw new NotImplementedException("Splines are not yet supported. Please explode your splines before uploading your file.");
                 }
                 if (entity is LwPolyline)
                 {
-                    throw new NotImplementedException("Polylines are not yet supported.");
+                    throw new NotImplementedException("Polylines are not yet supported. Please explode your polylines before uploading your file.");
                 }
                 
                 if (entity is Insert insert)
