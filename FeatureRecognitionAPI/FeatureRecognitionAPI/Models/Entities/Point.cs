@@ -35,10 +35,10 @@ namespace FeatureRecognitionAPI.Models
 
         public override bool Equals(object? obj)
         {
-            if (obj is Point)
+            if (obj is Point point)
             {
-                double xDiff = Math.Abs((obj as Point).X - this.X);
-                double yDiff = Math.Abs((obj as Point).Y - this.Y);
+                double xDiff = Math.Abs(point.X - this.X);
+                double yDiff = Math.Abs(point.Y - this.Y);
                 if (xDiff < 0.0009 && yDiff < 0.0009)
                 {
                     return true;

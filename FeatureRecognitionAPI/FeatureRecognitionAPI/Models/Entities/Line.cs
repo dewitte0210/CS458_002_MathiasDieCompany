@@ -14,8 +14,6 @@ namespace FeatureRecognitionAPI.Models
     {
         private const double TOLERANCE = 0.00005;
 
-        public Point StartPoint { get; set; }
-        public Point EndPoint { get; set; }
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
         
@@ -25,15 +23,15 @@ namespace FeatureRecognitionAPI.Models
         // Don't Delete. Called from ExtendedLine constructor
         protected Line()
         {
-            StartPoint = new Point();
-            EndPoint = new Point();
+            Start = new Point();
+            End = new Point();
             ChamferType = ChamferTypeEnum.None;
         }
 
         public Line(Line line)
         {
-            StartPoint = new Point(line.StartPoint);
-            EndPoint = new Point(line.EndPoint);
+            Start = new Point(line.Start);
+            End = new Point(line.End);
             SlopeY = line.SlopeY;
             SlopeX = line.SlopeX;
             Length = line.Length;
@@ -42,43 +40,43 @@ namespace FeatureRecognitionAPI.Models
 
         public Line(double startX, double startY, double endX, double endY)
         {
-            StartPoint = new Point(startX, startY);
-            EndPoint = new Point(endX, endY);
-            SlopeY = EndPoint.Y - StartPoint.Y;
-            SlopeX = EndPoint.X - StartPoint.X;
+            Start = new Point(startX, startY);
+            End = new Point(endX, endY);
+            SlopeY = End.Y - Start.Y;
+            SlopeX = End.X - Start.X;
             ChamferType = ChamferTypeEnum.None;
 
-            this.Length = Point.Distance(StartPoint, EndPoint);
+            this.Length = Point.Distance(Start, End);
         }
 
 
         public Line(Point startPoint, Point endPoint)
         {
-            StartPoint = new Point(startPoint);
-            EndPoint = new Point(endPoint);
+            Start = new Point(startPoint);
+            End = new Point(endPoint);
             
-            SlopeY = EndPoint.Y - StartPoint.Y;
-            SlopeX = EndPoint.X - StartPoint.X;
+            SlopeY = End.Y - Start.Y;
+            SlopeX = End.X - Start.X;
             
-            this.Length = Point.Distance(StartPoint, EndPoint);
+            this.Length = Point.Distance(Start, End);
         }
 
         //constructor with extendedline parameter
         public Line(double startX, double startY, double endX, double endY, bool extendedLine)
         {
-            StartPoint = new Point(startX, startY);
-            EndPoint = new Point(endX, endY);
+            Start = new Point(startX, startY);
+            End = new Point(endX, endY);
 
-            SlopeY = EndPoint.Y - StartPoint.Y;
-            SlopeX = EndPoint.X - StartPoint.X;
+            SlopeY = End.Y - Start.Y;
+            SlopeX = End.X - Start.X;
             ChamferType = ChamferTypeEnum.None;
 
-            Length = Point.Distance(StartPoint, EndPoint);
+            Length = Point.Distance(Start, End);
         }
 
         public bool hasPoint(Point point)
         {
-            return (StartPoint.Equals(point) || EndPoint.Equals(point));
+            return (Start.Equals(point) || End.Equals(point));
         }
 
         [Obsolete("Line isParallel is deprecated, please use Angles isParallel in Utility.")]
@@ -106,8 +104,8 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if (withinTolerance(lineOther.SlopeX, 0)) // means other is a verticle line
                     {
-                        return (withinTolerance(this.StartPoint.X,
-                            lineOther.StartPoint.X)); // checks that the x values are within .00005 of each other
+                        return (withinTolerance(this.Start.X,
+                            lineOther.Start.X)); // checks that the x values are within .00005 of each other
                     }
                     else
                     {
@@ -119,9 +117,9 @@ namespace FeatureRecognitionAPI.Models
                     return false; // means other is a verticle line but this is not
                 }
 
-                double ThisYintercept = this.StartPoint.Y - ((this.SlopeY / this.SlopeX) * this.StartPoint.X);
-                double OtherYintercept = lineOther.StartPoint.Y -
-                                         ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.StartPoint.X);
+                double ThisYintercept = this.Start.Y - ((this.SlopeY / this.SlopeX) * this.Start.X);
+                double OtherYintercept = lineOther.Start.Y -
+                                         ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.Start.X);
                 if (withinTolerance(Math.Abs(this.SlopeY / this.SlopeX),
                         Math.Abs(lineOther.SlopeY / lineOther.SlopeX)) &&
                     withinTolerance(ThisYintercept, OtherYintercept))
@@ -139,11 +137,11 @@ namespace FeatureRecognitionAPI.Models
             if (other is Line lineOther)
             {
                 // Vertical slope edge cases
-                if (Math.Round(this.StartPoint.X, 4).Equals(Math.Round(this.EndPoint.X, 4)) && Math.Round(lineOther.StartPoint.Y, 4).Equals(Math.Round(lineOther.EndPoint.Y, 4)))
+                if (Math.Round(this.Start.X, 4).Equals(Math.Round(this.End.X, 4)) && Math.Round(lineOther.Start.Y, 4).Equals(Math.Round(lineOther.End.Y, 4)))
                 {
                     return true;
                 }
-                else if (Math.Round(this.StartPoint.Y, 4).Equals(Math.Round(this.EndPoint.Y, 4)) && Math.Round(lineOther.StartPoint.X, 4).Equals(Math.Round(lineOther.EndPoint.X, 4)))
+                else if (Math.Round(this.Start.Y, 4).Equals(Math.Round(this.End.Y, 4)) && Math.Round(lineOther.Start.X, 4).Equals(Math.Round(lineOther.End.X, 4)))
                 {
                     return true;
                 }
@@ -167,8 +165,8 @@ namespace FeatureRecognitionAPI.Models
                 if (Math.Abs(((Line)obj).Length - this.Length) < EntityTolerance
                     && slopeDifY < EntityTolerance
                     && slopeDifX < EntityTolerance
-                    && this.hasPoint(((Line)obj).EndPoint)
-                    && this.hasPoint(((Line)obj).StartPoint))
+                    && this.hasPoint(((Line)obj).End)
+                    && this.hasPoint(((Line)obj).Start))
                 {
                     return true;
                 }
@@ -198,33 +196,33 @@ namespace FeatureRecognitionAPI.Models
 
         public override double MinX()
         {
-            return Math.Min(StartPoint.X, EndPoint.X);
+            return Math.Min(Start.X, End.X);
         }
 
         public override double MinY()
         {
-            return Math.Min(StartPoint.Y, EndPoint.Y);
+            return Math.Min(Start.Y, End.Y);
         }
 
         public override double MaxX()
         {
-            return Math.Max(StartPoint.X, EndPoint.X);
+            return Math.Max(Start.X, End.X);
         }
 
         public override double MaxY()
         {
-            return Math.Max(StartPoint.Y, EndPoint.Y);
+            return Math.Max(Start.Y, End.Y);
         }
 
         public Point GetDelta()
         {
-            return new Point(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y);
+            return new Point(End.X - Start.X, End.Y - Start.Y);
         }
         
         public override Line Transform(Matrix3 transform)
         {
-            Point newStart = transform * StartPoint; 
-            Point newEnd =  transform * EndPoint;
+            Point newStart = transform * Start; 
+            Point newEnd =  transform * End;
             return new Line(newStart, newEnd);
         }
     }
