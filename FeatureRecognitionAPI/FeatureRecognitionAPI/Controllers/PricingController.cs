@@ -31,7 +31,7 @@ namespace FeatureRecognitionAPI.Controllers
 
                 var (status, msg, output) = pricingService.EstimatePrice(quoteSubmissionDto);
 
-                if (status != OperationStatus.OK || output == null)
+                if (status != OperationStatus.Ok || output == null)
                     return BadRequest(msg);
 
                 return Ok(output);

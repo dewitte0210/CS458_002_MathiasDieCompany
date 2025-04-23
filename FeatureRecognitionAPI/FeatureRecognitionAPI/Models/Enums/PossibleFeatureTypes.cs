@@ -4,10 +4,8 @@ namespace FeatureRecognitionAPI.Models.Enums
 {
     public enum PossibleFeatureTypes
     {
-        [EnumMember(Value = "Unknown")]
-        Unknown,
-        [EnumMember(Value = "SideTubePunch")]
-        StdTubePunch,
+        [EnumMember(Value = "Unknown")] Unknown,
+        [EnumMember(Value = "SideTubePunch")] StdTubePunch,
         SideOutlet,
         HDSideOutlet,
         StdFTPunch,

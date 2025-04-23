@@ -1,31 +1,21 @@
-﻿using System.Web;
+﻿using System.Runtime.Versioning;
+using System.Web;
 using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models
 {
-    public enum ChamferTypeEnum
-    {
-        None,
-        Possible,
-        Confirmed
-    }
-
     public class Line : Entity
     {
         private const double TOLERANCE = 0.00005;
 
         public double SlopeY { get; set; }
         public double SlopeX { get; set; }
-        
-
-        public ChamferTypeEnum ChamferType { get; set; }
 
         // Don't Delete. Called from ExtendedLine constructor
         protected Line()
         {
             Start = new Point();
             End = new Point();
-            ChamferType = ChamferTypeEnum.None;
         }
 
         public Line(Line line)
@@ -35,7 +25,6 @@ namespace FeatureRecognitionAPI.Models
             SlopeY = line.SlopeY;
             SlopeX = line.SlopeX;
             Length = line.Length;
-            ChamferType = ChamferTypeEnum.None;
         }
 
         public Line(double startX, double startY, double endX, double endY)
@@ -44,7 +33,6 @@ namespace FeatureRecognitionAPI.Models
             End = new Point(endX, endY);
             SlopeY = End.Y - Start.Y;
             SlopeX = End.X - Start.X;
-            ChamferType = ChamferTypeEnum.None;
 
             this.Length = Point.Distance(Start, End);
         }
@@ -69,9 +57,20 @@ namespace FeatureRecognitionAPI.Models
 
             SlopeY = End.Y - Start.Y;
             SlopeX = End.X - Start.X;
-            ChamferType = ChamferTypeEnum.None;
 
             Length = Point.Distance(Start, End);
+        }
+
+        // todo: implement getLength()
+        // public override double GetLength()
+        // {
+        //     Point delta = GetDelta();
+        //     return double.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
+        // }
+
+        public Line swapStartEnd()
+        {
+            return new Line(EndPoint.X, EndPoint.Y, StartPoint.X, StartPoint.Y);
         }
 
         public bool hasPoint(Point point)

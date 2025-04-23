@@ -7,6 +7,7 @@
  */
 
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
@@ -25,7 +26,8 @@ public class Feature
     [JsonProperty] public double perimeter;
     [JsonProperty] public double diameter;
     [JsonProperty] public int count;
-    [JsonProperty] public int NumChamfers = 0;
+    //[JsonProperty] public int NumChamfers = 0;
+    public List<ChamferGroup> ChamferList = new List<ChamferGroup>();
 
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -92,6 +94,19 @@ public class Feature
     public Feature(List<Entity> entityList)
     {
         EntityList = entityList;
+        ConstructFromEntityList();
+    }
+
+    /// <summary>
+    /// create a feature when the feature type is known
+    /// </summary>
+    /// <param name="pft">PossibleFeatureType when known</param>
+    /// <param name="entityList">Entity list that makes up the feature</param>
+    public Feature(PossibleFeatureTypes pft, List<Entity> entityList)
+    {
+        FeatureType = pft;
+        EntityList = entityList;
+
         ConstructFromEntityList();
     }
 
@@ -191,7 +206,7 @@ public class Feature
         }
         
         // PERIMETER DETECTION:
-        CheckGroup3();
+        FlagGroup3();
         CheckGroup4();
         CheckGroup5();
         CheckGroup6Perimeter();
@@ -1194,6 +1209,14 @@ public class Feature
 
     #region PerimeterDetection
     
+
+    /*  todo: break out chamfered lines from parent feature
+     *  remove chamfered line entity from parent feature and extend the lines
+     *  to make the parent shape clean
+     *
+     *  then we can make group 1 rectangle detection better and front end
+     *  will read the new chamfer feature
+     */
     #region Group3
 
     /*  chamfered corner detection
@@ -1216,20 +1239,13 @@ public class Feature
         returns true if no problems??
     */
 
+    /// <summary>
+    /// Gets a list of only lines from a list of entities
+    /// </summary>
+    /// <param name="entityList"></param>
+    /// <returns>list of lines</returns>
     internal static List<Line> GetLinesFromEntityList(List<Entity> entityList)
     {
-        // current assumptions made:
-        // orientation is consistent
-        
-        // assumptions that can be made
-        // the three checked lines must be touching
-        
-        /*
-         *  TODO: seperate entity list into groups of touching lines
-         *  or transition to adjacency list but how to do efficiently
-         *  trying to fight the urge to scorched earth refactor
-         */
-        
         List<Line> lineList = [];
         foreach (Entity entity in entityList)
         {
@@ -1241,96 +1257,228 @@ public class Feature
         return lineList;
     }
 
-    // TODO: make sure this handles unordered lines
+    /// <summary>
+    /// Searches for a line that shares start/end points with a given line
+    /// </summary>
+    /// <param name="originLine">the original line</param>
+    /// <param name="lineList">list of lines to search through to find another line</param>
+    /// <param name="fromStart">whether to search from start or end of line</param>
+    /// <returns>null if no line is found, otherwise the touching line</returns>
+    internal static (Line?, bool) GetTouchingLine(Line originLine, List<Line> lineList, bool fromStart = false)
+    {
+        Line? touchingLine = null;
+        bool wasFlipped = false;
+
+        foreach (Line searchLine in lineList)
+        {
+            // ignore the origin line and flipped version
+            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
+    
+            Point originPoint = fromStart? originLine.StartPoint : originLine.EndPoint;
+
+            // if end meets start or start meets end
+            if (originPoint.Equals(fromStart ? searchLine.EndPoint : searchLine.StartPoint))
+            {
+                touchingLine = searchLine;
+                break;
+            }
+            // if end meets end or start meets start
+            else if (originPoint.Equals(fromStart ? searchLine.StartPoint : searchLine.EndPoint))
+            {
+                touchingLine = searchLine.swapStartEnd();
+                wasFlipped = true;
+                break;
+            }
+        }
+        return (touchingLine, wasFlipped);
+    }
+    
+    /// <summary>
+    /// Breaks up a 1D line list into groups of touching lines that are ordered.
+    /// Ordering is important because consistent line orientation is needed
+    /// for accurate angle detection
+    /// </summary>
+    /// <param name="lineList">1D list of lines</param>
+    /// <returns>list of line groups that are touching</returns>
+    internal static List<List<Line>> GetOrderedLines(List<Line> lineList)
+    {
+        List<Line> baseLineList = lineList.ToList();
+        List<List<Line>> orderedLineList = [];
+        
+        while (baseLineList.Count > 0)
+        {
+            // search from end
+            Line currentEndLine = baseLineList[0];
+            Line currentStartLine = baseLineList[0];
+            baseLineList.RemoveAt(0);
+            List<Line> lineGroup = [currentEndLine];
+            bool exhaustedEndSearch = false;
+            bool exhaustedStartSearch = false;
+
+            while (!exhaustedEndSearch)
+            {
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentEndLine, lineList);
+
+                //if null or already in linegroup, meaning found end of line loop
+                if (possibleLine == null 
+                    || lineGroup.Contains(possibleLine)
+                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                {
+                    exhaustedEndSearch = true;
+                    break;
+                }
+                
+                currentEndLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
+                lineGroup.Add(possibleLine);
+            }
+            while (!exhaustedStartSearch)
+            {
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList);
+
+                //if null or already in lineGroup, meaning found end of line loop
+                if (possibleLine == null 
+                    || lineGroup.Contains(possibleLine)
+                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                {
+                    exhaustedStartSearch = true;
+                    break;
+                }
+                
+                currentStartLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentStartLine.swapStartEnd() : currentStartLine);
+                lineGroup.Insert(0, possibleLine);
+            }
+            orderedLineList.Add(lineGroup);            
+        }
+        return orderedLineList;
+    }
     
     /// <summary>
     /// Gets a list of possible chamfer lines from a base list of lines
     /// </summary>
-    /// <param name="lineList"> list of lines, possible chamfers in this list
+    /// <param name="orderedLineList"> list of lines, possible chamfers in this list
     /// will be flagged as such</param>
     /// <returns>list of lines where each line has a chamfer type of possible</returns>
-    internal static List<Line> GetPossibleChamfers(List<Line> lineList)
+    private void SetPossibleChamfers(List<List<Line>> orderedLineList)
     {
-        List<Line> possibleChamferList = [];
-        
-        if (lineList.Count >= 3)
+        foreach (List<Line> lineGroup in orderedLineList)
         {
-            for (int i = 0; i < lineList.Count; i++)
+            if (lineGroup.Count < 3) continue;
+            for (int i = 0; i < lineGroup.Count; i++)
             {
-                Line lineA = lineList[i];
-                Line lineB = lineList[(i + 1) % lineList.Count];
-                Line lineC = lineList[(i + 2) % lineList.Count];
+                Line lineA = lineGroup[i];
+                Line lineB = lineGroup[(i + 1) % lineGroup.Count];
+                Line lineC = lineGroup[(i + 2) % lineGroup.Count];
 
                 //need to verify orientation of lines
-                Angle angleAB = GetAngle(lineA, lineB);
-                Angle angleBC = GetAngle(lineB, lineC);
-                Angle angleAC = GetAngle(lineA, lineC);
+                Angle ab = GetAngle(lineA, lineB);
+                Angle bc = GetAngle(lineB, lineC);
+                Angle ac = GetAngle(lineA, lineC);
 
                 //meets single chamfer conditions
-                if (angleAB.Equals(angleBC) && angleAC.GetDegrees() < 180 && angleAB.GetDegrees() > 90)
+                if (ab.Equals(bc))
                 {
-                    lineB.ChamferType = ChamferTypeEnum.Possible;
-                    possibleChamferList.Add(lineB);
-                }
-            }
-        }
-        return possibleChamferList;
-    }
-
-    private void CheckGroup3()
-    {
-        if (FeatureType != PossibleFeatureTypes.Group1A1) return;
-        
-        // copy of base entity list with just lines
-        List<Line> lineList = GetLinesFromEntityList(baseEntityList).ToList();
-        List<Line> possibleChamferList = GetPossibleChamfers(lineList);
-        
-        if (lineList.Count < 3) return;
-        if (possibleChamferList.Count <= 0) return;
-
-        // check potential chamfers
-        // if only one chamfer, it is confirmed to be chamfer
-        if (possibleChamferList.Count == 1)
-        {
-            possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
-        }
-        // if 2 to 3 chamfers, only confirm if a parallel line to it
-        // is also possible/confirmed chamfers
-        else if (possibleChamferList.Count is >= 2 and <= 3)
-        {
-            bool hasPallelChamfer = false;
-            foreach (Line possibleChamfer in possibleChamferList)
-            {
-                foreach (Line line in lineList)
-                {
-                    if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                    // measuring counterclockwise or clockwise
+                    if ((ab.GetDegrees() < 180 && ac.GetDegrees() < 180 && ac.GetDegrees() > 0)
+                        || (ab.GetDegrees() > 180 && ac.GetDegrees() > 180 && ac.GetDegrees() < 360))
                     {
-                        hasPallelChamfer = true;
+                        ChamferList.Add(new ChamferGroup(EntityList.IndexOf(lineA), 
+                            EntityList.IndexOf(lineB), EntityList.IndexOf(lineC), lineB));
                     }
                 }
-                if (!hasPallelChamfer)
-                {
-                    possibleChamferList.Remove(possibleChamfer);
-                    break;
-                }
-            }
-            // remaining possible chamfers meet above case so confirm
-            foreach (Line line in possibleChamferList)
-            {
-                line.ChamferType = ChamferTypeEnum.Confirmed;
             }
         }
+    }
+    
+    /// <summary>
+    /// Processes and removes possible chamfers if they do not meet the criteria.
+    /// If a chamfer has no chamfers parallel to it but does have lines parallel
+    /// then it is not a chamfer and is removed from the chamfer list.
+    /// </summary>
+    /// <param name="lineList"> unordered list of lines </param>
+    private void RemoveFalseChamfers(List<Line> lineList)
+    {
+        List<ChamferGroup> chamferGroupsToRemove = new();
+        foreach (ChamferGroup chamferGroup in ChamferList)
+        {
+            bool isParallelToSomething = false;
+            bool hasParallelChamfer = false;
+                    
+            // if parallel to a line... 
+            foreach (Line line in lineList)
+            {
+                // ignore same line
+                if (chamferGroup.ChamferIndex.Equals(line))
+                {
+                    continue;
+                }
+                    
+                if (IsParallel(chamferGroup.Chamfer, line))
+                {
+                    isParallelToSomething = true;
+                }
+            }
+            // and it is not a chamfer...
+            if (isParallelToSomething)
+            {
+                foreach (ChamferGroup compChamferGroup in ChamferList)
+                {
+                    if (chamferGroup != compChamferGroup && IsParallel(chamferGroup.Chamfer, compChamferGroup.Chamfer))
+                    {
+                        hasParallelChamfer = true;
+                    }
+                }
+            }
+            // it is not a chamfer
+            if (isParallelToSomething && !hasParallelChamfer)
+            {
+                chamferGroupsToRemove.Add(chamferGroup);
+                break;
+            }
+        }
+        foreach (ChamferGroup cgToRemove in chamferGroupsToRemove)
+        {
+            ChamferList.Remove(cgToRemove);
+        }
+        // remaining possible chamfers meet above case so confirm
+        //foreach (Line line in possibleChamferList)
+        foreach (ChamferGroup chamferGroup in ChamferList)
+        {
+            chamferGroup.Confirmed = true;
+        }
+    }
+
+    private void FlagGroup3()
+    {
+        if (FeatureType is not (PossibleFeatureTypes.Group1A1 or PossibleFeatureTypes.Group1A2)) return;
+        
+        // copy of base entity list with just lines
+        List<Line> lineList = GetLinesFromEntityList(EntityList).ToList();
+        SetPossibleChamfers(GetOrderedLines(lineList));
+        
+        if (lineList.Count < 3) return;
+        switch (ChamferList.Count)
+        {
+            case <= 0:
+                return;
+            // check potential chamfers
+            // if only one chamfer, it is confirmed to be a chamfer
+            case 1:
+                ChamferList[0].Confirmed = true;
+                break;
+            // if 2 to 3 chamfers, only confirm if a parallel line to it
+            // is also possible/confirmed chamfers
+            case >= 2 and <= 3:
+            {
+                RemoveFalseChamfers(lineList);
+                break;
+            }
+        }
+
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
         // TODO: implement better check for octagon problem, perhaps with frontend
-        if (possibleChamferList.Count > 4)
-        {
-            NumChamfers =  possibleChamferList.Count / 2;
-        }
-        else
-        {
-            NumChamfers = possibleChamferList.Count;
-        }
     }
 
     #endregion
@@ -1364,7 +1512,6 @@ public class Feature
 
     internal void CheckGroup9()
     {
-
         foreach (Feature feature in PerimeterFeatureList)
         {
             for (int i = 0; i < feature.EntityList.Count; i++)
@@ -1645,7 +1792,7 @@ public class Feature
      * @Return true if successfully extended. Could be false if the two lines don't have an intersect point,
      * aren't the same infinite line, or already touch
      */
-    private bool ExtendTwoLines(Line line1, Line line2)
+    public bool ExtendTwoLines(Line line1, Line line2)
     {
         if (!line1.DoesIntersect(line2) && !line1.KissCut || !line2.KissCut)
             //makes sure you're not extending lines that already touch

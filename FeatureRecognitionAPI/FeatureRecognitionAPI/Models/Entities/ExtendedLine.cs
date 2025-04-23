@@ -1,10 +1,9 @@
-﻿namespace FeatureRecognitionAPI.Models
+﻿namespace FeatureRecognitionAPI.Models;
+
+public class ExtendedLine : Line
 {
-    public class ExtendedLine : Line
-    {
-        //public Line Parent1 { get { return Parent1; } set { Parent1 = value; calcPoints(); } }
-        public Line Parent1 { get; set; }
-        public Line Parent2 { get; set; }
+    public Line Parent1 { get; set; }
+    public Line Parent2 { get; set; }
 
         public ExtendedLine()
         {
