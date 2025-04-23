@@ -1,4 +1,5 @@
 ﻿using FeatureRecognitionAPI.Models.Utility;
+using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -10,12 +11,24 @@ namespace FeatureRecognitionAPI.Models
     {
         public Point Center { get; set; }//Center point of circle
         public double Radius { get; set; }//Radius of circle
+        
+        [JsonIgnore] public new Point Start
+        {
+            get { throw new NotSupportedException("Circle does not have a start point.");}
+            set{ throw new NotSupportedException("Circle does not have a start point.");}
+        }
+
+        [JsonIgnore] public new Point End
+        {
+            get { throw new NotSupportedException("Circle does not have an end point."); }
+            set { throw new NotSupportedException("Circle does not have an end point."); }
+        }
 
         /**
          * Constructor that takes an x, y and radius value
          * calls calcPerimeter
          * makes it so Circle has no default constructor
-         * 
+         *
          * @param CenterX x coordinate of central point
          * @param CenterY y coordinate of central point
          * @param radius value of the radius of this circle
@@ -24,7 +37,7 @@ namespace FeatureRecognitionAPI.Models
         {
             Center = new Point(centerX, centerY);
             this.Radius = radius;
-            this.Length = (calcPerimeter(radius));
+            this.Length = (CalcPerimeter(radius));
         }
 
         /**
@@ -32,7 +45,7 @@ namespace FeatureRecognitionAPI.Models
          * 
          * @param radius is the radius value that is used to calculate the perimeter
          */
-        private double calcPerimeter(double radius)
+        private double CalcPerimeter(double radius)
         {
             return 2 * Math.PI * radius;
         }

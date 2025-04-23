@@ -641,7 +641,7 @@ public class Feature
             }
             else
             {
-                if (DetermineConcavity(baseEntityList[i]))
+                if (IsConcave(baseEntityList[i]))
                 {
                     //  If previous curve was convex, there is a switch in concavity
                     if (tempConvexCount > 0)
@@ -683,7 +683,7 @@ public class Feature
      * Combs through the base entity list to determine if the entity is concave to the shape or not
      * @param index - The index of the entity being checked
      */
-    private bool DetermineConcavity(Entity entity)
+    private bool IsConcave(Entity entity)
     {
         if (!(entity is Arc || entity is Ellipse)) { return false; }
         //  Variables used to extend the line that is used for concavity detection to ensure it passes through
@@ -707,9 +707,9 @@ public class Feature
         }
 
         //  Entends the ray
-        Point unitVector = new Point((ray.EndPoint.X - ray.StartPoint.X) / ray.Length, (ray.EndPoint.Y - ray.StartPoint.Y) / ray.Length);
-        Point newEndPoint = new Point(ray.StartPoint.X + maxLength * unitVector.X, ray.StartPoint.Y + maxLength * unitVector.Y);
-        ray = new Line(ray.StartPoint.X, ray.StartPoint.Y, newEndPoint.X, newEndPoint.Y);
+        Point unitVector = new Point((ray.End.X - ray.Start.X) / ray.Length, (ray.End.Y - ray.Start.Y) / ray.Length);
+        Point newEndPoint = new Point(ray.Start.X + maxLength * unitVector.X, ray.Start.Y + maxLength * unitVector.Y);
+        ray = new Line(ray.Start.X, ray.Start.Y, newEndPoint.X, newEndPoint.Y);
 
         //  Runs through the base list and finds the num of intersections with the shape
         //  Checks for end point intersections because it will detect 2 end point intersections
@@ -730,7 +730,7 @@ public class Feature
                     continue;
                 }
 
-                if (intersection.Equals(line.StartPoint) || intersection.Equals(line.EndPoint))
+                if (intersection.Equals(line.Start) || intersection.Equals(line.End))
                     numEndPointIntersections++;
             }
             else if (baseEntityList[i] is Arc arc1)
@@ -755,7 +755,7 @@ public class Feature
                     continue;
                 }
 
-                if (intersection.Equals(ellipse.StartPoint) || intersection.Equals(ellipse.EndPoint)){
+                if (intersection.Equals(ellipse.Start) || intersection.Equals(ellipse.End)){
                     numEndPointIntersections++;
                 }
             }
@@ -832,10 +832,10 @@ public class Feature
         }
 
         // Temp variables for correct line check since 4 lines can be formed from the baseLine endpoints
-        Line tempLine1 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
-        Line tempLine2 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
-        Line tempLine3 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
-        Line tempLine4 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
+        Line tempLine1 = new Line(baseLine1.Start.X, baseLine1.Start.Y, baseLine2.Start.X, baseLine2.Start.Y);
+        Line tempLine2 = new Line(baseLine1.End.X, baseLine1.End.Y, baseLine2.End.X, baseLine2.End.Y);
+        Line tempLine3 = new Line(baseLine1.Start.X, baseLine1.Start.Y, baseLine2.End.X, baseLine2.End.Y);
+        Line tempLine4 = new Line(baseLine1.End.X, baseLine1.End.Y, baseLine2.Start.X, baseLine2.Start.Y);
         // Variables for final quadrilateral lines
         Line newLine1;
         Line newLine2;
@@ -948,11 +948,11 @@ public class Feature
             for (int i = 0; i < lines.Count; i++)
             {
                 Point intersect = Entity.GetIntersectPoint(lines[i], biggerArc);
-                if (!lines[i].EndPoint.Equals(intersect))
+                if (!lines[i].End.Equals(intersect))
                 {
-                    Point temp = lines[i].StartPoint;
-                    lines[i].StartPoint = lines[i].EndPoint;
-                    lines[i].EndPoint = temp;
+                    Point temp = lines[i].Start;
+                    lines[i].Start = lines[i].End;
+                    lines[i].End = temp;
                 }
             }
 
@@ -978,11 +978,11 @@ public class Feature
                     double lineAngle;
                     if (Math.Round(lines[0].SlopeX, 4) == 0)
                     {
-                        lineAngle = Math.Round(Math.Atan2(lines[1].EndPoint.Y - lines[1].StartPoint.Y, lines[1].EndPoint.X - lines[1].StartPoint.X), 4);
+                        lineAngle = Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4);
                     }
                     else
                     {
-                        lineAngle = Math.Round(Math.Atan2(lines[0].EndPoint.Y - lines[0].StartPoint.Y, lines[0].EndPoint.X - lines[0].StartPoint.X), 4);
+                        lineAngle = Math.Round(Math.Atan2(lines[0].End.Y - lines[0].Start.Y, lines[0].End.X - lines[0].Start.X), 4);
                     }
                     if (((startAngle == Math.Round(Math.PI / 2, 4) || endAngle == Math.Round(Math.PI / 2, 4))
                         || (endAngle == Math.Round(3 * Math.PI / 2, 4) || startAngle == Math.Round(3 * Math.PI / 2, 4)))
@@ -996,10 +996,10 @@ public class Feature
                 // Case 3: Lines are not vertical, can run Atan() function
                 else
                 {
-                    if ((Math.Round(Math.Atan2(lines[0].EndPoint.Y - lines[0].StartPoint.Y, lines[0].EndPoint.X - lines[0].StartPoint.X), 4) == startAngle
-                        || Math.Round(Math.Atan2(lines[0].EndPoint.Y - lines[0].StartPoint.Y, lines[0].EndPoint.X - lines[0].StartPoint.X), 4) == endAngle)
-                        && (Math.Round(Math.Atan2(lines[1].EndPoint.Y - lines[1].StartPoint.Y, lines[1].EndPoint.X - lines[1].StartPoint.X), 4) == startAngle
-                        || Math.Round(Math.Atan2(lines[1].EndPoint.Y - lines[1].StartPoint.Y, lines[1].EndPoint.X - lines[1].StartPoint.X), 4) == endAngle))
+                    if ((Math.Round(Math.Atan2(lines[0].End.Y - lines[0].Start.Y, lines[0].End.X - lines[0].Start.X), 4) == startAngle
+                        || Math.Round(Math.Atan2(lines[0].End.Y - lines[0].Start.Y, lines[0].End.X - lines[0].Start.X), 4) == endAngle)
+                        && (Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4) == startAngle
+                        || Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4) == endAngle))
                     {
                         FeatureType = PossibleFeatureTypes.Group10;
                         return true;
@@ -1029,18 +1029,14 @@ public class Feature
             {
                 // Keeps track of the bigger/smaller arc for the concavity check
                 Arc bigArc = baseEntityList[0] as Arc;
-                int bigIndex = 0;
                 Arc smallArc = baseEntityList[1] as Arc;
-                int smallIndex = 1;
                 if (bigArc.Radius < smallArc.Radius)
                 {
                     Arc temp = bigArc;
                     bigArc = smallArc;
-                    bigIndex = 1;
                     smallArc = temp;
-                    smallIndex = 0;
                 }
-                if (bigArc.Start.Equals(smallArc.Start) && bigArc.End.Equals(smallArc.End) && DetermineConcavity(bigArc) && !DetermineConcavity(smallArc))
+                if (bigArc.Start.Equals(smallArc.Start) && bigArc.End.Equals(smallArc.End) && IsConcave(bigArc) && !IsConcave(smallArc))
                 {
                     FeatureType = PossibleFeatureTypes.Group11;
                     return true;
@@ -1063,8 +1059,8 @@ public class Feature
                     line1 = (Line)baseEntityList[0];
                 }
                 // Check that end points connect
-                if ((line1.StartPoint.Equals(arc1.Start) || line1.EndPoint.Equals(arc1.Start))
-                    && (line1.StartPoint.Equals(arc1.End) || line1.EndPoint.Equals(arc1.End)))
+                if ((line1.Start.Equals(arc1.Start) || line1.End.Equals(arc1.Start))
+                    && (line1.Start.Equals(arc1.End) || line1.End.Equals(arc1.End)))
                 {
                     FeatureType = PossibleFeatureTypes.Group11;
                     return true;
@@ -1076,30 +1072,24 @@ public class Feature
                 // Fetch arcs and line
                 // keeps track of index for concavity and endpoint checks
                 Arc bigArc = null;
-                int bigArcIndex = -1;
                 Arc side1 = null;
-                int side1Index = -1;
                 Arc side2 = null;
-                int side2Index = -1;
                 Line line1 = null;
                 for (int i = 0; i < baseEntityList.Count; i++)
                 {
-                    if (baseEntityList[i] is Arc)
+                    if (baseEntityList[i] is Arc arc)
                     {
                         if (bigArc is null)
                         {
-                            bigArc = (Arc)baseEntityList[i];
-                            bigArcIndex = i;
+                            bigArc = arc;
                         }
                         else if (side1 is null)
                         {
-                            side1 = (Arc)baseEntityList[i];
-                            side1Index = i;
+                            side1 = arc;
                         }
                         else if (side2 is null)
                         {
-                            side2 = (Arc)baseEntityList[i];
-                            side2Index = i;
+                            side2 = arc;
                         }
                     }
                     else
@@ -1109,31 +1099,24 @@ public class Feature
                 }
                 // Swap the arcs to get the correct one under the correct label
                 Arc temp;
-                int tempIndex;
                 if (bigArc.Radius < side1.Radius)
                 {
                     temp = bigArc;
-                    tempIndex = bigArcIndex;
                     bigArc = side1;
-                    bigArcIndex = side1Index;
                     side1 = temp;
-                    side1Index = tempIndex;
                 }
                 if (bigArc.Radius < side2.Radius)
                 {
                     temp = bigArc;
-                    tempIndex = bigArcIndex;
                     bigArc = side2;
-                    bigArcIndex = side2Index;
                     side2 = temp;
-                    side2Index = tempIndex;
                 }
-                bool isSide1Convex = !DetermineConcavity(side1);
-                bool isSide2Convex = !DetermineConcavity(side2);
-                bool isBigArcConvex = !DetermineConcavity(bigArc);
+                bool isSide1Convex = !IsConcave(side1);
+                bool isSide2Convex = !IsConcave(side2);
+                bool isBigArcConvex = !IsConcave(bigArc);
                 if (isSide1Convex && isSide2Convex && isBigArcConvex
-                    && line1.EntityPointsAreTouching(side1) && line1.EntityPointsAreTouching(side2)
-                    && bigArc.EntityPointsAreTouching(side1) && bigArc.EntityPointsAreTouching(side2))
+                    && line1.AreEndpointsTouching(side1) && line1.AreEndpointsTouching(side2)
+                    && bigArc.AreEndpointsTouching(side1) && bigArc.AreEndpointsTouching(side2))
                 {
                     FeatureType = PossibleFeatureTypes.Group11;
                     return true;
@@ -1291,16 +1274,16 @@ public class Feature
             // ignore the origin line and flipped version
             if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
     
-            Point originPoint = fromStart? originLine.StartPoint : originLine.EndPoint;
+            Point originPoint = fromStart? originLine.Start : originLine.End;
 
             // if end meets start or start meets end
-            if (originPoint.Equals(fromStart ? searchLine.EndPoint : searchLine.StartPoint))
+            if (originPoint.Equals(fromStart ? searchLine.End : searchLine.Start))
             {
                 touchingLine = searchLine;
                 break;
             }
             // if end meets end or start meets start
-            else if (originPoint.Equals(fromStart ? searchLine.StartPoint : searchLine.EndPoint))
+            else if (originPoint.Equals(fromStart ? searchLine.Start : searchLine.End))
             {
                 touchingLine = searchLine.swapStartEnd();
                 wasFlipped = true;
@@ -1913,7 +1896,7 @@ public class Feature
             //base case where the current entity touches the head (means its a closed shape)
             //checks if contained in visitedEntities to avoid the second entity from triggering this
             //checks if current entity is the same as head to avoid a false true
-            if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) &&
+            if (curPath.Peek() != head && curPath.Peek().AreEndpointsTouching(head) &&
                 !testedEntities.Contains(curPath.Peek()))
             {
                 return true; //Path found
@@ -1927,7 +1910,7 @@ public class Feature
             if (entity != curPath.Peek())
             {
                 // checks if entity in loop is not the curent entity being checked
-                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                if (curPath.Peek().AreEndpointsTouching(entity) && (!testedEntities.Contains(entity)))
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
