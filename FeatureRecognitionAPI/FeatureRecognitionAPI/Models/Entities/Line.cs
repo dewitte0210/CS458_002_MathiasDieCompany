@@ -70,7 +70,7 @@ namespace FeatureRecognitionAPI.Models
 
         public Line swapStartEnd()
         {
-            return new Line(EndPoint.X, EndPoint.Y, StartPoint.X, StartPoint.Y);
+            return new Line(End.X, End.Y, Start.X, Start.Y);
         }
 
         public bool hasPoint(Point point)

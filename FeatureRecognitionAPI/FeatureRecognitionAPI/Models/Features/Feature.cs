@@ -1274,16 +1274,16 @@ public class Feature
             // ignore the origin line and flipped version
             if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
     
-            Point originPoint = fromStart? originLine.StartPoint : originLine.EndPoint;
+            Point originPoint = fromStart? originLine.Start : originLine.End;
 
             // if end meets start or start meets end
-            if (originPoint.Equals(fromStart ? searchLine.EndPoint : searchLine.StartPoint))
+            if (originPoint.Equals(fromStart ? searchLine.End : searchLine.Start))
             {
                 touchingLine = searchLine;
                 break;
             }
             // if end meets end or start meets start
-            else if (originPoint.Equals(fromStart ? searchLine.StartPoint : searchLine.EndPoint))
+            else if (originPoint.Equals(fromStart ? searchLine.Start : searchLine.End))
             {
                 touchingLine = searchLine.swapStartEnd();
                 wasFlipped = true;

@@ -563,13 +563,13 @@ namespace FeatureRecognitionAPI.Models
         public static Point? GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
-            double A1 = line1.End.Y - line1.Start.Y;
-            double B1 = line1.End.X - line1.Start.X;
-            double C1 = A1 * line1.Start.X + B1 * line1.Start.Y;
+            double y1 = line1.End.Y - line1.Start.Y;
+            double x1 = line1.End.X - line1.Start.X;
+            double C1 = y1 * line1.Start.X + x1 * line1.Start.Y;
 
-            double A2 = line2.End.Y - line2.Start.Y;
-            double B2 = line2.End.X - line2.Start.X;
-            double C2 = A2 * line2.Start.X + B2 * line2.Start.Y;
+            double y2 = line2.End.Y - line2.Start.Y;
+            double x2 = line2.End.X - line2.Start.X;
+            double C2 = y2 * line2.Start.X + x2 * line2.Start.Y;
 
             double delta = y1 * x2 - y2 * x1;
 
