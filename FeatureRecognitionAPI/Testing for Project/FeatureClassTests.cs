@@ -615,7 +615,7 @@ namespace Testing_for_Project
             Line line2 = new(0.0, 5.0, 5.0, 5.0);
             Line line3 = new(5.0, 5.0, 5.0, 0.0);
             List<Entity> entities = new List<Entity>() { line1, line2, line3 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
@@ -627,7 +627,7 @@ namespace Testing_for_Project
             Arc arc1 = new(0.0, 0.0, 1.0, 180, 360);
             Line line2 = new(1.0, 0.0, 1.0, 5.0);
             List<Entity> entities = new List<Entity>() { line1, arc1, line2 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
@@ -641,7 +641,7 @@ namespace Testing_for_Project
             Arc arc2 = new(4.0, 1.0, 1.0, 270, 360);
             Line line3 = new(5.0, 1.0, 5.0, 5.0);
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature>() { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group5));
         }
@@ -654,7 +654,7 @@ namespace Testing_for_Project
             Line line1 = new(0.0, 1.0, 1.0, 0.0);
             Line line2 = new(1.0, 0.0, 2.0, 1.0);
             List<Entity> entities = new List<Entity>() { line1, line2 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
@@ -678,7 +678,7 @@ namespace Testing_for_Project
             Line line1 = new(0.0, 1.0, 0.0, 0.0);
             Line line2 = new(0.0, 0.0, 1.0, 0.0);
             List<Entity> entities = new List<Entity> { line1, line2 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group4));
         }
@@ -697,7 +697,7 @@ namespace Testing_for_Project
             Line line3 = new(4.0, 1.0, 4.0, 3.0);
             Arc arc4 = new(4.0, 3.0, 1.0, 90, 180);
             List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, arc4, line1, line2, line3 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group6));
         }
@@ -711,7 +711,7 @@ namespace Testing_for_Project
             Line line2 = new(3.0, 1.0, 3.0, 3.0);
             Arc arc3 = new(4.0, 3.0, 1.0, 90, 180);
             List<Entity> entities = new List<Entity>() { arc1, arc2, arc3, line1, line2 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.EqualTo(PossibleFeatureTypes.Group6));
         }
@@ -725,7 +725,7 @@ namespace Testing_for_Project
             Arc arc2 = new(4.0, 1.0, 1.0, 270, 360);
             Line line3 = new(5.0, 1.0, 5.0, 5.0);
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, arc2, line3 };
-            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) } };
+            Feature testFeature = new(entities) { PerimeterFeatureList = new List<Feature> { new(entities) }, baseEntityList = new List<Entity>() {new Line(5.0, 5.0, 10.0, 10.0)} };
             testFeature.DetectFeatures();
             Assert.That(testFeature.PerimeterFeatureList[0].FeatureType, Is.Not.EqualTo(PossibleFeatureTypes.Group6));
         }

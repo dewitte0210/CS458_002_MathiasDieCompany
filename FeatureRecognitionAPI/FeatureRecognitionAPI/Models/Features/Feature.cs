@@ -195,6 +195,8 @@ public class Feature
             PerimeterFeatureList.Clear();
         } // should only happen if line extension and separation were skipped
         
+        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses); // recount entities in baseShape
+        
         // BASE SHAPE DETECTION:
         if (!CheckGroup1B()
             && !CheckGroup1C() 
@@ -318,8 +320,8 @@ public class Feature
             }
         }
 
-        // set a dummy type and return false.
-        FeatureType = PossibleFeatureTypes.Punch;
+        // set to Unknown and return false.
+        FeatureType = PossibleFeatureTypes.Unknown;
         return false;
     }
 
@@ -1218,6 +1220,9 @@ public class Feature
 
         if (matchingPairs == 2)
         {
+            // MDC said they don't have a trapezoid feature and it would just be entered as a raduis rectangle
+            // FeatureType = PossibleFeatureTypes.Group6;
+            FeatureType = PossibleFeatureTypes.Group1A2;
             return true;
         }
 
