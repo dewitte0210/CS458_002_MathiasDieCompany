@@ -313,6 +313,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { min = values[i].X; }
                 else if (values[i].X < min) { min = values[i].X; }
             }
+            //Checks if the calculated min is in range of the parameters
             if (!isInEllipseRange(values[index])) { return Math.Min(Start.X, End.X); }
             return min;
         }
@@ -355,6 +356,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { min = values[i].Y; }
                 else if (values[i].Y < min) { min = values[i].Y; }
             }
+            //Checks if the calculated min is in range of the parameters
             if (!isInEllipseRange(values[index])) { return Math.Min(Start.Y, End.Y); }
             return min;
         }
@@ -397,6 +399,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { max = values[i].X; }
                 else if (values[i].X > max) { max = values[i].X; }
             }
+            //Checks if the calculated max is in range of the parameters
             if (!isInEllipseRange(values[index])) { return Math.Max(Start.X, End.X); }
             return max;
         }
@@ -439,6 +442,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { max = values[i].Y; }
                 else if (values[i].Y > max) { max = values[i].Y; }
             }
+            //Checks if the calculated max is in range of the parameters
             if (!isInEllipseRange(values[index])) { return Math.Max(Start.Y, End.Y); }
             return max;
         }
