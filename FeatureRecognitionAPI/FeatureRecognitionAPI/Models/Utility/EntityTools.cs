@@ -23,7 +23,7 @@ public static class EntityTools
         //lines are parallel
         if (MdcMath.DoubleEquals(diffCross, 0)) return null;
         
-        Point d = new(CrossProduct(line1.StartPoint, line1.EndPoint), CrossProduct(line2.StartPoint, line2.EndPoint));
+        Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
         double y = CrossProduct(d, yDiff) / diffCross;
         
@@ -50,32 +50,32 @@ public static class EntityTools
         Point intPoint = GetIntersection(line1, line2);
         if (intPoint == null) return false;
         
-        double line1StartDistance = Point.Distance(line1.StartPoint, intPoint);
-        double line1EndDistance = Point.Distance(line1.EndPoint, intPoint);
+        double line1StartDistance = Point.Distance(line1.Start, intPoint);
+        double line1EndDistance = Point.Distance(line1.End, intPoint);
         //if start is closer to intersect set that as new start
         if (line1StartDistance < line1EndDistance)
         {
-            line1.StartPoint = intPoint;
+            line1.Start = intPoint;
         }
         else
         {
-            line1.EndPoint = intPoint;
+            line1.End = intPoint;
         }
         
-        double line2StartDistance = Point.Distance(line2.StartPoint, intPoint);
-        double line2EndDistance = Point.Distance(line2.EndPoint, intPoint);
+        double line2StartDistance = Point.Distance(line2.Start, intPoint);
+        double line2EndDistance = Point.Distance(line2.End, intPoint);
         if (line2StartDistance < line2EndDistance)
         {
-            line2.StartPoint = intPoint;
+            line2.Start = intPoint;
         }
         else
         {
-            line2.EndPoint = intPoint;
+            line2.End = intPoint;
         }
 
         // update Length because for some reason it isn't a function
-        line1.Length = Point.Distance(line1.StartPoint, line1.EndPoint);
-        line2.Length = Point.Distance(line2.StartPoint, line2.EndPoint);
+        line1.Length = Point.Distance(line1.Start, line1.End);
+        line2.Length = Point.Distance(line2.Start, line2.End);
 
         return true;
     }

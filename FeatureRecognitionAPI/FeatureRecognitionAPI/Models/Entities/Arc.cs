@@ -11,8 +11,6 @@ namespace FeatureRecognitionAPI.Models;
 public class Arc : Entity
 {
     public Point Center { get; set; } //Central point
-    public Point Start { get; set; } //Start point
-    public Point End { get; set; } //End point
     public double Radius { get; set; } //Radius value
     public double StartAngle { get; set; } //angle from central point to start point
     public double EndAngle { get; set; } //angle from central point to end point
@@ -31,20 +29,20 @@ public class Arc : Entity
     public Arc(double centerX, double centerY, double radius, double startAngle, double endAngle)
     {
         Center = new Point(centerX, centerY);
-        this.Radius = radius;
-        this.StartAngle = startAngle;
-        this.EndAngle = endAngle;
-        Start = new(calcXCoord(centerX, radius, startAngle), calcYCoord(centerY, radius, startAngle));
-        End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
-        this.CentralAngle = calcCentralAngle(startAngle, endAngle);
-        this.Length = (calcLength(radius, CentralAngle));
+        Radius = radius;
+        StartAngle = startAngle;
+        EndAngle = endAngle;
+        Start = new(CalcXCoord(centerX, radius, startAngle), CalcYCoord(centerY, radius, startAngle));
+        End = new Point(CalcXCoord(centerX, radius, endAngle), CalcYCoord(centerY, radius, endAngle));
+        CentralAngle = CalcCentralAngle(startAngle, endAngle);
+        Length = (CalcLength(radius, CentralAngle));
     }
 
     /**
      * Function to calculate the x coordinate given the center point, Radius
      * and an angle.
      */
-    private static double calcXCoord(double x, double radius, double angle)
+    private static double CalcXCoord(double x, double radius, double angle)
     {
         return (radius * Math.Cos(Angles.DegToRadians(angle)) + x);
     }
@@ -53,25 +51,25 @@ public class Arc : Entity
      * Function to calculate the y coordinate given the center point, Radius
      * and an angle.
      */
-    private static double calcYCoord(double y, double radius, double angle)
+    private static double CalcYCoord(double y, double radius, double angle)
     {
         return (radius * Math.Sin(Angles.DegToRadians(angle)) + y);
     }
 
-        /**
-         * Function to calculate the central angle
-         * 
-         * @param startAngle the start angle of the arc being calculated
-         * @param endAngle the end angle of the arc being calculated
-         * @return the calculated the length of the arc
-         */
-        internal static double calcCentralAngle(double startAngle, double endAngle)
-        {
-            //The subtraction result would be negative, need to add 360 to get correct value
-            if (endAngle < startAngle)
-                return endAngle - startAngle + 360;
-            return endAngle - startAngle;
-        }
+    /**
+     * Function to calculate the central angle
+     *
+     * @param startAngle the start angle of the arc being calculated
+     * @param endAngle the end angle of the arc being calculated
+     * @return the calculated the length of the arc
+     */
+    internal static double CalcCentralAngle(double startAngle, double endAngle)
+    {
+        //The subtraction result would be negative, need to add 360 to get correct value
+        if (endAngle < startAngle)
+            return endAngle - startAngle + 360;
+        return endAngle - startAngle;
+    }
 
     /**
      * Function to calculate the length of the arc for perimeter length checks
@@ -80,13 +78,13 @@ public class Arc : Entity
      * @param centralAngle the central angle for the arc being calculated
      * @return the calculated length (partial circumference) of the arc
      */
-    private static double calcLength(double radius, double centralAngle)
+    private static double CalcLength(double radius, double centralAngle)
     {
         return (2 * Math.PI * radius * (centralAngle / 360));
     }
 
     /**
-     * Overides .Equals function for the Arc object
+     * Overrides .Equals function for the Arc object
      *
      * @param obj object being compared to this
      * @return true if the same arc, false if not
