@@ -1531,7 +1531,6 @@ public class Feature
                     {
                         feature.KissCut = true;
                         feature.FeatureType = PossibleFeatureTypes.Group9;
-
                     }
                 }
             }

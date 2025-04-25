@@ -59,10 +59,10 @@ namespace FeatureRecognitionAPI.Services
             supportedFile.DetectAllFeatureTypes();
 
             // Set the feature groups
-            List<List<Entity>> touchingEntityList = new List<List<Entity>>();
+            List<Entity> touchingEntityList = new List<Entity>();
             foreach (Feature feature in supportedFile.FeatureList)
             {
-                touchingEntityList.Add(feature.EntityList);
+                touchingEntityList.AddRange(feature.EntityList);
             }
 
             // Create JSON that will be sent to the frontend

@@ -69,16 +69,31 @@ public class FeatureGroup
     public void FindFeatureTypes()
     {
         List<Feature> featToAdd = new List<Feature>();
-        for (int i = 0; i < features.Count; i++)
+        foreach (Feature feature in features)
         {
 
-            features[i].ExtendAllEntities();
-            features[i].SeperateBaseEntities();
-            features[i].SeperatePerimeterEntities();
-            features[i].DetectFeatures();
-            for (int j = 0; j < features[i].PerimeterFeatureList.Count(); j++)
+            feature.ExtendAllEntities();
+            feature.SeperateBaseEntities();
+            feature.SeperatePerimeterEntities();
+            feature.DetectFeatures();
+            for (int j = 0; j < feature.PerimeterFeatureList.Count; j++)
             {
-                featToAdd.Add(features[i].PerimeterFeatureList[j]);
+                featToAdd.Add(feature.PerimeterFeatureList[j]);
+            }
+
+            bool isRecognized = feature.FeatureType != PossibleFeatureTypes.Unknown;
+            foreach (Entity entity in feature.EntityList)
+            {
+                entity.IsRecognized = isRecognized;
+            }
+            
+            foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
+            {
+                isRecognized = perimeterFeature.FeatureType != PossibleFeatureTypes.Unknown;
+                foreach (Entity entity in perimeterFeature.EntityList)
+                {
+                    entity.IsRecognized = isRecognized;
+                }
             }
         }
         features.AddRange(featToAdd);

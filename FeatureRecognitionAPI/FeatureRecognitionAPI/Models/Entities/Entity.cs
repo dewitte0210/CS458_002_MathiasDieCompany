@@ -20,6 +20,8 @@ namespace FeatureRecognitionAPI.Models
         [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
         public bool KissCut { get; set; }
+        
+        public bool? IsRecognized { get; set; } //for changing how lines look on the front end if the feature is not recognized
 
         //Precision for x and y intersect values to
         //account for inaccurate calculated values

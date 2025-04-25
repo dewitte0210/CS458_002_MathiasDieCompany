@@ -163,6 +163,7 @@ namespace FeatureRecognitionAPI.Models
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
+                //TODO: delete?
                 feature.CountEntities();
             }
         }
@@ -189,10 +190,9 @@ namespace FeatureRecognitionAPI.Models
             Point tempMinPoint;
             Point tempMaxPoint;
 
-            //bool firstrun = true;
             while (features.Count > 0)
             {
-                //Set max values to zero before run, if its not the first one
+                //Set max values to zero before run
                 maxDiffIndex = 0;
                 maxDiff.X = 0;
                 maxDiff.Y = 0;
@@ -207,7 +207,6 @@ namespace FeatureRecognitionAPI.Models
                     tempMaxPoint = features[i].FindMaxPoint();
                     tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);
                     tempDiff.Y = (tempMaxPoint.Y - tempMinPoint.Y);
-
 
                     if (tempDiff.X > maxDiff.X && tempDiff.Y > maxDiff.Y)
                     {
