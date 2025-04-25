@@ -189,7 +189,13 @@ public class Feature
      */
     public void DetectFeatures()
     {
-        if (baseEntityList.Count == 0) {baseEntityList = new(EntityList);} // should only happen if line extension and separation were skipped
+        if (baseEntityList.Count == 0)
+        {
+            baseEntityList = new(EntityList);
+            PerimeterFeatureList.Clear();
+        } // should only happen if line extension and separation were skipped
+        
+        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses); // recount entities in baseShape
         
         // BASE SHAPE DETECTION:
         if (!CheckGroup1B()
@@ -314,8 +320,8 @@ public class Feature
             }
         }
 
-        // set a dummy type and return false.
-        FeatureType = PossibleFeatureTypes.Punch;
+        // set to Unknown and return false.
+        FeatureType = PossibleFeatureTypes.Unknown;
         return false;
     }
 
@@ -1197,6 +1203,9 @@ public class Feature
 
         if (matchingPairs == 2)
         {
+            // MDC said they don't have a trapezoid feature and it would just be entered as a raduis rectangle
+            // FeatureType = PossibleFeatureTypes.Group6;
+            FeatureType = PossibleFeatureTypes.Group1A2;
             return true;
         }
 
@@ -1794,7 +1803,7 @@ public class Feature
      */
     public bool ExtendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2) && !line1.KissCut || !line2.KissCut)
+        if (!line1.DoesIntersect(line2) && !line1.KissCut && !line2.KissCut)
             //makes sure you're not extending lines that already touch
             // Makes sure KissCut lines are not extended
 
@@ -1822,15 +1831,19 @@ public class Feature
         exLine.AdjList.Remove(line2);
         
         // replace line1 and line2 with exLine in the adjacency lists for entities touching line1 and line2
-        foreach (Entity e in line1.AdjList)
+        for (int i = 0; i < line1.AdjList.Count; i++)
         {
-            e.AdjList.Remove(line1);
-            e.AdjList.Add(exLine);
+            List<Entity> tempList = new List<Entity>(line1.AdjList[i].AdjList);
+            tempList.Remove(line1);
+            tempList.Add(exLine);
+            line1.AdjList[i].AdjList = tempList;
         }
-        foreach (Entity e in line2.AdjList)
+        for (int i = 0; i < line2.AdjList.Count; i++)
         {
-            e.AdjList.Remove(line2);
-            e.AdjList.Add(exLine);
+            List<Entity> tempList = new List<Entity>(line2.AdjList[i].AdjList);
+            tempList.Remove(line2);
+            tempList.Add(exLine);
+            line2.AdjList[i].AdjList = tempList;
         }
     }
 
