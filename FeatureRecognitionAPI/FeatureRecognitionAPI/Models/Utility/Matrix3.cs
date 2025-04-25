@@ -2,9 +2,9 @@
 
 namespace FeatureRecognitionAPI.Models.Utility;
 
-/**
- * Wrapper around Matrix4 so we can reuse rotate, scale, transform, etc. from that class.
- */
+/// <summary>
+/// Wrapper around Matrix4 so we can reuse rotate, scale, transform, etc. from that class.
+/// </summary>
 public class Matrix3
 {
     private Matrix4 _matrix;
