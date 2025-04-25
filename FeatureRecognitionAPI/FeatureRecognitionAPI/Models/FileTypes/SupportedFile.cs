@@ -1,9 +1,4 @@
-﻿/*
- * Abstract class to be inherited by every File child class
- * - DWG, DXF
- */
-
-using ACadSharp;
+﻿using ACadSharp;
 using ACadSharp.Blocks;
 using ACadSharp.Entities;
 using FeatureRecognitionAPI.Models.Enums;
@@ -13,6 +8,9 @@ using FeatureRecognitionAPI.Services;
 
 namespace FeatureRecognitionAPI.Models
 {
+    /// <summary>
+    /// Abstract class to be inherited by every File child class - DWG, DXF
+    /// </summary>
     public abstract class SupportedFile
     {
 
@@ -61,8 +59,10 @@ namespace FeatureRecognitionAPI.Models
             }
         }
         
-        // This function takes in a list of entities and creates features based on groups of touching entities
-        // it also constructs each entity's AdjList (Adjacency List)
+        /// <summary>
+        /// This function takes in a list of entities and creates features based on groups of touching entities
+        /// it also constructs each entity's AdjList (Adjacency List)
+        /// </summary>
         public void GroupFeatureEntities()
         {
             if (FeatureList.Count > 0) {return;}
@@ -167,10 +167,10 @@ namespace FeatureRecognitionAPI.Models
             }
         }
         
-        /*
-         * Groups features together and stores how many of each feature group are present in the file
-         * Initializes class variable featuresList
-         */
+        /// <summary>
+        /// Groups features together and stores how many of each feature group are present in the file
+        /// Initializes class variable featuresList
+        /// </summary>
         public void SetFeatureGroups()
         {
             if (FeatureList.Count == 0)
@@ -231,10 +231,11 @@ namespace FeatureRecognitionAPI.Models
                 {
                     tempMaxPoint = features[i].FindMaxPoint();
                     tempMinPoint = features[i].FindMinPoint();
+                    
                     //Temp max should be less than maxPoint (if it's the same it also shouldn't be added)
+                    //TempMin should be greater than minPoint
                     if (tempMaxPoint.X < maxPoint.X && tempMaxPoint.Y < maxPoint.Y
-                                                    //TempMin should be greater than minPoint
-                                                    && tempMinPoint.X > minPoint.X && tempMinPoint.Y > minPoint.Y)
+                            && tempMinPoint.X > minPoint.X && tempMinPoint.Y > minPoint.Y)
                     {
                         featureGroupList.Add(features[i]);
                         features.RemoveAt(i);

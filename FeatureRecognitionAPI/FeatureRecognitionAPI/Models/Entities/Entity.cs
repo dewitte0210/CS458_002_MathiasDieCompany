@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models
 {
-    /**
-     * Abstract class that represents a generic entity in dxf or dwg files 
-     */
+    /// <summary>
+    /// Abstract class that represents a generic entity in dxf or dwg files
+    /// </summary>
     public abstract class Entity
     {
         // todo: make length a get function because it should never change
@@ -31,17 +31,15 @@ namespace FeatureRecognitionAPI.Models
             AdjList = new List<Entity>();
             KissCut = false;
         }
-
-        /**
-         * Function that checks if this entity intersects with another entity
-         *
-         * @param other is the entity being checked against this
-         * @return true if they intersect, otherwise false
-         */
-
+        
         // todo: implement getLength()
         //public abstract double GetLength();
         
+        /// <summary>
+        /// Function that checks if this entity intersects with another entity
+        /// </summary>
+        /// <param name="other"> the entity being checked against this </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         public bool DoesIntersect(Entity other)
         {
             if (this is Circle || other is Circle) { return false; }
@@ -82,14 +80,13 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        /**
-         * Helper function that is called from DoesIntersect
-         * Specifically checks if two lines intersect
-         * 
-         * @param line1 is the firt Line being checked
-         * @param line2 is the second Line being checked
-         * @return true if they intersect, otherwise false
-         */
+        /// <summary>
+        /// Helper function that is called from DoesIntersect
+        /// Specifically checks if two lines intersect
+        /// </summary>
+        /// <param name="line1"> the first Line being checked </param>
+        /// <param name="line2"> the second Line being checked </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         internal static bool IntersectLineWithLine(Line line1, Line line2)
         {
             // If the endpoints are touching we can avoid the intersect math
@@ -218,14 +215,13 @@ namespace FeatureRecognitionAPI.Models
             return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
 
-        /**
-         * Helper function that is called from DoesIntersect
-         * Specifically checks if a line and arc intersects
-         * 
-         * @param line is the Line being checked
-         * @param arc is the arc being checked
-         * @return true if they intersect, otherwise false
-         */
+        /// <summary>
+        /// Helper function that is called from DoesIntersect
+        /// Specifically checks if a line and arc intersects
+        /// </summary>
+        /// <param name="line"> the Line being checked </param>
+        /// <param name="arc"> the arc being checked </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         internal static bool IntersectLineWithArc(Line line, Arc arc)
         {
             //Check if the endpoints are touching first to avoid the intersect calculations
@@ -346,17 +342,15 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        /**
-         * Helper function that is called from DoesIntersect
-         * Specifically checks if two arcs intersects
-         * 
-         * @param arc1 is the first Arc being checked
-         * @param arc2 is the second Arc being checked
-         * @return true if they intersect, otherwise false
-         */
+        /// <summary>
+        /// Helper function that is called from DoesIntersect
+        /// Specifically checks if two arcs intersects
+        /// </summary>
+        /// <param name="arc1"> the first Arc being checked </param>
+        /// <param name="arc2"> the second Arc being checked </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         internal static bool IntersectArcWithArc(Arc arc1, Arc arc2)
         {
-
             // If the endpoints are touching we can avoid the intersect math 
             if (arc1.AreEndpointsTouching(arc2)) { return true; }
 
@@ -532,12 +526,12 @@ namespace FeatureRecognitionAPI.Models
         }
 
         // todo: remove redundant get touching functions and move to entityTools
-        /**
-         * Function to check if any points of this entity is touching any points of another entity
-         * 
-         * @param e2 is the entity being checked against this
-         * @return true if they have points touch, otherwise false
-         */
+        
+        /// <summary>
+        /// Function to check if any points of this entity is touching any points of another entity
+        /// </summary>
+        /// <param name="e2"> the entity being checked against this </param>
+        /// <returns> true if they have points touch, otherwise false </returns>
         internal bool AreEndpointsTouching(Entity e2)
         {
             if (this is Circle || e2 is Circle)
@@ -829,11 +823,10 @@ namespace FeatureRecognitionAPI.Models
 
         // todo: move to MDCMath
         
-        /**
-         * Solves the quadratic formula
-         * 
-         * @Return - List of solutions
-         */
+        /// <summary>
+        /// Solves the quadratic formula
+        /// </summary>
+        /// <returns> List of solutions </returns>
         internal static List<double> QuadraticFormula(double a, double b, double c)
         {
             List<double> solns = new List<double>();
@@ -855,7 +848,8 @@ namespace FeatureRecognitionAPI.Models
         }
         public abstract override bool Equals(object? obj);
 
-        //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
+        /// <returns> Return true when entities compared have similar traits,
+        /// length is the same (but start and end point, or mid point can vary) </returns>
         public abstract bool Compare(object? obj);
 
         public abstract double MinX();
