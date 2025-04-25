@@ -1803,7 +1803,7 @@ public class Feature
      */
     public bool ExtendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2) && !line1.KissCut || !line2.KissCut)
+        if (!line1.DoesIntersect(line2) && !line1.KissCut && !line2.KissCut)
             //makes sure you're not extending lines that already touch
             // Makes sure KissCut lines are not extended
 
