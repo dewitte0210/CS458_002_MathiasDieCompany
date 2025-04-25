@@ -13,41 +13,6 @@ namespace FeatureRecognitionAPI.Services
         {
         }
 
-        public async Task<(OperationStatus, string?)> GetFileExtension(string fileName)
-        {
-            if (fileName != null)
-            {
-                string ext = "";
-                bool extBool = false;
-                for (int i = 0; i < fileName.Length; i++)
-                {
-                    if (fileName[i] == '.')
-                    {
-                        extBool = true;
-                    }
-
-                    if (extBool)
-                    {
-                        ext += char.ToLower(fileName[i]);
-                    }
-                }
-
-                switch (ext)
-                {
-                    case ".dxf":
-                        return (OperationStatus.OK, ext);
-                    case ".dwg":
-                        return (OperationStatus.OK, ext);
-                    default:
-                        Console.WriteLine("ERROR detecting file extension");
-                        return (OperationStatus.OK, null);
-                }
-            }
-
-            Console.WriteLine("ERROR File does not exist");
-            return (OperationStatus.OK, null);
-        }
-
         /*
          * Handles an uploaded file by performing feature detection based on its extension
          * and returning the results in JSON format for the frontend.
@@ -55,95 +20,59 @@ namespace FeatureRecognitionAPI.Services
          * Supported file types: .dxf, .dwg
          *
          * @param file The uploaded file as an IFormFile object.
-         * @return A tuple containing:
-         *   - OperationStatus: The status of the operation, such as OK, BadRequest, or specific error types.
-         *   - string: The resulting JSON string if successful; null otherwise.
+         * @return 
+         *   - string: The resulting JSON string if successful;
          *
-         * Note: PDF support is currently commented out and will be implemented in the future.
-         *
-         * Exceptions:
-         * - Returns specific OperationStatus values for unsupported, corrupt, or external API-related errors.
          */
-        public async Task<(OperationStatus, string?)> UploadFile(IFormFile file)
+        public async Task<string?> UploadFile(IFormFile file)
         {
-            try
+            string? ext = Path.GetExtension(file.FileName);
+
+            if (ext == null)
             {
-                var (status, ext) = await GetFileExtension(file.FileName);
-
-                if (status != OperationStatus.OK || ext == null)
-                {
-                    Console.WriteLine("ERROR detecting file extension");
-                    return (OperationStatus.BadRequest, null);
-                }
-
-                // maybe change ExampleFiles directory
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "ExampleFiles", file.FileName);
-
-                if (!File.Exists(path))
-                {
-                    using (Stream stream = new FileStream(path, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-                }
+                throw new IOException("Error detecting file extension");
+            }
 
 
-                SupportedFile supportedFile;
-                switch (ext)
+            SupportedFile supportedFile;
+            using (Stream stream = file.OpenReadStream())
+            {
+                switch (ext.ToLower())
                 {
                     case ".dxf":
-                        using (var dxfStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                             supportedFile = new DXFFile(dxfStream.Name);
-                        }
+                        supportedFile = new DXFFile(stream);
 
                         break;
                     case ".dwg":
-                        using (var dwgStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                             supportedFile = new DWGFile(dwgStream.Name);
-                        }
+                        supportedFile = new DWGFile(stream);
 
                         break;
                     default:
-                        Console.WriteLine("ERROR detecting file extension");
-                        return (OperationStatus.BadRequest, null);
+                        throw new IOException("Invalid file extension: " + ext);
                 }
-                
-                // supportedFile.GroupFeatureEntities();
-                
-                supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
-
-                supportedFile.DetectAllFeatureTypes();
-                
-                // Set the feature groups
-                List<List<Entity>> touchingEntityList = new List<List<Entity>>();
-                foreach (Feature feature in supportedFile.FeatureList)
-                {
-                    touchingEntityList.Add(feature.EntityList);
-                }
-                
-                // Create JSON that will be sent to the frontend
-                var settings = new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto};
-                settings.Converters.Add(new StringEnumConverter());
-                string json = JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
-
-                return (OperationStatus.OK, json);
             }
-            catch (Exception ex)
+
+            // supportedFile.GroupFeatureEntities();
+
+            supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
+
+            supportedFile.DetectAllFeatureTypes();
+
+            // Set the feature groups
+            List<List<Entity>> touchingEntityList = new List<List<Entity>>();
+            foreach (Feature feature in supportedFile.FeatureList)
             {
-                if (ex.Message == "Unsupported DWG File")
-                    return (OperationStatus.UnsupportedFileType, ex.Message);
-                if (ex.Message == "Error: Issue with DXF File")
-                    return (OperationStatus.CorruptFile, ex.Message);
-                if (ex.Message == "Error: Issue with DWG File")
-                    return (OperationStatus.CorruptFile, ex.Message);
-
-                return (OperationStatus.ExternalApiFailure, ex.ToString());
+                touchingEntityList.Add(feature.EntityList);
             }
+
+            // Create JSON that will be sent to the frontend
+            var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+            settings.Converters.Add(new StringEnumConverter());
+
+            return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
         }
 
-        private static List<Entity> CondenseArcs(List<Entity> entities)
+        internal static List<Entity> CondenseArcs(List<Entity> entities)
         {
             List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
 

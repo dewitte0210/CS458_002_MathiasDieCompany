@@ -17,8 +17,6 @@ namespace FeatureRecognitionAPI.Models
         public double StartParameter { get; set; }
         public double EndParameter { get; set; }
         public double Rotation { get; set; }
-        public Point StartPoint { get; set; }
-        public Point EndPoint { get; set; }
         public bool IsFullEllipse { get; set; }
         private Ellipse() { }
         public Ellipse(double centerX, double centerY, double majorAxisXValue,
@@ -34,28 +32,28 @@ namespace FeatureRecognitionAPI.Models
             this.StartParameter = startParameter;
             this.EndParameter = endParameter;
             Rotation = Math.Atan2(MajorAxisEndPoint.Y - Center.Y, MajorAxisEndPoint.X - Center.X);
-            StartPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, StartParameter);
-            EndPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, EndParameter);
+            Start = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, StartParameter);
+            End = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, EndParameter);
             if (Rotation > 0)
             {
-                StartPoint.X = StartPoint.X - Center.X;
-                StartPoint.Y = StartPoint.Y - Center.Y;
-                EndPoint.X = EndPoint.X - Center.X;
-                EndPoint.Y = EndPoint.Y - Center.Y;
+                Start.X = Start.X - Center.X;
+                Start.Y = Start.Y - Center.Y;
+                End.X = End.X - Center.X;
+                End.Y = End.Y - Center.Y;
 
                 //Rotate around the origin
-                double temp = StartPoint.X;
-                StartPoint.X = -1 * ((StartPoint.X * Math.Cos(Rotation)) - (StartPoint.Y * Math.Sin(Rotation)));
-                StartPoint.Y = -1 * ((StartPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
-                temp = EndPoint.X;
-                EndPoint.X = -1 * ((EndPoint.X * Math.Cos(Rotation)) - (EndPoint.Y * Math.Sin(Rotation)));
-                EndPoint.Y = -1 * ((EndPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+                double temp = Start.X;
+                Start.X = -1 * ((Start.X * Math.Cos(Rotation)) - (Start.Y * Math.Sin(Rotation)));
+                Start.Y = -1 * ((Start.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+                temp = End.X;
+                End.X = -1 * ((End.X * Math.Cos(Rotation)) - (End.Y * Math.Sin(Rotation)));
+                End.Y = -1 * ((End.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
 
                 //Translate back
-                StartPoint.X = StartPoint.X + Center.X;
-                StartPoint.Y = StartPoint.Y + Center.Y;
-                EndPoint.X = EndPoint.X + Center.X;
-                EndPoint.Y = EndPoint.Y + Center.Y;
+                Start.X = Start.X + Center.X;
+                Start.Y = Start.Y + Center.Y;
+                End.X = End.X + Center.X;
+                End.Y = End.Y + Center.Y;
             }
             if (startParameter == 0 && endParameter == 2 * Math.PI)
             {
@@ -250,19 +248,29 @@ namespace FeatureRecognitionAPI.Models
             return pointAngle >= Math.Round(StartParameter, 4) && pointAngle <= Math.Round(EndParameter, 4);
         }
 
+        //TODO: finish this
         public override bool Equals(object? obj)
         {
             if (obj is Ellipse)
             {
-
+                //intentional reference comparison
+                if (this == obj)
+                {
+                    return true;
+                }
             }
             return false;
         }
+        //TODO: finish this
         public override bool Compare(object? obj)
         {
             if (obj is Ellipse)
             {
-
+                //intentional reference comparison
+                if (this == obj)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -277,7 +285,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == 0 && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) || (Rotation == Math.PI && !(0 >= StartParameter && 0 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.X, EndPoint.X);
+                        return Math.Min(Start.X, End.X);
                     }
                 }
                 return Center.X - MajorAxis;
@@ -289,7 +297,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == Math.PI / 2 && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.X, EndPoint.X);
+                        return Math.Min(Start.X, End.X);
                     }
                 }
                 return Center.X - MinorAxis;
@@ -305,8 +313,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { min = values[i].X; }
                 else if (values[i].X < min) { min = values[i].X; }
             }
-            //Checks if the calculated min is in range of the parameters
-            if (!isInEllipseRange(values[index])) { return Math.Min(StartPoint.X, EndPoint.X); }
+            if (!isInEllipseRange(values[index])) { return Math.Min(Start.X, End.X); }
             return min;
         }
 
@@ -320,7 +327,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == 0 && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) || (Rotation == Math.PI && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.Y, EndPoint.Y);
+                        return Math.Min(Start.Y, End.Y);
                     }
                 }
                 return Center.Y - MinorAxis;
@@ -332,7 +339,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == Math.PI / 2 && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(0 >= StartParameter && 0 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.Y, EndPoint.Y);
+                        return Math.Min(Start.Y, End.Y);
                     }
                 }
                 return Center.Y - MajorAxis;
@@ -348,8 +355,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { min = values[i].Y; }
                 else if (values[i].Y < min) { min = values[i].Y; }
             }
-            //Checks if the calculated min is in range of the parameters
-            if (!isInEllipseRange(values[index])) { return Math.Min(StartPoint.Y, EndPoint.Y); }
+            if (!isInEllipseRange(values[index])) { return Math.Min(Start.Y, End.Y); }
             return min;
         }
 
@@ -363,7 +369,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == 0 && !(0 >= StartParameter && 0 <= EndParameter)) || (Rotation == Math.PI && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.X, EndPoint.X);
+                        return Math.Max(Start.X, End.X);
                     }
                 }
                 return Center.X + MajorAxis;
@@ -375,7 +381,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == Math.PI / 2 && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.X, EndPoint.X);
+                        return Math.Max(Start.X, End.X);
                     }
                 }
                 return Center.X + MinorAxis;
@@ -391,8 +397,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { max = values[i].X; }
                 else if (values[i].X > max) { max = values[i].X; }
             }
-            //Checks if the calculated max is in range of the parameters
-            if (!isInEllipseRange(values[index])) { return Math.Max(StartPoint.X, EndPoint.X); }
+            if (!isInEllipseRange(values[index])) { return Math.Max(Start.X, End.X); }
             return max;
         }
 
@@ -406,7 +411,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == 0 && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) || (Rotation == Math.PI && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.Y, EndPoint.Y);
+                        return Math.Max(Start.Y, End.Y);
                     }
                 }
                 return Center.Y + MinorAxis;
@@ -418,7 +423,7 @@ namespace FeatureRecognitionAPI.Models
                 {
                     if ((Rotation == Math.PI / 2 && !(0 >= StartParameter && 0 <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.Y, EndPoint.Y);
+                        return Math.Max(Start.Y, End.Y);
                     }
                 }
                 return Center.Y + MajorAxis;
@@ -434,8 +439,7 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { max = values[i].Y; }
                 else if (values[i].Y > max) { max = values[i].Y; }
             }
-            //Checks if the calculated max is in range of the parameters
-            if (!isInEllipseRange(values[index])) { return Math.Max(StartPoint.Y, EndPoint.Y); }
+            if (!isInEllipseRange(values[index])) { return Math.Max(Start.Y, End.Y); }
             return max;
         }
 

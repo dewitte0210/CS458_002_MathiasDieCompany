@@ -40,8 +40,6 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
         const formData = new FormData();
         formData.append("file", file);
 
-        console.log(process.env);
-        console.log(process.env.REACT_APP_API_BASEURL);
         try {
             const res = await fetch(
                 `${process.env.REACT_APP_API_BASEURL}api/FeatureRecognition/uploadFile`,
@@ -51,14 +49,17 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                 }
             );
 
-            if (!res.ok)
-                throw new Error(`Server error: ${res.status} ${res.statusText}`);
+            if (!res.ok) {
+                throw new Error(`Server error: ${res.status} ${res.statusText}.\n${await res.json()}`);
+            }
 
             const jsonResponse = await res.json(); // Capture JSON responses
             setJsonResponse(jsonResponse); // Store response in state
             setSubmitted(true); // Update the state to indicate successful submission
         } catch (error) {
-            alert("An error occurred while submitting the file. Please try again.");
+            if (error instanceof Error){
+                alert("An error occurred while submitting the file. Please try again.\n\n" + error.message);
+            }
         } finally {
             setIsLoading(false); // End loading
         }
@@ -74,16 +75,6 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
         setFile(null); // Clear the file after submission
         setJsonResponse(null); // Clear the JSON response on going back
     };
-
-    function translateJSON(jsonResponseElement: any) {
-        return jsonResponseElement.map((element) => {
-            element.features = element.features.map((feature) =>{
-                feature.FeatureType = translate(feature.FeatureType);
-                return feature;
-            })
-            return element;
-        });
-    }
 
     return (
         <div className="upload-and-show">

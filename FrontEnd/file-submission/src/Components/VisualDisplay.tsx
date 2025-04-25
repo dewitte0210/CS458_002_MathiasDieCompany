@@ -67,7 +67,10 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                         drawArc(ctx, shape, scaleFactor, xOffset, yOffset);
                     } else if (shape["$type"].includes('Circle')) {
                         drawCircle(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } //else if (shape["$type"].includes() === 'quadcurve2d') {
+                    } else if (shape["$type"].includes('Ellipse')) {
+                        drawEllipse(ctx, shape, scaleFactor, xOffset, yOffset);
+                    }
+                    //else if (shape["$type"].includes() === 'quadcurve2d') {
                     //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
                     // } else if (shape["$type"].includes() === 'cubiccurve2d') {
                     //     drawCubicLine(ctx, shape, scaleFactor, xOffset, yOffset);
@@ -79,8 +82,8 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
 
         const drawLine = (ctx, shape, scaleFactor, xOffset, yOffset) => {
             ctx.beginPath();
-            const startPoint = shape.StartPoint
-            const endPoint = shape.EndPoint
+            const startPoint = shape.Start
+            const endPoint = shape.End
             ctx.moveTo((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
             ctx.lineTo((endPoint.X + xOffset) * scaleFactor, (endPoint.Y + yOffset) * scaleFactor);
 
@@ -118,6 +121,24 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                 shape.Radius * scaleFactor,
                 0,
                 2 * Math.PI
+            );
+            // Sets the color of the circle based on whether it is a kiss cut (green) or not (blue)
+            ctx.strokeStyle = 'black';
+            ctx.setLineDash([]);
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        };
+        const drawEllipse = (ctx, shape, scaleFactor, xOffset, yOffset) => {
+            ctx.beginPath();
+            const center = shape.Center;
+            ctx.ellipse(
+                (center.X + xOffset) * scaleFactor,
+                (center.Y + yOffset) * scaleFactor,
+                shape.MajorAxis * scaleFactor,
+                shape.MinorAxis * scaleFactor,
+                shape.Rotation,
+                shape.StartParameter,
+                shape.EndParameter, 
             );
             // Sets the color of the circle based on whether it is a kiss cut (green) or not (blue)
             ctx.strokeStyle = 'black';

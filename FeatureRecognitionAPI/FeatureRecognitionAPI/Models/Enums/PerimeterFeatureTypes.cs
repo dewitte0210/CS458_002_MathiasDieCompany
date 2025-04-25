@@ -1,13 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace FeatureRecognitionAPI.Models.Enums
+namespace FeatureRecognitionAPI.Models.Enums;
+
+public enum PerimeterFeatureTypes
 {
-    public enum PerimeterFeatureTypes
-    {
-        [JsonProperty]
-        Group4,
-        Group5,
-        Group6,
-        Group17
-    }
+    [JsonProperty] Group4,
+    Group5,
+    Group6,
+    Group17
 }

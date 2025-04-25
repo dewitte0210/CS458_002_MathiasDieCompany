@@ -7,6 +7,7 @@
  */
 
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
@@ -17,18 +18,16 @@ using static FeatureRecognitionAPI.Models.Utility.Angles;
 public class Feature
 {
     [JsonProperty] public PossibleFeatureTypes FeatureType { get; set; }
-
-    // A list of all the perimeter features attached to these features.
-    [JsonProperty] public List<PerimeterFeatureTypes> PerimeterFeatures { get; set; }
-
+    
     [JsonProperty] public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
-    [JsonProperty] public bool kissCut;
+    [JsonProperty] public bool KissCut;
     [JsonProperty] public int multipleRadius;
     [JsonProperty] public bool roundedCorner;
     [JsonProperty] public double perimeter;
     [JsonProperty] public double diameter;
     [JsonProperty] public int count;
-    [JsonProperty] public int NumChamfers = 0;
+    //[JsonProperty] public int NumChamfers = 0;
+    public List<ChamferGroup> ChamferList = new List<ChamferGroup>();
 
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 
@@ -44,7 +43,7 @@ public class Feature
     // the original feature
     //EXAMPLE: <[list for Mitered notch], [list for radius notch], [list for Group17], [list for chamfered corner]>
     // You will have to run detection for perimeter features for each index of this list
-    internal List<List<Entity>> PerimeterEntityList;
+    internal List<Feature> PerimeterFeatureList;
 
     public int GetNumLines() { return numLines; }
     public int GetNumArcs() { return numArcs; }
@@ -71,15 +70,14 @@ public class Feature
      * @Param kissCut stores whether the feature is kiss cut
      * @Param multipleRadius stores whether the feature has multiple radiuses for rounded corners
      */
-    public Feature(List<Entity> entityList, bool kissCut, int multipleRadius)
+    public Feature(List<Entity> entityList, bool KissCut, int multipleRadius)
     {
         EntityList = entityList;
-        this.kissCut = kissCut;
+        this.KissCut = KissCut;
         this.multipleRadius = multipleRadius;
         baseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
-        PerimeterEntityList = new List<List<Entity>>();
-        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
+        PerimeterFeatureList = new List<Feature>();
 
         CalcPerimeter();
     }
@@ -93,9 +91,22 @@ public class Feature
      * of the feature, including the perimeter features entities, unless the feature is just a
      * perimeter one
      */
-    public Feature(List<Entity> EntityList)
+    public Feature(List<Entity> entityList)
     {
-        this.EntityList = EntityList;
+        EntityList = entityList;
+        ConstructFromEntityList();
+    }
+
+    /// <summary>
+    /// create a feature when the feature type is known
+    /// </summary>
+    /// <param name="pft">PossibleFeatureType when known</param>
+    /// <param name="entityList">Entity list that makes up the feature</param>
+    public Feature(PossibleFeatureTypes pft, List<Entity> entityList)
+    {
+        FeatureType = pft;
+        EntityList = entityList;
+
         ConstructFromEntityList();
     }
 
@@ -104,15 +115,13 @@ public class Feature
     // This got moved out so Initialization can be called after populating its EntityList
     public void ConstructFromEntityList()
     {
-        this.count = 1;
-        this.multipleRadius = 1;
-        this.EntityList = EntityList;
-        this.baseEntityList = EntityList;
-        this.PerimeterFeatures = new List<PerimeterFeatureTypes>();
+        count = 1;
+        multipleRadius = 1;
+        baseEntityList = new();
         ExtendedEntityList = new List<Entity>();
-        PerimeterEntityList = new List<List<Entity>>();
+        PerimeterFeatureList = new List<Feature>();
 
-        CountEntities(baseEntityList, out numLines, out numArcs, out numCircles, out numEllipses);
+        CountEntities(EntityList, out numLines, out numArcs, out numCircles, out numEllipses);
 
         //calculate and set the perimeter of the feature
         CalcPerimeter();
@@ -180,46 +189,29 @@ public class Feature
      */
     public void DetectFeatures()
     {
-        //check two conditions possible to make Group1B (with no perimeter features)
-        if (CheckGroup1B(numCircles, numLines, numArcs, out PossibleFeatureTypes type))
+        if (baseEntityList.Count == 0) {baseEntityList = new(EntityList);} // should only happen if line extension and separation were skipped
+        
+        // BASE SHAPE DETECTION:
+        if (!CheckGroup1B()
+            && !CheckGroup1C() 
+            && !CheckGroup6Base()
+            && !CheckGroup1A()
+            && !CheckGroup2A()
+            && !CheckGroup10()
+            && !CheckGroup11()
+            && !CheckGroup12())
         {
-            FeatureType = type;
-        }
-        else if (CheckGroup1C(out type))
-        {
-            FeatureType = type;
-        }
-        else if (CheckGroup6Base())
-        {
-            FeatureType = PossibleFeatureTypes.Group6;
-        }
-        //check two conditions possible to make Group1A (with no perimeter features)
-        else if (numLines >= 4)
-        {
-            if (numArcs == 0)
-            {
-                FeatureType = PossibleFeatureTypes.Group1A1;
-            }
-            else FeatureType = PossibleFeatureTypes.Group1A2;
-        }
-        else if (CheckGroup2A(out type))
-        {
-            FeatureType = type;
-        }
-        else if (CheckGroup17())
-        {
-            FeatureType = PossibleFeatureTypes.Group17;
-        }
-        else
-        {
-            Console.WriteLine("Error: Cannot assign feature type.");
+            Console.WriteLine("Error: Cannot assign base feature type.");
+            FeatureType = PossibleFeatureTypes.Unknown;
         }
         
-        // Perimeter Feature Detection
-        CheckGroup3();
+        // PERIMETER DETECTION:
+        FlagGroup3();
         CheckGroup4();
         CheckGroup5();
         CheckGroup6Perimeter();
+        CheckGroup9();
+        CheckGroup17();
             
         //calculate and set the perimeter of the feature
         CalcPerimeter();
@@ -228,7 +220,27 @@ public class Feature
         CheckMultipleRadius();
     }
 
+    #region BaseDetection
+    
+    #region Group1A
 
+    public bool CheckGroup1A()
+    {
+        if (numLines >= 4)
+        {
+            if (numArcs == 0)
+            {
+                FeatureType = PossibleFeatureTypes.Group1A1;
+                return true;
+            }
+            FeatureType = PossibleFeatureTypes.Group1A2;
+            return true;
+        }
+        return false;
+    }
+    
+    #endregion
+    
     #region Group1B
 
     /*
@@ -238,7 +250,7 @@ public class Feature
      * @Param type is used as a return value with the out keyword
      * @Return true if the type was detected
      */
-    internal bool CheckGroup1B(int numCircles, int numLines, int numArcs, out PossibleFeatureTypes type)
+    internal bool CheckGroup1B()
     {
         // Entity is just a circle
         if (numCircles == 1 && numLines == 0 && numArcs == 0)
@@ -246,18 +258,18 @@ public class Feature
             Circle c = baseEntityList[0] as Circle;
             if (c.Radius * 2 <= 1.75)
             {
-                type = PossibleFeatureTypes.Punch;
+                FeatureType = PossibleFeatureTypes.Punch;
             }
             else
             {
-                type = PossibleFeatureTypes.Group1B1;
+                FeatureType = PossibleFeatureTypes.Group1B1;
             }
 
             return true;
         }
         //Entity contains the correct number of lines and arcs to be a rounded rectangle add up the degree measuers
         //of the arcs and make sure they are 360
-        else if (numArcs == 2 && numLines == 2 && IsSubshapeRectangle())
+        if (numArcs == 2 && numLines == 2 && IsSubshapeRectangle())
         {
             if (DoAnglesAddTo360())
             {
@@ -296,14 +308,14 @@ public class Feature
 
                 if (!IsArcConcave(arc1, line) && !IsArcConcave(arc2, line))
                 {
-                    type = PossibleFeatureTypes.Group1B2;
+                    FeatureType = PossibleFeatureTypes.Group1B2;
                     return true;
                 }
             }
         }
 
         // set a dummy type and return false.
-        type = PossibleFeatureTypes.Punch;
+        FeatureType = PossibleFeatureTypes.Punch;
         return false;
     }
 
@@ -311,37 +323,27 @@ public class Feature
 
     #region Group1C
 
-    public bool CheckGroup1C(out PossibleFeatureTypes type)
+    public bool CheckGroup1C()
     {
-        //Use local variables for lines cirlces arcs and elipses
-        int lines, circles, arcs, elipses;
-
-        //gives the count of lines arcs circles and elipses
-        CountEntities(baseEntityList, out lines, out arcs, out circles, out elipses);
-
         //Triange base shape needs 3 lines
-        if (lines != 3)
+        if (numLines != 3)
         {
-            type = PossibleFeatureTypes.Unknown;
             return false;
         }
-
+        
+        // TODO: This is wrong
         //If there are 3 lines and zero arcs then it should be a triangle
-        else if (arcs == 0)
+        if (numArcs == 0)
         {
-            type = PossibleFeatureTypes.Group1C;
-            this.FeatureType = PossibleFeatureTypes.Group1C;
+            FeatureType = PossibleFeatureTypes.Group1C;
             return true;
         }
-        else if (arcs > 3)
+        if (numArcs > 3)
         {
-            type = PossibleFeatureTypes.Unknown;
             return false;
         }
         //At this point arcs is between 1-3 and lines = 3
-        else
-        {
-            switch (arcs)
+            switch (numArcs)
             {
                 case 1:
                     {
@@ -372,24 +374,21 @@ public class Feature
                             }
                         }
 
-                            if (eIndex == 2)
-                            {
-                                break;
-                            }
+                        if (eIndex == 2)
+                        {
+                            break;
                         }
+                    }
 
                     if (touchingArc[0] is Line && touchingArc[1] is Line)
                     {
                         if (!Entity.IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
                         {
-                            type = PossibleFeatureTypes.Group1C;
-                            this.FeatureType = PossibleFeatureTypes.Group1C;
+                            FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
                         }
                     }
-
-                        type = PossibleFeatureTypes.Unknown;
-                        return false;
+                    return false;
                     }
                 case 2:
                     {
@@ -437,12 +436,9 @@ public class Feature
 
                         if (touchingArc[0] is Line && touchingArc[1] is Line)
                         {
-                            type = PossibleFeatureTypes.Group1C;
-                            this.FeatureType = PossibleFeatureTypes.Group1C;
+                            FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
                         }
-
-                        type = PossibleFeatureTypes.Unknown;
                         return false;
                     }
                 case 3:
@@ -502,29 +498,30 @@ public class Feature
                         {
                             if (entity is Arc)
                             {
-                                type = PossibleFeatureTypes.Unknown;
                                 return false;
                             }
                         }
 
-                        this.FeatureType = PossibleFeatureTypes.Group1C;
-                        type = PossibleFeatureTypes.Group1C;
+                        FeatureType = PossibleFeatureTypes.Group1C;
                         return true;
                     }
                 default:
-                    type = PossibleFeatureTypes.Unknown;
                     return false;
             }
         }
 
         //If somehow there is no decision made by this point then there is an error
-    }
 
     #endregion
 
     #region Group2A
 
-    internal bool CheckGroup2A(out PossibleFeatureTypes type)
+    /**
+     * Checks if a feature is Group 2A (elliptical features).
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup2A()
     {
         if ((numArcs >= 2 || numEllipses >= 2) && numCircles == 0)
         {
@@ -535,7 +532,7 @@ public class Feature
                 {
                     if (IsEllipse())
                     {
-                        type = PossibleFeatureTypes.Group2A1;
+                        FeatureType = PossibleFeatureTypes.Group2A1;
                         return true;
                     }
                 }
@@ -545,7 +542,7 @@ public class Feature
             {
                 if (IsBowtie() && IsSubshapeRectangle())
                 {
-                    type = PossibleFeatureTypes.Group2A2;
+                    FeatureType = PossibleFeatureTypes.Group2A2;
                     return true;
                 }
             }
@@ -555,12 +552,12 @@ public class Feature
         {
             if ((baseEntityList[0] as Ellipse).IsFullEllipse)
             {
-                type = PossibleFeatureTypes.Group2A1;
+                FeatureType = PossibleFeatureTypes.Group2A1;
                 return true;
             }
         }
 
-        type = PossibleFeatureTypes.Punch;
+        FeatureType = PossibleFeatureTypes.Punch;
         return false;
     }
 
@@ -644,7 +641,7 @@ public class Feature
             }
             else
             {
-                if (DetermineConcavity(baseEntityList[i], i))
+                if (IsConcave(baseEntityList[i]))
                 {
                     //  If previous curve was convex, there is a switch in concavity
                     if (tempConvexCount > 0)
@@ -686,14 +683,14 @@ public class Feature
      * Combs through the base entity list to determine if the entity is concave to the shape or not
      * @param index - The index of the entity being checked
      */
-    private bool DetermineConcavity(Entity entity, int index)
+    private bool IsConcave(Entity entity)
     {
         if (!(entity is Arc || entity is Ellipse)) { return false; }
         //  Variables used to extend the line that is used for concavity detection to ensure it passes through
         //  the entire shape
         Point minPoint = FindMinPoint();
         Point maxPoint = FindMaxPoint();
-        double maxLength = Point.Distance(maxPoint, minPoint);
+        double maxLength = 2 * Point.Distance(maxPoint, minPoint);
         Line ray;
 
         int numIntersections = 0;
@@ -710,44 +707,60 @@ public class Feature
         }
 
         //  Entends the ray
-        Point unitVector = new Point((ray.EndPoint.X - ray.StartPoint.X) / ray.Length, (ray.EndPoint.Y - ray.StartPoint.Y) / ray.Length);
-        Point newEndPoint = new Point(ray.StartPoint.X + maxLength * unitVector.X, ray.StartPoint.Y + maxLength * unitVector.Y);
-        ray = new Line(ray.StartPoint.X, ray.StartPoint.Y, newEndPoint.X, newEndPoint.Y);
+        Point unitVector = new Point((ray.End.X - ray.Start.X) / ray.Length, (ray.End.Y - ray.Start.Y) / ray.Length);
+        Point newEndPoint = new Point(ray.Start.X + maxLength * unitVector.X, ray.Start.Y + maxLength * unitVector.Y);
+        ray = new Line(ray.Start.X, ray.Start.Y, newEndPoint.X, newEndPoint.Y);
 
         //  Runs through the base list and finds the num of intersections with the shape
         //  Checks for end point intersections because it will detect 2 end point intersections
         //  per actual intersection
         for (int i = 0; i < baseEntityList.Count; i++)
         {
-            if (baseEntityList[i].DoesIntersect(ray))
+            if (!baseEntityList[i].DoesIntersect(ray))
             {
-                numIntersections++;
-                if (baseEntityList[i] is Line)
+                continue;
+            }
+
+            numIntersections++;
+            if (baseEntityList[i] is Line line)
+            {
+                Point? intersection = Entity.GetIntersectPoint(ray, line);
+                if (intersection == null)
                 {
-                    Line currEntity = (baseEntityList[i] as Line);
-                    if (Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.StartPoint) || Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.EndPoint))
-                    {
-                        numEndPointIntersections++;
-                    }
+                    continue;
                 }
-                else if (baseEntityList[i] is Arc)
+
+                if (intersection.Equals(line.Start) || intersection.Equals(line.End))
+                    numEndPointIntersections++;
+            }
+            else if (baseEntityList[i] is Arc arc1)
+            {
+                Point? intersection = Entity.GetIntersectPoint(ray, arc1);
+                if (intersection == null)
                 {
-                    Arc currEntity = (baseEntityList[i] as Arc);
-                    if (Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.Start) || Entity.GetIntersectPoint(ray, currEntity).Equals(currEntity.End))
-                    {
-                        numEndPointIntersections++;
-                    }
+                    continue;
                 }
-                else if(baseEntityList[i] is Ellipse ellipse)
+
+                if (intersection.Equals(arc1.Start) || intersection.Equals(arc1.End))
                 {
-                    double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
-                    if (Entity.GetIntersectPoint(ray, ellipse).Equals(ellipse.StartPoint) || Entity.GetIntersectPoint(ray, ellipse).Equals(ellipse.EndPoint))
-                    {
-                        numEndPointIntersections++;
-                    }
+                    numEndPointIntersections++;
+                }
+            }
+
+            else if (baseEntityList[i] is Ellipse ellipse)
+            {
+                Point? intersection = Entity.GetIntersectPoint(ray, ellipse);
+                if (intersection == null)
+                {
+                    continue;
+                }
+
+                if (intersection.Equals(ellipse.Start) || intersection.Equals(ellipse.End)){
+                    numEndPointIntersections++;
                 }
             }
         }
+
         //  Even num of intersections = concave
         return (numIntersections - (numEndPointIntersections / 2)) % 2 == 0;
     }
@@ -819,10 +832,10 @@ public class Feature
         }
 
         // Temp variables for correct line check since 4 lines can be formed from the baseLine endpoints
-        Line tempLine1 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
-        Line tempLine2 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
-        Line tempLine3 = new Line(baseLine1.StartPoint.X, baseLine1.StartPoint.Y, baseLine2.EndPoint.X, baseLine2.EndPoint.Y);
-        Line tempLine4 = new Line(baseLine1.EndPoint.X, baseLine1.EndPoint.Y, baseLine2.StartPoint.X, baseLine2.StartPoint.Y);
+        Line tempLine1 = new Line(baseLine1.Start.X, baseLine1.Start.Y, baseLine2.Start.X, baseLine2.Start.Y);
+        Line tempLine2 = new Line(baseLine1.End.X, baseLine1.End.Y, baseLine2.End.X, baseLine2.End.Y);
+        Line tempLine3 = new Line(baseLine1.Start.X, baseLine1.Start.Y, baseLine2.End.X, baseLine2.End.Y);
+        Line tempLine4 = new Line(baseLine1.End.X, baseLine1.End.Y, baseLine2.Start.X, baseLine2.Start.Y);
         // Variables for final quadrilateral lines
         Line newLine1;
         Line newLine2;
@@ -902,6 +915,254 @@ public class Feature
 
     #endregion
 
+    #region Group10
+
+    /**
+     * Checks the feature to see if it is group 10.
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup10()
+    {
+        if (numLines == 2 && numArcs == 2)
+        {
+            // Fetch the lines and arcs
+            List<Line> lines = new List<Line>();
+            List<Arc> arcs = new List<Arc>();
+            for (int i = 0; i < baseEntityList.Count; i++)
+            {
+                if (baseEntityList[i] is Line) { lines.Add((Line)baseEntityList[i]); }
+                else if (baseEntityList[i] is Arc) { arcs.Add((Arc)baseEntityList[i]); }
+            }
+            // Find the bigger arc for correct end point orientation for math calcs
+            Arc biggerArc;
+            if (arcs[0].Radius > arcs[1].Radius)
+            {
+                biggerArc = arcs[0];
+            }
+            else
+            {
+                biggerArc = arcs[1];
+            }
+            // Flip end points for calc if they are touching the smaller arc
+            for (int i = 0; i < lines.Count; i++)
+            {
+                Point intersect = Entity.GetIntersectPoint(lines[i], biggerArc);
+                if (!lines[i].End.Equals(intersect))
+                {
+                    Point temp = lines[i].Start;
+                    lines[i].Start = lines[i].End;
+                    lines[i].End = temp;
+                }
+            }
+
+            // Runs only if the arcs start and end at the same angle
+            if (arcs[0].StartAngle.Equals(arcs[1].StartAngle) && arcs[0].EndAngle.Equals(arcs[1].EndAngle))
+            {
+                // Start and end angles stored in variables for readability
+                double startAngle = Math.Round(Angles.DegToRadians(arcs[0].StartAngle), 4);
+                double endAngle = Math.Round(Angles.DegToRadians(arcs[0].EndAngle), 4);
+                // Case 1: Both lines are vertical
+                if (Math.Round(lines[0].SlopeX, 4) == 0 && Math.Round(lines[1].SlopeX, 4) == 0)
+                {
+                    if (Math.Round(startAngle + endAngle, 4) == Math.Round(2 * Math.PI, 4))
+                    {
+                        FeatureType = PossibleFeatureTypes.Group10;
+                        return true;
+                    }
+                }
+                // Case 2: Only one is vertical
+                else if (Math.Round(lines[0].SlopeX, 4) == 0 || Math.Round(lines[1].SlopeX, 4) == 0)
+                {
+                    // Angle of line stored in variable for readability
+                    double lineAngle;
+                    if (Math.Round(lines[0].SlopeX, 4) == 0)
+                    {
+                        lineAngle = Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4);
+                    }
+                    else
+                    {
+                        lineAngle = Math.Round(Math.Atan2(lines[0].End.Y - lines[0].Start.Y, lines[0].End.X - lines[0].Start.X), 4);
+                    }
+                    if (((startAngle == Math.Round(Math.PI / 2, 4) || endAngle == Math.Round(Math.PI / 2, 4))
+                        || (endAngle == Math.Round(3 * Math.PI / 2, 4) || startAngle == Math.Round(3 * Math.PI / 2, 4)))
+                        && (lineAngle == startAngle
+                        || lineAngle == endAngle))
+                    {
+                        FeatureType = PossibleFeatureTypes.Group10;
+                        return true;
+                    }
+                }
+                // Case 3: Lines are not vertical, can run Atan() function
+                else
+                {
+                    if ((Math.Round(Math.Atan2(lines[0].End.Y - lines[0].Start.Y, lines[0].End.X - lines[0].Start.X), 4) == startAngle
+                        || Math.Round(Math.Atan2(lines[0].End.Y - lines[0].Start.Y, lines[0].End.X - lines[0].Start.X), 4) == endAngle)
+                        && (Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4) == startAngle
+                        || Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4) == endAngle))
+                    {
+                        FeatureType = PossibleFeatureTypes.Group10;
+                        return true;
+                    }
+                }
+            }
+        }
+        FeatureType = PossibleFeatureTypes.Unknown;
+        return false;
+    }
+
+    #endregion
+
+    #region Group11
+
+    /**
+     * Checks the feature to see if it is group 11.
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup11()
+    {
+        if (numEllipses == 0 && numCircles == 0)
+        {
+            // Case 1
+            if (numArcs == 2 && numLines == 0)
+            {
+                // Keeps track of the bigger/smaller arc for the concavity check
+                Arc bigArc = baseEntityList[0] as Arc;
+                Arc smallArc = baseEntityList[1] as Arc;
+                if (bigArc.Radius < smallArc.Radius)
+                {
+                    Arc temp = bigArc;
+                    bigArc = smallArc;
+                    smallArc = temp;
+                }
+                if (bigArc.Start.Equals(smallArc.Start) && bigArc.End.Equals(smallArc.End) && IsConcave(bigArc) && !IsConcave(smallArc))
+                {
+                    FeatureType = PossibleFeatureTypes.Group11;
+                    return true;
+                }
+            }
+            // Case 2
+            else if (numArcs == 1 && numLines == 1)
+            {
+                // Fetch arc and line
+                Arc arc1;
+                Line line1;
+                if (baseEntityList[0] is Arc)
+                {
+                    arc1 = (Arc)baseEntityList[0];
+                    line1 = (Line)baseEntityList[1];
+                }
+                else
+                {
+                    arc1 = (Arc)baseEntityList[1];
+                    line1 = (Line)baseEntityList[0];
+                }
+                // Check that end points connect
+                if ((line1.Start.Equals(arc1.Start) || line1.End.Equals(arc1.Start))
+                    && (line1.Start.Equals(arc1.End) || line1.End.Equals(arc1.End)))
+                {
+                    FeatureType = PossibleFeatureTypes.Group11;
+                    return true;
+                }
+            }
+            // Case 3
+            else if (numArcs == 3 && numLines == 1)
+            {
+                // Fetch arcs and line
+                // keeps track of index for concavity and endpoint checks
+                Arc bigArc = null;
+                Arc side1 = null;
+                Arc side2 = null;
+                Line line1 = null;
+                for (int i = 0; i < baseEntityList.Count; i++)
+                {
+                    if (baseEntityList[i] is Arc arc)
+                    {
+                        if (bigArc is null)
+                        {
+                            bigArc = arc;
+                        }
+                        else if (side1 is null)
+                        {
+                            side1 = arc;
+                        }
+                        else if (side2 is null)
+                        {
+                            side2 = arc;
+                        }
+                    }
+                    else
+                    {
+                        line1 = (Line)baseEntityList[i];
+                    }
+                }
+                // Swap the arcs to get the correct one under the correct label
+                Arc temp;
+                if (bigArc.Radius < side1.Radius)
+                {
+                    temp = bigArc;
+                    bigArc = side1;
+                    side1 = temp;
+                }
+                if (bigArc.Radius < side2.Radius)
+                {
+                    temp = bigArc;
+                    bigArc = side2;
+                    side2 = temp;
+                }
+                bool isSide1Convex = !IsConcave(side1);
+                bool isSide2Convex = !IsConcave(side2);
+                bool isBigArcConvex = !IsConcave(bigArc);
+                if (isSide1Convex && isSide2Convex && isBigArcConvex
+                    && line1.AreEndpointsTouching(side1) && line1.AreEndpointsTouching(side2)
+                    && bigArc.AreEndpointsTouching(side1) && bigArc.AreEndpointsTouching(side2))
+                {
+                    FeatureType = PossibleFeatureTypes.Group11;
+                    return true;
+                }
+            }
+        }
+        FeatureType = PossibleFeatureTypes.Unknown;
+        return false;
+    }
+
+    #endregion
+
+    #region Group12
+
+    /**
+     * Checks the feature to see if it is group 12.
+     * 
+     * Returns the possible feature type.
+     */
+    internal bool CheckGroup12()
+    {
+        if (numCircles == 0 && numEllipses == 0 && numLines == 2)
+        {
+            if (numArcs == 2)
+            {
+                if (IsSubshapeRectangle())
+                {
+                    FeatureType = PossibleFeatureTypes.Group12a;
+                    return true;
+                }
+            }
+            else if (numArcs == 0)
+            {
+                if (Angles.IsPerpendicular((Line)baseEntityList[0], (Line)baseEntityList[1]))
+                {
+                    FeatureType = PossibleFeatureTypes.Group12b;
+                    return true;
+                }
+            }
+        }
+        FeatureType = PossibleFeatureTypes.Unknown;
+        return false;
+    }
+
+    #endregion
+
     #region Group6base
 
     /*
@@ -944,7 +1205,18 @@ public class Feature
 
     #endregion
 
+    #endregion
 
+    #region PerimeterDetection
+    
+
+    /*  todo: break out chamfered lines from parent feature
+     *  remove chamfered line entity from parent feature and extend the lines
+     *  to make the parent shape clean
+     *
+     *  then we can make group 1 rectangle detection better and front end
+     *  will read the new chamfer feature
+     */
     #region Group3
 
     /*  chamfered corner detection
@@ -967,20 +1239,13 @@ public class Feature
         returns true if no problems??
     */
 
+    /// <summary>
+    /// Gets a list of only lines from a list of entities
+    /// </summary>
+    /// <param name="entityList"></param>
+    /// <returns>list of lines</returns>
     internal static List<Line> GetLinesFromEntityList(List<Entity> entityList)
     {
-        // current assumptions made:
-        // orientation is consistent
-        
-        // assumptions that can be made
-        // the three checked lines must be touching
-        
-        /*
-         *  TODO: seperate entity list into groups of touching lines
-         *  or transition to adjacency list but how to do efficiently
-         *  trying to fight the urge to scorched earth refactor
-         */
-        
         List<Line> lineList = [];
         foreach (Entity entity in entityList)
         {
@@ -992,96 +1257,228 @@ public class Feature
         return lineList;
     }
 
-    // TODO: make sure this handles unordered lines
+    /// <summary>
+    /// Searches for a line that shares start/end points with a given line
+    /// </summary>
+    /// <param name="originLine">the original line</param>
+    /// <param name="lineList">list of lines to search through to find another line</param>
+    /// <param name="fromStart">whether to search from start or end of line</param>
+    /// <returns>null if no line is found, otherwise the touching line</returns>
+    internal static (Line?, bool) GetTouchingLine(Line originLine, List<Line> lineList, bool fromStart = false)
+    {
+        Line? touchingLine = null;
+        bool wasFlipped = false;
+
+        foreach (Line searchLine in lineList)
+        {
+            // ignore the origin line and flipped version
+            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
+    
+            Point originPoint = fromStart? originLine.Start : originLine.End;
+
+            // if end meets start or start meets end
+            if (originPoint.Equals(fromStart ? searchLine.End : searchLine.Start))
+            {
+                touchingLine = searchLine;
+                break;
+            }
+            // if end meets end or start meets start
+            else if (originPoint.Equals(fromStart ? searchLine.Start : searchLine.End))
+            {
+                touchingLine = searchLine.swapStartEnd();
+                wasFlipped = true;
+                break;
+            }
+        }
+        return (touchingLine, wasFlipped);
+    }
+    
+    /// <summary>
+    /// Breaks up a 1D line list into groups of touching lines that are ordered.
+    /// Ordering is important because consistent line orientation is needed
+    /// for accurate angle detection
+    /// </summary>
+    /// <param name="lineList">1D list of lines</param>
+    /// <returns>list of line groups that are touching</returns>
+    internal static List<List<Line>> GetOrderedLines(List<Line> lineList)
+    {
+        List<Line> baseLineList = lineList.ToList();
+        List<List<Line>> orderedLineList = [];
+        
+        while (baseLineList.Count > 0)
+        {
+            // search from end
+            Line currentEndLine = baseLineList[0];
+            Line currentStartLine = baseLineList[0];
+            baseLineList.RemoveAt(0);
+            List<Line> lineGroup = [currentEndLine];
+            bool exhaustedEndSearch = false;
+            bool exhaustedStartSearch = false;
+
+            while (!exhaustedEndSearch)
+            {
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentEndLine, lineList);
+
+                //if null or already in linegroup, meaning found end of line loop
+                if (possibleLine == null 
+                    || lineGroup.Contains(possibleLine)
+                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                {
+                    exhaustedEndSearch = true;
+                    break;
+                }
+                
+                currentEndLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
+                lineGroup.Add(possibleLine);
+            }
+            while (!exhaustedStartSearch)
+            {
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList);
+
+                //if null or already in lineGroup, meaning found end of line loop
+                if (possibleLine == null 
+                    || lineGroup.Contains(possibleLine)
+                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                {
+                    exhaustedStartSearch = true;
+                    break;
+                }
+                
+                currentStartLine = possibleLine;
+                baseLineList.Remove(wasFlipped ? currentStartLine.swapStartEnd() : currentStartLine);
+                lineGroup.Insert(0, possibleLine);
+            }
+            orderedLineList.Add(lineGroup);            
+        }
+        return orderedLineList;
+    }
     
     /// <summary>
     /// Gets a list of possible chamfer lines from a base list of lines
     /// </summary>
-    /// <param name="lineList"> list of lines, possible chamfers in this list
+    /// <param name="orderedLineList"> list of lines, possible chamfers in this list
     /// will be flagged as such</param>
     /// <returns>list of lines where each line has a chamfer type of possible</returns>
-    internal static List<Line> GetPossibleChamfers(List<Line> lineList)
+    private void SetPossibleChamfers(List<List<Line>> orderedLineList)
     {
-        List<Line> possibleChamferList = [];
-        
-        if (lineList.Count >= 3)
+        foreach (List<Line> lineGroup in orderedLineList)
         {
-            for (int i = 0; i < lineList.Count; i++)
+            if (lineGroup.Count < 3) continue;
+            for (int i = 0; i < lineGroup.Count; i++)
             {
-                Line lineA = lineList[i];
-                Line lineB = lineList[(i + 1) % lineList.Count];
-                Line lineC = lineList[(i + 2) % lineList.Count];
+                Line lineA = lineGroup[i];
+                Line lineB = lineGroup[(i + 1) % lineGroup.Count];
+                Line lineC = lineGroup[(i + 2) % lineGroup.Count];
 
                 //need to verify orientation of lines
-                Angle angleAB = GetAngle(lineA, lineB);
-                Angle angleBC = GetAngle(lineB, lineC);
-                Angle angleAC = GetAngle(lineA, lineC);
+                Angle ab = GetAngle(lineA, lineB);
+                Angle bc = GetAngle(lineB, lineC);
+                Angle ac = GetAngle(lineA, lineC);
 
                 //meets single chamfer conditions
-                if (angleAB.Equals(angleBC) && angleAC.GetDegrees() < 180 && angleAB.GetDegrees() > 90)
+                if (ab.Equals(bc))
                 {
-                    lineB.ChamferType = ChamferTypeEnum.Possible;
-                    possibleChamferList.Add(lineB);
-                }
-            }
-        }
-        return possibleChamferList;
-    }
-
-    private void CheckGroup3()
-    {
-        if (FeatureType != PossibleFeatureTypes.Group1A1) return;
-        
-        // copy of base entity list with just lines
-        List<Line> lineList = GetLinesFromEntityList(baseEntityList).ToList();
-        List<Line> possibleChamferList = GetPossibleChamfers(lineList);
-        
-        if (lineList.Count < 3) return;
-        if (possibleChamferList.Count <= 0) return;
-
-        // check potential chamfers
-        // if only one chamfer, it is confirmed to be chamfer
-        if (possibleChamferList.Count == 1)
-        {
-            possibleChamferList[0].ChamferType = ChamferTypeEnum.Confirmed;
-        }
-        // if 2 to 3 chamfers, only confirm if a parallel line to it
-        // is also possible/confirmed chamfers
-        else if (possibleChamferList.Count is >= 2 and <= 3)
-        {
-            bool hasPallelChamfer = false;
-            foreach (Line possibleChamfer in possibleChamferList)
-            {
-                foreach (Line line in lineList)
-                {
-                    if (IsParallel(possibleChamfer, line) && line.ChamferType != ChamferTypeEnum.None)
+                    // measuring counterclockwise or clockwise
+                    if ((ab.GetDegrees() < 180 && ac.GetDegrees() < 180 && ac.GetDegrees() > 0)
+                        || (ab.GetDegrees() > 180 && ac.GetDegrees() > 180 && ac.GetDegrees() < 360))
                     {
-                        hasPallelChamfer = true;
+                        ChamferList.Add(new ChamferGroup(EntityList.IndexOf(lineA), 
+                            EntityList.IndexOf(lineB), EntityList.IndexOf(lineC), lineB));
                     }
                 }
-                if (!hasPallelChamfer)
-                {
-                    possibleChamferList.Remove(possibleChamfer);
-                    break;
-                }
-            }
-            // remaining possible chamfers meet above case so confirm
-            foreach (Line line in possibleChamferList)
-            {
-                line.ChamferType = ChamferTypeEnum.Confirmed;
             }
         }
+    }
+    
+    /// <summary>
+    /// Processes and removes possible chamfers if they do not meet the criteria.
+    /// If a chamfer has no chamfers parallel to it but does have lines parallel
+    /// then it is not a chamfer and is removed from the chamfer list.
+    /// </summary>
+    /// <param name="lineList"> unordered list of lines </param>
+    private void RemoveFalseChamfers(List<Line> lineList)
+    {
+        List<ChamferGroup> chamferGroupsToRemove = new();
+        foreach (ChamferGroup chamferGroup in ChamferList)
+        {
+            bool isParallelToSomething = false;
+            bool hasParallelChamfer = false;
+                    
+            // if parallel to a line... 
+            foreach (Line line in lineList)
+            {
+                // ignore same line
+                if (chamferGroup.ChamferIndex.Equals(line))
+                {
+                    continue;
+                }
+                    
+                if (IsParallel(chamferGroup.Chamfer, line))
+                {
+                    isParallelToSomething = true;
+                }
+            }
+            // and it is not a chamfer...
+            if (isParallelToSomething)
+            {
+                foreach (ChamferGroup compChamferGroup in ChamferList)
+                {
+                    if (chamferGroup != compChamferGroup && IsParallel(chamferGroup.Chamfer, compChamferGroup.Chamfer))
+                    {
+                        hasParallelChamfer = true;
+                    }
+                }
+            }
+            // it is not a chamfer
+            if (isParallelToSomething && !hasParallelChamfer)
+            {
+                chamferGroupsToRemove.Add(chamferGroup);
+                break;
+            }
+        }
+        foreach (ChamferGroup cgToRemove in chamferGroupsToRemove)
+        {
+            ChamferList.Remove(cgToRemove);
+        }
+        // remaining possible chamfers meet above case so confirm
+        //foreach (Line line in possibleChamferList)
+        foreach (ChamferGroup chamferGroup in ChamferList)
+        {
+            chamferGroup.Confirmed = true;
+        }
+    }
+
+    private void FlagGroup3()
+    {
+        if (FeatureType is not (PossibleFeatureTypes.Group1A1 or PossibleFeatureTypes.Group1A2)) return;
+        
+        // copy of base entity list with just lines
+        List<Line> lineList = GetLinesFromEntityList(EntityList).ToList();
+        SetPossibleChamfers(GetOrderedLines(lineList));
+        
+        if (lineList.Count < 3) return;
+        switch (ChamferList.Count)
+        {
+            case <= 0:
+                return;
+            // check potential chamfers
+            // if only one chamfer, it is confirmed to be a chamfer
+            case 1:
+                ChamferList[0].Confirmed = true;
+                break;
+            // if 2 to 3 chamfers, only confirm if a parallel line to it
+            // is also possible/confirmed chamfers
+            case >= 2 and <= 3:
+            {
+                RemoveFalseChamfers(lineList);
+                break;
+            }
+        }
+
         // if more than 4 chamfers we run into the octagon problem
         // so we cannot confirm what lines are chamfers
         // TODO: implement better check for octagon problem, perhaps with frontend
-        if (possibleChamferList.Count > 4)
-        {
-            NumChamfers =  possibleChamferList.Count / 2;
-        }
-        else
-        {
-            NumChamfers = possibleChamferList.Count;
-        }
     }
 
     #endregion
@@ -1094,25 +1491,38 @@ public class Feature
      */
     public void CheckGroup4()
     {
-        if (numLines != 2 || (numArcs != 2 && numArcs != 0))
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return;
-        }
-
-        foreach (List<Entity> entityList in PerimeterEntityList)
-        {
-            Line tempLine = null;
-            foreach (Entity entity in entityList)
+            if (!(feature.numLines != 2 || (feature.numArcs != 2 && feature.numArcs != 0)))
             {
-                if (entity is Line && tempLine == null)
+                foreach (Entity entity in feature.EntityList)
                 {
-                    tempLine = (entity as Line);
-                }
-                else if (entity is Line)
-                {
-                    if (tempLine.DoesIntersect(entity))
+                    if (entity is Line tempLine && tempLine.DoesIntersect(entity))
                     {
-                        PerimeterFeatures.Add(PerimeterFeatureTypes.Group4);     
+                        feature.FeatureType = PossibleFeatureTypes.Group4;
+                    }
+                }
+            }
+        }
+    }
+
+    #endregion
+    
+    #region Group9
+
+    internal void CheckGroup9()
+    {
+        foreach (Feature feature in PerimeterFeatureList)
+        {
+            for (int i = 0; i < feature.EntityList.Count; i++)
+            {
+                for (int j = 0; j < feature.EntityList[i].AdjList.Count; j++)
+                {
+                    if (feature.EntityList[i].AdjList[j].KissCut)
+                    {
+                        feature.KissCut = true;
+                        feature.FeatureType = PossibleFeatureTypes.Group9;
+
                     }
                 }
             }
@@ -1127,22 +1537,24 @@ public class Feature
     /// </summary>
     internal void CheckGroup5()
     {
-        if (numLines < 2 || numLines > 3 || numCircles != 0 || numArcs > 2)
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return;
-        }
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
+            if (!(feature is not { numLines: 2, numArcs: 1 } && feature is not { numLines: 3, numArcs: 0 or 2 }) && !feature.KissCut)
             {
-                return;
-            }
-        }
+                bool con = true;
+                foreach (Entity entity in feature.EntityList)
+                {
+                    if (entity is Arc arc && (arc.CentralAngle != 90 && arc.CentralAngle != 180))
+                    {
+                        con = false;
+                    }
+                }
 
-        if (HasTwoParalellLine(EntityList))
-        {
-            PerimeterFeatures.Add(PerimeterFeatureTypes.Group5); 
+                if (con && HasTwoParalellLine(feature.EntityList))
+                {
+                    feature.FeatureType = PossibleFeatureTypes.Group5;
+                }
+            }
         }
     }
 
@@ -1154,27 +1566,29 @@ public class Feature
     /// </summary>
     internal void CheckGroup6Perimeter()
     {
-        if (numLines < 2 || numCircles != 0 || numArcs < 2 || numArcs > 4)
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return;
-        }
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
+            if (!(feature.numLines < 2 || feature.numCircles != 0 || feature.numArcs < 3 || feature.numArcs > 4))
             {
-                return;
-            }
-        }
+                bool con = true;
+                foreach (Entity entity in feature.EntityList)
+                {
+                    if (entity is Arc && ((entity as Arc).CentralAngle != 90 && (entity as Arc).CentralAngle != 180))
+                    {
+                        con = false;
+                    }
+                }
 
-        if (HasTwoParalellLine(EntityList))
-        {
-            PerimeterFeatures.Add(PerimeterFeatureTypes.Group6); 
+                if (con && HasTwoParalellLine(feature.EntityList))
+                {
+                    feature.FeatureType = PossibleFeatureTypes.Group6;
+                }
+            }
         }
     }
 
     #endregion
-
+    
     #region Group17
 
     /*
@@ -1182,26 +1596,33 @@ public class Feature
      *
      * @return True if it is Group 17, false if not
      */
-    internal bool CheckGroup17()
+    internal void CheckGroup17()
     {
-        if (numLines != 2 || numCircles != 0 || numArcs != 1)
+        foreach (Feature feature in PerimeterFeatureList)
         {
-            return false;
-        }
-
-        foreach (Entity entity in EntityList)
-        {
-            if (entity is Arc && ((entity as Arc).CentralAngle <= 180))
+            if (!(feature.numLines != 2 || feature.numCircles != 0 || feature.numArcs != 1))
             {
-                return false;
+                bool con = true;
+                foreach (Entity entity in feature.EntityList)
+                {
+                    if (entity is Arc arc && WithinTolerance(arc.CentralAngle, 180))
+                    {
+                        con = false;
+                    }
+                }
+
+                if (con)
+                {
+                    feature.FeatureType = PossibleFeatureTypes.Group17;
+                }
             }
         }
-
-        return true;
     }
 
     #endregion
 
+    #endregion
+    
     #endregion
 
     #region OverrideFunctions
@@ -1371,14 +1792,17 @@ public class Feature
      * @Return true if successfully extended. Could be false if the two lines don't have an intersect point,
      * aren't the same infinite line, or already touch
      */
-    private bool ExtendTwoLines(Line line1, Line line2)
+    public bool ExtendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2))
+        if (!line1.DoesIntersect(line2) && !line1.KissCut || !line2.KissCut)
             //makes sure you're not extending lines that already touch
+            // Makes sure KissCut lines are not extended
+
         {
             if (line1.isSameInfiniteLine(line2))
             {
-                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object     
+                ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object 
+                ChangeAdjListForExtendedLine(tempLine, line1, line2);
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);
@@ -1387,6 +1811,27 @@ public class Feature
         }
 
         return false;
+    }
+
+    private void ChangeAdjListForExtendedLine(ExtendedLine exLine, Line line1, Line line2)
+    {
+        // maeke the extended line's adjacency list
+        exLine.AdjList = new List<Entity>(line1.AdjList);
+        exLine.AdjList.AddRange(line2.AdjList);
+        exLine.AdjList.Remove(line1);
+        exLine.AdjList.Remove(line2);
+        
+        // replace line1 and line2 with exLine in the adjacency lists for entities touching line1 and line2
+        foreach (Entity e in line1.AdjList)
+        {
+            e.AdjList.Remove(line1);
+            e.AdjList.Add(exLine);
+        }
+        foreach (Entity e in line2.AdjList)
+        {
+            e.AdjList.Remove(line2);
+            e.AdjList.Add(exLine);
+        }
     }
 
     #endregion
@@ -1401,17 +1846,13 @@ public class Feature
      */
     public bool SeperateBaseEntities()
     {
-        if (ExtendedEntityList[0] is Circle) // case where the feature contains a circle
+        if (ExtendedEntityList[0] is Circle or Ellipse) // case where the feature contains a circle or ellipse
         {
             if (ExtendedEntityList.Count == 1 && baseEntityList.Count == 0) // it should be the only entity in the list
             {
-                baseEntityList.Add((Circle)ExtendedEntityList[0]); // adds the circle to the baseEntityList
+                baseEntityList.Add(ExtendedEntityList[0]); // adds the circle to the baseEntityList
                 return true;
             }
-            else
-            {
-                return false;
-            } // means that it contains a circle but is not the only entity
         }
 
         // lists to pass to the helper function
@@ -1455,7 +1896,7 @@ public class Feature
             //base case where the current entity touches the head (means its a closed shape)
             //checks if contained in visitedEntities to avoid the second entity from triggering this
             //checks if current entity is the same as head to avoid a false true
-            if (curPath.Peek() != head && curPath.Peek().EntityPointsAreTouching(head) &&
+            if (curPath.Peek() != head && curPath.Peek().AreEndpointsTouching(head) &&
                 !testedEntities.Contains(curPath.Peek()))
             {
                 return true; //Path found
@@ -1469,7 +1910,7 @@ public class Feature
             if (entity != curPath.Peek())
             {
                 // checks if entity in loop is not the curent entity being checked
-                if (curPath.Peek().EntityPointsAreTouching(entity) && (!testedEntities.Contains(entity)))
+                if (curPath.Peek().AreEndpointsTouching(entity) && (!testedEntities.Contains(entity)))
                 // checks that the entitiy has not already been tested and is touching the entity
                 {
                     curPath.Push(entity); //adds to stack
@@ -1487,6 +1928,10 @@ public class Feature
         {
             foreach (Entity entity in ExtendedEntityList)
             {
+                if (entity is Ellipse)
+                {
+                    continue;
+                }
                 if (!testedEntities
                         .Contains(entity)) // finds the first entity that has not been tested and selects it as the head
                 {
@@ -1507,7 +1952,7 @@ public class Feature
 
     /*
      * Function that uses finds the Path from the two parents of all extended lines and adds the Path as a group of
-     * entities at new index in PerimeterEntityList
+     * entities at new index in PerimeterFeatureList
      *
      * @Return true if a valid Path is found and seperated successfully
      */
@@ -1533,7 +1978,7 @@ public class Feature
             GetTouchingList(path, unusedEntities, null);
             if (path.Count > 0)
             {
-                PerimeterEntityList.Add(new List<Entity>(path));
+                PerimeterFeatureList.Add(new Feature(new(path)));
             }
 
             path.Clear();
@@ -1590,6 +2035,7 @@ public class Feature
 
     private void AddBackParentsHelper(ExtendedLine exLine, List<Entity> targetList)
     {
+        bool addedParent = false;
         if (exLine.Parent1 is ExtendedLine)
         {
             AddBackParentsHelper((ExtendedLine)exLine.Parent1, targetList);
@@ -1597,6 +2043,7 @@ public class Feature
         else
         {
             targetList.Add(exLine.Parent1);
+            addedParent = true;
         }
 
         if (exLine.Parent2 is ExtendedLine)
@@ -1606,8 +2053,26 @@ public class Feature
         else
         {
             targetList.Add(exLine.Parent2);
+            addedParent = true;
         }
 
+        if (addedParent)
+        {
+            foreach (Entity e in exLine.AdjList)
+            {
+                if (e.DoesIntersect(exLine.Parent1))
+                {
+                    e.AdjList.Add(exLine.Parent1);
+                }
+                else
+                {
+                    e.AdjList.Add(exLine.Parent2);
+                }
+
+                e.AdjList.Remove(exLine);
+            }
+        }
+        
         targetList.Remove(exLine); // targetList will not have a parent that is an extended line in it
     }
 
