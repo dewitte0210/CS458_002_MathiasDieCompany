@@ -14,7 +14,7 @@ namespace FeatureRecognitionAPI.Models
 
         public DXFFile(Stream stream)
         {
-            FileType = SupportedExtensions.dxf;
+            FileType = SupportedExtensions.Dxf;
             DxfReader reader = new DxfReader(stream);
             doc = reader.Read();
             ParseFile();
@@ -22,7 +22,7 @@ namespace FeatureRecognitionAPI.Models
 
         public DXFFile(string path) : base(path)
         {
-            FileType = SupportedExtensions.dxf;
+            FileType = SupportedExtensions.Dxf;
 
             if (File.Exists(path))
             {

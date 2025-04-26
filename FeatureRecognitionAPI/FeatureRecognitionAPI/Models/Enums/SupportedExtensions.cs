@@ -1,8 +1,7 @@
-﻿namespace FeatureRecognitionAPI.Models.Enums
+﻿namespace FeatureRecognitionAPI.Models.Enums;
+
+public enum SupportedExtensions
 {
-    public enum SupportedExtensions
-    {
-        dwg,
-        dxf,
-    }
+    Dwg,
+    Dxf,
 }

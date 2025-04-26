@@ -1,6 +1,5 @@
 ﻿using DecimalMath;
 using System.Runtime.CompilerServices;
-using CSMath;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 
@@ -8,14 +7,16 @@ using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models
 {
-    /**
-     * Abstract class that represents a generic entity in dxf or dwg files 
-     */
+    /// <summary>
+    /// Abstract class that represents a generic entity in dxf or dwg files
+    /// </summary>
     public abstract class Entity
     {
         // todo: make length a get function because it should never change
         // without underlying properties changing
-        public double Length { get; set; }
+        public double Length { get; set; }//length of the entity
+        public Point Start { get; set; }
+        public Point End { get; set; }
         [JsonIgnore] public List<Entity> AdjList { get; set; }
         public const double EntityTolerance = 0.00005;
         public bool KissCut { get; set; }
@@ -30,17 +31,15 @@ namespace FeatureRecognitionAPI.Models
             AdjList = new List<Entity>();
             KissCut = false;
         }
-
-        /**
-         * Function that checks if this entity intersects with another entity
-         *
-         * @param other is the entity being checked against this
-         * @return true if they intersect, otherwise false
-         */
-
+        
         // todo: implement getLength()
         //public abstract double GetLength();
         
+        /// <summary>
+        /// Function that checks if this entity intersects with another entity
+        /// </summary>
+        /// <param name="other"> the entity being checked against this </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         public bool DoesIntersect(Entity other)
         {
             if (this is Circle || other is Circle) { return false; }
@@ -81,19 +80,17 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        /**
-         * Helper function that is called from DoesIntersect
-         * Specifically checks if two lines intersect
-         * 
-         * @param line1 is the firt Line being checked
-         * @param line2 is the second Line being checked
-         * @return true if they intersect, otherwise false
-         */
+        /// <summary>
+        /// Helper function that is called from DoesIntersect
+        /// Specifically checks if two lines intersect
+        /// </summary>
+        /// <param name="line1"> the first Line being checked </param>
+        /// <param name="line2"> the second Line being checked </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         internal static bool IntersectLineWithLine(Line line1, Line line2)
         {
             // If the endpoints are touching we can avoid the intersect math
-            bool touching = line1.StartPoint.Equals(line2.StartPoint) || line1.StartPoint.Equals(line2.EndPoint) || line1.EndPoint.Equals(line2.StartPoint) || line1.EndPoint.Equals(line2.EndPoint);
-            if (touching) { return true; }
+            if (line1.AreEndpointsTouching(line2)) { return true; }
 
             //  Get lines in the form Ax + By + C = 0
             double A1;
@@ -105,17 +102,17 @@ namespace FeatureRecognitionAPI.Models
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if ((new Point(line1.StartPoint.X, 0).Equals(new Point(line1.EndPoint.X, 0))))
+            if ((new Point(line1.Start.X, 0).Equals(new Point(line1.End.X, 0))))
             {
                 A1 = 1;
                 B1 = 0;
-                C1 = -1 * line1.EndPoint.X;
+                C1 = -1 * line1.End.X;
                 vertical1 = true;
             }
             else
             {
-                slope1 = (line1.EndPoint.Y - line1.StartPoint.Y) / (line1.EndPoint.X - line1.StartPoint.X);
-                intercept1 = line1.EndPoint.Y - (slope1 * line1.EndPoint.X);
+                slope1 = (line1.End.Y - line1.Start.Y) / (line1.End.X - line1.Start.X);
+                intercept1 = line1.End.Y - (slope1 * line1.End.X);
                 // The slope of the line ends up being A in the general form
                 A1 = slope1;
                 C1 = intercept1;
@@ -138,17 +135,17 @@ namespace FeatureRecognitionAPI.Models
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if ((new Point(line2.StartPoint.X, 0).Equals(new Point(line2.EndPoint.X, 0))))
+            if ((new Point(line2.Start.X, 0).Equals(new Point(line2.End.X, 0))))
             {
                 A2 = 1;
                 B2 = 0;
-                C2 = -1 * line2.EndPoint.X;
+                C2 = -1 * line2.End.X;
                 vertical2 = true;
             }
             else
             {
-                slope2 = (line2.EndPoint.Y - line2.StartPoint.Y) / (line2.EndPoint.X - line2.StartPoint.X);
-                intercept2 = line2.EndPoint.Y - (slope2 * line2.EndPoint.X);
+                slope2 = (line2.End.Y - line2.Start.Y) / (line2.End.X - line2.Start.X);
+                intercept2 = line2.End.Y - (slope2 * line2.End.X);
                 // The slope of the line ends up being A in the general form
                 A2 = slope2;
                 C2 = intercept2;
@@ -165,9 +162,9 @@ namespace FeatureRecognitionAPI.Models
             //  Lines are parallel -> non zero
             if (slope1 == slope2 && slope1 != 0) { return false; }
             //  Lines are parallel -> vertical
-            else if (vertical1 && vertical2) { return false; }
+            if (vertical1 && vertical2) { return false; }
             //  Lines are parallel -> horizontal
-            else if (slope1 == slope2 && (!vertical1 && !vertical2)) { return false; }
+            if (slope1 == slope2 && (!vertical1 && !vertical2)) { return false; }
 
             //  Calc intersection between lines
             double intersectX;
@@ -175,25 +172,25 @@ namespace FeatureRecognitionAPI.Models
             //  line1 is vertical
             if (B1 == 0)
             {
-                intersectX = line1.EndPoint.X;
+                intersectX = line1.End.X;
                 intersectY = ((-1 * A2 * intersectX) - C2) / B2;
             }
             //  line2 is vertical
             else if (B2 == 0)
             {
-                intersectX = line2.EndPoint.X;
+                intersectX = line2.End.X;
                 intersectY = ((-1 * A1 * intersectX) - C1) / B1;
             }
             //  line1 is horizontal
             else if (slope1 == 0)
             {
-                intersectY = line1.EndPoint.Y;
+                intersectY = line1.End.Y;
                 intersectX = ((-1 * B2 * intersectY) - C2) / A2;
             }
             //  line2 is horizontal
             else if (slope2 == 0)
             {
-                intersectY = line2.EndPoint.Y;
+                intersectY = line2.End.Y;
                 intersectX = ((-1 * B1 * intersectY) - C1) / A1;
             }
             else
@@ -203,37 +200,32 @@ namespace FeatureRecognitionAPI.Models
             }
 
             //  Check if the intersection is in bounds of both line segments
-            bool line1InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line1.StartPoint.X, intersectTolerance), Math.Round(line1.EndPoint.X, intersectTolerance)) &&
-                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line1.StartPoint.X, intersectTolerance), Math.Round(line1.EndPoint.X, intersectTolerance));
+            bool line1InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line1.Start.X, intersectTolerance), Math.Round(line1.End.X, intersectTolerance)) &&
+                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line1.Start.X, intersectTolerance), Math.Round(line1.End.X, intersectTolerance));
 
-            bool line1InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line1.StartPoint.Y, intersectTolerance), Math.Round(line1.EndPoint.Y, intersectTolerance)) &&
-                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line1.StartPoint.Y, intersectTolerance), Math.Round(line1.EndPoint.Y, intersectTolerance));
+            bool line1InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line1.Start.Y, intersectTolerance), Math.Round(line1.End.Y, intersectTolerance)) &&
+                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line1.Start.Y, intersectTolerance), Math.Round(line1.End.Y, intersectTolerance));
 
-            bool line2InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line2.StartPoint.X, intersectTolerance), Math.Round(line2.EndPoint.X, intersectTolerance)) &&
-                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line2.StartPoint.X, intersectTolerance), Math.Round(line2.EndPoint.X, intersectTolerance));
+            bool line2InBoundsX = Math.Round(intersectX, intersectTolerance) >= Math.Min(Math.Round(line2.Start.X, intersectTolerance), Math.Round(line2.End.X, intersectTolerance)) &&
+                    Math.Round(intersectX, intersectTolerance) <= Math.Max(Math.Round(line2.Start.X, intersectTolerance), Math.Round(line2.End.X, intersectTolerance));
 
-            bool line2InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line2.StartPoint.Y, intersectTolerance), Math.Round(line2.EndPoint.Y, intersectTolerance)) &&
-                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line2.StartPoint.Y, intersectTolerance), Math.Round(line2.EndPoint.Y, intersectTolerance));
+            bool line2InBoundsY = Math.Round(intersectY, intersectTolerance) >= Math.Min(Math.Round(line2.Start.Y, intersectTolerance), Math.Round(line2.End.Y, intersectTolerance)) &&
+                    Math.Round(intersectY, intersectTolerance) <= Math.Max(Math.Round(line2.Start.Y, intersectTolerance), Math.Round(line2.End.Y, intersectTolerance));
 
             return line1InBoundsX && line1InBoundsY && line2InBoundsX && line2InBoundsY;
         }
 
-        /**
-         * Helper function that is called from DoesIntersect
-         * Specifically checks if a line and arc intersects
-         * 
-         * @param line is the Line being checked
-         * @param arc is the arc being checked
-         * @return true if they intersect, otherwise false
-         */
+        /// <summary>
+        /// Helper function that is called from DoesIntersect
+        /// Specifically checks if a line and arc intersects
+        /// </summary>
+        /// <param name="line"> the Line being checked </param>
+        /// <param name="arc"> the arc being checked </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         internal static bool IntersectLineWithArc(Line line, Arc arc)
         {
             //Check if the endpoints are touching first to avoid the intersect calculations
-            Point aStart = new(arc.Start.X, arc.Start.Y);
-            Point aEnd = new(arc.End.X, arc.End.Y);
-            bool touching = line.StartPoint.Equals(aStart) || line.StartPoint.Equals(aEnd) ||
-                            line.EndPoint.Equals(aStart) || line.EndPoint.Equals(aEnd);
-            if (touching)
+            if (line.AreEndpointsTouching(arc))
             {
                 return true;
             }
@@ -251,21 +243,21 @@ namespace FeatureRecognitionAPI.Models
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if (line.EndPoint.X == line.StartPoint.X)
+            if (line.End.X == line.Start.X)
             {
                 a = 1;
                 b = 0;
-                c = -1 * line.EndPoint.X;
+                c = -1 * line.End.X;
             }
             else
             {
-                slope = (line.EndPoint.Y - line.StartPoint.Y) / (line.EndPoint.X - line.StartPoint.X);
+                slope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
                 if (slope > 1000000 || slope < -1000000)
                 {
                     slope = 0;
                 }
 
-                intercept = line.EndPoint.Y - (slope * line.EndPoint.X);
+                intercept = line.End.Y - (slope * line.End.X);
                 // The slope of the line ends up being A in the general form
                 a = slope;
                 c = intercept;
@@ -284,10 +276,10 @@ namespace FeatureRecognitionAPI.Models
             List<double> solns = new();
 
             //  Special case for vertical line
-            if (line.EndPoint.X == line.StartPoint.X)
+            if (line.End.X == line.Start.X)
             {
                 decimal[] tempSolns = DecimalEx.SolveQuadratic(1, (decimal)(-2 * arc.Center.Y),
-                    (decimal)(Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) -
+                    (decimal)(Math.Pow(arc.Center.Y, 2) + Math.Pow((line.End.X - arc.Center.X), 2) -
                               Math.Pow(arc.Radius, 2)));
 
                 foreach (decimal number in tempSolns)
@@ -301,11 +293,11 @@ namespace FeatureRecognitionAPI.Models
                     //  Solution y value
                     double y = solns[i];
                     //  Solution x value
-                    double x = line.EndPoint.X;
-                    if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x &&
-                        Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y &&
-                        Math.Max(line.StartPoint.X, line.EndPoint.X) >= x &&
-                        Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y)
+                    double x = line.End.X;
+                    if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.Start.X, line.End.X) <= x &&
+                        Math.Min(line.Start.Y, line.End.Y) <= y &&
+                        Math.Max(line.Start.X, line.End.X) >= x &&
+                        Math.Max(line.Start.Y, line.End.Y) >= y)
                     {
                         return true;
                     }
@@ -333,14 +325,14 @@ namespace FeatureRecognitionAPI.Models
                     double y = ((-1 * a) * solns[i] - c) / b;
 
                     if (arc.IsInArcRange(new Point(x, y)) &&
-                        Math.Min(Math.Round(line.StartPoint.X, intersectTolerance),
-                            Math.Round(line.EndPoint.X, intersectTolerance)) <= x &&
-                        Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance),
-                            Math.Round(line.EndPoint.Y, intersectTolerance)) <= y &&
-                        Math.Max(Math.Round(line.StartPoint.X, intersectTolerance),
-                            Math.Round(line.EndPoint.X, intersectTolerance)) >= x &&
-                        Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance),
-                            Math.Round(line.EndPoint.Y, intersectTolerance)) >= y)
+                        Math.Min(Math.Round(line.Start.X, intersectTolerance),
+                            Math.Round(line.End.X, intersectTolerance)) <= x &&
+                        Math.Min(Math.Round(line.Start.Y, intersectTolerance),
+                            Math.Round(line.End.Y, intersectTolerance)) <= y &&
+                        Math.Max(Math.Round(line.Start.X, intersectTolerance),
+                            Math.Round(line.End.X, intersectTolerance)) >= x &&
+                        Math.Max(Math.Round(line.Start.Y, intersectTolerance),
+                            Math.Round(line.End.Y, intersectTolerance)) >= y)
                     {
                         return true;
                     }
@@ -350,29 +342,22 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        /**
-         * Helper function that is called from DoesIntersect
-         * Specifically checks if two arcs intersects
-         * 
-         * @param arc1 is the first Arc being checked
-         * @param arc2 is the second Arc being checked
-         * @return true if they intersect, otherwise false
-         */
+        /// <summary>
+        /// Helper function that is called from DoesIntersect
+        /// Specifically checks if two arcs intersects
+        /// </summary>
+        /// <param name="arc1"> the first Arc being checked </param>
+        /// <param name="arc2"> the second Arc being checked </param>
+        /// <returns> true if they intersect, otherwise false </returns>
         internal static bool IntersectArcWithArc(Arc arc1, Arc arc2)
         {
-
             // If the endpoints are touching we can avoid the intersect math 
-            Point a1Start = new(arc1.Start.X, arc1.Start.Y);
-            Point a1End = new(arc1.End.X, arc1.End.Y);
-            Point a2Start = new(arc2.Start.X, arc2.Start.Y);
-            Point a2End = new(arc2.End.X, arc2.End.Y);
-            bool touching = a1Start.Equals(a2Start) || a1Start.Equals(a2End) || a1End.Equals(a2Start) || a1End.Equals(a2End);
-            if (touching) { return true; }
+            if (arc1.AreEndpointsTouching(arc2)) { return true; }
 
             // Treat both Arcs circles, get the line between their centers
             Line between = new Line(arc1.Center.X, arc1.Center.Y, arc2.Center.X, arc2.Center.Y);
 
-            // First case, the circles do not intersect as they are too far appart
+            // First case, the circles do not intersect as they are too far apart
             // Second case, one circle is entirely inside the other but not intersecting.
             if (between.Length > (arc1.Radius + arc2.Radius) ||
                 between.Length < (Math.Abs(arc1.Radius - arc2.Radius)) ||
@@ -422,8 +407,8 @@ namespace FeatureRecognitionAPI.Models
             }
             if (rotation > 0)
             {
-                Point start = line.StartPoint;
-                Point end = line.EndPoint;
+                Point start = line.Start;
+                Point end = line.End;
 
                 //Translate the line to the origin
                 start.X = start.X - ellipse.Center.X;
@@ -456,17 +441,17 @@ namespace FeatureRecognitionAPI.Models
             bool isVertical = false;
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if ((new Point(line.StartPoint.X, 0).Equals(new Point(line.EndPoint.X, 0))))
+            if ((new Point(line.Start.X, 0).Equals(new Point(line.End.X, 0))))
             {
                 Al = 1;
                 Bl = 0;
-                Cl = -1 * (line.EndPoint.X - ellipse.Center.X);
+                Cl = -1 * (line.End.X - ellipse.Center.X);
                 isVertical = true;
             }
             else
             {
-                slopel = (line.EndPoint.Y - line.StartPoint.Y) / (line.EndPoint.X - line.StartPoint.X);
-                interceptl = (line.EndPoint.Y - ellipse.Center.Y) - (slopel * (line.EndPoint.X - ellipse.Center.X));
+                slopel = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+                interceptl = (line.End.Y - ellipse.Center.Y) - (slopel * (line.End.X - ellipse.Center.X));
                 // The slope of the line ends up being A in the general form
                 Al = slopel;
                 Cl = interceptl;
@@ -531,115 +516,33 @@ namespace FeatureRecognitionAPI.Models
                 for (int i = 0; i < SolnCoords.Count; i++)
                 {
                     if (ellipse.isInEllipseRange(new Point(SolnCoords[i].X + ellipse.Center.X, SolnCoords[i].Y + ellipse.Center.Y))
-                        && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= (SolnCoords[i].X + ellipse.Center.X)
-                        && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= (SolnCoords[i].Y + ellipse.Center.Y)
-                        && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= (SolnCoords[i].X + ellipse.Center.X)
-                        && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= (SolnCoords[i].Y + ellipse.Center.Y)) { return true; }
+                        && Math.Min(Math.Round(line.Start.X, intersectTolerance), Math.Round(line.End.X, intersectTolerance)) <= (SolnCoords[i].X + ellipse.Center.X)
+                        && Math.Min(Math.Round(line.Start.Y, intersectTolerance), Math.Round(line.End.Y, intersectTolerance)) <= (SolnCoords[i].Y + ellipse.Center.Y)
+                        && Math.Max(Math.Round(line.Start.X, intersectTolerance), Math.Round(line.End.X, intersectTolerance)) >= (SolnCoords[i].X + ellipse.Center.X)
+                        && Math.Max(Math.Round(line.Start.Y, intersectTolerance), Math.Round(line.End.Y, intersectTolerance)) >= (SolnCoords[i].Y + ellipse.Center.Y)) { return true; }
                 }
             }
             return false;
         }
 
         // todo: remove redundant get touching functions and move to entityTools
-        /**
-         * Function to check if any points of this entity is touching any points of another entity
-         * 
-         * @param e2 is the entity being checked against this
-         * @return true if they have points touch, otherwise false
-         */
-        internal bool EntityPointsAreTouching(Entity e2)
+        
+        /// <summary>
+        /// Function to check if any points of this entity is touching any points of another entity
+        /// </summary>
+        /// <param name="e2"> the entity being checked against this </param>
+        /// <returns> true if they have points touch, otherwise false </returns>
+        internal bool AreEndpointsTouching(Entity e2)
         {
             if (this is Circle || e2 is Circle)
             {
                 return false;
             }
-            if (this is Line line1)
-            {
-                if (e2 is Line line2)
-                {
-                    if (line1.StartPoint.Equals(line2.StartPoint))
-                    {
-                        return true;
-                    }
-                    if (line1.StartPoint.Equals(line2.EndPoint))
-                    {
-                        return true;
-                    }
-                    if (line1.EndPoint.Equals(line2.StartPoint))
-                    {
-                        return true;
-                    }
-                    if (line1.EndPoint.Equals(line2.EndPoint))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-                else if (e2 is Arc arc)
-                {
-                    if (line1.StartPoint.Equals(arc.Start))
-                    {
-                        return true;
-                    }
-                    if (line1.StartPoint.Equals(arc.End))
-                    {
-                        return true;
-                    }
-                    if (line1.EndPoint.Equals(arc.Start))
-                    {
-                        return true;
-                    }
-                    if (line1.EndPoint.Equals(arc.End))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-            else if (this is Arc arc)
-            {
-                if (e2 is Line line)
-                {
-                    if (arc.Start.Equals(line.StartPoint))
-                    {
-                        return true;
-                    }
-                    if (arc.Start.Equals(line.EndPoint))
-                    {
-                        return true;
-                    }
-                    if (arc.End.Equals(line.StartPoint))
-                    {
-                        return true;
-                    }
-                    if (arc.End.Equals(line.EndPoint))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-                else if (e2 is Arc arc2)
-                {
-                    if (arc.Start.Equals(arc2.Start))
-                    {
-                        return true;
-                    }
-                    if (arc.Start.Equals(arc2.End))
-                    {
-                        return true;
-                    }
-                    if (arc.End.Equals(arc2.Start))
-                    {
-                        return true;
-                    }
-                    if (arc.End.Equals(arc2.End))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-            return false;
+
+            return Start.Equals(e2.Start) ||
+                   Start.Equals(e2.End) ||
+                   End.Equals(e2.Start) ||
+                   End.Equals(e2.End);
         }
 
         // todo: move to entityTools
@@ -654,13 +557,13 @@ namespace FeatureRecognitionAPI.Models
         public static Point? GetIntersectPoint(Line line1, Line line2)
         {
             Point intersectPoint = new Point();
-            double y1 = line1.EndPoint.Y - line1.StartPoint.Y;
-            double x1 = line1.EndPoint.X - line1.StartPoint.X;
-            double C1 = y1 * line1.StartPoint.X + x1 * line1.StartPoint.Y;
+            double y1 = line1.End.Y - line1.Start.Y;
+            double x1 = line1.End.X - line1.Start.X;
+            double C1 = y1 * line1.Start.X + x1 * line1.Start.Y;
 
-            double y2 = line2.EndPoint.Y - line2.StartPoint.Y;
-            double x2 = line2.EndPoint.X - line2.StartPoint.X;
-            double C2 = y2 * line2.StartPoint.X + x2 * line2.StartPoint.Y;
+            double y2 = line2.End.Y - line2.Start.Y;
+            double x2 = line2.End.X - line2.Start.X;
+            double C2 = y2 * line2.Start.X + x2 * line2.Start.Y;
 
             double delta = y1 * x2 - y2 * x1;
 
@@ -692,29 +595,29 @@ namespace FeatureRecognitionAPI.Models
 
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if (line.EndPoint.X == line.StartPoint.X)
+            if (line.End.X == line.Start.X)
             {
                 a = 1;
                 b = 0;
-                c = -1 * line.EndPoint.X;
+                c = -1 * line.End.X;
             }
             else
             {
-                double xDif = line.EndPoint.X - line.StartPoint.X;
+                double xDif = line.End.X - line.Start.X;
                 if (xDif == 0)
                 {
                     slope = 0;
                 }
                 else
                 {
-                    slope = (line.EndPoint.Y - line.StartPoint.Y) / xDif;
+                    slope = (line.End.Y - line.Start.Y) / xDif;
                 }
 
                 if (slope > 1000000 || slope < -1000000)
                 {
                     slope = 0;
                 }
-                intercept = line.EndPoint.Y - (slope * line.EndPoint.X);
+                intercept = line.End.Y - (slope * line.End.X);
                 // The slope of the line ends up being A in the general form
                 a = slope;
                 c = intercept;
@@ -737,12 +640,12 @@ namespace FeatureRecognitionAPI.Models
                 List<double> solns = new();
 
                 //  Special case for vertical line
-                if (line.EndPoint.X == line.StartPoint.X)
+                if (line.End.X == line.Start.X)
                 {
                     double[] tempSolns = QuadraticFormula(
                         1, 
                         (-2 * arc.Center.Y), 
-                        (Math.Pow(arc.Center.Y, 2) + Math.Pow((line.EndPoint.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2))
+                        (Math.Pow(arc.Center.Y, 2) + Math.Pow((line.End.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2))
                         ).ToArray();
 
                     foreach (double number in tempSolns)
@@ -755,8 +658,8 @@ namespace FeatureRecognitionAPI.Models
                         //  Solution y value
                         double y = solns[i];
                         //  Solution x value
-                        double x = line.EndPoint.X;
-                        if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.StartPoint.X, line.EndPoint.X) <= x && Math.Min(line.StartPoint.Y, line.EndPoint.Y) <= y && Math.Max(line.StartPoint.X, line.EndPoint.X) >= x && Math.Max(line.StartPoint.Y, line.EndPoint.Y) >= y) { return new Point(x, y); }
+                        double x = line.End.X;
+                        if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.Start.X, line.End.X) <= x && Math.Min(line.Start.Y, line.End.Y) <= y && Math.Max(line.Start.X, line.End.X) >= x && Math.Max(line.Start.Y, line.End.Y) >= y) { return new Point(x, y); }
                     }
                 }
                 else
@@ -776,14 +679,14 @@ namespace FeatureRecognitionAPI.Models
                         double y = slope * solns[i] + intercept;
 
                         if (arc.IsInArcRange(new Point(x, y)) &&
-                            Math.Min(Math.Round(line.StartPoint.X, intersectTolerance),
-                                Math.Round(line.EndPoint.X, intersectTolerance)) <= x &&
-                            Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance),
-                                Math.Round(line.EndPoint.Y, intersectTolerance)) <= y &&
-                            Math.Max(Math.Round(line.StartPoint.X, intersectTolerance),
-                                Math.Round(line.EndPoint.X, intersectTolerance)) >= x &&
-                            Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance),
-                                Math.Round(line.EndPoint.Y, intersectTolerance)) >= y)
+                            Math.Min(Math.Round(line.Start.X, intersectTolerance),
+                                Math.Round(line.End.X, intersectTolerance)) <= x &&
+                            Math.Min(Math.Round(line.Start.Y, intersectTolerance),
+                                Math.Round(line.End.Y, intersectTolerance)) <= y &&
+                            Math.Max(Math.Round(line.Start.X, intersectTolerance),
+                                Math.Round(line.End.X, intersectTolerance)) >= x &&
+                            Math.Max(Math.Round(line.Start.Y, intersectTolerance),
+                                Math.Round(line.End.Y, intersectTolerance)) >= y)
                         {
                             return new Point(x, y);
                         }
@@ -823,7 +726,7 @@ namespace FeatureRecognitionAPI.Models
             }
             if (rotation > 0)
             {
-                line = new Line(-1 * ((line.StartPoint.X * Math.Cos(rotation)) - (line.StartPoint.Y * Math.Sin(rotation))), -1 * ((line.StartPoint.Y * Math.Cos(rotation)) + (line.StartPoint.X * Math.Sin(rotation))), -1 * ((line.EndPoint.X * Math.Cos(rotation)) - (line.EndPoint.Y * Math.Sin(rotation))), -1 * ((line.EndPoint.Y * Math.Cos(rotation)) + (line.EndPoint.X * Math.Sin(rotation))));
+                line = new Line(-1 * ((line.Start.X * Math.Cos(rotation)) - (line.Start.Y * Math.Sin(rotation))), -1 * ((line.Start.Y * Math.Cos(rotation)) + (line.Start.X * Math.Sin(rotation))), -1 * ((line.End.X * Math.Cos(rotation)) - (line.End.Y * Math.Sin(rotation))), -1 * ((line.End.Y * Math.Cos(rotation)) + (line.End.X * Math.Sin(rotation))));
             }
             //  Get line in the form Ax + By + C = 0 and moved so that ellipse center is the origin
             double Al;
@@ -834,17 +737,17 @@ namespace FeatureRecognitionAPI.Models
             bool isVertical = false;
             //  This is to check for a vertical line, since it would crash the program
             //  trying to divide by 0
-            if ((new Point(line.StartPoint.X, 0).Equals(new Point(line.EndPoint.X, 0))))
+            if ((new Point(line.Start.X, 0).Equals(new Point(line.End.X, 0))))
             {
                 Al = 1;
                 Bl = 0;
-                Cl = -1 * (line.EndPoint.X - ellipse.Center.X);
+                Cl = -1 * (line.End.X - ellipse.Center.X);
                 isVertical = true;
             }
             else
             {
-                slopel = (line.EndPoint.Y - line.StartPoint.Y) / (line.EndPoint.X - line.StartPoint.X);
-                interceptl = (line.EndPoint.Y - ellipse.Center.Y) - (slopel * (line.EndPoint.X - ellipse.Center.X));
+                slopel = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+                interceptl = (line.End.Y - ellipse.Center.Y) - (slopel * (line.End.X - ellipse.Center.X));
                 // The slope of the line ends up being A in the general form
                 Al = slopel;
                 Cl = interceptl;
@@ -909,10 +812,10 @@ namespace FeatureRecognitionAPI.Models
                 for (int i = 0; i < SolnCoords.Count; i++)
                 {
                     if (ellipse.isInEllipseRange(new Point(SolnCoords[i].X + ellipse.Center.X, SolnCoords[i].Y + ellipse.Center.Y))
-                        && Math.Min(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) <= (SolnCoords[i].X + ellipse.Center.X)
-                        && Math.Min(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) <= (SolnCoords[i].Y + ellipse.Center.Y)
-                        && Math.Max(Math.Round(line.StartPoint.X, intersectTolerance), Math.Round(line.EndPoint.X, intersectTolerance)) >= (SolnCoords[i].X + ellipse.Center.X)
-                        && Math.Max(Math.Round(line.StartPoint.Y, intersectTolerance), Math.Round(line.EndPoint.Y, intersectTolerance)) >= (SolnCoords[i].Y + ellipse.Center.Y)) { return new Point(SolnCoords[i].X + ellipse.Center.X, SolnCoords[i].Y + ellipse.Center.Y); }
+                        && Math.Min(Math.Round(line.Start.X, intersectTolerance), Math.Round(line.End.X, intersectTolerance)) <= (SolnCoords[i].X + ellipse.Center.X)
+                        && Math.Min(Math.Round(line.Start.Y, intersectTolerance), Math.Round(line.End.Y, intersectTolerance)) <= (SolnCoords[i].Y + ellipse.Center.Y)
+                        && Math.Max(Math.Round(line.Start.X, intersectTolerance), Math.Round(line.End.X, intersectTolerance)) >= (SolnCoords[i].X + ellipse.Center.X)
+                        && Math.Max(Math.Round(line.Start.Y, intersectTolerance), Math.Round(line.End.Y, intersectTolerance)) >= (SolnCoords[i].Y + ellipse.Center.Y)) { return new Point(SolnCoords[i].X + ellipse.Center.X, SolnCoords[i].Y + ellipse.Center.Y); }
                 }
             }
             return null;
@@ -920,11 +823,10 @@ namespace FeatureRecognitionAPI.Models
 
         // todo: move to MDCMath
         
-        /**
-         * Solves the quadratic formula
-         * 
-         * @Return - List of solutions
-         */
+        /// <summary>
+        /// Solves the quadratic formula
+        /// </summary>
+        /// <returns> List of solutions </returns>
         internal static List<double> QuadraticFormula(double a, double b, double c)
         {
             List<double> solns = new List<double>();
@@ -946,7 +848,8 @@ namespace FeatureRecognitionAPI.Models
         }
         public abstract override bool Equals(object? obj);
 
-        //Return true when entities compared have similar traits, length is the same (but start and end point, or mid point can vary)
+        /// <returns> Return true when entities compared have similar traits,
+        /// length is the same (but start and end point, or mid point can vary) </returns>
         public abstract bool Compare(object? obj);
 
         public abstract double MinX();

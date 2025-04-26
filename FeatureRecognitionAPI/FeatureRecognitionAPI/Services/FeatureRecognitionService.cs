@@ -13,17 +13,14 @@ namespace FeatureRecognitionAPI.Services
         {
         }
 
-        /*
-         * Handles an uploaded file by performing feature detection based on its extension
-         * and returning the results in JSON format for the frontend.
-         *
-         * Supported file types: .dxf, .dwg
-         *
-         * @param file The uploaded file as an IFormFile object.
-         * @return 
-         *   - string: The resulting JSON string if successful;
-         *
-         */
+        /// <summary>
+        /// Handles an uploaded file by performing feature detection based on its extension
+        /// and returning the results in JSON format for the frontend.
+        /// Supported file types: .dxf, .dwg
+        /// </summary>
+        /// <param name="file"> The uploaded file as an IFormFile object. </param>
+        /// <returns> The resulting JSON string if successful </returns>
+        /// <exception cref="IOException"></exception>
         public async Task<string?> UploadFile(IFormFile file)
         {
             string? ext = Path.GetExtension(file.FileName);

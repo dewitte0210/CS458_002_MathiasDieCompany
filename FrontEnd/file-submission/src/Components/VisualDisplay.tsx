@@ -82,8 +82,8 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
 
         const drawLine = (ctx, shape, scaleFactor, xOffset, yOffset) => {
             ctx.beginPath();
-            const startPoint = shape.StartPoint
-            const endPoint = shape.EndPoint
+            const startPoint = shape.Start
+            const endPoint = shape.End
             ctx.moveTo((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
             ctx.lineTo((endPoint.X + xOffset) * scaleFactor, (endPoint.Y + yOffset) * scaleFactor);
 

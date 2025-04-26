@@ -2,10 +2,10 @@
 
 namespace FeatureRecognitionAPI.Models
 {
-    /**
-     * Class that represents a Ellipse object that extends Entity
-     * Inherits entityType and Length fields
-     */
+    /// <summary>
+    /// Class that represents a Ellipse object that extends Entity
+    /// Inherits entityType and Length fields
+    /// </summary>
     public class Ellipse : Entity
     {
         public Point Center { get; set; }
@@ -17,10 +17,8 @@ namespace FeatureRecognitionAPI.Models
         public double StartParameter { get; set; }
         public double EndParameter { get; set; }
         public double Rotation { get; set; }
-        public Point StartPoint { get; set; }
-        public Point EndPoint { get; set; }
         public bool IsFullEllipse { get; set; }
-        private Ellipse() { }
+        
         public Ellipse(double centerX, double centerY, double majorAxisXValue,
             double majorAxisYValue, double minorToMajorAxisRatio,
             double startParameter, double endParameter)
@@ -34,28 +32,28 @@ namespace FeatureRecognitionAPI.Models
             this.StartParameter = startParameter;
             this.EndParameter = endParameter;
             Rotation = Math.Atan2(MajorAxisEndPoint.Y - Center.Y, MajorAxisEndPoint.X - Center.X);
-            StartPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, StartParameter);
-            EndPoint = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, EndParameter);
+            Start = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, StartParameter);
+            End = PointOnEllipseGivenAngleInRadians(MajorAxis, MinorAxis, EndParameter);
             if (Rotation > 0)
             {
-                StartPoint.X = StartPoint.X - Center.X;
-                StartPoint.Y = StartPoint.Y - Center.Y;
-                EndPoint.X = EndPoint.X - Center.X;
-                EndPoint.Y = EndPoint.Y - Center.Y;
+                Start.X = Start.X - Center.X;
+                Start.Y = Start.Y - Center.Y;
+                End.X = End.X - Center.X;
+                End.Y = End.Y - Center.Y;
 
                 //Rotate around the origin
-                double temp = StartPoint.X;
-                StartPoint.X = -1 * ((StartPoint.X * Math.Cos(Rotation)) - (StartPoint.Y * Math.Sin(Rotation)));
-                StartPoint.Y = -1 * ((StartPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
-                temp = EndPoint.X;
-                EndPoint.X = -1 * ((EndPoint.X * Math.Cos(Rotation)) - (EndPoint.Y * Math.Sin(Rotation)));
-                EndPoint.Y = -1 * ((EndPoint.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+                double temp = Start.X;
+                Start.X = -1 * ((Start.X * Math.Cos(Rotation)) - (Start.Y * Math.Sin(Rotation)));
+                Start.Y = -1 * ((Start.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
+                temp = End.X;
+                End.X = -1 * ((End.X * Math.Cos(Rotation)) - (End.Y * Math.Sin(Rotation)));
+                End.Y = -1 * ((End.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
 
                 //Translate back
-                StartPoint.X = StartPoint.X + Center.X;
-                StartPoint.Y = StartPoint.Y + Center.Y;
-                EndPoint.X = EndPoint.X + Center.X;
-                EndPoint.Y = EndPoint.Y + Center.Y;
+                Start.X = Start.X + Center.X;
+                Start.Y = Start.Y + Center.Y;
+                End.X = End.X + Center.X;
+                End.Y = End.Y + Center.Y;
             }
             if (startParameter == 0 && endParameter == 2 * Math.PI)
             {
@@ -86,11 +84,11 @@ namespace FeatureRecognitionAPI.Models
             return 4 * majorAxis * Math.PI / (2 * a) * (1 - total);
         }
 
-        /**
-         * This function breaks down the perimeter of the partial ellipse into a series of small lines that
-         * follow the actual perimeter of the partial ellipse. It is an accurate estimate of the perimeter
-         * since an exact formula does not exist.
-         */
+        /// <summary>
+        /// This function breaks down the perimeter of the partial ellipse into a series of small lines that
+        /// follow the actual perimeter of the partial ellipse. It is an accurate estimate of the perimeter
+        /// since an exact formula does not exist.
+        /// </summary>
         private double partialPerimterCalc()
         {
             //Major axis value
@@ -125,14 +123,13 @@ namespace FeatureRecognitionAPI.Models
             }
             return sum;
         }
-
-        /**
-         * Calculates the coordinate on an ellipse given the angle in radians.
-         * 
-         * @Param a - Major axis value
-         * @PAram b - Minor axis value
-         * @Param angle - angle of coordinate desired
-         */
+        
+        /// <summary>
+        /// Calculates the coordinate on an ellipse given the angle in radians.
+        /// </summary>
+        /// <param name="a"> Major axis value </param>
+        /// <param name="b"> Minor axis value </param>
+        /// <param name="angle"> angle of coordinate desired </param>
         internal Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
         {
             double x1;
@@ -185,6 +182,10 @@ namespace FeatureRecognitionAPI.Models
             return sol;
         }
 
+        /**
+         * Takes an angle and creates a line representing a vector pointing out from the center in the
+         * direction of the angle.
+         */
         public Line vectorFromCenter(double angle)
         {
             double a = Point.Distance(MajorAxisEndPoint, Center);
@@ -192,9 +193,9 @@ namespace FeatureRecognitionAPI.Models
             return new Line(Center.X, Center.Y, endPoint.X + Center.X, endPoint.Y + Center.Y);
         }
 
-        /**
-         * Checks if a given point on the ellipse is in range of the parameter boundaries
-         */
+        /// <summary>
+        /// Checks if a given point on the ellipse is in range of the parameter boundaries
+        /// </summary>
         internal bool isInEllipseRange(Point point)
         {
             double y = point.Y - Center.Y;
@@ -275,30 +276,35 @@ namespace FeatureRecognitionAPI.Models
 
         public override double MinX()
         {
+            //Base cases
             if (Rotation == 0 || Rotation == Math.PI)
             {
+                //If the major axis is not in the partial ellipse, the end points have to be the min
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == 0 && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) || (Rotation == Math.PI && !(0 >= StartParameter && 0 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.X, EndPoint.X);
+                        return Math.Min(Start.X, End.X);
                     }
                 }
                 return Center.X - MajorAxis;
             }
             else if (Rotation == Math.PI / 2 || Rotation == 3 * Math.PI / 2)
             {
+                //If the minor axis is not in the partial ellipse, the end points have to be the min
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == Math.PI / 2 && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.X, EndPoint.X);
+                        return Math.Min(Start.X, End.X);
                     }
                 }
                 return Center.X - MinorAxis;
             }
             List<Point> values = MaxAndMinX();
+            //Min value
             double min = 0;
+            //Index tracker
             int index = 0;
             for (int i = 0; i < values.Count; i++)
             {
@@ -306,36 +312,42 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { min = values[i].X; }
                 else if (values[i].X < min) { min = values[i].X; }
             }
-            if (!isInEllipseRange(values[index])) { return Math.Min(StartPoint.X, EndPoint.X); }
+            //Checks if the calculated min is in range of the parameters
+            if (!isInEllipseRange(values[index])) { return Math.Min(Start.X, End.X); }
             return min;
         }
 
         public override double MinY()
         {
+            //Base cases
             if (Rotation == 0 || Rotation == Math.PI)
             {
+                //If the minor axis is not in the partial ellipse, the end points have to be the min
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == 0 && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) || (Rotation == Math.PI && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.Y, EndPoint.Y);
+                        return Math.Min(Start.Y, End.Y);
                     }
                 }
                 return Center.Y - MinorAxis;
             }
+            //If the major axis is not in the partial ellipse, the end points have to be the min
             else if (Rotation == Math.PI / 2 || Rotation == 3 * Math.PI / 2)
             {
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == Math.PI / 2 && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(0 >= StartParameter && 0 <= EndParameter)))
                     {
-                        return Math.Min(StartPoint.Y, EndPoint.Y);
+                        return Math.Min(Start.Y, End.Y);
                     }
                 }
                 return Center.Y - MajorAxis;
             }
             List<Point> values = MaxAndMinY();
+            //Min value
             double min = 0;
+            //Index tracker
             int index = 0;
             for (int i = 0; i < values.Count; i++)
             {
@@ -343,36 +355,42 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { min = values[i].Y; }
                 else if (values[i].Y < min) { min = values[i].Y; }
             }
-            if (!isInEllipseRange(values[index])) { return Math.Min(StartPoint.Y, EndPoint.Y); }
+            //Checks if the calculated min is in range of the parameters
+            if (!isInEllipseRange(values[index])) { return Math.Min(Start.Y, End.Y); }
             return min;
         }
 
         public override double MaxX()
         {
+            //Base cases
             if (Rotation == 0 || Rotation == Math.PI)
             {
+                //If the major axis is not in the partial ellipse, the end points have to be the max
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == 0 && !(0 >= StartParameter && 0 <= EndParameter)) || (Rotation == Math.PI && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.X, EndPoint.X);
+                        return Math.Max(Start.X, End.X);
                     }
                 }
                 return Center.X + MajorAxis;
             }
+            //If the minor axis is not in the partial ellipse, the end points have to be the max
             else if (Rotation == Math.PI / 2 || Rotation == 3 * Math.PI / 2)
             {
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == Math.PI / 2 && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.X, EndPoint.X);
+                        return Math.Max(Start.X, End.X);
                     }
                 }
                 return Center.X + MinorAxis;
             }
             List<Point> values = MaxAndMinX();
+            //Max value
             double max = 0;
+            //Index tracker
             int index = 0;
             for (int i = 0; i < values.Count; i++)
             {
@@ -380,36 +398,42 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { max = values[i].X; }
                 else if (values[i].X > max) { max = values[i].X; }
             }
-            if (!isInEllipseRange(values[index])) { return Math.Max(StartPoint.X, EndPoint.X); }
+            //Checks if the calculated max is in range of the parameters
+            if (!isInEllipseRange(values[index])) { return Math.Max(Start.X, End.X); }
             return max;
         }
 
         public override double MaxY()
         {
+            //Base cases
             if (Rotation == 0 || Rotation == Math.PI)
             {
+                //If the minor axis is not in the partial ellipse, the end points have to be the max
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == 0 && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) || (Rotation == Math.PI && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.Y, EndPoint.Y);
+                        return Math.Max(Start.Y, End.Y);
                     }
                 }
                 return Center.Y + MinorAxis;
             }
+            //If the major axis is not in the partial ellipse, the end points have to be the max
             else if (Rotation == Math.PI / 2 || Rotation == 3 * Math.PI / 2)
             {
                 if (!IsFullEllipse)
                 {
                     if ((Rotation == Math.PI / 2 && !(0 >= StartParameter && 0 <= EndParameter)) || (Rotation == 3 * Math.PI / 2 && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                     {
-                        return Math.Max(StartPoint.Y, EndPoint.Y);
+                        return Math.Max(Start.Y, End.Y);
                     }
                 }
                 return Center.Y + MajorAxis;
             }
             List<Point> values = MaxAndMinY();
+            //Max value
             double max = 0;
+            //Index tracker
             int index = 0;
             for (int i = 0; i < values.Count; i++)
             {
@@ -417,10 +441,16 @@ namespace FeatureRecognitionAPI.Models
                 if (i == 0) { max = values[i].Y; }
                 else if (values[i].Y > max) { max = values[i].Y; }
             }
-            if (!isInEllipseRange(values[index])) { return Math.Max(StartPoint.Y, EndPoint.Y); }
+            //Checks if the calculated max is in range of the parameters
+            if (!isInEllipseRange(values[index])) { return Math.Max(Start.Y, End.Y); }
             return max;
         }
 
+        #region Bounds
+        /**
+         * Calculates the y axis bounds of the ellipse
+         * @Return - The 2 points on the ellipse corresponding to the bounds
+         */
         private List<Point> MaxAndMinY()
         {
             double A = 0, B = 0, C = 0, D = 0, E = 0, alpha = 0;
@@ -437,6 +467,10 @@ namespace FeatureRecognitionAPI.Models
             return yValues;
         }
 
+        /**
+         * Calculates the x axis bounds of the ellipse
+         * @Return - The 2 points on the ellipse corresponding to the bounds
+         */
         private List<Point> MaxAndMinX()
         {
             double A = 0, B = 0, C = 0, D = 0, E = 0, alpha = 0;
@@ -453,6 +487,9 @@ namespace FeatureRecognitionAPI.Models
             return yValues;
         }
 
+        /**
+         * Calculates the constants in the general form of an ellipse (Ax^2 + Bx + Cy^2 + Dy + Exy + alpha)
+         */
         private void CalculateEllipseConstants(ref double A, ref double B, ref double C, ref double D, ref double E, ref double alpha)
         {
             A = (Math.Pow(Math.Cos(Rotation), 2) / Math.Pow(MajorAxis, 2)) + (Math.Pow(Math.Sin(Rotation), 2) / Math.Pow(MinorAxis, 2));
@@ -463,6 +500,10 @@ namespace FeatureRecognitionAPI.Models
             alpha = (Math.Pow(Center.X, 2) * ((Math.Pow(Math.Cos(Rotation), 2) / Math.Pow(MajorAxis, 2)) + (Math.Pow(Math.Sin(Rotation), 2) / Math.Pow(MinorAxis, 2)))) + (Center.X * Center.Y * Math.Sin(2 * Rotation) * (Math.Pow(MajorAxis, -2) - Math.Pow(MinorAxis, -2))) + (Math.Pow(Center.Y, 2) * ((Math.Pow(Math.Sin(Rotation), 2) / Math.Pow(MajorAxis, 2)) + (Math.Pow(Math.Cos(Rotation), 2) / Math.Pow(MinorAxis, 2)))) - 1;
         }
 
+        /**
+         * Takes the bounding lines and plugs them into the ellipse equation for the quadratic formula
+         * @Return - The x values of the bounding coords
+         */
         private List<double> CalcXCoordOfBoundCoords(double A, double B, double C, double D, double E, double alpha, double slope, double intercept)
         {
             double squaredCoef = A + (slope * ((C * slope) + E));
@@ -470,6 +511,7 @@ namespace FeatureRecognitionAPI.Models
             double delta = intercept * ((C * intercept) + D) + alpha;
             return QuadraticFormula(squaredCoef, linearCoef, delta);
         }
+        #endregion
 
         public override Ellipse Transform(Matrix3 transform)
         {

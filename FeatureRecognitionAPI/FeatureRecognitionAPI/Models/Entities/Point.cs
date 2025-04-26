@@ -4,10 +4,13 @@ namespace FeatureRecognitionAPI.Models
     {
         public double X { get; set; }
         public double Y { get; set; }
-        public bool intersect; //boolean value that is true if this point is an intersect point between two lines
-
-        //this is only true on points where the intersection point has to be calculated,
-        //not on points where lines already touch
+        
+        /// <summary>
+        /// boolean value that is true if this point is an intersect point between two lines
+        /// this is only true on points where the intersection point has to be calculated,
+        /// not on points where lines already touch
+        /// </summary>
+        public bool intersect; 
 
         public Point()
         {
@@ -35,10 +38,10 @@ namespace FeatureRecognitionAPI.Models
 
         public override bool Equals(object? obj)
         {
-            if (obj is Point)
+            if (obj is Point point)
             {
-                double xDiff = Math.Abs((obj as Point).X - this.X);
-                double yDiff = Math.Abs((obj as Point).Y - this.Y);
+                double xDiff = Math.Abs(point.X - this.X);
+                double yDiff = Math.Abs(point.Y - this.Y);
                 if (xDiff < 0.0009 && yDiff < 0.0009)
                 {
                     return true;

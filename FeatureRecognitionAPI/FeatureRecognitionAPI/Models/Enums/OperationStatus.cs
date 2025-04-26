@@ -1,12 +1,11 @@
-﻿namespace FeatureRecognitionAPI.Models.Enums
+﻿namespace FeatureRecognitionAPI.Models.Enums;
+
+public enum OperationStatus
 {
-    public enum OperationStatus
-    {
-        Unknown,
-        OK,
-        ExternalApiFailure,
-        UnsupportedFileType,
-        CorruptFile,
-        BadRequest
-    }
+    Unknown,
+    Ok,
+    ExternalApiFailure,
+    UnsupportedFileType,
+    CorruptFile,
+    BadRequest
 }
