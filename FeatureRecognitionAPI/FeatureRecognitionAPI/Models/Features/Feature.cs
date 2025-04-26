@@ -1211,7 +1211,7 @@ public class Feature
 
     #region Group3
 
-    /*  chamfered corner detection
+    /*  Chamfered corner detection
             given 3 lines...
                 if the two matching angles are equal and greater than 90
                 and the angle between edge 1 and 3 are less than 180
@@ -1223,16 +1223,12 @@ public class Feature
                 those should also be a possible chamfer
             4 corners
                 have the user select a base chamfer
-                or just use the count as it is and visualize from 4 shortest
-                
-        calculates in bulk so do not call per entity
-        only runs detection on perimeter features since chamfers
-          are only on the outside of a part
-        returns true if no problems??
     */
 
     /// <summary>
-    /// Gets a list of only lines from a list of entities
+    /// Gets a list of only lines from a list of entities.
+    /// Orientation is not guaranteed, use getTouchingLine or
+    /// getOrderedLines for consistent orientation
     /// </summary>
     /// <param name="entityList"></param>
     /// <returns>list of lines</returns>
@@ -1434,7 +1430,6 @@ public class Feature
             ChamferList.Remove(cgToRemove);
         }
         // remaining possible chamfers meet above case so confirm
-        //foreach (Line line in possibleChamferList)
         foreach (ChamferGroup chamferGroup in ChamferList)
         {
             chamferGroup.Confirmed = true;
@@ -1454,23 +1449,26 @@ public class Feature
         {
             case <= 0:
                 return;
+            
             // check potential chamfers
             // if only one chamfer, it is confirmed to be a chamfer
             case 1:
                 ChamferList[0].Confirmed = true;
                 break;
+            
             // if 2 to 3 chamfers, only confirm if a parallel line to it
             // is also possible/confirmed chamfers
             case >= 2 and <= 3:
-            {
                 RemoveFalseChamfers(lineList);
                 break;
-            }
+            
+            // if 4 chamfers we can run into the octagon problem
+            // where we cannot know for sure if anything is a 
+            // chamfer or not so clear list and leave to user
+            case >= 4:
+                ChamferList.Clear();
+                break;
         }
-
-        // if more than 4 chamfers we run into the octagon problem
-        // so we cannot confirm what lines are chamfers
-        // TODO: implement better check for octagon problem, perhaps with frontend
     }
 
     #endregion

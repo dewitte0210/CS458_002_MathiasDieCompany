@@ -458,7 +458,10 @@ namespace Testing_for_Project
             // detects all groups including group3
             f.DetectFeatures();
             
-            Assert.That(f.ChamferList.Count, Is.EqualTo(8));
+            // octagon should not have any chamfers
+            // because we cannot know for sure
+            // what lines are the chamfers
+            Assert.That(f.ChamferList.Count, Is.EqualTo(0));
         }
 
         [Test]
