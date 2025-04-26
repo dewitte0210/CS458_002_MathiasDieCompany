@@ -53,9 +53,22 @@ namespace FeatureRecognitionAPI.Models
             GroupFeatureEntities();
             SetFeatureGroups();
 
+            //if there is a num-up here, only one copy of the die will have its lines identified as recognized or unrecognized
             foreach (FeatureGroup featureGroup in FeatureGroups)
             {
                 featureGroup.FindFeatureTypes();
+            }
+            
+            //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
+            if (FeatureGroups.Any(group => group.Count > 1))
+            {
+                foreach (Feature feature in FeatureList)
+                {
+                   feature.ExtendAllEntities();
+                   feature.SeperateBaseEntities();
+                   feature.SeperatePerimeterEntities();
+                   feature.DetectFeatures();
+                }
             }
         }
         

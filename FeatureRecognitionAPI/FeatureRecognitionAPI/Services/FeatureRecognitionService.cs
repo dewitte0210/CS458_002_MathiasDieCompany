@@ -48,24 +48,8 @@ namespace FeatureRecognitionAPI.Services
                         throw new IOException("Invalid file extension: " + ext);
                 }
             }
-
-            // supportedFile.GroupFeatureEntities();
-
-            supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
-
+            
             supportedFile.DetectAllFeatureTypes();
-
-            //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
-            if (supportedFile.FeatureGroups.Any(group => group.Count > 1))
-            {
-                foreach (Feature feature in supportedFile.FeatureList)
-                {
-                   feature.ExtendAllEntities();
-                   feature.SeperateBaseEntities();
-                   feature.SeperatePerimeterEntities();
-                   feature.DetectFeatures();
-                }
-            }
             
             List<Entity> touchingEntityList = new List<Entity>();
             foreach (Feature feature in supportedFile.FeatureList)
