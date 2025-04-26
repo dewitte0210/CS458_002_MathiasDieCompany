@@ -12,7 +12,6 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NHibernate.Dialect.Function;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 public class Feature
@@ -26,6 +25,7 @@ public class Feature
     [JsonProperty] public double perimeter;
     [JsonProperty] public double diameter;
     [JsonProperty] public int count;
+    public bool? IsRecognized { get; set; }
     //[JsonProperty] public int NumChamfers = 0;
     public List<ChamferGroup> ChamferList = new List<ChamferGroup>();
 
@@ -1643,11 +1643,20 @@ public class Feature
      */
     public override bool Equals(object obj)
     {
-        if (!(obj is Feature) || (obj == null))
+        if (obj == null)
         {
             return false;
         }
-        else if (obj == this) return true;
+
+        if (!(obj is Feature feature))
+        {
+            return false;
+        }
+
+        if (obj == this)
+        {
+            return true;
+        }
         /*
          * Way to quickly determine that it's likely that the features are equal.
          * There are edge cases where two features that aren't the same could be set as equal,
@@ -1672,30 +1681,28 @@ public class Feature
          * If there are the same number of arcs lines and circles, and permiters match,
          * then check to see if all entities have a corresponding entity with matching values
          */
-        if (((Feature)obj).numLines == this.numLines
-            && ((Feature)obj).numCircles == this.numCircles
-            && ((Feature)obj).numArcs == this.numArcs
-            && Math.Abs(((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance)
+        if (feature.numLines != this.numLines
+            || feature.numCircles != this.numCircles
+            || feature.numArcs != this.numArcs
+            || Math.Abs(feature.perimeter - this.perimeter) >= Entity.EntityTolerance)
         {
-            //Genuinly my first time ever using lambda expression for something actually useful
-            //sort both lists by length
-            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-
-            //For each entity in this.EntityList check for a corresponding entity obj.EntityList
-            bool equalLists = true;
-            foreach (Entity j in ((Feature)obj).EntityList)
-            {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
-                {
-                    equalLists = false;
-                    break;
-                }
-            }
-
-            return equalLists;
+            return false;
         }
-        else return false;
+
+        //sort both lists by length
+        EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+        feature.EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+
+        //For each entity in this.EntityList check for a corresponding entity obj.EntityList
+        foreach (Entity j in ((Feature)obj).EntityList)
+        {
+            if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public bool Compare(object obj)
@@ -2013,9 +2020,7 @@ public class Feature
         }
 
         List<Entity> touchingList = new List<Entity>();
-        for (int i = 0;
-             i < unusedEntities.Count;
-             i++) // adds all entities in unusedEntities that touch curEntitty to Path and touchinglist and removes them from unusedEntities
+        for (int i = 0; i < unusedEntities.Count; i++) // adds all entities in unusedEntities that touch curEntity to Path and touchingList and removes them from unusedEntities
         {
             if (curEntity.DoesIntersect(unusedEntities[i]))
             {
@@ -2246,6 +2251,101 @@ public class Feature
                     {
                         multipleRadius += 1;
                     }
+                }
+            }
+        }
+    }
+
+    public void SetLineRecognition()
+    {
+        IsRecognized = FeatureType != PossibleFeatureTypes.Unknown;
+        //TODO: clean this up
+        foreach (Entity e in EntityList)
+        {
+            e.IsRecognized = IsRecognized;
+        }
+        
+        foreach (Entity e in baseEntityList)
+        {
+            e.IsRecognized = IsRecognized;
+        }
+        
+        foreach (Entity e in ExtendedEntityList)
+        {
+            e.IsRecognized = IsRecognized;
+        }
+
+        foreach (Feature perimeterFeature in PerimeterFeatureList)
+        {
+            foreach (Entity e in perimeterFeature.EntityList)
+            {
+                e.IsRecognized = IsRecognized;
+            }
+        }
+    }
+
+    //todo: better name for this
+    public static void DistributeFeatureRecognitionData(List<Feature> features)
+    {
+        DistributeFeatureRecognitionData(features, features);
+    }
+    public static void DistributeFeatureRecognitionData(List<Feature> featuresA, List<Feature> featuresB)
+    {
+        foreach (Feature f1 in featuresA)
+        {
+            if (f1.IsRecognized == null)
+            {
+                f1.ExtendAllEntities();
+                f1.SeperateBaseEntities();
+                f1.SeperatePerimeterEntities();
+                f1.DetectFeatures();
+            }
+            foreach (Feature f2 in featuresB)
+            {
+                //intentional reference comparison
+                if (f1 == f2)
+                {
+                    continue;
+                }
+                
+                if (f2.IsRecognized == null)
+                {
+                    f2.ExtendAllEntities();
+                    f2.SeperateBaseEntities();
+                    f2.SeperatePerimeterEntities();
+                    f2.DetectFeatures();
+                }
+
+                if (!f1.Equals(f2))
+                {
+                    continue;
+                }
+
+                if (f1.IsRecognized == null && f2.IsRecognized == null)
+                {
+                    continue;
+                }
+
+                if (f1.IsRecognized != null && f2.IsRecognized != null)
+                {
+                    continue;
+                }
+
+                if (f1.IsRecognized != null)
+                {
+                    //now we need to do the same thing but with perimeter features
+                    f2.FeatureType = f1.FeatureType;
+                    f2.SetLineRecognition();
+                }
+                else
+                {
+                    f1.FeatureType = f2.FeatureType;
+                    f1.SetLineRecognition();
+                }
+
+                if (f1.PerimeterFeatureList.Count > 0 || f2.PerimeterFeatureList.Count > 0)
+                {
+                    DistributeFeatureRecognitionData(f1.PerimeterFeatureList, f2.PerimeterFeatureList);
                 }
             }
         }

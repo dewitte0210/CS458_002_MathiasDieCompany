@@ -58,7 +58,11 @@ namespace FeatureRecognitionAPI.Services
 
             supportedFile.DetectAllFeatureTypes();
 
-            // Set the feature groups
+            if (supportedFile.FeatureGroups.Any(group => group.Count > 1))
+            {
+                Feature.DistributeFeatureRecognitionData(supportedFile.FeatureList);
+            }
+            
             List<Entity> touchingEntityList = new List<Entity>();
             foreach (Feature feature in supportedFile.FeatureList)
             {
