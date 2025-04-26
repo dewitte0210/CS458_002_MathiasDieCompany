@@ -76,14 +76,9 @@ public class FeatureGroup
             feature.SeperateBaseEntities();
             feature.SeperatePerimeterEntities();
             feature.DetectFeatures();
-
-            feature.IsRecognized = feature.FeatureType != PossibleFeatureTypes.Unknown;
-            feature.SetLineRecognition();
             
             foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
             {
-                perimeterFeature.IsRecognized = perimeterFeature.FeatureType != PossibleFeatureTypes.Unknown;
-                perimeterFeature.SetLineRecognition();
                 featToAdd.Add(perimeterFeature);
             }
         }

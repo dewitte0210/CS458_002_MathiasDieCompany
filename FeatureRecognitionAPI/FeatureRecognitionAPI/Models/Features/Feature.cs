@@ -16,8 +16,26 @@ using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 public class Feature
 {
-    [JsonProperty] public PossibleFeatureTypes FeatureType { get; set; }
-    
+    private PossibleFeatureTypes? _featureType;
+    [JsonProperty]
+    public PossibleFeatureTypes? FeatureType
+    {
+        get { return _featureType; }
+        set
+        {
+            _featureType = value;
+            bool isRecognized = FeatureType != PossibleFeatureTypes.Unknown;
+        
+            EntityList?.ForEach(e => e.IsRecognized = isRecognized);
+            baseEntityList?.ForEach(e => e.IsRecognized = isRecognized);
+            ExtendedEntityList?.ForEach(e => e.IsRecognized = isRecognized);
+            PerimeterFeatureList?.ForEach(eList =>
+            {
+                eList?.EntityList.ForEach(e => e.IsRecognized = isRecognized);
+            });
+        }
+    }
+
     [JsonProperty] public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty] public bool KissCut;
     [JsonProperty] public int multipleRadius;
@@ -25,7 +43,6 @@ public class Feature
     [JsonProperty] public double perimeter;
     [JsonProperty] public double diameter;
     [JsonProperty] public int count;
-    public bool? IsRecognized { get; set; }
     //[JsonProperty] public int NumChamfers = 0;
     public List<ChamferGroup> ChamferList = new List<ChamferGroup>();
 
@@ -218,6 +235,14 @@ public class Feature
         CheckGroup6Perimeter();
         CheckGroup9();
         CheckGroup17();
+
+        foreach (Feature feature in PerimeterFeatureList)
+        {
+            if (feature.FeatureType == null)
+            {
+                feature.FeatureType = PossibleFeatureTypes.Unknown;
+            }
+        }
             
         //calculate and set the perimeter of the feature
         CalcPerimeter();
@@ -2256,34 +2281,6 @@ public class Feature
         }
     }
 
-    public void SetLineRecognition()
-    {
-        IsRecognized = FeatureType != PossibleFeatureTypes.Unknown;
-        //TODO: clean this up
-        foreach (Entity e in EntityList)
-        {
-            e.IsRecognized = IsRecognized;
-        }
-        
-        foreach (Entity e in baseEntityList)
-        {
-            e.IsRecognized = IsRecognized;
-        }
-        
-        foreach (Entity e in ExtendedEntityList)
-        {
-            e.IsRecognized = IsRecognized;
-        }
-
-        foreach (Feature perimeterFeature in PerimeterFeatureList)
-        {
-            foreach (Entity e in perimeterFeature.EntityList)
-            {
-                e.IsRecognized = IsRecognized;
-            }
-        }
-    }
-
     //todo: better name for this
     public static void DistributeFeatureRecognitionData(List<Feature> features)
     {
@@ -2291,24 +2288,22 @@ public class Feature
     }
     public static void DistributeFeatureRecognitionData(List<Feature> featuresA, List<Feature> featuresB)
     {
-        foreach (Feature f1 in featuresA)
+        for (int i = 0; i < featuresA.Count; ++i)
         {
-            if (f1.IsRecognized == null)
+            Feature f1 = featuresA[i];
+            if (f1.FeatureType == null)
             {
                 f1.ExtendAllEntities();
                 f1.SeperateBaseEntities();
                 f1.SeperatePerimeterEntities();
                 f1.DetectFeatures();
             }
-            foreach (Feature f2 in featuresB)
+
+            for (int j = i; j < featuresB.Count; j++)
             {
-                //intentional reference comparison
-                if (f1 == f2)
-                {
-                    continue;
-                }
-                
-                if (f2.IsRecognized == null)
+                Feature f2 = featuresB[j];
+
+                if (f2.FeatureType == null)
                 {
                     f2.ExtendAllEntities();
                     f2.SeperateBaseEntities();
@@ -2320,29 +2315,8 @@ public class Feature
                 {
                     continue;
                 }
-
-                if (f1.IsRecognized == null && f2.IsRecognized == null)
-                {
-                    continue;
-                }
-
-                if (f1.IsRecognized != null && f2.IsRecognized != null)
-                {
-                    continue;
-                }
-
-                if (f1.IsRecognized != null)
-                {
-                    //now we need to do the same thing but with perimeter features
-                    f2.FeatureType = f1.FeatureType;
-                    f2.SetLineRecognition();
-                }
-                else
-                {
-                    f1.FeatureType = f2.FeatureType;
-                    f1.SetLineRecognition();
-                }
-
+                
+                //now we need to do the same thing but with perimeter features
                 if (f1.PerimeterFeatureList.Count > 0 || f2.PerimeterFeatureList.Count > 0)
                 {
                     DistributeFeatureRecognitionData(f1.PerimeterFeatureList, f2.PerimeterFeatureList);
