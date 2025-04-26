@@ -2274,48 +2274,4 @@ public class Feature
             }
         }
     }
-
-    //todo: better name for this
-    public static void DistributeFeatureRecognitionData(List<Feature> features)
-    {
-        DistributeFeatureRecognitionData(features, features);
-    }
-    public static void DistributeFeatureRecognitionData(List<Feature> featuresA, List<Feature> featuresB)
-    {
-        for (int i = 0; i < featuresA.Count; ++i)
-        {
-            Feature f1 = featuresA[i];
-            if (f1.FeatureType == null)
-            {
-                f1.ExtendAllEntities();
-                f1.SeperateBaseEntities();
-                f1.SeperatePerimeterEntities();
-                f1.DetectFeatures();
-            }
-
-            for (int j = i; j < featuresB.Count; j++)
-            {
-                Feature f2 = featuresB[j];
-
-                if (f2.FeatureType == null)
-                {
-                    f2.ExtendAllEntities();
-                    f2.SeperateBaseEntities();
-                    f2.SeperatePerimeterEntities();
-                    f2.DetectFeatures();
-                }
-
-                if (!f1.Equals(f2))
-                {
-                    continue;
-                }
-                
-                //now we need to do the same thing but with perimeter features
-                if (f1.PerimeterFeatureList.Count > 0 || f2.PerimeterFeatureList.Count > 0)
-                {
-                    DistributeFeatureRecognitionData(f1.PerimeterFeatureList, f2.PerimeterFeatureList);
-                }
-            }
-        }
-    }
 }

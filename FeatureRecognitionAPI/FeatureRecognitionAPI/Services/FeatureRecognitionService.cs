@@ -55,9 +55,16 @@ namespace FeatureRecognitionAPI.Services
 
             supportedFile.DetectAllFeatureTypes();
 
+            //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
             if (supportedFile.FeatureGroups.Any(group => group.Count > 1))
             {
-                Feature.DistributeFeatureRecognitionData(supportedFile.FeatureList);
+                foreach (Feature feature in supportedFile.FeatureList)
+                {
+                   feature.ExtendAllEntities();
+                   feature.SeperateBaseEntities();
+                   feature.SeperatePerimeterEntities();
+                   feature.DetectFeatures();
+                }
             }
             
             List<Entity> touchingEntityList = new List<Entity>();
