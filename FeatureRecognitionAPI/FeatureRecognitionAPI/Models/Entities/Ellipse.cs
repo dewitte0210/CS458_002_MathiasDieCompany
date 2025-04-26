@@ -2,10 +2,10 @@
 
 namespace FeatureRecognitionAPI.Models
 {
-    /**
-     * Class that represents a Ellipse object that extends Entity
-     * Inherits entityType and Length fields
-     */
+    /// <summary>
+    /// Class that represents a Ellipse object that extends Entity
+    /// Inherits entityType and Length fields
+    /// </summary>
     public class Ellipse : Entity
     {
         public Point Center { get; set; }
@@ -18,7 +18,7 @@ namespace FeatureRecognitionAPI.Models
         public double EndParameter { get; set; }
         public double Rotation { get; set; }
         public bool IsFullEllipse { get; set; }
-        private Ellipse() { }
+        
         public Ellipse(double centerX, double centerY, double majorAxisXValue,
             double majorAxisYValue, double minorToMajorAxisRatio,
             double startParameter, double endParameter)
@@ -84,11 +84,11 @@ namespace FeatureRecognitionAPI.Models
             return 4 * majorAxis * Math.PI / (2 * a) * (1 - total);
         }
 
-        /**
-         * This function breaks down the perimeter of the partial ellipse into a series of small lines that
-         * follow the actual perimeter of the partial ellipse. It is an accurate estimate of the perimeter
-         * since an exact formula does not exist.
-         */
+        /// <summary>
+        /// This function breaks down the perimeter of the partial ellipse into a series of small lines that
+        /// follow the actual perimeter of the partial ellipse. It is an accurate estimate of the perimeter
+        /// since an exact formula does not exist.
+        /// </summary>
         private double partialPerimterCalc()
         {
             //Major axis value
@@ -123,14 +123,13 @@ namespace FeatureRecognitionAPI.Models
             }
             return sum;
         }
-
-        /**
-         * Calculates the coordinate on an ellipse given the angle in radians.
-         * 
-         * @Param a - Major axis value
-         * @PAram b - Minor axis value
-         * @Param angle - angle of coordinate desired
-         */
+        
+        /// <summary>
+        /// Calculates the coordinate on an ellipse given the angle in radians.
+        /// </summary>
+        /// <param name="a"> Major axis value </param>
+        /// <param name="b"> Minor axis value </param>
+        /// <param name="angle"> angle of coordinate desired </param>
         internal Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
         {
             double x1;
@@ -194,9 +193,9 @@ namespace FeatureRecognitionAPI.Models
             return new Line(Center.X, Center.Y, endPoint.X + Center.X, endPoint.Y + Center.Y);
         }
 
-        /**
-         * Checks if a given point on the ellipse is in range of the parameter boundaries
-         */
+        /// <summary>
+        /// Checks if a given point on the ellipse is in range of the parameter boundaries
+        /// </summary>
         internal bool isInEllipseRange(Point point)
         {
             double y = point.Y - Center.Y;

@@ -7,7 +7,8 @@ namespace FeatureRecognitionAPI.Models.Features;
 public class FeatureGroup
 {
     // todo: just make Count return length of feature list
-    public int Count { get; set; } //Track how many feature groups of this type are found
+    //Track how many feature groups of this type are found
+    public int Count { get; set; }
     private int totalArcs;
     private int totalLines;
     private int totalCircles;
@@ -113,7 +114,9 @@ public class FeatureGroup
         return this.features;
     }
         
-    //Check of all features in the group have a corresponding feature in other group, return true if they do
+    /// <summary>
+    /// Check of all features in the group have a corresponding feature in other group, return true if they do 
+    /// </summary>
     public override bool Equals(object? obj)
     {
         if (!(obj is FeatureGroup) || obj == null)
