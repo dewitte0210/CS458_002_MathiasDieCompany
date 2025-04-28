@@ -5,6 +5,7 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
 using FeatureRecognitionAPI.Services;
+using Entity = FeatureRecognitionAPI.Models.Entities.Entity;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -79,7 +80,8 @@ namespace FeatureRecognitionAPI.Models
                 int count = 0;
                 for (int j = i+1; j < EntityList.Count; j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 {
-                    if (!EntityList[i].DoesIntersect(EntityList[j]))
+                    //if (!EntityList[i].DoesIntersect(EntityList[j]))
+                    if (!Intersect.DoesIntersect(EntityList[i], EntityList[j]))
                     {
                         continue;
                     }

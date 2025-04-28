@@ -1,5 +1,3 @@
-using ACadSharp.Entities;
-using DecimalMath;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
 
 namespace FeatureRecognitionAPI.Models.Utility;
@@ -47,7 +45,7 @@ public static class EntityTools
         //if parallel do not extend 
         if (IsParallel(line1, line2)) return false;
 
-        Point? intPoint = Intersect.GetIntersectPoint(line1, line2);
+        Point? intPoint = Intersect.GetInfiniteLineIntersect(line1, line2);
         if (intPoint == null) return false;
         
         // todo: update line adjacency lists

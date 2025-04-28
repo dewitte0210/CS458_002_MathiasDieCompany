@@ -562,8 +562,9 @@ namespace Testing_for_Project
                           + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
             DXFFile exampleFile = new DXFFile(path);
             exampleFile.DetectAllFeatureTypes();
+            int numChamfers = GetNumChamferFeatures(exampleFile.FeatureGroups);
             
-            Assert.That(GetNumChamferFeatures(exampleFile.FeatureGroups), Is.EqualTo(1));
+            Assert.That(numChamfers, Is.EqualTo(1));
         }
         
         [Test]
