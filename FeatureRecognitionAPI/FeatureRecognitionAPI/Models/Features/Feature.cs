@@ -144,13 +144,9 @@ public class Feature
     
     #region FeatureDetection
 
-    public void CountEntities()
-    {
-        CountEntities(EntityList, out numLines, out numArcs, out numCircles, out numEllipses);
-    }
 
     /// <summary>
-    /// Counts the Lines, Arcs, and Circles in the EntityList.
+    /// Counts the entities in the EntityList.
     /// </summary>
     /// <param name="entityList"> the list that is being looped through. Note that it is passed by reference
     /// and any changes to the list in this function will change the list in the scope of wherever this

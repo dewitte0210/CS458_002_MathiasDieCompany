@@ -62,7 +62,7 @@ namespace FeatureRecognitionAPI.Models
             //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
             if (FeatureGroups.Any(group => group.Count > 1))
             {
-                foreach (Feature feature in FeatureList)
+                foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
                 {
                    feature.ExtendAllEntities();
                    feature.SeperateBaseEntities();
@@ -176,8 +176,6 @@ namespace FeatureRecognitionAPI.Models
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
-                //TODO: delete?
-                feature.CountEntities();
             }
         }
         
