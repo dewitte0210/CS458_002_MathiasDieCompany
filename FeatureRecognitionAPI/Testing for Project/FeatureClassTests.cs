@@ -559,7 +559,7 @@ namespace Testing_for_Project
             string path2 = Directory.GetCurrentDirectory();
             int stringTrim = path2.IndexOf("Testing");
             string path = path2.Substring(0, stringTrim) 
-                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-002.dxf";
+                          + "FeatureRecognitionAPI\\ExampleFiles\\Example-002-single-pattern.dxf";
             DXFFile exampleFile = new DXFFile(path);
             exampleFile.DetectAllFeatureTypes();
             int numChamfers = GetNumChamferFeatures(exampleFile.FeatureGroups);

@@ -49,6 +49,12 @@ public static class Intersect
         if (entity1 is Circle || entity2 is Circle) return null;
 
         // todo: implement arc-ellipse and ellipse-ellipse intersect
+        
+        // If the endpoints are touching we can avoid the intersect math 
+        if (Equals(entity1.Start, entity2.Start)) return entity1.Start;
+        if (Equals(entity1.Start, entity2.End)) return entity1.Start;
+        if (Equals(entity1.End, entity2.End)) return entity1.End;
+        if (Equals(entity1.End, entity2.Start)) return entity1.End;
 
         if (entity1 is Line line1)
         {
@@ -80,7 +86,6 @@ public static class Intersect
                     return FindIntersectPointHelper(line2, ellipse1);
             }
         }
-
         return null;
     }
 
@@ -131,14 +136,20 @@ public static class Intersect
         double x = CrossProduct(d, xDiff) / diffCross;
         double y = CrossProduct(d, yDiff) / diffCross;
 
-
         bool withinX = x >= Math.Min(line1.Start.X, line2.Start.X) - DoubleTolerance
                        && x <= Math.Max(line1.End.X, line2.End.X) + DoubleTolerance;
         bool withinY = y >= Math.Min(line1.Start.Y, line2.Start.Y) - DoubleTolerance
                        && x <= Math.Max(line1.End.Y, line2.End.Y) + DoubleTolerance;
 
+        // use the old line-line intersect function behavior
+        if (true)
+        {
+            if (IsParallel(line1, line2)) return null;
+        }
+        
         if (withinX && withinY) return new Point(x, y);
         return null;
+    
     }
     
     // line with arc
@@ -421,13 +432,6 @@ public static class Intersect
     // arc with arc
     internal static Point? FindIntersectPointHelper(Arc arc1, Arc arc2)
     {
-        // If the endpoints are touching we can avoid the intersect math 
-        if (Equals(arc1.Start, arc2.Start)) return arc1.Start;
-        if (Equals(arc1.Start, arc2.End)) return arc1.Start;
-        if (Equals(arc1.End, arc2.End)) return arc1.End;
-        if (Equals(arc1.End, arc2.Start)) return arc1.End;
-
-
         // Treat both Arcs circles, get the line between their centers
         Line between = new Line(arc1.Center.X, arc1.Center.Y, arc2.Center.X, arc2.Center.Y);
 
@@ -467,6 +471,4 @@ public static class Intersect
         if (intersect2IsValid) return new Point(intersect2X, intersect2Y);
         return null;
     }
-
-
 }

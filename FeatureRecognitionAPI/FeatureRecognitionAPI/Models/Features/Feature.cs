@@ -1382,13 +1382,6 @@ public class Feature
                     }
                 }
             }
-
-
-            
-            
-            
-            
-            
         }
     }
     
@@ -1903,7 +1896,7 @@ public class Feature
 
     private void ChangeAdjListForExtendedLine(ExtendedLine exLine, Line line1, Line line2)
     {
-        // maeke the extended line's adjacency list
+        // make the extended line's adjacency list
         exLine.AdjList = new List<Entity>(line1.AdjList);
         exLine.AdjList.AddRange(line2.AdjList);
         exLine.AdjList.Remove(line1);
