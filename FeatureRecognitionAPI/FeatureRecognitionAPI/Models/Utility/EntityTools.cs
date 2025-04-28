@@ -99,8 +99,8 @@ public static class EntityTools
         }
 
         // update Length because for some reason it isn't a function
-        line1.Length = Point.Distance(line1.Start, line1.End);
-        line2.Length = Point.Distance(line2.Start, line2.End);
+        //line1.Length = Point.Distance(line1.Start, line1.End);
+        //line2.Length = Point.Distance(line2.Start, line2.End);
 
         return true;
     }

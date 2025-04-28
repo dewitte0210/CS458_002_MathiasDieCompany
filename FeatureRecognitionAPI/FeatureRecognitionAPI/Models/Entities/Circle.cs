@@ -49,8 +49,13 @@ namespace FeatureRecognitionAPI.Models
             return 2 * Math.PI * radius;
         }
 
+        public override double GetLength()
+        {
+            return CalcPerimeter(Radius);
+        }
+
         /// <summary>
-        /// Overides .Equals function for the Arc object
+        /// Overrides .Equals function for the Arc object
         /// </summary>
         /// <param name="obj"> the object that is being compared </param>
         /// <returns> true if equal, otherwise false </returns>

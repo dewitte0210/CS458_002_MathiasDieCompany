@@ -14,7 +14,8 @@ namespace FeatureRecognitionAPI.Models
     {
         // todo: make length a get function because it should never change
         // without underlying properties changing
-        public double Length { get; set; }//length of the entity
+        public double Length { get; init; }//length of the entity
+        
         public Point Start { get; set; }
         public Point End { get; set; }
         [JsonIgnore] public List<Entity> AdjList { get; set; }
@@ -33,7 +34,7 @@ namespace FeatureRecognitionAPI.Models
         }
         
         // todo: implement getLength()
-        //public abstract double GetLength();
+        public abstract double GetLength();
         
         /// <summary>
         /// Function that checks if this entity intersects with another entity
@@ -484,7 +485,7 @@ namespace FeatureRecognitionAPI.Models
                 double b = -2 * Al * Cl;
                 double c = Math.Pow(Cl, 2) - (Math.Pow(Bl, 2) * Math.Pow(minor, 2));
                 //List of x value solns
-                List<double> xSolns = QuadraticFormula(a, b, c);
+                List<double> xSolns = MdcMath.QuadraticFormula(a, b, c);
                 bool firstSoln = false;
                 for (int i = 0; i < xSolns.Count; i++)
                 {
@@ -543,41 +544,6 @@ namespace FeatureRecognitionAPI.Models
                    Start.Equals(e2.End) ||
                    End.Equals(e2.Start) ||
                    End.Equals(e2.End);
-        }
-
-        // todo: move to entityTools
-        /**
-         * Function that finds at what point two lines intersect when they are treated as infinite
-         * this is mostly for the perpendicular line check, which is commented out
-         * 
-         * @param line1 is the first line being checked
-         * @param line2 is the second line being checked
-         * @return the point that line1 and line2 intersects. The points intersect field will be false if they are parallel
-         */
-        public static Point? GetIntersectPoint(Line line1, Line line2)
-        {
-            Point intersectPoint = new Point();
-            double y1 = line1.End.Y - line1.Start.Y;
-            double x1 = line1.End.X - line1.Start.X;
-            double C1 = y1 * line1.Start.X + x1 * line1.Start.Y;
-
-            double y2 = line2.End.Y - line2.Start.Y;
-            double x2 = line2.End.X - line2.Start.X;
-            double C2 = y2 * line2.Start.X + x2 * line2.Start.Y;
-
-            double delta = y1 * x2 - y2 * x1;
-
-            // Lines are parallel and thus cannot intersect
-            intersectPoint.intersect = MdcMath.DoubleEquals(delta, 0);
-
-            if (!intersectPoint.intersect)
-            {
-                return null;
-            }
-
-            // Intersection point
-            intersectPoint.setPoint(((x1 * C2 - x2 * C1) / delta), ((y1 * C2 - y2 * C1) / delta));
-            return intersectPoint;
         }
 
         internal static Point GetIntersectPoint(Line line, Arc arc)
@@ -642,7 +608,7 @@ namespace FeatureRecognitionAPI.Models
                 //  Special case for vertical line
                 if (line.End.X == line.Start.X)
                 {
-                    double[] tempSolns = QuadraticFormula(
+                    double[] tempSolns = MdcMath.QuadraticFormula(
                         1, 
                         (-2 * arc.Center.Y), 
                         (Math.Pow(arc.Center.Y, 2) + Math.Pow((line.End.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2))
@@ -780,7 +746,7 @@ namespace FeatureRecognitionAPI.Models
                 double b = -2 * Al * Cl;
                 double c = Math.Pow(Cl, 2) - (Math.Pow(Bl, 2) * Math.Pow(minor, 2));
                 //List of x value solns
-                List<double> xSolns = QuadraticFormula(a, b, c);
+                List<double> xSolns = MdcMath.QuadraticFormula(a, b, c);
                 bool firstSoln = false;
                 for (int i = 0; i < xSolns.Count; i++)
                 {
@@ -820,32 +786,7 @@ namespace FeatureRecognitionAPI.Models
             }
             return null;
         }
-
-        // todo: move to MDCMath
         
-        /// <summary>
-        /// Solves the quadratic formula
-        /// </summary>
-        /// <returns> List of solutions </returns>
-        internal static List<double> QuadraticFormula(double a, double b, double c)
-        {
-            List<double> solns = new List<double>();
-            if (a == 0) { return solns; }
-            double insideSqrt = Math.Pow(b, 2) - (4 * a * c);
-            //Two real solutions
-            if (insideSqrt > 0)
-            {
-                solns.Add(((-1 * b) + Math.Sqrt(insideSqrt)) / (2 * a));
-                solns.Add(((-1 * b) - Math.Sqrt(insideSqrt)) / (2 * a));
-            }
-            //One real solution
-            else if (insideSqrt == 0)
-            {
-                solns.Add((-1 * b) / (2 * a));
-            }
-            return solns;
-
-        }
         public abstract override bool Equals(object? obj);
 
         /// <returns> Return true when entities compared have similar traits,

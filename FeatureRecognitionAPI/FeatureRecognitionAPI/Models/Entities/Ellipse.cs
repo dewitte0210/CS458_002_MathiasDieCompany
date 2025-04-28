@@ -247,6 +247,11 @@ namespace FeatureRecognitionAPI.Models
             return pointAngle >= Math.Round(StartParameter, 4) && pointAngle <= Math.Round(EndParameter, 4);
         }
 
+        public override double GetLength()
+        {
+            return (IsFullEllipse)? fullPerimeterCalc() : partialPerimterCalc();
+        }
+
         //TODO: finish this
         public override bool Equals(object? obj)
         {
@@ -509,7 +514,7 @@ namespace FeatureRecognitionAPI.Models
             double squaredCoef = A + (slope * ((C * slope) + E));
             double linearCoef = intercept * ((2 * C * slope) + E) + B + (D * slope);
             double delta = intercept * ((C * intercept) + D) + alpha;
-            return QuadraticFormula(squaredCoef, linearCoef, delta);
+            return MdcMath.QuadraticFormula(squaredCoef, linearCoef, delta);
         }
         #endregion
 

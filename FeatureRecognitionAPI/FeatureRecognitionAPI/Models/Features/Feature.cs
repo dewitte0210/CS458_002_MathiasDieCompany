@@ -724,7 +724,8 @@ public class Feature
             numIntersections++;
             if (baseEntityList[i] is Line line)
             {
-                Point? intersection = Entity.GetIntersectPoint(ray, line);
+                //Point? intersection = Entity.GetIntersectPoint(ray, line);
+                Point? intersection = EntityTools.GetIntersection(ray, line);
                 if (intersection == null)
                 {
                     continue;
@@ -869,9 +870,10 @@ public class Feature
                 newLine2 = tempLine4;
             }
         }
-        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4)) 
-            && newLine1.isPerpendicular(baseLine1) && newLine1.isPerpendicular(baseLine2) 
-            && newLine2.isPerpendicular(baseLine1) && newLine2.isPerpendicular(baseLine2);
+
+        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4))
+               && IsPerpendicular(newLine1, baseLine1) && IsPerpendicular(newLine1, baseLine2)
+               && IsPerpendicular(newLine2, baseLine1) && IsPerpendicular(newLine2, baseLine2);
     }
 
     /// <summary>
