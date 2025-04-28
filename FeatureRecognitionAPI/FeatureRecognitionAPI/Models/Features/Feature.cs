@@ -724,7 +724,7 @@ public class Feature
             numIntersections++;
             if (baseEntityList[i] is Line line)
             {
-                Point? intersection = EntityTools.GetIntersectPoint(ray, line);
+                Point? intersection = Intersect.GetIntersectPoint(ray, line);
                 if (intersection == null)
                 {
                     continue;
@@ -735,7 +735,7 @@ public class Feature
             }
             else if (baseEntityList[i] is Arc arc1)
             {
-                Point? intersection = EntityTools.GetIntersectPoint(ray, arc1);
+                Point? intersection = Intersect.GetIntersectPoint(ray, arc1);
                 if (intersection == null)
                 {
                     continue;
@@ -749,7 +749,7 @@ public class Feature
 
             else if (baseEntityList[i] is Ellipse ellipse)
             {
-                Point? intersection = EntityTools.GetIntersectPoint(ray, ellipse);
+                Point? intersection = Intersect.GetIntersectPoint(ray, ellipse);
                 if (intersection == null)
                 {
                     continue;
@@ -869,9 +869,10 @@ public class Feature
                 newLine2 = tempLine4;
             }
         }
-        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4)) 
-            && newLine1.isPerpendicular(baseLine1) && newLine1.isPerpendicular(baseLine2) 
-            && newLine2.isPerpendicular(baseLine1) && newLine2.isPerpendicular(baseLine2);
+
+        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4))
+               && IsPerpendicular(newLine1, baseLine1) && IsPerpendicular(newLine1, baseLine2)
+               && IsPerpendicular(newLine2, baseLine1) && IsPerpendicular(newLine2, baseLine2);
     }
 
     /// <summary>
@@ -947,7 +948,7 @@ public class Feature
             // Flip end points for calc if they are touching the smaller arc
             for (int i = 0; i < lines.Count; i++)
             {
-                Point intersect = EntityTools.GetIntersectPoint(lines[i], biggerArc);
+                Point intersect = Intersect.GetIntersectPoint(lines[i], biggerArc);
                 if (!lines[i].End.Equals(intersect))
                 {
                     Point temp = lines[i].Start;
@@ -1562,22 +1563,24 @@ public class Feature
                     }
                 }
             }
-            
+
             //check for chamfer
             if (feature.EntityList.Count == 1)
             {
-                    Point? LineAIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
-                    Point? LineBIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
+                Point? LineAIntersect =
+                    Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
+                Point? LineBIntersect =
+                    Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
 
-                    if (LineAIntersect == null || LineBIntersect == null)
-                    {
-                        return;
-                    }
-                    
-                    
+                /*
+                if (LineAIntersect == null || LineBIntersect == null)
+                {
+                    return;
+                }
+                */
             }
         }
-        
+
         // for (int i = 0; i < PerimeterFeatureList.Count(); i++)
         // {
         //     if (PerimeterFeatureList[i] == 1 && PerimeterFeatureList[i] is Line line)
@@ -1602,9 +1605,7 @@ public class Feature
         //     
         // }
 
-        
-        
-        
+
         // check if a line that is not in base shape is touching kiss-cut line in adjacency list
 
         /*if (numLines == 4)
@@ -1613,9 +1614,8 @@ public class Feature
             // set list as Kiss-Cut
         }*/
         // loop through baseEntityList, if a line is kiss cut kisscut=True, then return
-        
-        
     }
+
 
     #endregion
 

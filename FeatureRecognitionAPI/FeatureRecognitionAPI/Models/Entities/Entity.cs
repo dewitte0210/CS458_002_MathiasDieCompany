@@ -14,7 +14,8 @@ namespace FeatureRecognitionAPI.Models
     {
         // todo: make length a get function because it should never change
         // without underlying properties changing
-        public double Length { get; set; }//length of the entity
+        public double Length { get; init; }//length of the entity
+        
         public Point Start { get; set; }
         public Point End { get; set; }
         [JsonIgnore] public List<Entity> AdjList { get; set; }
@@ -33,7 +34,7 @@ namespace FeatureRecognitionAPI.Models
         }
         
         // todo: implement getLength()
-        //public abstract double GetLength();
+        public abstract double GetLength();
         
         /// <summary>
         /// Function that checks if this entity intersects with another entity
@@ -484,7 +485,7 @@ namespace FeatureRecognitionAPI.Models
                 double b = -2 * Al * Cl;
                 double c = Math.Pow(Cl, 2) - (Math.Pow(Bl, 2) * Math.Pow(minor, 2));
                 //List of x value solns
-                List<double> xSolns = QuadraticFormula(a, b, c);
+                List<double> xSolns = MdcMath.QuadraticFormula(a, b, c);
                 bool firstSoln = false;
                 for (int i = 0; i < xSolns.Count; i++)
                 {
@@ -545,33 +546,6 @@ namespace FeatureRecognitionAPI.Models
                    End.Equals(e2.End);
         }
 
-        // todo: move to entityTools
-        
-        // todo: move to MDCMath
-        
-        /// <summary>
-        /// Solves the quadratic formula
-        /// </summary>
-        /// <returns> List of solutions </returns>
-        internal static List<double> QuadraticFormula(double a, double b, double c)
-        {
-            List<double> solns = new List<double>();
-            if (a == 0) { return solns; }
-            double insideSqrt = Math.Pow(b, 2) - (4 * a * c);
-            //Two real solutions
-            if (insideSqrt > 0)
-            {
-                solns.Add(((-1 * b) + Math.Sqrt(insideSqrt)) / (2 * a));
-                solns.Add(((-1 * b) - Math.Sqrt(insideSqrt)) / (2 * a));
-            }
-            //One real solution
-            else if (insideSqrt == 0)
-            {
-                solns.Add((-1 * b) / (2 * a));
-            }
-            return solns;
-
-        }
         public abstract override bool Equals(object? obj);
 
         /// <returns> Return true when entities compared have similar traits,

@@ -6,10 +6,8 @@ namespace FeatureRecognitionAPI.Models
 {
     public class Line : Entity
     {
-        private const double TOLERANCE = 0.00005;
-
-        public double SlopeY { get; set; }
-        public double SlopeX { get; set; }
+        public double SlopeY { get; init; }
+        public double SlopeX { get; init; }
 
         // Don't Delete. Called from ExtendedLine constructor
         protected Line()
@@ -78,50 +76,32 @@ namespace FeatureRecognitionAPI.Models
             return (Start.Equals(point) || End.Equals(point));
         }
 
-        [Obsolete("Line isParallel is deprecated, please use Angles isParallel in Utility.")]
-        public bool isParallel(Line line)
-        {
-            // Vertical line case
-            if (Math.Abs(this.SlopeX) < Entity.EntityTolerance && Math.Abs(line.SlopeX) < Entity.EntityTolerance) { return true; }
-            // Horizontal line case
-            if (Math.Abs(this.SlopeY) < Entity.EntityTolerance && Math.Abs(line.SlopeY) < Entity.EntityTolerance) { return true; }
-            // One line is vertical while the other is not
-            if (Math.Abs(this.SlopeX) < Entity.EntityTolerance || Math.Abs(line.SlopeX) < Entity.EntityTolerance) { return false; }
-            return Math.Round(this.SlopeY / this.SlopeX, 4).Equals(Math.Round(line.SlopeY / line.SlopeX, 4));
-        }
-
-        private static bool withinTolerance(double value, double target)
-        {
-            return ((value <= (target + TOLERANCE)) && (value >= (target - TOLERANCE)));
-        }
-
         public bool isSameInfiniteLine(Entity other)
         {
             if (other is Line lineOther)
             {
-                if (this.SlopeX > -0.00005 && this.SlopeX < 0.00005) // means this is a verticle line
+                if (this.SlopeX > -0.00005 && this.SlopeX < 0.00005) // means this is a vertical line
                 {
-                    if (withinTolerance(lineOther.SlopeX, 0)) // means other is a verticle line
+                    if (MdcMath.DoubleEquals(lineOther.SlopeX, 0)) // means other is a vertical line
                     {
-                        return (withinTolerance(this.Start.X,
-                            lineOther.Start.X)); // checks that the x values are within .00005 of each other
+                        // checks that the x values are within .00005 of each other
+                        return (MdcMath.DoubleEquals(this.Start.X, lineOther.Start.X));
                     }
                     else
                     {
-                        return false; // both have to be a verticle line
+                        return false; // both have to be a vertical line
                     }
                 }
-                else if (withinTolerance(lineOther.SlopeX, 0))
+                else if (MdcMath.DoubleEquals(lineOther.SlopeX, 0))
                 {
-                    return false; // means other is a verticle line but this is not
+                    return false; // means other is a vertical line but this is not
                 }
 
                 double ThisYintercept = this.Start.Y - ((this.SlopeY / this.SlopeX) * this.Start.X);
-                double OtherYintercept = lineOther.Start.Y -
-                                         ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.Start.X);
-                if (withinTolerance(Math.Abs(this.SlopeY / this.SlopeX),
-                        Math.Abs(lineOther.SlopeY / lineOther.SlopeX)) &&
-                    withinTolerance(ThisYintercept, OtherYintercept))
+                double OtherYintercept = lineOther.Start.Y - ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.Start.X);
+                if (MdcMath.DoubleEquals(Math.Abs(this.SlopeY / this.SlopeX), 
+                        Math.Abs(lineOther.SlopeY / lineOther.SlopeX)) 
+                    && MdcMath.DoubleEquals(ThisYintercept, OtherYintercept))
                 {
                     return true;
                 }
@@ -130,27 +110,9 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        [Obsolete("Line isPerpendicular is deprecated, please use Angles isPerpendicular in Utility.")]
-        public bool isPerpendicular(Entity other)
+        public override double GetLength()
         {
-            if (other is Line lineOther)
-            {
-                // Vertical slope edge cases
-                if (Math.Round(this.Start.X, 4).Equals(Math.Round(this.End.X, 4)) && Math.Round(lineOther.Start.Y, 4).Equals(Math.Round(lineOther.End.Y, 4)))
-                {
-                    return true;
-                }
-                else if (Math.Round(this.Start.Y, 4).Equals(Math.Round(this.End.Y, 4)) && Math.Round(lineOther.Start.X, 4).Equals(Math.Round(lineOther.End.X, 4)))
-                {
-                    return true;
-                }
-                if ((this.SlopeY / this.SlopeX) == (-1 * (lineOther.SlopeX / lineOther.SlopeY)))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return Point.Distance(Start, End);
         }
 
         public override bool Equals(object? obj)

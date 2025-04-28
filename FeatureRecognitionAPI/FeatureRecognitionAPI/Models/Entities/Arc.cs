@@ -36,6 +36,11 @@ public class Arc : Entity
         CentralAngle = CalcCentralAngle(startAngle, endAngle);
         Length = (CalcLength(radius, CentralAngle));
     }
+
+    public override double GetLength()
+    {
+        return CalcLength(Radius, CentralAngle);
+    }
     
     /// <summary>
     /// Function to calculate the x coordinate given the center point, Radius

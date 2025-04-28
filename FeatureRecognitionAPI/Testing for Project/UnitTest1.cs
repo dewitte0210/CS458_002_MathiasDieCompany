@@ -1,6 +1,7 @@
 using ACadSharp;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Utility;
 using NuGet.Frameworks;
 
 namespace Testing_for_Project
@@ -140,7 +141,7 @@ namespace Testing_for_Project
             Line test = new Line(0, 0, 0, 0);
             List<double> solutions1 = new List<double>() { 2, 5 };
             List<double> solutions2 = new List<double>() { 5, 2 };
-            List<double> actual = Entity.QuadraticFormula(1, -7, 10);
+            List<double> actual = MdcMath.QuadraticFormula(1, -7, 10);
             Assert.That((actual[0] == solutions1[0] && actual[1] == solutions1[1]) || (actual[0] == solutions2[0] && actual[1] == solutions2[1]));
         }
 
@@ -159,17 +160,16 @@ namespace Testing_for_Project
             //Parralel lines with start and end points oposite of eachother have the same slope (but will be positive/negative)
             Line line1 = new(1, 1, 3, 3);
             Line line2 = new(3, 3, 1, 1);
-            bool check1 = line1.isParallel(line2);
+            //bool check1 = line1.isParallel(line2);
+            bool check1 = Angles.IsParallel(line1, line2);
             Assert.IsTrue(check1);
 
             //Same x different Y
             Line line3 = new(1, 1, 1, 3);
             Line line4 = new(1, 3, 1, 1);
-            bool check2 = line3.isParallel(line4);
+            //bool check2 = line3.isParallel(line4);
+            bool check2 = Angles.IsParallel(line3, line4);
             Assert.IsTrue(check2);
-
-
-
         }
 
         #region TestingDXF&DWG
