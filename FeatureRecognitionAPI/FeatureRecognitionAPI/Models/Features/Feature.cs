@@ -1560,6 +1560,16 @@ public class Feature
                     {
                         feature.KissCut = true;
                         feature.FeatureType = PossibleFeatureTypes.Group9;
+                        return;
+                    }
+                }
+            }
+            
+            //check for chamfer
+            if (feature.EntityList.Count == 1)
+            {
+                    Point? LineAIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
+                    Point? LineBIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
 
                         /*
                         if (LineAIntersect == null || LineBIntersect == null)
