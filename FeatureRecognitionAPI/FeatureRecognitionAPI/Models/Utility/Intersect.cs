@@ -10,14 +10,6 @@ public static class Intersect
     /// </summary>
     private const int IntersectTolerance = 4;
 
-    /**
-    * Function that finds at what point two lines intersect when they are treated as infinite
-    * this is mostly for the perpendicular line check, which is commented out
-    *
-    * @param line1 is the first line being checked
-    * @param line2 is the second line being checked
-    * @return the point that line1 and line2 intersects. The points intersect field will be false if they are parallel
-    */
     /// <summary>
     /// Finds an intersect point between two entities.
     /// Only really does it for a line and another entity
