@@ -165,12 +165,8 @@ public class PricingDataService : IPricingDataService
          return await WriteToDBFile("BasePrices", _ratesPrices);
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="fileName">filename without extenstion</param>
     /// <param name="obj"></param>
-    /// <returns></returns>
     private async Task<bool> WriteToDBFile(string fileName, Object obj)
     {
         object writeLock = new(); 
