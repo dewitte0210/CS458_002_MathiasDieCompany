@@ -724,8 +724,7 @@ public class Feature
             numIntersections++;
             if (baseEntityList[i] is Line line)
             {
-                //Point? intersection = Entity.GetIntersectPoint(ray, line);
-                Point? intersection = EntityTools.GetIntersection(ray, line);
+                Point? intersection = EntityTools.GetIntersectPoint(ray, line);
                 if (intersection == null)
                 {
                     continue;
@@ -736,7 +735,7 @@ public class Feature
             }
             else if (baseEntityList[i] is Arc arc1)
             {
-                Point? intersection = Entity.GetIntersectPoint(ray, arc1);
+                Point? intersection = EntityTools.GetIntersectPoint(ray, arc1);
                 if (intersection == null)
                 {
                     continue;
@@ -750,7 +749,7 @@ public class Feature
 
             else if (baseEntityList[i] is Ellipse ellipse)
             {
-                Point? intersection = Entity.GetIntersectPoint(ray, ellipse);
+                Point? intersection = EntityTools.GetIntersectPoint(ray, ellipse);
                 if (intersection == null)
                 {
                     continue;
@@ -949,7 +948,7 @@ public class Feature
             // Flip end points for calc if they are touching the smaller arc
             for (int i = 0; i < lines.Count; i++)
             {
-                Point intersect = Entity.GetIntersectPoint(lines[i], biggerArc);
+                Point intersect = EntityTools.GetIntersectPoint(lines[i], biggerArc);
                 if (!lines[i].End.Equals(intersect))
                 {
                     Point temp = lines[i].Start;
@@ -1382,6 +1381,13 @@ public class Feature
                     }
                 }
             }
+
+
+            
+            
+            
+            
+            
         }
     }
     
@@ -1497,6 +1503,44 @@ public class Feature
                 }
             }
         }
+
+
+        // for (int i = 0; i < PerimeterFeatureList.Count(); i++)
+        // {
+        //     // TODO check for chamfur
+        //     if (PerimeterFeatureList[i] == 1 && PerimeterFeatureList[i] is Line line)
+        //     {
+        //         // Break up both of the lines touching the kiss cut line
+        //         Point LineAIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[0]));
+        //         Point LineBIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[1]));
+        //
+        //
+        //         if (LineAIntersect.Equals(line.StartPoint))
+        //         {
+        //             
+        //         }
+        //         else
+        //         {
+        //             
+        //         }
+        //         
+        //         
+        //         
+        //     }
+        //     
+        // }
+
+        
+        
+        
+        // check if a line that is not in base shape is touching kiss-cut line in adjacency list
+
+        /*if (numLines == 4)
+        {
+            // check if a line is kiss cut
+            // set list as Kiss-Cut
+        }*/
+        // loop through baseEntityList, if a line is kiss cut kisscut=True, then return
     }
 
     #endregion
@@ -1515,11 +1559,63 @@ public class Feature
                     {
                         feature.KissCut = true;
                         feature.FeatureType = PossibleFeatureTypes.Group9;
-
+                        return;
                     }
                 }
             }
+            
+            //check for chamfer
+            if (feature.EntityList.Count == 1)
+            {
+                    Point? LineAIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
+                    Point? LineBIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
+
+                    if (LineAIntersect == null || LineBIntersect == null)
+                    {
+                        return;
+                    }
+                    
+                    
+            }
         }
+        
+        // for (int i = 0; i < PerimeterFeatureList.Count(); i++)
+        // {
+        //     if (PerimeterFeatureList[i] == 1 && PerimeterFeatureList[i] is Line line)
+        //     {
+        //         // Break up both of the lines touching the kiss cut line
+        //         Point LineAIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[0]));
+        //         Point LineBIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[1]));
+        //
+        //
+        //         if (LineAIntersect.Equals(line.StartPoint))
+        //         {
+        //             
+        //         }
+        //         else
+        //         {
+        //             
+        //         }
+        //         
+        //         
+        //         
+        //     }
+        //     
+        // }
+
+        
+        
+        
+        // check if a line that is not in base shape is touching kiss-cut line in adjacency list
+
+        /*if (numLines == 4)
+        {
+            // check if a line is kiss cut
+            // set list as Kiss-Cut
+        }*/
+        // loop through baseEntityList, if a line is kiss cut kisscut=True, then return
+        
+        
     }
 
     #endregion
