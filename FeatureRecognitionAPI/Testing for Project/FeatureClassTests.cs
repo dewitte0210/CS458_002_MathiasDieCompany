@@ -801,7 +801,6 @@ namespace Testing_for_Project
         }
 
         [Test]
-
         public void TestSortedFeatureList()
         {
             Line line1 = new(4, 5, 4, 0);
@@ -814,5 +813,72 @@ namespace Testing_for_Project
             bool testBool = testFeature.SeperateBaseEntities();
             Assert.That(testBool, Is.True);
         }
+        
+        #region CornerNotches
+
+        [Test]
+        public void TestCornerNotchPattern1()
+        {
+            Line line1 = new(0, 0, 0, 1);
+            Line line2 = new(0, 1, 0, 2);
+            Line line3 = new(0, 2, 0, 3);
+            Line line4 = new(0, 3, 0, 4);
+            List<Entity> entities = new List<Entity>() { line1, line2, line3, line4 };
+            DXFFile testFile = new DXFFile(entities);
+            testFile.GroupFeatureEntities();
+            List<Entity> cList = testFile.FindCornerNotchPattern();
+            Assert.IsTrue(cList.Count == entities.Count);
+            Assert.IsTrue(cList.All(entities.Contains));
+        }
+        
+        [Test]
+        public void TestCornerNotchPattern2()
+        {
+            Line line1 = new(0, 0, 1, 0);
+            Arc arc1 = new(2, 0, 1, 180, 90);
+            Line line2 = new(2, 1, 2, 2);
+            Line line3 = new(2, 2, 1, 2);
+            Arc arc2 = new(0, 2, 1, 0, 270);
+            Line line4 = new(0, 1, 0, .5);
+            List<Entity> entities = new List<Entity>() { line1, arc1, line2, line3, arc2, line4 };
+            DXFFile testFile = new DXFFile(entities);
+            testFile.GroupFeatureEntities();
+            List<Entity> cList = testFile.FindCornerNotchPattern();
+            Assert.IsTrue(cList.Count == entities.Count);
+            Assert.IsTrue(cList.All(entities.Contains));
+        }
+        
+        [Test]
+        public void TestCornerNotchWeirdPattern()
+        {
+            Line line1 = new(0, 0, 1, 1);
+            Line line2 = new(1, 1, 2, 2);
+            Line line3 = new(2, 2, 1, 2);
+            Line line4 = new(1, 2, 0, 1);
+            Line line5 = new(0, 1, 0, .5);
+            List<Entity> entities = new List<Entity>() { line1, line2, line3, line4, line5 };
+            DXFFile testFile = new DXFFile(entities);
+            testFile.GroupFeatureEntities();
+            List<Entity> cList = testFile.FindCornerNotchPattern();
+            Assert.IsTrue(cList.Count == 4);
+            Assert.IsTrue(cList.All(e => e is Line));
+        }
+        
+        [Test]
+        public void TestCornerNotchFalsePattern2()
+        {
+            Line line1 = new(0, 0, 1, 0);
+            Arc arc1 = new(2, 0, 1, 180, 90);
+            Line line2 = new(2, 1, 2, 2);
+            Line line3 = new(2, 2, 1, 2);
+            Line line4 = new(1, 2, 0, 1);
+            Line line5 = new(0, 1, 0, .5);
+            List<Entity> entities = new List<Entity>() { line1, arc1, line2, line3, line4, line5 };
+            DXFFile testFile = new DXFFile(entities);
+            testFile.GroupFeatureEntities();
+            List<Entity> cList = testFile.FindCornerNotchPattern();
+            Assert.IsTrue(cList.Count == 0);
+        }
+        #endregion
     }
 }

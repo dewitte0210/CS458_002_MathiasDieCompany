@@ -383,11 +383,73 @@ namespace FeatureRecognitionAPI.Models
             }
         }
 
-        public void CornerNotchFlag()
+        /**
+         * Finds a list of touching entities that follow one of two patterns that make up a corner notch:
+         *  1. Line -> Line -> Line -> Line
+         *  2. Line -> Arc -> Line -> Line -> Arc -> Line
+         */
+        public List<Entity> FindCornerNotchPattern()
         {
-            foreach (Feature feature in FeatureList)
+            List<Entity> returned = new List<Entity>();
+            FindCornerNotchPatternHelper(EntityList[0], returned);
+            return returned;
+        }
+        
+        /**
+         *  Helper function to FindCornerNotchPattern
+         *  This is recursive to check entities in touching order.
+         *  Returns true if curEntity leads to one of the patterns
+         */
+        private bool FindCornerNotchPatternHelper(Entity curEntity, List<Entity> path)
+        {
+            // base case: completed list
+            if (path is [_, not Arc, _, _] || path.Count == 6)
             {
+                return true;
             }
+
+            bool added = false;
+            // Expecting second arc while first is in index 1
+            if (path is [_, Arc, _, _])
+            {
+                if (curEntity is Arc)
+                {
+                    path.Add(curEntity);
+                    added = true;
+                }
+                else
+                {
+                    // Can't have just 1 arc in the list
+                    return false;
+                }
+            }
+            // Index 1 can have arc or line
+            else if (path.Count == 1)
+            {
+                if (curEntity is Arc or Line)
+                {
+                    path.Add(curEntity);
+                    added = true;
+                }
+            }
+            else if (curEntity is Line)
+            {
+                path.Add(curEntity);
+                added = true;
+            }
+
+            if (added)
+            {
+                // Go to next entity
+                if (curEntity.AdjList.Where(e => !e.Equals(path[^1])).Any(e => FindCornerNotchPatternHelper(e, path)))
+                {
+                    return true;
+                }
+
+                path.RemoveAt(path.Count - 1);
+            }
+
+            return false;
         }
 
         public void CornerNotchFlagHelper(Line entity)

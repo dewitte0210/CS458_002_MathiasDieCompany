@@ -1822,7 +1822,7 @@ public class Feature
         return false;
     }
 
-    private void ChangeAdjListForExtendedLine(ExtendedLine exLine, Line line1, Line line2)
+    private static void ChangeAdjListForExtendedLine(ExtendedLine exLine, Line line1, Line line2)
     {
         // maeke the extended line's adjacency list
         exLine.AdjList = new List<Entity>(line1.AdjList);
