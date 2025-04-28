@@ -1802,7 +1802,7 @@ public class Feature
             if (line1.isSameInfiniteLine(line2))
             {
                 ExtendedLine tempLine = new ExtendedLine(line1, line2); // makes a new extended line object 
-                ChangeAdjListForExtendedLine(tempLine, line1, line2);
+                //ChangeAdjListForExtendedLine(tempLine, line1, line2);
                 ExtendedEntityList.Remove(line1);
                 ExtendedEntityList.Remove(line2);
                 ExtendedEntityList.Add(tempLine);

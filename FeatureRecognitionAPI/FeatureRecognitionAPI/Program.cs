@@ -1,4 +1,5 @@
 using FeatureRecognitionAPI.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +15,19 @@ builder.Services.AddScoped<IFeatureRecognitionService, FeatureRecognitionService
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IPricingDataService, PricingDataService>();
 
+builder.WebHost.ConfigureKestrel(opts =>
+{
+    opts.ConfigureHttpsDefaults(httpsOpts =>
+    {
+        httpsOpts.ClientCertificateMode = ClientCertificateMode.NoCertificate;
+    });
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FeatureRecognitionPolicy", builder =>
     {
-        builder.WithOrigins("*")
+        builder.WithOrigins("https://mdcestimator.com", "http://localhost", "https://localhost", "*")
                 .WithHeaders(HeaderNames.AccessControlAllowOrigin)
                .AllowAnyMethod() // Temporarily allow any method
                .AllowAnyHeader(); // Temporarily allow any header

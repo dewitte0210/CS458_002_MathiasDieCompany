@@ -188,6 +188,12 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         }
     };
 
+    const CheckAllKissCut = async (event: React.FormEvent) => {
+        setData((prev) => 
+        {
+           return prev.map((feature) => feature.kissCut = !feature.kissCut) 
+        })
+    }
 
     return (
         <div className="quote-container">
@@ -289,7 +295,11 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                     <th>Group</th>
                                     <th>Perimeter/Diameter</th>
                                     <th>Multiple Radii</th>
-                                    <th>Kiss Cut</th>
+                                    <th>Kiss Cut
+                                        <input type="checkbox"     
+
+                                        />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
