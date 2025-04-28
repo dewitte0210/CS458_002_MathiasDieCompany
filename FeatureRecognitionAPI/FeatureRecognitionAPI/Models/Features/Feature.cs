@@ -1547,6 +1547,7 @@ public class Feature
     
     #region Group9
 
+
     internal void CheckGroup9()
     {
         foreach (Feature feature in PerimeterFeatureList)
@@ -1559,63 +1560,56 @@ public class Feature
                     {
                         feature.KissCut = true;
                         feature.FeatureType = PossibleFeatureTypes.Group9;
-                        return;
+
+                        /*
+                        if (LineAIntersect == null || LineBIntersect == null)
+                        {
+                            return;
+                        }
+                        */
+
                     }
                 }
-            }
-            
-            //check for chamfer
-            if (feature.EntityList.Count == 1)
-            {
-                    Point? LineAIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
-                    Point? LineBIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
 
-                    if (LineAIntersect == null || LineBIntersect == null)
-                    {
-                        return;
-                    }
-                    
-                    
+                // for (int i = 0; i < PerimeterFeatureList.Count(); i++)
+                // {
+                //     if (PerimeterFeatureList[i] == 1 && PerimeterFeatureList[i] is Line line)
+                //     {
+                //         // Break up both of the lines touching the kiss cut line
+                //         Point LineAIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[0]));
+                //         Point LineBIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[1]));
+                //
+                //
+                //         if (LineAIntersect.Equals(line.StartPoint))
+                //         {
+                //             
+                //         }
+                //         else
+                //         {
+                //             
+                //         }
+                //         
+                //         
+                //         
+                //     }
+                //     
+                // }
+
+
+
+
+                // check if a line that is not in base shape is touching kiss-cut line in adjacency list
+
+                /*if (numLines == 4)
+                {
+                    // check if a line is kiss cut
+                    // set list as Kiss-Cut
+                }*/
+                // loop through baseEntityList, if a line is kiss cut kisscut=True, then return
+
+
             }
         }
-        
-        // for (int i = 0; i < PerimeterFeatureList.Count(); i++)
-        // {
-        //     if (PerimeterFeatureList[i] == 1 && PerimeterFeatureList[i] is Line line)
-        //     {
-        //         // Break up both of the lines touching the kiss cut line
-        //         Point LineAIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[0]));
-        //         Point LineBIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[1]));
-        //
-        //
-        //         if (LineAIntersect.Equals(line.StartPoint))
-        //         {
-        //             
-        //         }
-        //         else
-        //         {
-        //             
-        //         }
-        //         
-        //         
-        //         
-        //     }
-        //     
-        // }
-
-        
-        
-        
-        // check if a line that is not in base shape is touching kiss-cut line in adjacency list
-
-        /*if (numLines == 4)
-        {
-            // check if a line is kiss cut
-            // set list as Kiss-Cut
-        }*/
-        // loop through baseEntityList, if a line is kiss cut kisscut=True, then return
-        
-        
     }
 
     #endregion
