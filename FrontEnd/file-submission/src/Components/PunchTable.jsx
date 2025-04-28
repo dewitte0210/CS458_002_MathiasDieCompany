@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Fraction from 'fraction.js'
 
 
 export default function PunchTable({ tableData, tableID }) {
     const [rows, setRows] = useState([]);
-    const [dataLoaded, setDataLoaded] = useState(false);
+    const hasInitialized = useRef(false);
     
     useEffect(() => {
-        setRows(tableData)
-        if(rows?.length > 0 && !dataLoaded){
-            setRows(rows.map(({cutSize, baseSize, setupCost, runCost}) => ({
+        if(!hasInitialized.current  && tableData?.length > 0){
+            const transformed = tableData.map(({cutSize, baseSize, setupCost, runCost}) => ({
                 cutSize: new Fraction(cutSize).toFraction(true).toString(),
                 baseSize: new Fraction(baseSize).toFraction(true).toString(),
                 setupCost,
                 runCost
-            })))
-        }
-        if(rows?.length > 0){
-            setDataLoaded(true);
+            }))
+            setRows(transformed)
+            hasInitialized.current = true;
         }
     }, [tableData])
     const tableStyle = {
@@ -40,19 +38,31 @@ export default function PunchTable({ tableData, tableID }) {
         marginLeft: '700px'
     }
     
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault()
-        try{
-            const newPunchData = rows.map(({cutSize, baseSize, setupCost, runCost}) => ({
-               cutSize: new Fraction(cutSize).valueOf(),
-               baseSize: new Fraction(baseSize).valueOf(),
-               setupCost: parseFloat(setupCost),
-               runCost: parseFloat(runCost)
-           }))
-            console.log(newPunchData)
-        }catch(e){
-            console.error(e)
+        if (true) { // This will be for the confirmation but couldn't get it working.
+            try{
+                const newPunchData = rows.map(({cutSize, baseSize, setupCost, runCost}) => ({
+                    cutSize: new Fraction(cutSize).valueOf(),
+                    baseSize: new Fraction(baseSize).valueOf(),
+                    setupCost: new Fraction(setupCost).valueOf(),
+                    runCost: new Fraction(runCost).valueOf()
+                }))
+                const postData = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newPunchData)
+                }
+                await fetch(`${process.env.REACT_APP_API_BASEURL}api/Pricing/UpdatePunchPrice/${tableID}`, postData)
+                alert("Successfully Updated Table")
+            }catch(e){
+                console.error(e)
+                alert("Error in updating table. Check that all values are numbers")
+            }
         }
+        
     }
     
     const handleInputChange = (index, field, value) => {
