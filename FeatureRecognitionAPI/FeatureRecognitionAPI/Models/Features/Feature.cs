@@ -724,7 +724,7 @@ public class Feature
             numIntersections++;
             if (baseEntityList[i] is Line line)
             {
-                Point? intersection = EntityTools.GetIntersectPoint(ray, line);
+                Point? intersection = Intersect.GetIntersectPoint(ray, line);
                 if (intersection == null)
                 {
                     continue;
@@ -735,7 +735,7 @@ public class Feature
             }
             else if (baseEntityList[i] is Arc arc1)
             {
-                Point? intersection = EntityTools.GetIntersectPoint(ray, arc1);
+                Point? intersection = Intersect.GetIntersectPoint(ray, arc1);
                 if (intersection == null)
                 {
                     continue;
@@ -749,7 +749,7 @@ public class Feature
 
             else if (baseEntityList[i] is Ellipse ellipse)
             {
-                Point? intersection = EntityTools.GetIntersectPoint(ray, ellipse);
+                Point? intersection = Intersect.GetIntersectPoint(ray, ellipse);
                 if (intersection == null)
                 {
                     continue;
@@ -948,7 +948,7 @@ public class Feature
             // Flip end points for calc if they are touching the smaller arc
             for (int i = 0; i < lines.Count; i++)
             {
-                Point intersect = EntityTools.GetIntersectPoint(lines[i], biggerArc);
+                Point intersect = Intersect.GetIntersectPoint(lines[i], biggerArc);
                 if (!lines[i].End.Equals(intersect))
                 {
                     Point temp = lines[i].Start;
@@ -1567,8 +1567,8 @@ public class Feature
             //check for chamfer
             if (feature.EntityList.Count == 1)
             {
-                    Point? LineAIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
-                    Point? LineBIntersect = EntityTools.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
+                    Point? LineAIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
+                    Point? LineBIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
 
                     if (LineAIntersect == null || LineBIntersect == null)
                     {

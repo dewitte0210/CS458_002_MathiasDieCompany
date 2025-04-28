@@ -546,10 +546,6 @@ namespace FeatureRecognitionAPI.Models
                    End.Equals(e2.End);
         }
 
-        // todo: move to entityTools
-        
-        // todo: move to MDCMath
-        
         public abstract override bool Equals(object? obj);
 
         /// <returns> Return true when entities compared have similar traits,
