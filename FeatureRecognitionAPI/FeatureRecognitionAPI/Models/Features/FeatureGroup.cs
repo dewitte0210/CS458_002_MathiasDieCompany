@@ -29,9 +29,6 @@ public class FeatureGroup
     
     private void BreakOutChamfers()
     {
-        // todo: make so it works with more than one chamfer
-        // todo: check if not removing breaks group1A and entity count numbers
-            
         List<Feature> featuresToAdd = new();
         foreach (Feature feature in features)
         {

@@ -7,7 +7,7 @@ public static class EntityTools
 {
     /// <summary>
     /// Determine if two lines are collinear. Two lines are collinear if they are parallel
-    /// and lie on the same infinite line. NOT TESTED YET
+    /// and lie on the same infinite line. (isSameInfiniteLine) NOT TESTED YET
     /// </summary>
     /// <param name="line1"></param>
     /// <param name="line2"></param>

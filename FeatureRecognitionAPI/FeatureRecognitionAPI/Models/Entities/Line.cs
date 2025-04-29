@@ -36,7 +36,6 @@ namespace FeatureRecognitionAPI.Models
             this.Length = Point.Distance(Start, End);
         }
 
-
         public Line(Point startPoint, Point endPoint)
         {
             Start = new Point(startPoint);
@@ -60,13 +59,6 @@ namespace FeatureRecognitionAPI.Models
             Length = Point.Distance(Start, End);
         }
 
-        // todo: implement getLength()
-        // public override double GetLength()
-        // {
-        //     Point delta = GetDelta();
-        //     return double.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
-        // }
-
         public Line swapStartEnd()
         {
             return new Line(End.X, End.Y, Start.X, Start.Y);
@@ -75,40 +67,6 @@ namespace FeatureRecognitionAPI.Models
         public bool hasPoint(Point point)
         {
             return (Start.Equals(point) || End.Equals(point));
-        }
-
-        public bool isSameInfiniteLine(Entity other)
-        {
-            if (other is Line lineOther)
-            {
-                if (this.SlopeX > -0.00005 && this.SlopeX < 0.00005) // means this is a vertical line
-                {
-                    if (MdcMath.DoubleEquals(lineOther.SlopeX, 0)) // means other is a vertical line
-                    {
-                        // checks that the x values are within .00005 of each other
-                        return (MdcMath.DoubleEquals(this.Start.X, lineOther.Start.X));
-                    }
-                    else
-                    {
-                        return false; // both have to be a vertical line
-                    }
-                }
-                else if (MdcMath.DoubleEquals(lineOther.SlopeX, 0))
-                {
-                    return false; // means other is a vertical line but this is not
-                }
-
-                double ThisYintercept = this.Start.Y - ((this.SlopeY / this.SlopeX) * this.Start.X);
-                double OtherYintercept = lineOther.Start.Y - ((lineOther.SlopeY / lineOther.SlopeX) * lineOther.Start.X);
-                if (MdcMath.DoubleEquals(Math.Abs(this.SlopeY / this.SlopeX), 
-                        Math.Abs(lineOther.SlopeY / lineOther.SlopeX)) 
-                    && MdcMath.DoubleEquals(ThisYintercept, OtherYintercept))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public override double GetLength()
@@ -132,9 +90,8 @@ namespace FeatureRecognitionAPI.Models
                 {
                     return true;
                 }
-                else return false;
             }
-            else return false;
+            return false;
         }
 
         public override bool Compare(object? obj)
@@ -151,9 +108,8 @@ namespace FeatureRecognitionAPI.Models
                 {
                     return true;
                 }
-                else return false;
             }
-            else return false;
+            return false;
         }
 
         public override double MinX()

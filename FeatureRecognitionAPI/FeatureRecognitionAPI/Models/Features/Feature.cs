@@ -1633,7 +1633,7 @@ public class Feature
                     }
                 }
 
-                if (con && HasTwoParalellLine(feature.EntityList))
+                if (con && HasTwoParallelLine(feature.EntityList))
                 {
                     feature.FeatureType = PossibleFeatureTypes.Group5;
                 }
@@ -1663,7 +1663,7 @@ public class Feature
                     }
                 }
 
-                if (con && HasTwoParalellLine(feature.EntityList))
+                if (con && HasTwoParallelLine(feature.EntityList))
                 {
                     feature.FeatureType = PossibleFeatureTypes.Group6;
                 }
@@ -1873,13 +1873,11 @@ public class Feature
     /// aren't the same infinite line, or already touch </returns>
     public bool ExtendTwoLines(Line line1, Line line2)
     {
-        //if (!line1.DoesIntersect(line2) && !line1.KissCut && !line2.KissCut)
+        //makes sure you're not extending lines that already touch
+        // Makes sure KissCut lines are not extended
         if (!DoesIntersect(line1, line2) && !line1.KissCut && !line2.KissCut)
-            //makes sure you're not extending lines that already touch
-            // Makes sure KissCut lines are not extended
-
         {
-            if (line1.isSameInfiniteLine(line2))
+            if (EntityTools.IsCollinear(line1, line2))
             {
                 // makes a new extended line object
                 ExtendedLine tempLine = new ExtendedLine(line1, line2);  
@@ -2227,38 +2225,17 @@ public class Feature
     /// </summary>
     /// <param name="entities"> the Entity list that is checked </param>
     /// <returns> true if a set of parallel lines is found </returns>
-    private static bool HasTwoParalellLine(List<Entity> entities)
+    private static bool HasTwoParallelLine(List<Entity> entities)
     {
-        for (int i = 0; i < entities.Count(); i++)
+        foreach (Entity e1 in entities)
         {
-            if (entities[i] is Line)
+            foreach (Entity e2 in entities)
             {
-                for (int j = 0; j < entities.Count(); j++)
+                if (e1 is Line line1 && e2 is Line line2)
                 {
-                    if (j == i || entities[j] is not Line)
-                    {
-                        continue;
-                    }
+                    if (line1 == line2) continue;
 
-                    Line entityI = (entities[i] as Line);
-                    Line entityJ = (entities[j] as Line);
-
-                    // Check for verticality
-                    if ((Math.Abs(entityI.SlopeX) > Entity.EntityTolerance || Math.Abs(entityI.SlopeX) > 10000000) &&
-                        (Math.Abs(entityJ.SlopeX) > Entity.EntityTolerance || Math.Abs(entityJ.SlopeX) > 10000000) ||
-                        (Math.Abs(entityI.SlopeY) > Entity.EntityTolerance || Math.Abs(entityI.SlopeY) > 10000000) &&
-                        (Math.Abs(entityJ.SlopeY) > Entity.EntityTolerance || Math.Abs(entityJ.SlopeY) > 10000000))
-                    {
-                        return true;
-                    }
-
-                    double slopeI = entityI.SlopeY / entityI.SlopeX;
-                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
-
-                    if (slopeI == slopeJ)
-                    {
-                        return true;
-                    }
+                    if (IsParallel(line1, line2)) return true;
                 }
             }
         }
@@ -2275,9 +2252,9 @@ public class Feature
     public void CalcPerimeter()
     {
         perimeter = 0;
-        for (int i = 0; i < EntityList.Count; i++)
+        foreach (Entity entity in EntityList)
         {
-            perimeter += EntityList[i].Length;
+            perimeter += entity.Length;
         }
 
         if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch)
