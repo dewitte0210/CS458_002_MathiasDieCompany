@@ -18,6 +18,29 @@ public static class MdcMath
     }
 
     /// <summary>
+    /// Determine if the given value is between values a and b.
+    /// B can be less than, or greater than a
+    /// </summary>
+    /// <param name="value"> the value to compare </param>
+    /// <param name="a"> one bound of the check </param>
+    /// <param name="b"> the other bound of the check </param>
+    /// <param name="tolerance"> double tolerance </param>
+    /// <returns> true if value is between a and b </returns>
+    public static bool IsBetween(double value, double a, double b, double tolerance = DoubleTolerance)
+    {
+        double low = a;
+        double high = b;
+        // if b is less than a, swap the values
+        if (b < a)
+        {
+            low = b;
+            high = a;
+        }
+        
+        return value >= low - tolerance && value <= high + tolerance;
+    }
+
+    /// <summary>
     /// Solves the quadratic formula
     /// </summary>
     /// <returns> List of solutions </returns>

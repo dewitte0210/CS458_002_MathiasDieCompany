@@ -127,29 +127,22 @@ public static class Intersect
         Point xDiff = new(-l1Delta.X, -l2Delta.X);
         Point yDiff = new(-l1Delta.Y, -l2Delta.Y);
 
+        // uses cross product to get around slope divide by 0 issues
         double diffCross = CrossProduct(xDiff, yDiff);
 
-        //lines are parallel
+        // lines are parallel, don't say they intersect even if they are actually collinear
         if (DoubleEquals(diffCross, 0)) return null;
 
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
         double y = CrossProduct(d, yDiff) / diffCross;
-
-        bool withinX = x >= Math.Min(line1.Start.X, line2.Start.X) - DoubleTolerance
-                       && x <= Math.Max(line1.End.X, line2.End.X) + DoubleTolerance;
-        bool withinY = y >= Math.Min(line1.Start.Y, line2.Start.Y) - DoubleTolerance
-                       && x <= Math.Max(line1.End.Y, line2.End.Y) + DoubleTolerance;
-
-        // use the old line-line intersect function behavior
-        if (true)
-        {
-            if (IsParallel(line1, line2)) return null;
-        }
         
-        if (withinX && withinY) return new Point(x, y);
+        // if point lies on both lines it must be within both bounds
+        bool within1 = IsBetween(x, line1.Start.X, line1.End.X) && IsBetween(y, line1.Start.Y, line1.End.Y);
+        bool within2 = IsBetween(x, line2.Start.X, line2.End.X) && IsBetween(y, line2.Start.Y, line2.End.Y);
+
+        if (within1 && within2) return new Point(x, y);
         return null;
-    
     }
     
     // line with arc

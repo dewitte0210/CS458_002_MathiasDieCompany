@@ -66,10 +66,7 @@ namespace FeatureRecognitionAPI.Models
         /// </summary>
         public void GroupFeatureEntities()
         {
-            if (FeatureList.Count > 0)
-            {
-                return;
-            }
+            if (FeatureList.Count > 0) return;
 
             // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
             List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList();
@@ -82,15 +79,12 @@ namespace FeatureRecognitionAPI.Models
             for (int i = 0; i < EntityList.Count; i++)
             {
                 int count = 0;
-                // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                // j = i+1 so we don't see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
                 for (int j = i + 1; j < EntityList.Count; j++)
                 {
-                    //if (!EntityList[i].DoesIntersect(EntityList[j]))
-                    if (!Intersect.DoesIntersect(EntityList[i], EntityList[j]))
-                    {
-                        continue;
-                    }
+                    if (!Intersect.DoesIntersect(EntityList[i], EntityList[j])) continue;
 
+                    // these entities do intersect
                     // adds each entity to their AdjList. This should not happen twice because of the j=i+1
                     EntityList[i].AdjList.Add(EntityList[j]);
                     EntityList[j].AdjList.Add(EntityList[i]);
