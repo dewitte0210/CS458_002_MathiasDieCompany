@@ -965,7 +965,7 @@ public class Feature
                 double startAngle = Math.Round(Angles.DegToRadians(arcs[0].StartAngle), 4);
                 double endAngle = Math.Round(Angles.DegToRadians(arcs[0].EndAngle), 4);
                 // Case 1: Both lines are vertical
-                if (Math.Round(lines[0].SlopeX, 4) == 0 && Math.Round(lines[1].SlopeX, 4) == 0)
+                if (Math.Round(lines[0].GetSlopeX(), 4) == 0 && Math.Round(lines[1].GetSlopeX(), 4) == 0)
                 {
                     if (Math.Round(startAngle + endAngle, 4) == Math.Round(2 * Math.PI, 4))
                     {
@@ -974,11 +974,11 @@ public class Feature
                     }
                 }
                 // Case 2: Only one is vertical
-                else if (Math.Round(lines[0].SlopeX, 4) == 0 || Math.Round(lines[1].SlopeX, 4) == 0)
+                else if (Math.Round(lines[0].GetSlopeX(), 4) == 0 || Math.Round(lines[1].GetSlopeX(), 4) == 0)
                 {
                     // Angle of line stored in variable for readability
                     double lineAngle;
-                    if (Math.Round(lines[0].SlopeX, 4) == 0)
+                    if (Math.Round(lines[0].GetSlopeX(), 4) == 0)
                     {
                         lineAngle = Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4);
                     }
@@ -1266,7 +1266,7 @@ public class Feature
         foreach (Line searchLine in lineList)
         {
             // ignore the origin line and flipped version
-            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
+            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.SwapStartEnd())) continue;
     
             Point originPoint = fromStart? originLine.Start : originLine.End;
 
@@ -1279,7 +1279,7 @@ public class Feature
             // if end meets end or start meets start
             else if (originPoint.Equals(fromStart ? searchLine.Start : searchLine.End))
             {
-                touchingLine = searchLine.swapStartEnd();
+                touchingLine = searchLine.SwapStartEnd();
                 wasFlipped = true;
                 break;
             }
@@ -1316,31 +1316,31 @@ public class Feature
                 //if null or already in linegroup, meaning found end of line loop
                 if (possibleLine == null 
                     || lineGroup.Contains(possibleLine)
-                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                    || lineGroup.Contains(possibleLine.SwapStartEnd()))
                 {
                     exhaustedEndSearch = true;
                     break;
                 }
                 
                 currentEndLine = possibleLine;
-                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
+                baseLineList.Remove(wasFlipped ? currentEndLine.SwapStartEnd() : currentEndLine);
                 lineGroup.Add(possibleLine);
             }
             while (!exhaustedStartSearch)
             {
-                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList);
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList, true);
 
                 //if null or already in lineGroup, meaning found end of line loop
                 if (possibleLine == null 
                     || lineGroup.Contains(possibleLine)
-                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                    || lineGroup.Contains(possibleLine.SwapStartEnd()))
                 {
                     exhaustedStartSearch = true;
                     break;
                 }
                 
                 currentStartLine = possibleLine;
-                baseLineList.Remove(wasFlipped ? currentStartLine.swapStartEnd() : currentStartLine);
+                baseLineList.Remove(wasFlipped ? currentStartLine.SwapStartEnd() : currentStartLine);
                 lineGroup.Insert(0, possibleLine);
             }
             orderedLineList.Add(lineGroup);            

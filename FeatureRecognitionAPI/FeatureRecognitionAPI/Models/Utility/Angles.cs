@@ -162,12 +162,12 @@ namespace FeatureRecognitionAPI.Models.Utility
 					&& _side != Side.Unknown 
 					&& objA._side != Side.Unknown)
                 {
-                    if (objA._side == this._side && objA._angle == this._angle)
+                    if (objA._side == _side && objA._angle.Equals(_angle))
                     {
                         return true;
                     }
                     //sides are opposite
-                    if (objA._side != this._side && objA._angle.GetOppositeAngle() == _angle)
+                    if (objA._side != _side && objA._angle.GetOppositeAngle().Equals(_angle))
                     {
                         return true;
                     }

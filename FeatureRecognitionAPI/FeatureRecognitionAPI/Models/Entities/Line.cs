@@ -4,9 +4,6 @@ namespace FeatureRecognitionAPI.Models.Entities;
 
 public class Line : Entity
 {
-    public double SlopeY { get; init; }
-    public double SlopeX { get; init; }
-
     // Don't Delete. Called from ExtendedLine constructor
     protected Line()
     {
@@ -18,25 +15,18 @@ public class Line : Entity
     {
         Start = new Point(line.Start);
         End = new Point(line.End);
-        SlopeY = line.SlopeY;
-        SlopeX = line.SlopeX;
     }
 
     public Line(double startX, double startY, double endX, double endY)
     {
         Start = new Point(startX, startY);
         End = new Point(endX, endY);
-        SlopeY = End.Y - Start.Y;
-        SlopeX = End.X - Start.X;
     }
 
     public Line(Point startPoint, Point endPoint)
     {
         Start = new Point(startPoint);
         End = new Point(endPoint);
-            
-        SlopeY = End.Y - Start.Y;
-        SlopeX = End.X - Start.X;
     }
 
     //constructor with extendedline parameter
@@ -44,12 +34,9 @@ public class Line : Entity
     {
         Start = new Point(startX, startY);
         End = new Point(endX, endY);
-
-        SlopeY = End.Y - Start.Y;
-        SlopeX = End.X - Start.X;
     }
 
-    public Line swapStartEnd()
+    public Line SwapStartEnd()
     {
         return new Line(End.X, End.Y, Start.X, Start.Y);
     }
@@ -76,17 +63,18 @@ public class Line : Entity
 
     public override bool Equals(object? obj)
     {
+        if (obj == null) return false;
+        
         //If both lines have the same length , and the slopes are equal (within tight tolerance)
-        if (obj is Line && Math.Abs(((Line)obj).GetLength() - this.GetLength()) < EntityTolerance)
+        if (obj is Line lineComp && MdcMath.DoubleEquals(GetLength(), lineComp.GetLength()))
         {
-            double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
-            double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
+            double slopeDifY = Math.Abs(GetSlopeY() - lineComp.GetSlopeY());
+            double slopeDifX = Math.Abs(GetSlopeX() - lineComp.GetSlopeX());
 
-            if (Math.Abs(((Line)obj).GetLength() - this.GetLength()) < EntityTolerance
-                && slopeDifY < EntityTolerance
+            if (slopeDifY < EntityTolerance
                 && slopeDifX < EntityTolerance
-                && this.hasPoint(((Line)obj).End)
-                && this.hasPoint(((Line)obj).Start))
+                && this.hasPoint(lineComp.End)
+                && this.hasPoint(lineComp.Start))
             {
                 return true;
             }
@@ -94,22 +82,9 @@ public class Line : Entity
         return false;
     }
 
-    public override bool Compare(object? obj)
+    public override int GetHashCode()
     {
-        //If both lines have the same length , and the slopes are equal (within tight tolerance)
-        if (obj is Line && Math.Abs(((Line)obj).GetLength() - this.GetLength()) < EntityTolerance)
-        {
-            double slopeDifY = Math.Abs(SlopeY - ((Line)obj).SlopeY);
-            double slopeDifX = Math.Abs(SlopeX - ((Line)obj).SlopeX);
-
-            if (Math.Abs(((Line)obj).GetLength() - this.GetLength()) < EntityTolerance
-                && slopeDifY < EntityTolerance
-                && slopeDifX < EntityTolerance)
-            {
-                return true;
-            }
-        }
-        return false;
+        return HashCode.Combine(Start, End);
     }
 
     public override double MinX()

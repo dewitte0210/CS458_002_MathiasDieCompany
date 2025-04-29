@@ -53,7 +53,7 @@ public class Circle : Entity
     /// <returns> true if equal, otherwise false </returns>
     public override bool Equals(object? obj)
     {
-        //If the object is a cricle, and the circles have even Radius, within tollerance then the circles are equal
+        //If the object is a circle, and the circles have even Radius, within tolerance then the circles are equal
         if (obj is Circle)
         {
             if (Math.Abs(((Circle)obj).Radius - this.Radius) < EntityTolerance)
@@ -65,20 +65,11 @@ public class Circle : Entity
         else return false;
     }
 
-    public override bool Compare(object? obj)
+    public override int GetHashCode()
     {
-        //If the object is a cricle, and the circles have even Radius, within tollerance then the circles are equal
-        if (obj is Circle)
-        {
-            if (Math.Abs(((Circle)obj).Radius - this.Radius) < EntityTolerance)
-            {
-                return true;
-            }
-            else return false;
-        }
-        else return false;
+        return HashCode.Combine(Center, Radius);
     }
-        
+
     public override double MinX()
     {
         return Center.X - Radius;

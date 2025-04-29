@@ -5,7 +5,7 @@ using Math = System.Math;
 namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Class that represents a Arc object that extends Entity
+/// Class that represents an Arc object that extends Entity
 /// Inherits entityType and Length fields 
 /// </summary>
 public class Arc : Entity
@@ -100,22 +100,6 @@ public class Arc : Entity
         else return false;
     }
 
-    public override bool Compare(object? obj)
-    {
-        if (obj is Arc)
-        {
-            if (Math.Abs(((Arc)obj).GetLength() - this.GetLength()) < EntityTolerance
-                && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
-                && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
-                && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
-            {
-                return true;
-            }
-            else return false;
-        }
-        else return false;
-    }
-
     /// <summary>
     /// Function that determines if a point is in between the start and end angles
     /// (already checked to be on the line if the arc is treated as a circle)
@@ -180,7 +164,7 @@ public class Arc : Entity
         return middleAngle;
     }
 
-    public int GetHashCode()
+    public override int GetHashCode()
     {
         //hash is built using ellipse center and arc radius
         //so two arcs with the same center and arc radius will have the same hash
@@ -325,7 +309,7 @@ public class Arc : Entity
             else
             {
                 angle = Math.IEEERemainder(angle, 360.0);
-                //** IEEEremainder can return -180 here for some input values...
+                //** IEEERemainder can return -180 here for some input values...
                 if (angle == -180.0)
                 {
                     angle = 180.0;
@@ -341,7 +325,7 @@ public class Arc : Entity
             else
             {
                 angle = Math.IEEERemainder(angle, 360.0);
-                //** IEEEremainder can return -180 here for some input values...
+                //** IEEERemainder can return -180 here for some input values...
                 if (angle == -180.0)
                 {
                     angle = 180.0;

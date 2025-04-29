@@ -3,7 +3,7 @@
 namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Class that represents a Ellipse object that extends Entity
+/// Class that represents an Ellipse object that extends Entity
 /// Inherits entityType and Length fields
 /// </summary>
 public class Ellipse : Entity
@@ -87,7 +87,7 @@ public class Ellipse : Entity
     /// follow the actual perimeter of the partial ellipse. It is an accurate estimate of the perimeter
     /// since an exact formula does not exist.
     /// </summary>
-    private double partialPerimterCalc()
+    private double PartialPerimeterCalc()
     {
         //Major axis value
         double a = Point.Distance(MajorAxisEndPoint, Center);
@@ -116,8 +116,8 @@ public class Ellipse : Entity
             double ang1 = (i * angleIncrement) + StartParameter;
             Point p1 = PointOnEllipseGivenAngleInRadians(a, b, ang1);
             Point p2 = PointOnEllipseGivenAngleInRadians(a, b, ang1 + angleIncrement);
-            Line lineOnPerim = new Line(p1.X, p1.Y, p2.X, p2.Y);
-            sum += lineOnPerim.GetLength();
+            Line lineOnPerimeter = new Line(p1.X, p1.Y, p2.X, p2.Y);
+            sum += lineOnPerimeter.GetLength();
         }
         return sum;
     }
@@ -127,7 +127,7 @@ public class Ellipse : Entity
     /// </summary>
     /// <param name="a"> Major axis value </param>
     /// <param name="b"> Minor axis value </param>
-    /// <param name="angle"> angle of coordinate desired </param>
+    /// <param name="angle"> angle of coordinate desired in Radians </param>
     internal Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
     {
         double x1;
@@ -247,7 +247,7 @@ public class Ellipse : Entity
 
     public override double GetLength()
     {
-        return (IsFullEllipse)? fullPerimeterCalc() : partialPerimterCalc();
+        return (IsFullEllipse)? fullPerimeterCalc() : PartialPerimeterCalc();
     }
 
     //TODO: finish this
@@ -263,18 +263,10 @@ public class Ellipse : Entity
         }
         return false;
     }
-    //TODO: finish this
-    public override bool Compare(object? obj)
+
+    public override int GetHashCode()
     {
-        if (obj is Ellipse)
-        {
-            //intentional reference comparison
-            if (this == obj)
-            {
-                return true;
-            }
-        }
-        return false;
+        return HashCode.Combine(Center, MajorAxis, MinorAxis, Rotation);
     }
 
     public override double MinX()
@@ -451,17 +443,17 @@ public class Ellipse : Entity
 
     #region Bounds
     /**
-     * Calculates the y axis bounds of the ellipse
+     * Calculates the y-axis bounds of the ellipse
      * @Return - The 2 points on the ellipse corresponding to the bounds
      */
     private List<Point> MaxAndMinY()
     {
-        double A = 0, B = 0, C = 0, D = 0, E = 0, alpha = 0;
-        CalculateEllipseConstants(ref A, ref B, ref C, ref D, ref E, ref alpha);
-        double denom = Math.Sin(Rotation) * Math.Cos(Rotation) * (Math.Pow(MinorAxis, 2) - Math.Pow(MajorAxis, 2));
-        double slope = -1 * ((Math.Pow(MajorAxis, 2) * Math.Pow(Math.Sin(Rotation), 2)) + (Math.Pow(MinorAxis, 2) * Math.Pow(Math.Cos(Rotation), 2))) / denom;
-        double gamma = ((Center.X * ((Math.Pow(MajorAxis, 2) * Math.Pow(Math.Sin(Rotation), 2)) + (Math.Pow(MinorAxis, 2) * Math.Pow(Math.Cos(Rotation), 2)))) / denom) + Center.Y;
-        List<double> xValues = CalcXCoordOfBoundCoords(A, B, C, D, E, alpha, slope, gamma);
+        double a = 0, b = 0, c = 0, d = 0, e = 0, alpha = 0;
+        CalculateEllipseConstants(ref a, ref b, ref c, ref d, ref e, ref alpha);
+        double denominator = Math.Sin(Rotation) * Math.Cos(Rotation) * (Math.Pow(MinorAxis, 2) - Math.Pow(MajorAxis, 2));
+        double slope = -1 * ((Math.Pow(MajorAxis, 2) * Math.Pow(Math.Sin(Rotation), 2)) + (Math.Pow(MinorAxis, 2) * Math.Pow(Math.Cos(Rotation), 2))) / denominator;
+        double gamma = ((Center.X * ((Math.Pow(MajorAxis, 2) * Math.Pow(Math.Sin(Rotation), 2)) + (Math.Pow(MinorAxis, 2) * Math.Pow(Math.Cos(Rotation), 2)))) / denominator) + Center.Y;
+        List<double> xValues = CalcXCoordOfBoundCoords(a, b, c, d, e, alpha, slope, gamma);
         List<Point> yValues = new List<Point>();
         foreach (double result in xValues)
         {
@@ -471,17 +463,17 @@ public class Ellipse : Entity
     }
 
     /**
-     * Calculates the x axis bounds of the ellipse
+     * Calculates the x-axis bounds of the ellipse
      * @Return - The 2 points on the ellipse corresponding to the bounds
      */
     private List<Point> MaxAndMinX()
     {
-        double A = 0, B = 0, C = 0, D = 0, E = 0, alpha = 0;
-        CalculateEllipseConstants(ref A, ref B, ref C, ref D, ref E, ref alpha);
-        double denom = (Math.Pow(MinorAxis, 2) * Math.Pow(Math.Sin(Rotation), 2)) + (Math.Pow(MajorAxis, 2) * Math.Pow(Math.Cos(Rotation), 2));
-        double slope = ((Math.Pow(MajorAxis, 2) - Math.Pow(MinorAxis, 2)) * Math.Sin(Rotation) * Math.Cos(Rotation)) / denom;
-        double beta = (((Math.Pow(MinorAxis, 2) * Center.X * Math.Sin(Rotation) * Math.Cos(Rotation)) - (Math.Pow(MajorAxis, 2) * Center.X * Math.Sin(Rotation) * Math.Cos(Rotation))) / denom) + Center.Y;
-        List<double> xValues = CalcXCoordOfBoundCoords(A, B, C, D, E, alpha, slope, beta);
+        double a = 0, b = 0, c = 0, d = 0, e = 0, alpha = 0;
+        CalculateEllipseConstants(ref a, ref b, ref c, ref d, ref e, ref alpha);
+        double denominator = (Math.Pow(MinorAxis, 2) * Math.Pow(Math.Sin(Rotation), 2)) + (Math.Pow(MajorAxis, 2) * Math.Pow(Math.Cos(Rotation), 2));
+        double slope = ((Math.Pow(MajorAxis, 2) - Math.Pow(MinorAxis, 2)) * Math.Sin(Rotation) * Math.Cos(Rotation)) / denominator;
+        double beta = (((Math.Pow(MinorAxis, 2) * Center.X * Math.Sin(Rotation) * Math.Cos(Rotation)) - (Math.Pow(MajorAxis, 2) * Center.X * Math.Sin(Rotation) * Math.Cos(Rotation))) / denominator) + Center.Y;
+        List<double> xValues = CalcXCoordOfBoundCoords(a, b, c, d, e, alpha, slope, beta);
         List<Point> yValues = new List<Point>();
         foreach (double result in xValues)
         {
@@ -507,12 +499,12 @@ public class Ellipse : Entity
      * Takes the bounding lines and plugs them into the ellipse equation for the quadratic formula
      * @Return - The x values of the bounding coords
      */
-    private List<double> CalcXCoordOfBoundCoords(double A, double B, double C, double D, double E, double alpha, double slope, double intercept)
+    private List<double> CalcXCoordOfBoundCoords(double a, double b, double c, double d, double e, double alpha, double slope, double intercept)
     {
-        double squaredCoef = A + (slope * ((C * slope) + E));
-        double linearCoef = intercept * ((2 * C * slope) + E) + B + (D * slope);
-        double delta = intercept * ((C * intercept) + D) + alpha;
-        return MdcMath.QuadraticFormula(squaredCoef, linearCoef, delta);
+        double squaredCoefficient = a + (slope * ((c * slope) + e));
+        double linearCoefficient = intercept * ((2 * c * slope) + e) + b + (d * slope);
+        double delta = intercept * ((c * intercept) + d) + alpha;
+        return MdcMath.QuadraticFormula(squaredCoefficient, linearCoefficient, delta);
     }
     #endregion
 

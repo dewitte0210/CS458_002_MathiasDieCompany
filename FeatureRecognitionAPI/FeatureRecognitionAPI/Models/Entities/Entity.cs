@@ -31,14 +31,12 @@ public abstract class Entity
 
     public abstract override bool Equals(object? obj);
 
-    /// <returns> Return true when entities compared have similar traits,
-    /// length is the same (but start and end point, or mid point can vary) </returns>
-    public abstract bool Compare(object? obj);
-
     public abstract double MinX();
     public abstract double MinY();
     public abstract double MaxX();
     public abstract double MaxY();
 
     public abstract Entity Transform(Matrix3 transform);
+
+    public abstract override int GetHashCode();
 }

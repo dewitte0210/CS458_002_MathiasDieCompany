@@ -24,8 +24,8 @@ public class ExtendedLine : Line
         Parent2 = parent2;
         CalcPoints();
 
-        SlopeY = End.Y - Start.Y;
-        SlopeX = End.X - Start.X;
+        //SlopeY = End.Y - Start.Y;
+        //SlopeX = End.X - Start.X;
     }
 
     /// <summary>
@@ -34,13 +34,9 @@ public class ExtendedLine : Line
     private void CalcPoints()
     {
         Point pointToExtend;
-        if (Point.Distance(
-                Parent1.Start,
-                Parent2.Start)
-            < Point.Distance(
-                Parent1.End,
-                Parent2.Start))
-            //This looks like a lot but all this is doing is finding the closest point on line1 to line2
+        
+        //This looks like a lot but all this is doing is finding the closest point on line1 to line2
+        if (Point.Distance(Parent1.Start, Parent2.Start) < Point.Distance(Parent1.End, Parent2.Start))
         {
             //At this point we know the point to be extended on line1 is the start point, meaning the end point can stay the same
             //  Hence why tempLine end point is set to line1's
@@ -54,13 +50,9 @@ public class ExtendedLine : Line
             Start.X = Parent1.Start.X;
             Start.Y = Parent1.Start.Y;
         }
-        if (Point.Distance(
-                pointToExtend,
-                Parent2.Start)
-            > Point.Distance(
-                pointToExtend,
-                Parent2.End))
-            //Similar to the one above but finds what point on line2 is farthest from line1's point to extend
+
+        //Similar to the one above but finds what point on line2 is farthest from line1's point to extend
+        if (Point.Distance(pointToExtend, Parent2.Start) > Point.Distance(pointToExtend, Parent2.End))
         {
             End.X = Parent2.Start.X;
             End.Y = Parent2.Start.Y;
