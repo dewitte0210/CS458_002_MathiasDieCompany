@@ -708,7 +708,7 @@ public class Feature
         }
 
         //  Entends the ray
-        Point unitVector = new Point((ray.End.X - ray.Start.X) / ray.Length, (ray.End.Y - ray.Start.Y) / ray.Length);
+        Point unitVector = new Point((ray.End.X - ray.Start.X) / ray.GetLength(), (ray.End.Y - ray.Start.Y) / ray.GetLength());
         Point newEndPoint = new Point(ray.Start.X + maxLength * unitVector.X, ray.Start.Y + maxLength * unitVector.Y);
         ray = new Line(ray.Start.X, ray.Start.Y, newEndPoint.X, newEndPoint.Y);
 
@@ -841,19 +841,19 @@ public class Feature
         Line newLine1;
         Line newLine2;
         // Checks the lengths of each line to ensure the right line is used to form the quadrilateral
-        if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) < Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        if (Math.Round(tempLine1.GetLength(), 4) + Math.Round(tempLine2.GetLength(), 4) < Math.Round(tempLine3.GetLength(), 4) + Math.Round(tempLine4.GetLength(), 4))
         {
             newLine1 = tempLine1;
             newLine2 = tempLine2;
         }
-        else if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) > Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        else if (Math.Round(tempLine1.GetLength(), 4) + Math.Round(tempLine2.GetLength(), 4) > Math.Round(tempLine3.GetLength(), 4) + Math.Round(tempLine4.GetLength(), 4))
         {
             newLine1 = tempLine3;
             newLine2 = tempLine4;
         }
         else
         {
-            if (Math.Round(tempLine1.Length, 4) < Math.Round(tempLine2.Length, 4))
+            if (Math.Round(tempLine1.GetLength(), 4) < Math.Round(tempLine2.GetLength(), 4))
             {
                 newLine1 = tempLine1;
             }
@@ -861,7 +861,7 @@ public class Feature
             {
                 newLine1 = tempLine2;
             }
-            if (Math.Round(tempLine3.Length, 4) < Math.Round(tempLine4.Length, 4))
+            if (Math.Round(tempLine3.GetLength(), 4) < Math.Round(tempLine4.GetLength(), 4))
             {
                 newLine2 = tempLine3;
             }
@@ -871,7 +871,7 @@ public class Feature
             }
         }
 
-        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4))
+        return Math.Round(baseLine1.GetLength(), 4).Equals(Math.Round(baseLine2.GetLength(), 4))
                && IsPerpendicular(newLine1, baseLine1) && IsPerpendicular(newLine1, baseLine2)
                && IsPerpendicular(newLine2, baseLine1) && IsPerpendicular(newLine2, baseLine2);
     }
@@ -965,7 +965,7 @@ public class Feature
                 double startAngle = Math.Round(Angles.DegToRadians(arcs[0].StartAngle), 4);
                 double endAngle = Math.Round(Angles.DegToRadians(arcs[0].EndAngle), 4);
                 // Case 1: Both lines are vertical
-                if (Math.Round(lines[0].SlopeX, 4) == 0 && Math.Round(lines[1].SlopeX, 4) == 0)
+                if (Math.Round(lines[0].GetSlopeX(), 4) == 0 && Math.Round(lines[1].GetSlopeX(), 4) == 0)
                 {
                     if (Math.Round(startAngle + endAngle, 4) == Math.Round(2 * Math.PI, 4))
                     {
@@ -974,11 +974,11 @@ public class Feature
                     }
                 }
                 // Case 2: Only one is vertical
-                else if (Math.Round(lines[0].SlopeX, 4) == 0 || Math.Round(lines[1].SlopeX, 4) == 0)
+                else if (Math.Round(lines[0].GetSlopeX(), 4) == 0 || Math.Round(lines[1].GetSlopeX(), 4) == 0)
                 {
                     // Angle of line stored in variable for readability
                     double lineAngle;
-                    if (Math.Round(lines[0].SlopeX, 4) == 0)
+                    if (Math.Round(lines[0].GetSlopeX(), 4) == 0)
                     {
                         lineAngle = Math.Round(Math.Atan2(lines[1].End.Y - lines[1].Start.Y, lines[1].End.X - lines[1].Start.X), 4);
                     }
@@ -1266,7 +1266,7 @@ public class Feature
         foreach (Line searchLine in lineList)
         {
             // ignore the origin line and flipped version
-            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.swapStartEnd())) continue;
+            if (originLine.Equals(searchLine) || originLine.Equals(searchLine.SwapStartEnd())) continue;
     
             Point originPoint = fromStart? originLine.Start : originLine.End;
 
@@ -1279,7 +1279,7 @@ public class Feature
             // if end meets end or start meets start
             else if (originPoint.Equals(fromStart ? searchLine.Start : searchLine.End))
             {
-                touchingLine = searchLine.swapStartEnd();
+                touchingLine = searchLine.SwapStartEnd();
                 wasFlipped = true;
                 break;
             }
@@ -1316,31 +1316,31 @@ public class Feature
                 //if null or already in linegroup, meaning found end of line loop
                 if (possibleLine == null 
                     || lineGroup.Contains(possibleLine)
-                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                    || lineGroup.Contains(possibleLine.SwapStartEnd()))
                 {
                     exhaustedEndSearch = true;
                     break;
                 }
                 
                 currentEndLine = possibleLine;
-                baseLineList.Remove(wasFlipped ? currentEndLine.swapStartEnd() : currentEndLine);
+                baseLineList.Remove(wasFlipped ? currentEndLine.SwapStartEnd() : currentEndLine);
                 lineGroup.Add(possibleLine);
             }
             while (!exhaustedStartSearch)
             {
-                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList);
+                (Line? possibleLine, bool wasFlipped) = GetTouchingLine(currentStartLine, lineList, true);
 
                 //if null or already in lineGroup, meaning found end of line loop
                 if (possibleLine == null 
                     || lineGroup.Contains(possibleLine)
-                    || lineGroup.Contains(possibleLine.swapStartEnd()))
+                    || lineGroup.Contains(possibleLine.SwapStartEnd()))
                 {
                     exhaustedStartSearch = true;
                     break;
                 }
                 
                 currentStartLine = possibleLine;
-                baseLineList.Remove(wasFlipped ? currentStartLine.swapStartEnd() : currentStartLine);
+                baseLineList.Remove(wasFlipped ? currentStartLine.SwapStartEnd() : currentStartLine);
                 lineGroup.Insert(0, possibleLine);
             }
             orderedLineList.Add(lineGroup);            
@@ -1633,7 +1633,7 @@ public class Feature
                     }
                 }
 
-                if (con && HasTwoParalellLine(feature.EntityList))
+                if (con && HasTwoParallelLine(feature.EntityList))
                 {
                     feature.FeatureType = PossibleFeatureTypes.Group5;
                 }
@@ -1663,7 +1663,7 @@ public class Feature
                     }
                 }
 
-                if (con && HasTwoParalellLine(feature.EntityList))
+                if (con && HasTwoParallelLine(feature.EntityList))
                 {
                     feature.FeatureType = PossibleFeatureTypes.Group6;
                 }
@@ -1750,14 +1750,14 @@ public class Feature
         {
             //Genuinely my first time ever using lambda expression for something actually useful
             //sort both lists by length
-            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+            ((Feature)obj).EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
 
             //For each entity in this.EntityList check for a corresponding entity obj.EntityList
             bool equalLists = true;
             foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
                 {
                     equalLists = false;
                     break;
@@ -1784,15 +1784,15 @@ public class Feature
         {
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
-            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+            ((Feature)obj).EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
             //Remove the entity if it's found, and set the corresponding value in validArray to true
             bool equalLists = true;
             foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
                 {
                     equalLists = false;
                     break;
@@ -1873,13 +1873,11 @@ public class Feature
     /// aren't the same infinite line, or already touch </returns>
     public bool ExtendTwoLines(Line line1, Line line2)
     {
-        //if (!line1.DoesIntersect(line2) && !line1.KissCut && !line2.KissCut)
+        //makes sure you're not extending lines that already touch
+        // Makes sure KissCut lines are not extended
         if (!DoesIntersect(line1, line2) && !line1.KissCut && !line2.KissCut)
-            //makes sure you're not extending lines that already touch
-            // Makes sure KissCut lines are not extended
-
         {
-            if (line1.isSameInfiniteLine(line2))
+            if (EntityTools.IsCollinear(line1, line2))
             {
                 // makes a new extended line object
                 ExtendedLine tempLine = new ExtendedLine(line1, line2);  
@@ -1951,7 +1949,7 @@ public class Feature
         foreach (Entity entity in ExtendedEntityList)
         // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
-            if (entity.Length > head.Length)
+            if (entity.GetLength() > head.GetLength())
             {
                 head = entity;
             }
@@ -2227,38 +2225,17 @@ public class Feature
     /// </summary>
     /// <param name="entities"> the Entity list that is checked </param>
     /// <returns> true if a set of parallel lines is found </returns>
-    private static bool HasTwoParalellLine(List<Entity> entities)
+    private static bool HasTwoParallelLine(List<Entity> entities)
     {
-        for (int i = 0; i < entities.Count(); i++)
+        foreach (Entity e1 in entities)
         {
-            if (entities[i] is Line)
+            foreach (Entity e2 in entities)
             {
-                for (int j = 0; j < entities.Count(); j++)
+                if (e1 is Line line1 && e2 is Line line2)
                 {
-                    if (j == i || entities[j] is not Line)
-                    {
-                        continue;
-                    }
+                    if (line1 == line2) continue;
 
-                    Line entityI = (entities[i] as Line);
-                    Line entityJ = (entities[j] as Line);
-
-                    // Check for verticality
-                    if ((Math.Abs(entityI.SlopeX) > Entity.EntityTolerance || Math.Abs(entityI.SlopeX) > 10000000) &&
-                        (Math.Abs(entityJ.SlopeX) > Entity.EntityTolerance || Math.Abs(entityJ.SlopeX) > 10000000) ||
-                        (Math.Abs(entityI.SlopeY) > Entity.EntityTolerance || Math.Abs(entityI.SlopeY) > 10000000) &&
-                        (Math.Abs(entityJ.SlopeY) > Entity.EntityTolerance || Math.Abs(entityJ.SlopeY) > 10000000))
-                    {
-                        return true;
-                    }
-
-                    double slopeI = entityI.SlopeY / entityI.SlopeX;
-                    double slopeJ = entityJ.SlopeY / entityJ.SlopeX;
-
-                    if (slopeI == slopeJ)
-                    {
-                        return true;
-                    }
+                    if (IsParallel(line1, line2)) return true;
                 }
             }
         }
@@ -2275,9 +2252,9 @@ public class Feature
     public void CalcPerimeter()
     {
         perimeter = 0;
-        for (int i = 0; i < EntityList.Count; i++)
+        foreach (Entity entity in EntityList)
         {
-            perimeter += EntityList[i].Length;
+            perimeter += entity.GetLength();
         }
 
         if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch)

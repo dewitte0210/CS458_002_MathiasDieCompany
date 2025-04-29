@@ -144,7 +144,7 @@ public static class Intersect
         if (within1 && within2) return new Point(x, y);
         return null;
     }
-    
+
     // line with arc
     internal static Point? FindIntersectPointHelper(Line line, Arc arc)
     {
@@ -161,7 +161,7 @@ public static class Intersect
 
         //  This is to check for a vertical line, since it would crash the program
         //  trying to divide by 0
-        if (line.End.X == line.Start.X)
+        if (DoubleEquals(line.End.X, line.Start.X))
         {
             a = 1;
             b = 0;
@@ -170,19 +170,11 @@ public static class Intersect
         else
         {
             double xDif = line.End.X - line.Start.X;
-            if (xDif == 0)
-            {
-                slope = 0;
-            }
-            else
-            {
-                slope = (line.End.Y - line.Start.Y) / xDif;
-            }
+            
+            if (DoubleEquals(xDif, 0)) slope = 0;
+            else slope = (line.End.Y - line.Start.Y) / xDif;
 
-            if (slope > 1000000 || slope < -1000000)
-            {
-                slope = 0;
-            }
+            if (slope is > 1000000 or < -1000000) slope = 0;
 
             intercept = line.End.Y - (slope * line.End.X);
             // The slope of the line ends up being A in the general form
@@ -204,39 +196,38 @@ public static class Intersect
         if (arc.Radius >= distance)
         {
             //  Will hold the solution values of the quadratic equation
-            List<double> solns = new();
+            List<double> solutions = new();
 
             //  Special case for vertical line
-            if (line.End.X == line.Start.X)
+            if (DoubleEquals(line.End.X, line.Start.X))
             {
-                double[] tempSolns = QuadraticFormula(
+                double[] tempSolutions = QuadraticFormula(
                     1,
                     (-2 * arc.Center.Y),
                     (Math.Pow(arc.Center.Y, 2) + Math.Pow((line.End.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2))
                 ).ToArray();
 
-                foreach (double number in tempSolns)
+                foreach (double number in tempSolutions)
                 {
-                    solns.Add(number);
+                    solutions.Add(number);
                 }
 
                 //  Checks if each solution is on the arc, if one is on it return true
-                for (int i = 0; i < solns.Count(); i++)
+                foreach (double solution in solutions)
                 {
-                    //  Solution y value
-                    double y = solns[i];
                     //  Solution x value
                     double x = line.End.X;
-                    if (arc.IsInArcRange(new Point(x, y)) && Math.Min(line.Start.X, line.End.X) <= x &&
-                        Math.Min(line.Start.Y, line.End.Y) <= y && Math.Max(line.Start.X, line.End.X) >= x &&
-                        Math.Max(line.Start.Y, line.End.Y) >= y)
+                    if (arc.IsInArcRange(new Point(x, solution)) && Math.Min(line.Start.X, line.End.X) <= x &&
+                        Math.Min(line.Start.Y, line.End.Y) <= solution && Math.Max(line.Start.X, line.End.X) >= x &&
+                        Math.Max(line.Start.Y, line.End.Y) >= solution)
                     {
-                        return new Point(x, y);
+                        return new Point(x, solution);
                     }
                 }
             }
             else
             {
+                // todo what is going on here?
                 decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1),
                     (decimal)(-2.0 * arc.Center.X) + (decimal)(2 * (intercept * slope)) -
                     (decimal)(2 * (arc.Center.Y * slope)),
@@ -245,30 +236,26 @@ public static class Intersect
                     (decimal)Math.Pow(arc.Radius, 2));
                 foreach (decimal number in tempSolns)
                 {
-                    solns.Add((double)number);
+                    solutions.Add((double)number);
                 }
 
                 //  Checks if each solution is on the arc, if one is on it return true
-                for (int i = 0; i < solns.Count; i++)
+                foreach (double solution in solutions)
                 {
                     //Solution x value
-                    double x = solns[i];
+                    double x = solution;
                     //Solution y value
-                    double y = slope * solns[i] + intercept;
+                    double y = slope * solution + intercept;
 
-                    int intersectTolerance = 4;
-
-                    if (arc.IsInArcRange(new Point(x, y)) &&
-                        Math.Min(Math.Round(line.Start.X, IntersectTolerance),
-                            Math.Round(line.End.X, IntersectTolerance)) <= x &&
-                        Math.Min(Math.Round(line.Start.Y, IntersectTolerance),
-                            Math.Round(line.End.Y, IntersectTolerance)) <= y &&
-                        Math.Max(Math.Round(line.Start.X, IntersectTolerance),
-                            Math.Round(line.End.X, IntersectTolerance)) >= x &&
-                        Math.Max(Math.Round(line.Start.Y, IntersectTolerance),
-                            Math.Round(line.End.Y, IntersectTolerance)) >= y)
+                    Point returnPoint = new(x, y);
+                    
+                    if (arc.IsInArcRange(returnPoint) &&
+                        Math.Round(Math.Min(line.Start.X, line.End.X), IntersectTolerance) <= x &&
+                        Math.Round(Math.Min(line.Start.Y, line.End.Y), IntersectTolerance) <= y &&
+                        Math.Round(Math.Max(line.Start.X, line.End.X), IntersectTolerance) >= x &&
+                        Math.Round(Math.Max(line.Start.Y, line.End.Y), IntersectTolerance) >= y)
                     {
-                        return new Point(x, y);
+                        return returnPoint;
                     }
                 }
             }
@@ -284,11 +271,11 @@ public static class Intersect
         double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
         double y = ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y;
         double rotation;
-        if (x == 0)
+        if (DoubleEquals(x, 0))
         {
             rotation = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
         }
-        else if (y == 0)
+        else if (DoubleEquals(y, 0))
         {
             rotation = x > 0 ? 0 : Math.PI;
         }
@@ -316,93 +303,91 @@ public static class Intersect
         }
 
         //  Get line in the form Ax + By + C = 0 and moved so that ellipse center is the origin
-        double Al;
-        double Bl;
-        double Cl;
-        double slopel = 0;
-        double interceptl = 0;
+        double lineA;
+        double lineB;
+        double lineC;
         bool isVertical = false;
         //  This is to check for a vertical line, since it would crash the program
         //  trying to divide by 0
         if ((new Point(line.Start.X, 0).Equals(new Point(line.End.X, 0))))
         {
-            Al = 1;
-            Bl = 0;
-            Cl = -1 * (line.End.X - ellipse.Center.X);
+            lineA = 1;
+            lineB = 0;
+            lineC = -1 * (line.End.X - ellipse.Center.X);
             isVertical = true;
         }
         else
         {
-            slopel = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
-            interceptl = (line.End.Y - ellipse.Center.Y) - (slopel * (line.End.X - ellipse.Center.X));
+            double lineSlope = (line.End.Y - line.Start.Y) / (line.End.X - line.Start.X);
+            double lineIntercept = (line.End.Y - ellipse.Center.Y) - (lineSlope * (line.End.X - ellipse.Center.X));
             // The slope of the line ends up being A in the general form
-            Al = slopel;
-            Cl = interceptl;
-            Bl = -1;
+            lineA = lineSlope;
+            lineC = lineIntercept;
+            lineB = -1;
             //  A cannot be negative in the general form
-            if (Al < 0)
+            if (lineA < 0)
             {
-                Al *= -1;
-                Bl *= -1;
-                Cl *= -1;
+                lineA *= -1;
+                lineB *= -1;
+                lineC *= -1;
             }
         }
 
         double major = Point.Distance(ellipse.MajorAxisEndPoint, ellipse.Center);
         double minor = major * ellipse.MinorToMajorAxisRatio;
         //List of solutions from equations
-        List<Point> SolnCoords = new List<Point>();
+        List<Point> solutionCoords = new();
         //Vertical line case
-        if (isVertical && Cl <= Math.Round(major, IntersectTolerance))
+        if (isVertical && lineC <= Math.Round(major, IntersectTolerance))
         {
-            SolnCoords.Add(new Point(-1 * Cl, minor * Math.Sqrt(1 - (Math.Pow(Cl, 2) / Math.Pow(major, 2)))));
-            if (Cl < Math.Round(major, IntersectTolerance))
+            solutionCoords.Add(new Point(-1 * lineC, minor * Math.Sqrt(1 - (Math.Pow(lineC, 2) / Math.Pow(major, 2)))));
+            if (lineC < Math.Round(major, IntersectTolerance))
             {
-                SolnCoords.Add(new Point(-1 * Cl,
-                    -1 * (minor * Math.Sqrt(1 - (Math.Pow(Cl, 2) / Math.Pow(major, 2))))));
+                solutionCoords.Add(new Point(-1 * lineC,
+                    -1 * (minor * Math.Sqrt(1 - (Math.Pow(lineC, 2) / Math.Pow(major, 2))))));
             }
         }
         else
         {
-            double a = Math.Pow(Al, 2) + ((Math.Pow(Bl, 2) * Math.Pow(minor, 2)) / Math.Pow(major, 2));
-            double b = -2 * Al * Cl;
-            double c = Math.Pow(Cl, 2) - (Math.Pow(Bl, 2) * Math.Pow(minor, 2));
-            //List of x value solns
-            List<double> xSolns = QuadraticFormula(a, b, c);
-            bool firstSoln = false;
-            for (int i = 0; i < xSolns.Count; i++)
+            double a = Math.Pow(lineA, 2) + ((Math.Pow(lineB, 2) * Math.Pow(minor, 2)) / Math.Pow(major, 2));
+            double b = -2 * lineA * lineC;
+            double c = Math.Pow(lineC, 2) - (Math.Pow(lineB, 2) * Math.Pow(minor, 2));
+            //List of x value solutions
+            List<double> xSolutions = QuadraticFormula(a, b, c);
+            bool firstSolution = false;
+            foreach (double xSolution in xSolutions)
             {
                 double yValue;
                 if (isVertical)
                 {
-                    if (!firstSoln)
+                    if (!firstSolution)
                     {
                         yValue = Math.Sqrt(Math.Pow(minor, 2) -
-                                           ((Math.Pow(xSolns[i], 2) / Math.Pow(major, 2)) * Math.Pow(minor, 2)));
-                        SolnCoords.Add(new Point(xSolns[i], yValue));
-                        firstSoln = true;
+                                           ((Math.Pow(xSolution, 2) / Math.Pow(major, 2)) * Math.Pow(minor, 2)));
+                        solutionCoords.Add(new Point(xSolution, yValue));
+                        firstSolution = true;
                     }
                     else
                     {
                         yValue = -1 * (Math.Sqrt(Math.Pow(minor, 2) -
-                                                 ((Math.Pow(xSolns[i], 2) / Math.Pow(major, 2)) * Math.Pow(minor, 2))));
-                        SolnCoords.Add(new Point(xSolns[i], yValue));
+                                                 ((Math.Pow(xSolution, 2) / Math.Pow(major, 2)) * Math.Pow(minor, 2))));
+                        solutionCoords.Add(new Point(xSolution, yValue));
                     }
                 }
                 else
                 {
-                    yValue = (((-1 * Al) * xSolns[i]) - Cl) / Bl;
-                    SolnCoords.Add(new Point(xSolns[i], yValue));
+                    yValue = (((-1 * lineA) * xSolution) - lineC) / lineB;
+                    solutionCoords.Add(new Point(xSolution, yValue));
                 }
             }
         }
 
-        if (SolnCoords.Count > 0)
+        if (solutionCoords.Count > 0)
         {
-            for (int i = 0; i < SolnCoords.Count; i++)
+            foreach (Point solutionCoord in solutionCoords)
             {
-                double compX = Math.Round(SolnCoords[i].X + ellipse.Center.X, IntersectTolerance);
-                double compY = Math.Round(SolnCoords[i].Y + ellipse.Center.Y, IntersectTolerance);
+                double compX = Math.Round(solutionCoord.X + ellipse.Center.X, IntersectTolerance);
+                double compY = Math.Round(solutionCoord.Y + ellipse.Center.Y, IntersectTolerance);
                 double roundedStartX = Math.Round(line.Start.X, IntersectTolerance);
                 double roundedEndX = Math.Round(line.End.X, IntersectTolerance);
                 double roundedStartY = Math.Round(line.Start.Y, IntersectTolerance);
@@ -430,9 +415,9 @@ public static class Intersect
 
         // First case, the circles do not intersect as they are too far apart
         // Second case, one circle is entirely inside the other but not intersecting.
-        if (between.Length > (arc1.Radius + arc2.Radius) ||
-            between.Length < (Math.Abs(arc1.Radius - arc2.Radius)) ||
-            between.Length == 0)
+        if (between.GetLength() > (arc1.Radius + arc2.Radius) 
+            || between.GetLength() < (Math.Abs(arc1.Radius - arc2.Radius)) 
+            || DoubleEquals(between.GetLength(), 0))
         {
             return null;
         }
@@ -440,26 +425,25 @@ public static class Intersect
         // The circles intersect. Do they intersect at the position of the arcs?
 
         // Find a and h.
-        double a = (Math.Pow(arc1.Radius, 2) - Math.Pow(arc2.Radius, 2) + Math.Pow(between.Length, 2)) /
-                   (2 * between.Length);
+        double a = (Math.Pow(arc1.Radius, 2) - Math.Pow(arc2.Radius, 2) + Math.Pow(between.GetLength(), 2)) /
+                   (2 * between.GetLength());
         double h = Math.Sqrt(Math.Pow(arc1.Radius, 2) - Math.Pow(a, 2));
 
         // Find P2.
-        double cx2 = arc1.Center.X + a * (arc2.Center.X - arc1.Center.X) / between.Length;
-        double cy2 = arc1.Center.Y + a * (arc2.Center.Y - arc1.Center.Y) / between.Length;
+        double cx2 = arc1.Center.X + a * (arc2.Center.X - arc1.Center.X) / between.GetLength();
+        double cy2 = arc1.Center.Y + a * (arc2.Center.Y - arc1.Center.Y) / between.GetLength();
 
         // Get the points P3.
-        double intersect1X = (cx2 + h * (arc2.Center.Y - arc1.Center.Y) / between.Length);
-        double intersect1Y = (cy2 - h * (arc2.Center.X - arc1.Center.X) / between.Length);
-        double intersect2X = (cx2 - h * (arc2.Center.Y - arc1.Center.Y) / between.Length);
-        double intersect2Y = (cy2 + h * (arc2.Center.X - arc1.Center.X) / between.Length);
+        double intersect1X = (cx2 + h * (arc2.Center.Y - arc1.Center.Y) / between.GetLength());
+        double intersect1Y = (cy2 - h * (arc2.Center.X - arc1.Center.X) / between.GetLength());
+        double intersect2X = (cx2 - h * (arc2.Center.Y - arc1.Center.Y) / between.GetLength());
+        double intersect2Y = (cy2 + h * (arc2.Center.X - arc1.Center.X) / between.GetLength());
 
         bool intersect1IsValid = arc1.IsInArcRange(new Point(intersect1X, intersect1Y)) &&
                                  arc2.IsInArcRange(new Point(intersect1X, intersect1Y));
         bool intersect2IsValid = arc1.IsInArcRange(new Point(intersect2X, intersect2Y)) &&
                                  arc2.IsInArcRange(new Point(intersect2X, intersect2Y));
 
-        //return intersect1IsValid || intersect2IsValid;
         if (intersect1IsValid) return new Point(intersect1X, intersect1Y);
         if (intersect2IsValid) return new Point(intersect2X, intersect2Y);
         return null;

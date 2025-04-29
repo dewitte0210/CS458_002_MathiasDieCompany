@@ -15,10 +15,6 @@ public abstract class Entity
     public Point End { get; set; }
     public bool KissCut { get; set; }
         
-    // todo: make length a get function because it should never change
-    // without underlying properties changing
-    public double Length { get; init; }
-        
     [JsonIgnore] public List<Entity> AdjList { get; set; }
         
     public const double EntityTolerance = 0.00005;
@@ -31,14 +27,9 @@ public abstract class Entity
         End = new Point();
     }
         
-    // todo: implement getLength()
     public abstract double GetLength();
 
     public abstract override bool Equals(object? obj);
-
-    /// <returns> Return true when entities compared have similar traits,
-    /// length is the same (but start and end point, or mid point can vary) </returns>
-    public abstract bool Compare(object? obj);
 
     public abstract double MinX();
     public abstract double MinY();
@@ -46,4 +37,6 @@ public abstract class Entity
     public abstract double MaxY();
 
     public abstract Entity Transform(Matrix3 transform);
+
+    public abstract override int GetHashCode();
 }

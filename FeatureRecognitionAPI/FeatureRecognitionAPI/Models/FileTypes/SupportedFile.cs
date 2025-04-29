@@ -5,7 +5,12 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
 using FeatureRecognitionAPI.Services;
+using Arc = FeatureRecognitionAPI.Models.Entities.Arc;
+using Circle = FeatureRecognitionAPI.Models.Entities.Circle;
+using Ellipse = FeatureRecognitionAPI.Models.Entities.Ellipse;
 using Entity = FeatureRecognitionAPI.Models.Entities.Entity;
+using Line = FeatureRecognitionAPI.Models.Entities.Line;
+using Point = FeatureRecognitionAPI.Models.Entities.Point;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -404,7 +409,7 @@ namespace FeatureRecognitionAPI.Models
             Angles.Angle outerAngleFar = null;
             for (int i = 0; i < entity.AdjList.Count; i++)
             {
-                if (entity.AdjList[i] is Line { AdjList.Count: 2 } e && entity.Length == e.Length)
+                if (entity.AdjList[i] is Line { AdjList.Count: 2 } e && entity.GetLength() == e.GetLength())
                 {
                     innerAngle = Angles.GetAngle(entity, e);
                     outerAngleClose = Angles.GetAngle(entity, (Line)entity.AdjList[1-i]);

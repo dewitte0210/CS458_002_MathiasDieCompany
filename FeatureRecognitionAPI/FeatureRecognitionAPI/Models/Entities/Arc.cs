@@ -1,12 +1,11 @@
-using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Utility;
 using Convert = System.Convert;
 using Math = System.Math;
 
-namespace FeatureRecognitionAPI.Models;
+namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Class that represents a Arc object that extends Entity
+/// Class that represents an Arc object that extends Entity
 /// Inherits entityType and Length fields 
 /// </summary>
 public class Arc : Entity
@@ -35,12 +34,15 @@ public class Arc : Entity
         Start = new(CalcXCoord(centerX, radius, startAngle), CalcYCoord(centerY, radius, startAngle));
         End = new Point(CalcXCoord(centerX, radius, endAngle), CalcYCoord(centerY, radius, endAngle));
         CentralAngle = CalcCentralAngle(startAngle, endAngle);
-        Length = (CalcLength(radius, CentralAngle));
     }
 
+    /// <summary>
+    /// Function to calculate the length of the arc for perimeter length checks 
+    /// </summary>
+    /// <returns>the calculated length (partial circumference) of the arc</returns>
     public override double GetLength()
     {
-        return CalcLength(Radius, CentralAngle);
+        return (2 * Math.PI * Radius * (CentralAngle / 360));
     }
     
     /// <summary>
@@ -74,18 +76,7 @@ public class Arc : Entity
             return endAngle - startAngle + 360;
         return endAngle - startAngle;
     }
-
-    /// <summary>
-    /// Function to calculate the length of the arc for perimeter length checks 
-    /// </summary>
-    /// <param name="radius"> the radius value of the arc being calculated </param>
-    /// <param name="centralAngle"> the central angle for the arc being calculated </param>
-    /// <returns> the calculated length (partial circumference) of the arc </returns>
-    private static double CalcLength(double radius, double centralAngle)
-    {
-        return (2 * Math.PI * radius * (centralAngle / 360));
-    }
-
+    
     /// <summary>
     /// Overrides .Equals function for the Arc object
     /// </summary>
@@ -96,27 +87,11 @@ public class Arc : Entity
         if (obj is Arc)
         {
             //IDE Mapped everything to work with tolerance in one tab push :O
-            if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
+            if (Math.Abs(((Arc)obj).GetLength() - this.GetLength()) < EntityTolerance
                 && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
                 && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
                 && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance
                 && ((Arc)obj).Start.Equals(this.Start) && ((Arc)obj).End.Equals(this.End))
-            {
-                return true;
-            }
-            else return false;
-        }
-        else return false;
-    }
-
-    public override bool Compare(object? obj)
-    {
-        if (obj is Arc)
-        {
-            if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
-                && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
-                && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
-                && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
             {
                 return true;
             }
@@ -189,15 +164,15 @@ public class Arc : Entity
         return middleAngle;
     }
 
-    public int GetHashCode()
+    public override int GetHashCode()
     {
         //hash is built using ellipse center and arc radius
         //so two arcs with the same center and arc radius will have the same hash
+        //Note: this hash may not be robust enough
         return Convert.ToInt32(
             Center.X * 10010111 +
             Center.Y * 10000379 +
             Radius * 10006721);
-        //Note: this hash may not be robust enough
     }
 
     public override double MinX()
@@ -334,7 +309,7 @@ public class Arc : Entity
             else
             {
                 angle = Math.IEEERemainder(angle, 360.0);
-                //** IEEEremainder can return -180 here for some input values...
+                //** IEEERemainder can return -180 here for some input values...
                 if (angle == -180.0)
                 {
                     angle = 180.0;
@@ -350,7 +325,7 @@ public class Arc : Entity
             else
             {
                 angle = Math.IEEERemainder(angle, 360.0);
-                //** IEEEremainder can return -180 here for some input values...
+                //** IEEERemainder can return -180 here for some input values...
                 if (angle == -180.0)
                 {
                     angle = 180.0;

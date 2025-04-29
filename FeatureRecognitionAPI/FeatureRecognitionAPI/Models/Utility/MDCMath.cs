@@ -36,7 +36,7 @@ public static class MdcMath
             low = b;
             high = a;
         }
-        
+
         return value >= low - tolerance && value <= high + tolerance;
     }
 
