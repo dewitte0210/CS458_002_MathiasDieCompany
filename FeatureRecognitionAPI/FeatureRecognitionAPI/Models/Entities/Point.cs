@@ -1,3 +1,5 @@
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
+
 namespace FeatureRecognitionAPI.Models
 {
     public class Point
@@ -26,12 +28,7 @@ namespace FeatureRecognitionAPI.Models
         {
             if (obj is Point point)
             {
-                double xDiff = Math.Abs(point.X - this.X);
-                double yDiff = Math.Abs(point.Y - this.Y);
-                if (xDiff < 0.0009 && yDiff < 0.0009)
-                {
-                    return true;
-                }
+                return DoubleEquals(X, point.X) && DoubleEquals(Y, point.Y);
             }
             return false;
         }

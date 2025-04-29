@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NHibernate.Dialect.Function;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
+using static FeatureRecognitionAPI.Models.Utility.Intersect;
 
 public class Feature
 {
@@ -327,7 +328,7 @@ public class Feature
 
     public bool CheckGroup1C()
     {
-        //Triange base shape needs 3 lines
+        //Triangle base shape needs 3 lines
         if (numLines != 3)
         {
             return false;
@@ -368,7 +369,7 @@ public class Feature
                     {
                         if (baseEntityList[i] is Line && eIndex < 2)
                         {
-                            if (Entity.IntersectLineWithArc((Line)baseEntityList[i],
+                            if (DoesIntersect((Line)baseEntityList[i],
                                     (Arc)baseEntityList[arcIndex]))
                             {
                                 touchingArc[eIndex] = (Line)baseEntityList[i];
@@ -384,7 +385,7 @@ public class Feature
 
                     if (touchingArc[0] is Line && touchingArc[1] is Line)
                     {
-                        if (!Entity.IntersectLineWithLine((Line)touchingArc[0], (Line)touchingArc[1]))
+                        if (!DoesIntersect((Line)touchingArc[0], (Line)touchingArc[1]))
                         {
                             FeatureType = PossibleFeatureTypes.Group1C;
                             return true;
@@ -412,7 +413,7 @@ public class Feature
                     {
                         if (baseEntityList[i] is Line && eIndex < 2)
                         {
-                            if (Entity.IntersectLineWithArc((Line)baseEntityList[i],
+                            if (DoesIntersect((Line)baseEntityList[i],
                                     (Arc)baseEntityList[arcIndex]))
                             {
                                 touchingArc[eIndex] = (Line)baseEntityList[i];
@@ -421,7 +422,7 @@ public class Feature
                         }
                         else if (baseEntityList[i] is Arc && eIndex < 2)
                         {
-                            if (Entity.IntersectArcWithArc((Arc)baseEntityList[i],
+                            if (DoesIntersect((Arc)baseEntityList[i],
                                     (Arc)baseEntityList[arcIndex]))
                             {
                                 touchingArc[eIndex] = (Arc)baseEntityList[i];
@@ -467,8 +468,8 @@ public class Feature
                     {
                         if (baseEntityList[i] is Line && eIndex < 4)
                         {
-                            if (Entity.IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[0])
-                                || Entity.IntersectLineWithArc((Line)baseEntityList[i], (Arc)arcList[1]))
+                            if (DoesIntersect((Line)baseEntityList[i], (Arc)arcList[0])
+                                || DoesIntersect((Line)baseEntityList[i], (Arc)arcList[1]))
                             {
                                 touchingArc[eIndex] = (Line)baseEntityList[i];
                                 eIndex++;
@@ -480,8 +481,8 @@ public class Feature
                             if (!arcList[0].Equals((Arc)baseEntityList[i])
                                 && !arcList[1].Equals((Arc)baseEntityList[i])
                                 //And if the arc intersects with the arc at 0 or at 1
-                                && (Entity.IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[0])
-                                    || Entity.IntersectArcWithArc((Arc)baseEntityList[i], (Arc)arcList[1])))
+                                && (DoesIntersect((Arc)baseEntityList[i], (Arc)arcList[0])
+                                    || DoesIntersect((Arc)baseEntityList[i], (Arc)arcList[1])))
                             {
                                 touchingArc[eIndex] = (Arc)baseEntityList[i];
                                 eIndex++;
@@ -716,7 +717,7 @@ public class Feature
         //  per actual intersection
         for (int i = 0; i < baseEntityList.Count; i++)
         {
-            if (!baseEntityList[i].DoesIntersect(ray))
+            if (!DoesIntersect(baseEntityList[i], ray))
             {
                 continue;
             }
@@ -724,7 +725,7 @@ public class Feature
             numIntersections++;
             if (baseEntityList[i] is Line line)
             {
-                Point? intersection = Intersect.GetIntersectPoint(ray, line);
+                Point? intersection = GetIntersectPoint(ray, line);
                 if (intersection == null)
                 {
                     continue;
@@ -735,7 +736,7 @@ public class Feature
             }
             else if (baseEntityList[i] is Arc arc1)
             {
-                Point? intersection = Intersect.GetIntersectPoint(ray, arc1);
+                Point? intersection = GetIntersectPoint(ray, arc1);
                 if (intersection == null)
                 {
                     continue;
@@ -749,7 +750,7 @@ public class Feature
 
             else if (baseEntityList[i] is Ellipse ellipse)
             {
-                Point? intersection = Intersect.GetIntersectPoint(ray, ellipse);
+                Point? intersection = GetIntersectPoint(ray, ellipse);
                 if (intersection == null)
                 {
                     continue;
@@ -907,7 +908,7 @@ public class Feature
         Line ccw = new Line(edgeOfArc.X, edgeOfArc.Y, -1 * (arc.Center.Y - edgeOfArc.Y) + edgeOfArc.X,
             (arc.Center.X - edgeOfArc.X) + edgeOfArc.Y);
         //Slope of perpendicular line will be vertical
-        if (line.DoesIntersect(cw) || line.DoesIntersect(ccw))
+        if (DoesIntersect(line, cw) || DoesIntersect(line, ccw))
         {
             return true;
         }
@@ -948,7 +949,7 @@ public class Feature
             // Flip end points for calc if they are touching the smaller arc
             for (int i = 0; i < lines.Count; i++)
             {
-                Point intersect = Intersect.GetIntersectPoint(lines[i], biggerArc);
+                Point intersect = GetIntersectPoint(lines[i], biggerArc);
                 if (!lines[i].End.Equals(intersect))
                 {
                     Point temp = lines[i].Start;
@@ -1115,8 +1116,8 @@ public class Feature
                 bool isSide2Convex = !IsConcave(side2);
                 bool isBigArcConvex = !IsConcave(bigArc);
                 if (isSide1Convex && isSide2Convex && isBigArcConvex
-                    && line1.AreEndpointsTouching(side1) && line1.AreEndpointsTouching(side2)
-                    && bigArc.AreEndpointsTouching(side1) && bigArc.AreEndpointsTouching(side2))
+                    && AreEndpointsTouching(line1, side1) && AreEndpointsTouching(line1, side2)
+                    && AreEndpointsTouching(bigArc, side1) && AreEndpointsTouching(bigArc, side2))
                 {
                     FeatureType = PossibleFeatureTypes.Group11;
                     return true;
@@ -1381,13 +1382,6 @@ public class Feature
                     }
                 }
             }
-
-
-            
-            
-            
-            
-            
         }
     }
     
@@ -1496,7 +1490,7 @@ public class Feature
             {
                 foreach (Entity entity in feature.EntityList)
                 {
-                    if (entity is Line tempLine && tempLine.DoesIntersect(entity))
+                    if (entity is Line tempLine && DoesIntersect(tempLine, entity))
                     {
                         feature.FeatureType = PossibleFeatureTypes.Group4;
                     }
@@ -1568,9 +1562,9 @@ public class Feature
             if (feature.EntityList.Count == 1)
             {
                 Point? LineAIntersect =
-                    Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
+                    GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
                 Point? LineBIntersect =
-                    Intersect.GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
+                    GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
 
                 /*
                 if (LineAIntersect == null || LineBIntersect == null)
@@ -1879,7 +1873,8 @@ public class Feature
     /// aren't the same infinite line, or already touch </returns>
     public bool ExtendTwoLines(Line line1, Line line2)
     {
-        if (!line1.DoesIntersect(line2) && !line1.KissCut && !line2.KissCut)
+        //if (!line1.DoesIntersect(line2) && !line1.KissCut && !line2.KissCut)
+        if (!DoesIntersect(line1, line2) && !line1.KissCut && !line2.KissCut)
             //makes sure you're not extending lines that already touch
             // Makes sure KissCut lines are not extended
 
@@ -1901,7 +1896,7 @@ public class Feature
 
     private void ChangeAdjListForExtendedLine(ExtendedLine exLine, Line line1, Line line2)
     {
-        // maeke the extended line's adjacency list
+        // make the extended line's adjacency list
         exLine.AdjList = new List<Entity>(line1.AdjList);
         exLine.AdjList.AddRange(line2.AdjList);
         exLine.AdjList.Remove(line1);
@@ -1991,7 +1986,7 @@ public class Feature
             //base case where the current entity touches the head (means its a closed shape)
             //checks if contained in visitedEntities to avoid the second entity from triggering this
             //checks if current entity is the same as head to avoid a false true
-            if (curPath.Peek() != head && curPath.Peek().AreEndpointsTouching(head) &&
+            if (curPath.Peek() != head && AreEndpointsTouching(curPath.Peek(), head) &&
                 !testedEntities.Contains(curPath.Peek()))
             {
                 return true; //Path found
@@ -2006,7 +2001,7 @@ public class Feature
             if (entity != curPath.Peek())
             {
                 // checks if entity in loop is not the current entity being checked
-                if (curPath.Peek().AreEndpointsTouching(entity) && (!testedEntities.Contains(entity)))
+                if (AreEndpointsTouching(curPath.Peek(), entity) && !testedEntities.Contains(entity))
                 {
                     // checks that the entity has not already been tested and is touching the entity
                     //adds to stack
@@ -2087,12 +2082,12 @@ public class Feature
     /// </summary>
     /// <param name="path"> the list of touching entities</param>
     /// <param name="unusedEntities"> all available entities to add</param>
-    /// <param name="curEntity"> is the current entity being checked </param>
-    public void GetTouchingList(List<Entity> path, List<Entity> unusedEntities, Entity curEntity)
+    /// <param name="currentEntity"> is the current entity being checked </param>
+    public void GetTouchingList(List<Entity> path, List<Entity> unusedEntities, Entity currentEntity)
     {
-        if (curEntity is null)
+        if (currentEntity is null)
         {
-            curEntity = unusedEntities[0];
+            currentEntity = unusedEntities[0];
             path.Add(unusedEntities[0]);
             unusedEntities.RemoveAt(0);
         }
@@ -2101,7 +2096,7 @@ public class Feature
         // adds all entities in unusedEntities that touch curEntity to Path and touchinglist and removes them from unusedEntities
         for (int i = 0; i < unusedEntities.Count; i++) 
         {
-            if (curEntity.DoesIntersect(unusedEntities[i]))
+            if (DoesIntersect(currentEntity, unusedEntities[i]))
             {
                 touchingList.Add(unusedEntities[i]);
                 path.Add(unusedEntities[i]);
@@ -2159,7 +2154,7 @@ public class Feature
         {
             foreach (Entity e in exLine.AdjList)
             {
-                if (e.DoesIntersect(exLine.Parent1))
+                if (DoesIntersect(e, exLine.Parent1))
                 {
                     e.AdjList.Add(exLine.Parent1);
                 }

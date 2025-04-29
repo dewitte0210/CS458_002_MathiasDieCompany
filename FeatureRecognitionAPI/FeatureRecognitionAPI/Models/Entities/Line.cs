@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Versioning;
 using System.Web;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Utility;
 
 namespace FeatureRecognitionAPI.Models

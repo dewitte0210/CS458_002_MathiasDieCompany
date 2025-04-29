@@ -1,3 +1,4 @@
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Utility;
 using Convert = System.Convert;
 using Math = System.Math;

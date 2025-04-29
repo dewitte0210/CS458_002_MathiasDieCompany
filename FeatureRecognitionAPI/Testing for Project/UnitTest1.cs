@@ -1,6 +1,7 @@
 using ACadSharp;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Utility;
 using NuGet.Frameworks;
 

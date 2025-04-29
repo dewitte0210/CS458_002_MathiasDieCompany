@@ -1,18 +1,42 @@
 using DecimalMath;
+using FeatureRecognitionAPI.Models.Entities;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
 namespace FeatureRecognitionAPI.Models.Utility;
 
 public static class Intersect
 {
     /// <summary>
+    /// Function to check if any points of this entity is touching any points of another entity
+    /// </summary>
+    /// <param name="e1"> first entity </param>
+    /// <param name="e2"> second entity </param>
+    /// <returns> true if they have points touch, otherwise false </returns>
+    internal static bool AreEndpointsTouching(Entity? e1, Entity? e2)
+    {
+        if (e1 is null || e2 is null) return false;
+        if (e1 is Circle || e2 is Circle) return false;
+
+        return e1.Start.Equals(e2.Start) ||
+               e1.Start.Equals(e2.End) ||
+               e1.End.Equals(e2.Start) ||
+               e1.End.Equals(e2.End);
+    }
+
+    /// <summary>
     /// used for intersect functions
     /// </summary>
     private const int IntersectTolerance = 4;
 
+    public static bool DoesIntersect(Entity? e1, Entity? e2)
+    {
+        return GetIntersectPoint(e1, e2) != null;
+    }
+
     /// <summary>
     /// Finds an intersect point between two entities.
-    /// Only really does it for a line and another entity
+    /// Check against null if you want to bool compare
     /// </summary>
     /// <param name="entity1"> An entity but really a Line </param>
     /// <param name="entity2"> Another entity </param>
@@ -21,23 +45,60 @@ public static class Intersect
     {
         if (entity1 == null || entity2 == null) return null;
 
-        if (entity1 is Line line)
+        // todo: implement circle intersects
+        if (entity1 is Circle || entity2 is Circle) return null;
+
+        // todo: implement arc-ellipse and ellipse-ellipse intersect
+        
+        // If the endpoints are touching we can avoid the intersect math 
+        if (Equals(entity1.Start, entity2.Start)) return entity1.Start;
+        if (Equals(entity1.Start, entity2.End)) return entity1.Start;
+        if (Equals(entity1.End, entity2.End)) return entity1.End;
+        if (Equals(entity1.End, entity2.Start)) return entity1.End;
+
+        if (entity1 is Line line1)
         {
             switch (entity2)
             {
                 case Line line2:
-                    return FindIntersectPoint(line, line2);
-                case Arc arc:
-                    return FindIntersectPoint(line, arc);
-                case Ellipse ellipse:
-                    return FindIntersectPoint(line, ellipse);
+                    return FindIntersectPointHelper(line1, line2);
+                case Arc arc2:
+                    return FindIntersectPointHelper(line1, arc2);
+                case Ellipse ellipse2:
+                    return FindIntersectPointHelper(line1, ellipse2);
             }
         }
-
+        else if (entity1 is Arc arc1)
+        {
+            switch (entity2)
+            {
+                case Line line2:
+                    return FindIntersectPointHelper(line2, arc1);
+                case Arc arc2:
+                    return FindIntersectPointHelper(arc1, arc2);
+            }
+        }
+        else if (entity1 is Ellipse ellipse1)
+        {
+            switch (entity2)
+            {
+                case Line line2:
+                    return FindIntersectPointHelper(line2, ellipse1);
+            }
+        }
         return null;
     }
 
-    private static Point? FindIntersectPoint(Line line1, Line line2)
+    /// <summary>
+    /// Finds the intersect point between two lines.
+    /// Treats the two lines as infinite. 
+    /// </summary>
+    /// <param name="line1"></param>
+    /// <param name="line2"></param>
+    /// <returns>
+    /// returns the point where the two lines would intersect, otherwise null
+    /// </returns>
+    public static Point? GetInfiniteLineIntersect(Line line1, Line line2)
     {
         Point l1Delta = line1.GetDelta();
         Point l2Delta = line2.GetDelta();
@@ -48,7 +109,7 @@ public static class Intersect
         double diffCross = CrossProduct(xDiff, yDiff);
 
         //lines are parallel
-        if (MdcMath.DoubleEquals(diffCross, 0)) return null;
+        if (DoubleEquals(diffCross, 0)) return null;
 
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
@@ -56,8 +117,36 @@ public static class Intersect
 
         return new Point(x, y);
     }
+    
+    // line with line
+    internal static Point? FindIntersectPointHelper(Line line1, Line line2)
+    {
+        Point l1Delta = line1.GetDelta();
+        Point l2Delta = line2.GetDelta();
 
-    private static Point? FindIntersectPoint(Line line, Arc arc)
+        Point xDiff = new(-l1Delta.X, -l2Delta.X);
+        Point yDiff = new(-l1Delta.Y, -l2Delta.Y);
+
+        // uses cross product to get around slope divide by 0 issues
+        double diffCross = CrossProduct(xDiff, yDiff);
+
+        // lines are parallel, don't say they intersect even if they are actually collinear
+        if (DoubleEquals(diffCross, 0)) return null;
+
+        Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
+        double x = CrossProduct(d, xDiff) / diffCross;
+        double y = CrossProduct(d, yDiff) / diffCross;
+        
+        // if point lies on both lines it must be within both bounds
+        bool within1 = IsBetween(x, line1.Start.X, line1.End.X) && IsBetween(y, line1.Start.Y, line1.End.Y);
+        bool within2 = IsBetween(x, line2.Start.X, line2.End.X) && IsBetween(y, line2.Start.Y, line2.End.Y);
+
+        if (within1 && within2) return new Point(x, y);
+        return null;
+    }
+    
+    // line with arc
+    internal static Point? FindIntersectPointHelper(Line line, Arc arc)
     {
         //  Get line in the slope-intercept form, then transform it to the
         //  general form: Ax + By + C = 0
@@ -120,7 +209,7 @@ public static class Intersect
             //  Special case for vertical line
             if (line.End.X == line.Start.X)
             {
-                double[] tempSolns = MdcMath.QuadraticFormula(
+                double[] tempSolns = QuadraticFormula(
                     1,
                     (-2 * arc.Center.Y),
                     (Math.Pow(arc.Center.Y, 2) + Math.Pow((line.End.X - arc.Center.X), 2) - Math.Pow(arc.Radius, 2))
@@ -188,7 +277,8 @@ public static class Intersect
         return null;
     }
 
-    private static Point? FindIntersectPoint(Line line, Ellipse ellipse)
+    // line with ellipse
+    internal static Point? FindIntersectPointHelper(Line line, Ellipse ellipse)
     {
         //Need to rotate the line around the origin for rotated ellipses
         double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
@@ -278,7 +368,7 @@ public static class Intersect
             double b = -2 * Al * Cl;
             double c = Math.Pow(Cl, 2) - (Math.Pow(Bl, 2) * Math.Pow(minor, 2));
             //List of x value solns
-            List<double> xSolns = MdcMath.QuadraticFormula(a, b, c);
+            List<double> xSolns = QuadraticFormula(a, b, c);
             bool firstSoln = false;
             for (int i = 0; i < xSolns.Count; i++)
             {
@@ -311,22 +401,67 @@ public static class Intersect
         {
             for (int i = 0; i < SolnCoords.Count; i++)
             {
-                if (ellipse.isInEllipseRange(new Point(SolnCoords[i].X + ellipse.Center.X,
-                        SolnCoords[i].Y + ellipse.Center.Y))
-                    && Math.Min(Math.Round(line.Start.X, IntersectTolerance),
-                        Math.Round(line.End.X, IntersectTolerance)) <= (SolnCoords[i].X + ellipse.Center.X)
-                    && Math.Min(Math.Round(line.Start.Y, IntersectTolerance),
-                        Math.Round(line.End.Y, IntersectTolerance)) <= (SolnCoords[i].Y + ellipse.Center.Y)
-                    && Math.Max(Math.Round(line.Start.X, IntersectTolerance),
-                        Math.Round(line.End.X, IntersectTolerance)) >= (SolnCoords[i].X + ellipse.Center.X)
-                    && Math.Max(Math.Round(line.Start.Y, IntersectTolerance),
-                        Math.Round(line.End.Y, IntersectTolerance)) >= (SolnCoords[i].Y + ellipse.Center.Y))
+                double compX = Math.Round(SolnCoords[i].X + ellipse.Center.X, IntersectTolerance);
+                double compY = Math.Round(SolnCoords[i].Y + ellipse.Center.Y, IntersectTolerance);
+                double roundedStartX = Math.Round(line.Start.X, IntersectTolerance);
+                double roundedEndX = Math.Round(line.End.X, IntersectTolerance);
+                double roundedStartY = Math.Round(line.Start.Y, IntersectTolerance);
+                double roundedEndY = Math.Round(line.End.Y, IntersectTolerance);
+                
+                if (ellipse.isInEllipseRange(new Point(compX, compY))
+                    && Math.Min(roundedStartX, roundedEndX) <= compX
+                    && Math.Max(roundedStartX, roundedEndX) >= compX
+                    && Math.Min(roundedStartY, roundedEndY) <= compY
+                    && Math.Max(roundedStartY, roundedEndY) >= compY)
                 {
-                    return new Point(SolnCoords[i].X + ellipse.Center.X, SolnCoords[i].Y + ellipse.Center.Y);
+                    return new Point(compX, compY);
                 }
             }
         }
 
+        return null;
+    }
+
+    // arc with arc
+    internal static Point? FindIntersectPointHelper(Arc arc1, Arc arc2)
+    {
+        // Treat both Arcs circles, get the line between their centers
+        Line between = new Line(arc1.Center.X, arc1.Center.Y, arc2.Center.X, arc2.Center.Y);
+
+        // First case, the circles do not intersect as they are too far apart
+        // Second case, one circle is entirely inside the other but not intersecting.
+        if (between.Length > (arc1.Radius + arc2.Radius) ||
+            between.Length < (Math.Abs(arc1.Radius - arc2.Radius)) ||
+            between.Length == 0)
+        {
+            return null;
+        }
+
+        // The circles intersect. Do they intersect at the position of the arcs?
+
+        // Find a and h.
+        double a = (Math.Pow(arc1.Radius, 2) - Math.Pow(arc2.Radius, 2) + Math.Pow(between.Length, 2)) /
+                   (2 * between.Length);
+        double h = Math.Sqrt(Math.Pow(arc1.Radius, 2) - Math.Pow(a, 2));
+
+        // Find P2.
+        double cx2 = arc1.Center.X + a * (arc2.Center.X - arc1.Center.X) / between.Length;
+        double cy2 = arc1.Center.Y + a * (arc2.Center.Y - arc1.Center.Y) / between.Length;
+
+        // Get the points P3.
+        double intersect1X = (cx2 + h * (arc2.Center.Y - arc1.Center.Y) / between.Length);
+        double intersect1Y = (cy2 - h * (arc2.Center.X - arc1.Center.X) / between.Length);
+        double intersect2X = (cx2 - h * (arc2.Center.Y - arc1.Center.Y) / between.Length);
+        double intersect2Y = (cy2 + h * (arc2.Center.X - arc1.Center.X) / between.Length);
+
+        bool intersect1IsValid = arc1.IsInArcRange(new Point(intersect1X, intersect1Y)) &&
+                                 arc2.IsInArcRange(new Point(intersect1X, intersect1Y));
+        bool intersect2IsValid = arc1.IsInArcRange(new Point(intersect2X, intersect2Y)) &&
+                                 arc2.IsInArcRange(new Point(intersect2X, intersect2Y));
+
+        //return intersect1IsValid || intersect2IsValid;
+        if (intersect1IsValid) return new Point(intersect1X, intersect1Y);
+        if (intersect2IsValid) return new Point(intersect2X, intersect2Y);
         return null;
     }
 }
