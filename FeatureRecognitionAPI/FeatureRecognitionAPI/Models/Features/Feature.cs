@@ -708,7 +708,7 @@ public class Feature
         }
 
         //  Entends the ray
-        Point unitVector = new Point((ray.End.X - ray.Start.X) / ray.Length, (ray.End.Y - ray.Start.Y) / ray.Length);
+        Point unitVector = new Point((ray.End.X - ray.Start.X) / ray.GetLength(), (ray.End.Y - ray.Start.Y) / ray.GetLength());
         Point newEndPoint = new Point(ray.Start.X + maxLength * unitVector.X, ray.Start.Y + maxLength * unitVector.Y);
         ray = new Line(ray.Start.X, ray.Start.Y, newEndPoint.X, newEndPoint.Y);
 
@@ -841,19 +841,19 @@ public class Feature
         Line newLine1;
         Line newLine2;
         // Checks the lengths of each line to ensure the right line is used to form the quadrilateral
-        if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) < Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        if (Math.Round(tempLine1.GetLength(), 4) + Math.Round(tempLine2.GetLength(), 4) < Math.Round(tempLine3.GetLength(), 4) + Math.Round(tempLine4.GetLength(), 4))
         {
             newLine1 = tempLine1;
             newLine2 = tempLine2;
         }
-        else if (Math.Round(tempLine1.Length, 4) + Math.Round(tempLine2.Length, 4) > Math.Round(tempLine3.Length, 4) + Math.Round(tempLine4.Length, 4))
+        else if (Math.Round(tempLine1.GetLength(), 4) + Math.Round(tempLine2.GetLength(), 4) > Math.Round(tempLine3.GetLength(), 4) + Math.Round(tempLine4.GetLength(), 4))
         {
             newLine1 = tempLine3;
             newLine2 = tempLine4;
         }
         else
         {
-            if (Math.Round(tempLine1.Length, 4) < Math.Round(tempLine2.Length, 4))
+            if (Math.Round(tempLine1.GetLength(), 4) < Math.Round(tempLine2.GetLength(), 4))
             {
                 newLine1 = tempLine1;
             }
@@ -861,7 +861,7 @@ public class Feature
             {
                 newLine1 = tempLine2;
             }
-            if (Math.Round(tempLine3.Length, 4) < Math.Round(tempLine4.Length, 4))
+            if (Math.Round(tempLine3.GetLength(), 4) < Math.Round(tempLine4.GetLength(), 4))
             {
                 newLine2 = tempLine3;
             }
@@ -871,7 +871,7 @@ public class Feature
             }
         }
 
-        return Math.Round(baseLine1.Length, 4).Equals(Math.Round(baseLine2.Length, 4))
+        return Math.Round(baseLine1.GetLength(), 4).Equals(Math.Round(baseLine2.GetLength(), 4))
                && IsPerpendicular(newLine1, baseLine1) && IsPerpendicular(newLine1, baseLine2)
                && IsPerpendicular(newLine2, baseLine1) && IsPerpendicular(newLine2, baseLine2);
     }
@@ -1750,14 +1750,14 @@ public class Feature
         {
             //Genuinely my first time ever using lambda expression for something actually useful
             //sort both lists by length
-            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+            ((Feature)obj).EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
 
             //For each entity in this.EntityList check for a corresponding entity obj.EntityList
             bool equalLists = true;
             foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
                 {
                     equalLists = false;
                     break;
@@ -1784,15 +1784,15 @@ public class Feature
         {
             //Genuinly my first time ever using lambda expression for something actually useful
             //sort both lists by length
-            EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-            ((Feature)obj).EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+            EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+            ((Feature)obj).EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
 
             //For each entity in this.EntityList check for a corresponding entity in tmpList
             //Remove the entity if it's found, and set the corresponding value in validArray to true
             bool equalLists = true;
             foreach (Entity j in ((Feature)obj).EntityList)
             {
-                if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+                if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
                 {
                     equalLists = false;
                     break;
@@ -1949,7 +1949,7 @@ public class Feature
         foreach (Entity entity in ExtendedEntityList)
         // this finds the entity with the greatest length and makes it the head to hopefully reduce runtime
         {
-            if (entity.Length > head.Length)
+            if (entity.GetLength() > head.GetLength())
             {
                 head = entity;
             }
@@ -2254,7 +2254,7 @@ public class Feature
         perimeter = 0;
         foreach (Entity entity in EntityList)
         {
-            perimeter += entity.Length;
+            perimeter += entity.GetLength();
         }
 
         if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch)

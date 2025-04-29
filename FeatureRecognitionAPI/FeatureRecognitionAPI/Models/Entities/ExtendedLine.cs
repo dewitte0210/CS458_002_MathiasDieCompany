@@ -1,4 +1,4 @@
-﻿namespace FeatureRecognitionAPI.Models;
+﻿namespace FeatureRecognitionAPI.Models.Entities;
 
 public class ExtendedLine : Line
 {
@@ -26,8 +26,6 @@ public class ExtendedLine : Line
 
         SlopeY = End.Y - Start.Y;
         SlopeX = End.X - Start.X;
-
-        this.Length = Point.Distance(Start, End);
     }
 
     /// <summary>
