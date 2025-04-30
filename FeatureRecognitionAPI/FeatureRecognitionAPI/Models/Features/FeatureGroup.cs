@@ -60,7 +60,6 @@ public class FeatureGroup
         }
         // add the new chamfer features to the group
         features.AddRange(featuresToAdd);
-        Count += featuresToAdd.Count;
         featuresToAdd.Clear();
     }
 
@@ -88,10 +87,15 @@ public class FeatureGroup
         // Group identical features together
         for (int i = 0; i < features.Count; i++)
         {
+            //ignore group 3 chamfer check because equals sees them as the same even though they are not
+            if (features[i].FeatureType == PossibleFeatureTypes.Group3)
+            {
+                continue;
+            }
+            
             for (int j = i + 1; j < features.Count; j++)
             {
-                //ignore group 3 chamfer check because equals sees them as the same even though they are not
-                if (features[i].Equals(features[j]) && features[i].FeatureType != PossibleFeatureTypes.Group3)
+                if (features[i].Equals(features[j]))
                 {
                     features[i].count += features[j].count;
                     features.RemoveAt(j);

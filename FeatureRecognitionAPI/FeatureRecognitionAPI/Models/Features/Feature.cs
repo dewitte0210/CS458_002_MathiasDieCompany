@@ -1732,13 +1732,13 @@ public class Feature
         }
 
         //sort both lists by length
-        EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
-        feature.EntityList.Sort((x, y) => x.Length.CompareTo(y.Length));
+        EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+        feature.EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
 
         //For each entity in this.EntityList check for a corresponding entity obj.EntityList
         foreach (Entity j in ((Feature)obj).EntityList)
         {
-            if (!EntityList.Any(e => Math.Abs(e.Length - j.Length) < Entity.EntityTolerance))
+            if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
             {
                 return false;
             }

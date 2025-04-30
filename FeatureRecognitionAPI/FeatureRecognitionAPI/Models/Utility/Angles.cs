@@ -284,13 +284,13 @@ namespace FeatureRecognitionAPI.Models.Utility
 		public static bool IsPerpendicular(Line a, Line b)
 		{
 			Degrees angle = GetAngle(a, b).GetDegrees();
-			return DoubleEquals((angle + 90) % 180, 0);
+			return DoubleEquals(Math.Round(angle + 90, 4) % 180, Entity.EntityTolerance);
 		}
 
 		public static bool IsParallel(Line a, Line b)
 		{
 			// round because angle can be 179.999 and modulus won't work
-			double angle = Double.Round(GetAngle(a, b).GetDegrees());
+			double angle = Math.Round(GetAngle(a, b).GetDegrees(), 4);
 			return DoubleEquals((angle % 180), 0);
 		}
 	}
