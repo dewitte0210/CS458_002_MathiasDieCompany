@@ -401,7 +401,7 @@ h3 {
 
 .modal-image {
   display: block;
-  width: 40px;
+  width: 60px;
   height: auto;
   margin-left: auto;
   margin-right: auto;
@@ -409,6 +409,7 @@ h3 {
 
 .modal-image-description {
   text-align: center;
+  font-size: large;
 }
 
 .supported-features {

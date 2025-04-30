@@ -37,7 +37,7 @@ const ParentModal: React.FC<ParentModalProps> = ({
   return (
     <>
       {/* Parent Modal */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal show={showModal && !childModalVisible} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Supported Features</Modal.Title>
         </Modal.Header>
@@ -55,12 +55,12 @@ const ParentModal: React.FC<ParentModalProps> = ({
             ))}
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <button className="animated-button" onClick={handleCloseModal}>
-            <span>Close</span>
-            <span></span>
-          </button>
-        </Modal.Footer>
+        {/*<Modal.Footer>*/}
+        {/*  <button className="animated-button" onClick={handleCloseModal}>*/}
+        {/*    <span>Close</span>*/}
+        {/*    <span></span>*/}
+        {/*  </button>*/}
+        {/*</Modal.Footer>*/}
       </Modal>
 
       {/* Child Modal */}
@@ -75,12 +75,12 @@ const ParentModal: React.FC<ParentModalProps> = ({
             </>
           )}
         </Modal.Body>
-        <Modal.Footer>
-        <button className="animated-button" onClick={handleCloseChildModal}>
-            <span>Close</span>
-            <span></span>
-          </button>
-        </Modal.Footer>
+        {/*<Modal.Footer>*/}
+        {/*<button className="animated-button" onClick={handleCloseChildModal}>*/}
+        {/*    <span>Close</span>*/}
+        {/*    <span></span>*/}
+        {/*  </button>*/}
+        {/*</Modal.Footer>*/}
       </Modal>
     </>
   );
