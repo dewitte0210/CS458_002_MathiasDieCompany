@@ -1559,55 +1559,35 @@ public class Feature
             }
 
             //check for chamfer
-            if (feature.EntityList.Count == 1)
+            /* if (feature.EntityList.Count == 1)
             {
-                Point? LineAIntersect =
-                    GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[0]);
-                Point? LineBIntersect =
-                    GetIntersectPoint(feature.EntityList[0], feature.EntityList[0].AdjList[1]);
+                
+                Line LineA = (Line)feature.EntityList[0].AdjList[0];
+                Line LineB = (Line)feature.EntityList[0].AdjList[1];
 
-                /*
-                if (LineAIntersect == null || LineBIntersect == null)
-                {
-                    return;
-                }
-                */
+                
+                
+                    Point? LineAIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineA);
+                    Point? LineBIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineB);
+
+                    if (LineAIntersect == null || LineBIntersect == null)
+                    {
+                        return;
+                    }
+
+                    Line LineA1 = new Line(LineA.Start, LineAIntersect);
+                    Line LineA2 = new Line(LineAIntersect, LineA.End);
+                    
+                    Line LineB1 = new Line(LineB.Start, LineAIntersect);
+                    Line LineB2 = new Line(LineBIntersect, LineB.End);
+                    
+                    
+                
+                    
+
             }
+            */
         }
-
-        // for (int i = 0; i < PerimeterFeatureList.Count(); i++)
-        // {
-        //     if (PerimeterFeatureList[i] == 1 && PerimeterFeatureList[i] is Line line)
-        //     {
-        //         // Break up both of the lines touching the kiss cut line
-        //         Point LineAIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[0]));
-        //         Point LineBIntersect = Entity.GetIntersectPoint(line, ((Line)PerimeterFeatureList[i][0].AdjList[1]));
-        //
-        //
-        //         if (LineAIntersect.Equals(line.StartPoint))
-        //         {
-        //             
-        //         }
-        //         else
-        //         {
-        //             
-        //         }
-        //         
-        //         
-        //         
-        //     }
-        //     
-        // }
-
-
-        // check if a line that is not in base shape is touching kiss-cut line in adjacency list
-
-        /*if (numLines == 4)
-        {
-            // check if a line is kiss cut
-            // set list as Kiss-Cut
-        }*/
-        // loop through baseEntityList, if a line is kiss cut kisscut=True, then return
     }
 
 
