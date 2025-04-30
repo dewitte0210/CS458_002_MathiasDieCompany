@@ -1,6 +1,7 @@
 using ACadSharp;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Utility;
 using NuGet.Frameworks;
 
@@ -50,21 +51,21 @@ namespace Testing_for_Project
         public void TestFullEllipseClass()
         {
             Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
-            Assert.That(ellipse1.Length, Is.EqualTo(15.865439589290595));
+            Assert.That(ellipse1.GetLength(), Is.EqualTo(15.865439589290595));
         }
 
         [Test]
         public void TestPartialEllipseClass()
         {
             Ellipse ellipse1 = new Ellipse(0, 0, 3, 0, 2.0 / 3.0, 0, Math.PI);
-            Assert.That(Math.Round(ellipse1.Length, 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
+            Assert.That(Math.Round(ellipse1.GetLength(), 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
         }
 
         [Test]
         public void TestPartialRotatedEllipseClass()
         {
             Ellipse ellipse1 = new Ellipse(0, 0, 0, 3, 2.0 / 3.0, 0, Math.PI);
-            Assert.That(Math.Round(ellipse1.Length, 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
+            Assert.That(Math.Round(ellipse1.GetLength(), 3), Is.EqualTo(Math.Round(15.865439589290595 / 2, 3)));
         }
 
         [Test]

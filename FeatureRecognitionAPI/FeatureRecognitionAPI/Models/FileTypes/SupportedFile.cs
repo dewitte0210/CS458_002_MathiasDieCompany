@@ -5,6 +5,12 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
 using FeatureRecognitionAPI.Services;
+using Arc = FeatureRecognitionAPI.Models.Entities.Arc;
+using Circle = FeatureRecognitionAPI.Models.Entities.Circle;
+using Ellipse = FeatureRecognitionAPI.Models.Entities.Ellipse;
+using Entity = FeatureRecognitionAPI.Models.Entities.Entity;
+using Line = FeatureRecognitionAPI.Models.Entities.Line;
+using Point = FeatureRecognitionAPI.Models.Entities.Point;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -49,41 +55,54 @@ namespace FeatureRecognitionAPI.Models
         
         public void DetectAllFeatureTypes()
         {
-            SetEntities(FeatureRecognitionService.CondenseArcs(GetEntities()));
+            SetEntities(EntityTools.CondenseArcs(GetEntities()));
             GroupFeatureEntities();
             SetFeatureGroups();
 
+            //if there is a num-up here, only one copy of the die will have its lines identified as recognized or unrecognized
             foreach (FeatureGroup featureGroup in FeatureGroups)
             {
                 featureGroup.FindFeatureTypes();
             }
+            
+            //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
+            if (FeatureGroups.Any(group => group.Count > 1))
+            {
+                foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
+                {
+                   feature.ExtendAllEntities();
+                   feature.SeperateBaseEntities();
+                   feature.SeperatePerimeterEntities();
+                   feature.DetectFeatures();
+                }
+            }
         }
-        
+
         /// <summary>
         /// This function takes in a list of entities and creates features based on groups of touching entities
         /// it also constructs each entity's AdjList (Adjacency List)
         /// </summary>
         public void GroupFeatureEntities()
         {
-            if (FeatureList.Count > 0) {return;}
-            
+            if (FeatureList.Count > 0) return;
+
             // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
-            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList(); 
+            List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList();
             FeatureList.Add(new Feature(new List<Entity>()));
-            
-            FeatureList[0].EntityList.Add(EntityList[0]); // starts the mapping with the first entity in EntityList list as a new list in features
+
+            // starts the mapping with the first entity in EntityList list as a new list in features
+            FeatureList[0].EntityList.Add(EntityList[0]);
             listMap[0] = 0;
-            
+
             for (int i = 0; i < EntityList.Count; i++)
             {
                 int count = 0;
-                for (int j = i+1; j < EntityList.Count; j++) // j = i+1 so we dont see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                // j = i+1 so we don't see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+                for (int j = i + 1; j < EntityList.Count; j++)
                 {
-                    if (!EntityList[i].DoesIntersect(EntityList[j]))
-                    {
-                        continue;
-                    }
+                    if (!Intersect.DoesIntersect(EntityList[i], EntityList[j])) continue;
 
+                    // these entities do intersect
                     // adds each entity to their AdjList. This should not happen twice because of the j=i+1
                     EntityList[i].AdjList.Add(EntityList[j]);
                     EntityList[j].AdjList.Add(EntityList[i]);
@@ -95,8 +114,11 @@ namespace FeatureRecognitionAPI.Models
                         tempLine.KissCut = true;
                     }
 
-                    if (listMap[i] == -1 || listMap[j] == -1) // checks that either i or j still needs to be mapped
-                        // say there is a third entity k that touches i and j. i and j was already checked for k and added to entitylist. when i is checked against j it would attempt to add them again.
+                    // checks that either i or j still needs to be mapped
+                    // say there is a third entity k that touches i and j.
+                    // i and j was already checked for k and added to entityList.
+                    // when i is checked against j it would attempt to add them again.
+                    if (listMap[i] == -1 || listMap[j] == -1)
                     {
                         if (listMap[i] != -1) // means entity i is mapped to a feature
                         {
@@ -122,7 +144,7 @@ namespace FeatureRecognitionAPI.Models
                     }
                     else // both i and j are already mapped
                     {
-                        if (listMap[i] == listMap[j]) 
+                        if (listMap[i] == listMap[j])
                         {
                             continue;
                         }
@@ -163,7 +185,6 @@ namespace FeatureRecognitionAPI.Models
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
-                feature.CountEntities();
             }
         }
         
@@ -189,10 +210,9 @@ namespace FeatureRecognitionAPI.Models
             Point tempMinPoint;
             Point tempMaxPoint;
 
-            //bool firstrun = true;
             while (features.Count > 0)
             {
-                //Set max values to zero before run, if its not the first one
+                //Set max values to zero before run
                 maxDiffIndex = 0;
                 maxDiff.X = 0;
                 maxDiff.Y = 0;
@@ -207,7 +227,6 @@ namespace FeatureRecognitionAPI.Models
                     tempMaxPoint = features[i].FindMaxPoint();
                     tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);
                     tempDiff.Y = (tempMaxPoint.Y - tempMinPoint.Y);
-
 
                     if (tempDiff.X > maxDiff.X && tempDiff.Y > maxDiff.Y)
                     {
@@ -400,7 +419,7 @@ namespace FeatureRecognitionAPI.Models
             Angles.Angle outerAngleFar = null;
             for (int i = 0; i < entity.AdjList.Count; i++)
             {
-                if (entity.AdjList[i] is Line { AdjList.Count: 2 } e && entity.Length == e.Length)
+                if (entity.AdjList[i] is Line { AdjList.Count: 2 } e && entity.GetLength() == e.GetLength())
                 {
                     innerAngle = Angles.GetAngle(entity, e);
                     outerAngleClose = Angles.GetAngle(entity, (Line)entity.AdjList[1-i]);

@@ -4,25 +4,25 @@ namespace FeatureRecognitionAPI.Models.Enums
 {
     public enum PossibleFeatureTypes
     {
-        [EnumMember(Value = "Unknown")] Unknown,
         [EnumMember(Value = "SideTubePunch")] StdTubePunch,
-        SideOutlet,
+        [EnumMember(Value = "Unknown")] Unknown,
         HDSideOutlet,
-        StdFTPunch,
-        StdSWPunch,
-        StdRetractPins,
         Punch,
+        SideOutlet,
+        StdFTPunch,
+        StdRetractPins,
+        StdSWPunch,
         Group1A1, // Metered Rectangle
         Group1A2, // Radius Corner Rectangle
         Group1B1, // Circle
         Group1B2, // Rounded Rectangle
+        Group1C, // Triangles
+        Group2A1, // Elipses
+        Group2A2, // Bowties
         Group3,
         Group4,
         Group5,
-        Group1C, // Triangles
         Group6,
-        Group2A1, // Elipses
-        Group2A2, // Bowties
         Group7,
         Group8,
         Group9,

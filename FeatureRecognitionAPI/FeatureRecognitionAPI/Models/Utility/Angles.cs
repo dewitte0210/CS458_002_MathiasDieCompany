@@ -1,5 +1,5 @@
-using System.Security.Policy;
 using static FeatureRecognitionAPI.Models.Utility.MdcMath;
+using FeatureRecognitionAPI.Models.Entities;
 
 // This file is used for calculating the angle between lines and on what side they lay
 namespace FeatureRecognitionAPI.Models.Utility
@@ -10,7 +10,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 	/// </summary>
 	public static class Angles
 	{
-		private const double TOLERANCE = 0.001;
+		private const double Tolerance = 0.001;
 		private const double AngleTolDeg = 0.001;
 		private const double AngleTolRad = AngleTolDeg * Math.PI / 180;
 
@@ -38,7 +38,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 		public static bool WithinTolerance(double value, double target)
 		{
-			return Math.Abs(value - target) < TOLERANCE;
+			return Math.Abs(value - target) < Tolerance;
 		}
 
 		public class Degrees(double value)
@@ -57,16 +57,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 			}
 			
 			#region Overrides
-
-			public static bool operator ==(Degrees a, Degrees b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Degrees a, Degrees b)
-			{
-				return !a.Equals(b);
-			}
 			
 			public override bool Equals(object? obj)
 			{
@@ -105,16 +95,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 			}
 			
 			#region Overrides
-
-			public static bool operator ==(Radians a, Radians b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Radians a, Radians b)
-			{
-				return !a.Equals(b);
-			}
 			
 			public override bool Equals(object? obj)
 			{
@@ -174,16 +154,6 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			#region Overrides
 			
-			public static bool operator ==(Angle a, Angle b)
-			{
-				return a.Equals(b);
-			}
-			
-			public static bool operator !=(Angle a, Angle b)
-			{
-				return !a.Equals(b);
-			}
-			
 			public override bool Equals(object? obj)
 			{
 				if (obj == null) { return false; }
@@ -192,12 +162,12 @@ namespace FeatureRecognitionAPI.Models.Utility
 					&& _side != Side.Unknown 
 					&& objA._side != Side.Unknown)
                 {
-                    if (objA._side == this._side && objA._angle == this._angle)
+                    if (objA._side == _side && objA._angle.Equals(_angle))
                     {
                         return true;
                     }
                     //sides are opposite
-                    if (objA._side != this._side && objA._angle.GetOppositeAngle() == _angle)
+                    if (objA._side != _side && objA._angle.GetOppositeAngle().Equals(_angle))
                     {
                         return true;
                     }
@@ -258,7 +228,7 @@ namespace FeatureRecognitionAPI.Models.Utility
         // may not handle all cases yet, to be tested
         public static Angle GetAngle(Line a, Line b, Side targetSide = Side.Interior, Orientation ori = Orientation.Counter)
 		{
-			if (DoubleEquals(a.Length, 0) || DoubleEquals(b.Length, 0))
+			if (DoubleEquals(a.GetLength(), 0) || DoubleEquals(b.GetLength(), 0))
 			{
 				return new Angle(new Degrees(0), Side.Unknown);
 			}
@@ -267,7 +237,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 			double dot = DotProduct(a, b);
 			Side side = Side.Unknown;
 
-			double cosTheta = dot / (a.Length * b.Length);
+			double cosTheta = dot / (a.GetLength() * b.GetLength());
 			cosTheta = Math.Max(-1, Math.Min(1, cosTheta));
 
 			double angle = Math.Acos(cosTheta) * (180 / Math.PI);
@@ -314,13 +284,13 @@ namespace FeatureRecognitionAPI.Models.Utility
 		public static bool IsPerpendicular(Line a, Line b)
 		{
 			Degrees angle = GetAngle(a, b).GetDegrees();
-			return DoubleEquals((angle + 90) % 180, 0);
+			return DoubleEquals(Math.Round(angle + 90, 4) % 180, Entity.EntityTolerance);
 		}
 
 		public static bool IsParallel(Line a, Line b)
 		{
-			// round because angle can be 179.999 and modulus wont work
-			double angle = Double.Round(GetAngle(a, b).GetDegrees());
+			// round because angle can be 179.999 and modulus won't work
+			double angle = Math.Round(GetAngle(a, b).GetDegrees(), 4);
 			return DoubleEquals((angle % 180), 0);
 		}
 	}
