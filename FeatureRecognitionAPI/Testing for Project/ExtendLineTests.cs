@@ -18,8 +18,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
 
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 4)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 10)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(7, 4)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(7, 10)));
         }
 
         [Test]
@@ -36,8 +36,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
 
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 4)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(7, 14)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(7, 4)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(7, 14)));
         }
 
         [Test]
@@ -52,8 +52,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
 
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(4, 7)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(10, 7)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(4, 7)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(10, 7)));
         }
 
         [Test]
@@ -69,8 +69,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
 
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(4, 7)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(14, 7)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(4, 7)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(14, 7)));
         }
 
         [Test]
@@ -92,8 +92,8 @@ namespace Testing_for_Project
                 if (entity is ExtendedLine)
                 {
 
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(10, 7)));
                     hasExtendedLine = true;
                 }
             }
@@ -138,8 +138,8 @@ namespace Testing_for_Project
                 if (entity is ExtendedLine)
                 {
                     Assert.IsFalse(hasExtendedLine);
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(14, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(14, 7)));
                     hasExtendedLine = true;
                 }
             }
@@ -164,8 +164,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(0, 0)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(9, 9)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(0, 0)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(9, 9)));
         }
 
         [Test]
@@ -180,8 +180,8 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.ExtendedEntityList.Count == 1);
             Assert.IsTrue(testFeature.ExtendedEntityList[0] is Line);
             Line finalTestLine = (Line)testFeature.ExtendedEntityList[0];
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(0, 0)));
-            Assert.IsTrue(finalTestLine.hasPoint(new Point(18, 18)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(0, 0)));
+            Assert.IsTrue(finalTestLine.HasPoint(new Point(18, 18)));
         }
 
         [Test]
@@ -299,8 +299,8 @@ namespace Testing_for_Project
                 {
                     Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
                     // Checks correct point values
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(10, 7)));
                     // Checks correct parent values
                     Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
                     Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));
@@ -334,8 +334,8 @@ namespace Testing_for_Project
                 {
                     Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
                     // Checks correct point values
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(10, 7)));
                     // Checks correct parent values
                     Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
                     Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));
@@ -365,8 +365,8 @@ namespace Testing_for_Project
                 {
                     Assert.IsFalse(hasExtendedLine);
                     // Checks correct point values
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(10, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(10, 7)));
                     // Checks correct parent values
                     Assert.IsTrue(((ExtendedLine)entity).Parent1.Equals(line1) || ((ExtendedLine)entity).Parent1.Equals(line5));
                     Assert.IsTrue(((ExtendedLine)entity).Parent2.Equals(line1) || ((ExtendedLine)entity).Parent2.Equals(line5));
@@ -414,8 +414,8 @@ namespace Testing_for_Project
                 {
                     Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
                     // Checks correct point values
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(14, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(14, 7)));
                     // Checks correct parent values
                     ExtendedLine extendedLineParent = new ExtendedLine();
                     Line lineParent = new ExtendedLine();
@@ -498,8 +498,8 @@ namespace Testing_for_Project
                 {
                     Assert.IsFalse(hasExtendedLine); // Checks if only one extended line
                     // Checks correct point values
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(4, 7)));
-                    Assert.IsTrue(((ExtendedLine)entity).hasPoint(new Point(14, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(4, 7)));
+                    Assert.IsTrue(((ExtendedLine)entity).HasPoint(new Point(14, 7)));
                     // Checks correct parent values
                     ExtendedLine extendedLineParent = new ExtendedLine();
                     Line lineParent = new ExtendedLine();
@@ -838,7 +838,7 @@ namespace Testing_for_Project
             exampleTwo.DetectAllFeatureTypes();
 
             Assert.IsTrue(exampleTwo.FeatureGroups.Count == 1); // one overall feature when combined
-            Assert.IsTrue(exampleTwo.FeatureGroups[0].Count == 7); // 6 identical features
+            Assert.IsTrue(exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups == 7); // 6 identical features
             List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].GetFeatures();
 
             Assert.IsTrue(singleFeatureList.Count == 7); // 6 features make up the die
@@ -848,7 +848,7 @@ namespace Testing_for_Project
             {
                 totalFeatures += feature.count;
             }
-            totalFeatures *= exampleTwo.FeatureGroups[0].Count;
+            totalFeatures *= exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups;
             Assert.IsTrue(totalFeatures == 63); // number of features accounting for combined features
         }
 

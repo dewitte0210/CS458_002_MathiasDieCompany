@@ -8,7 +8,7 @@ public class FeatureGroup
 {
     // todo: just make Count return length of feature list
     //Track how many feature groups of this type are found
-    public int Count { get; set; }
+    public int NumIdenticalFeatureGroups { get; set; }
     private int totalArcs;
     private int totalLines;
     private int totalCircles;
@@ -60,7 +60,7 @@ public class FeatureGroup
         }
         // add the new chamfer features to the group
         features.AddRange(featuresToAdd);
-        Count += featuresToAdd.Count;
+        NumIdenticalFeatureGroups += featuresToAdd.Count;
         featuresToAdd.Clear();
     }
 

@@ -261,7 +261,7 @@ namespace FeatureRecognitionAPI.Models
                     {
                         if (fGroup.Equals(newfGroup))
                         {
-                            fGroup.Count++;
+                            fGroup.NumIdenticalFeatureGroups++;
                             added = true;
                             break;
                         }
@@ -270,13 +270,13 @@ namespace FeatureRecognitionAPI.Models
                     //If the foreach loop was excited without adding anything add newFGroup to the featuregroup list
                     if (!added)
                     {
-                        newfGroup.Count++;
+                        newfGroup.NumIdenticalFeatureGroups++;
                         FeatureGroups.Add(newfGroup);
                     }
                 }
                 else
                 {
-                    newfGroup.Count++;
+                    newfGroup.NumIdenticalFeatureGroups++;
                     FeatureGroups.Add(newfGroup);
                 }
             }

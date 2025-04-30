@@ -393,7 +393,7 @@ public static class Intersect
                 double roundedStartY = Math.Round(line.Start.Y, IntersectTolerance);
                 double roundedEndY = Math.Round(line.End.Y, IntersectTolerance);
                 
-                if (ellipse.isInEllipseRange(new Point(compX, compY))
+                if (ellipse.IsInEllipseRange(new Point(compX, compY))
                     && Math.Min(roundedStartX, roundedEndX) <= compX
                     && Math.Max(roundedStartX, roundedEndX) >= compX
                     && Math.Min(roundedStartY, roundedEndY) <= compY

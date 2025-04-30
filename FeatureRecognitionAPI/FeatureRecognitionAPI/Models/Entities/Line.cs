@@ -29,7 +29,7 @@ public class Line : Entity
         End = new Point(endPoint);
     }
 
-    //constructor with extendedline parameter
+    //constructor with extendedLine parameter
     public Line(double startX, double startY, double endX, double endY, bool extendedLine)
     {
         Start = new Point(startX, startY);
@@ -41,7 +41,7 @@ public class Line : Entity
         return new Line(End.X, End.Y, Start.X, Start.Y);
     }
 
-    public bool hasPoint(Point point)
+    public bool HasPoint(Point point)
     {
         return (Start.Equals(point) || End.Equals(point));
     }
@@ -73,8 +73,8 @@ public class Line : Entity
 
             if (slopeDifY < EntityTolerance
                 && slopeDifX < EntityTolerance
-                && this.hasPoint(lineComp.End)
-                && this.hasPoint(lineComp.Start))
+                && this.HasPoint(lineComp.End)
+                && this.HasPoint(lineComp.Start))
             {
                 return true;
             }

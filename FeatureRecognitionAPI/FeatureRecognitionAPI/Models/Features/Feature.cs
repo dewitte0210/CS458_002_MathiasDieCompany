@@ -704,7 +704,7 @@ public class Feature
             Ellipse tempEntity = entity as Ellipse;
             double startAngle = tempEntity.StartParameter + Math.Atan2(tempEntity.MajorAxisEndPoint.Y - tempEntity.Center.Y, tempEntity.MajorAxisEndPoint.X - tempEntity.Center.X);
             double endAngle = tempEntity.EndParameter + Math.Atan2(tempEntity.MajorAxisEndPoint.Y - tempEntity.Center.Y, tempEntity.MajorAxisEndPoint.X - tempEntity.Center.X);
-            ray = (entity as Ellipse).vectorFromCenter((endAngle - startAngle) / 2);
+            ray = (entity as Ellipse).VectorFromCenter((endAngle - startAngle) / 2);
         }
 
         //  Entends the ray
