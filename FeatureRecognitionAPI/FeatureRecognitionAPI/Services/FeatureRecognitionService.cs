@@ -1,6 +1,8 @@
 ﻿using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.Utility;
 using iText.Commons.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -13,17 +15,14 @@ namespace FeatureRecognitionAPI.Services
         {
         }
 
-        /*
-         * Handles an uploaded file by performing feature detection based on its extension
-         * and returning the results in JSON format for the frontend.
-         *
-         * Supported file types: .dxf, .dwg
-         *
-         * @param file The uploaded file as an IFormFile object.
-         * @return 
-         *   - string: The resulting JSON string if successful;
-         *
-         */
+        /// <summary>
+        /// Handles an uploaded file by performing feature detection based on its extension
+        /// and returning the results in JSON format for the frontend.
+        /// Supported file types: .dxf, .dwg
+        /// </summary>
+        /// <param name="file"> The uploaded file as an IFormFile object. </param>
+        /// <returns> The resulting JSON string if successful </returns>
+        /// <exception cref="IOException"></exception>
         public async Task<string?> UploadFile(IFormFile file)
         {
             string? ext = Path.GetExtension(file.FileName);
@@ -54,7 +53,7 @@ namespace FeatureRecognitionAPI.Services
 
             // supportedFile.GroupFeatureEntities();
 
-            supportedFile.SetEntities(CondenseArcs(supportedFile.GetEntities()));
+            supportedFile.SetEntities(EntityTools.CondenseArcs(supportedFile.GetEntities()));
 
             supportedFile.DetectAllFeatureTypes();
 
@@ -72,92 +71,6 @@ namespace FeatureRecognitionAPI.Services
             return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
         }
 
-        internal static List<Entity> CondenseArcs(List<Entity> entities)
-        {
-            List<Entity> returned = entities.Where(entity => !(entity is Arc)).ToList();
-
-            List<IGrouping<int, Arc>> arcGroups = entities
-                .OfType<Arc>()
-                .GroupBy(arc => arc.GetHashCode()).ToList();
-
-            List<Arc> arcs = new List<Arc>();
-            foreach (var g in arcGroups)
-            {
-                List<Arc> group = g.ToList();
-                Arc initArc = group[0];
-                group.RemoveAt(0);
-
-                if (group.Count == 0)
-                {
-                    arcs.Add(initArc);
-                    continue;
-                }
-
-                int idx = 0;
-                int failCount = 0;
-                while (group.Count > 0)
-                {
-                    if (failCount >= group.Count)
-                    {
-                        arcs.Add(initArc);
-                        idx = 0;
-                        initArc = group[0];
-                        group.RemoveAt(0);
-                        if (group.Count == 0)
-                        {
-                            arcs.Add(initArc);
-                            break;
-                        }
-
-                        failCount = 0;
-                    }
-
-                    Arc otherArc = group[idx];
-                    if (initArc.ConnectsTo(otherArc))
-                    {
-                        Point center = initArc.Center;
-                        double radius = initArc.Radius;
-
-                        bool startAtSmallArcStart =
-                            Math.Abs(otherArc.StartAngle + otherArc.CentralAngle - initArc.StartAngle) % 360 <
-                            Entity.EntityTolerance;
-
-                        double angleStart = startAtSmallArcStart ? otherArc.StartAngle : initArc.StartAngle;
-                        double angleExtent = otherArc.CentralAngle + initArc.CentralAngle;
-
-                        initArc = new Arc(center.X, center.Y, radius, angleStart, angleStart + angleExtent);
-                        group.RemoveAt(idx);
-                        failCount = 0;
-                    }
-                    else
-                    {
-                        failCount++;
-                    }
-
-                    if (group.Count == 0)
-                    {
-                        arcs.Add(initArc);
-                        break;
-                    }
-
-                    idx = (idx + 1) % group.Count;
-                }
-            }
-
-            // Convert arcs to circles if necessary
-            foreach (Arc arc in arcs)
-            {
-                if (Math.Abs(arc.CentralAngle - 360) <= Entity.EntityTolerance)
-                {
-                    returned.Add(new Circle(arc.Center.X, arc.Center.Y, arc.Radius));
-                }
-                else
-                {
-                    returned.Add(arc);
-                }
-            }
-
-            return returned;
-        }
+        
     }
 }

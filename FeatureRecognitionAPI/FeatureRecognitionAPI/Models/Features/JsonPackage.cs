@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using FeatureRecognitionAPI.Models.Entities;
+using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features;
 
-/**
- * Helper class to send both table data and draw data to the front end.
- */
+/// <summary>
+/// Helper class to send both table data and draw data to the front end.
+/// </summary>
 public class JsonPackage
 {
     [JsonProperty] private readonly List<List<Entity>> _touchingEntitiesList;

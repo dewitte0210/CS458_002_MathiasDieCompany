@@ -1,6 +1,4 @@
-﻿using ACadSharp;
-using ACadSharp.IO;
-using FeatureRecognitionAPI.Models;
+﻿using FeatureRecognitionAPI.Models.Entities;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
 using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
