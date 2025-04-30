@@ -15,19 +15,22 @@ builder.Services.AddScoped<IFeatureRecognitionService, FeatureRecognitionService
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IPricingDataService, PricingDataService>();
 
-builder.WebHost.ConfigureKestrel(opts =>
+if (!builder.Environment.IsDevelopment())
 {
-    opts.ConfigureHttpsDefaults(httpsOpts =>
+    builder.WebHost.ConfigureKestrel(opts =>
     {
-        httpsOpts.ClientCertificateMode = ClientCertificateMode.NoCertificate;
+        opts.ConfigureHttpsDefaults(httpsOpts =>
+        {
+            httpsOpts.ClientCertificateMode = ClientCertificateMode.NoCertificate;
+        });
     });
-});
+}
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FeatureRecognitionPolicy", builder =>
     {
-        builder.WithOrigins("https://mdcestimator.com", "http://localhost", "https://localhost", "*")
+        builder.WithOrigins("*")
                 .WithHeaders(HeaderNames.AccessControlAllowOrigin)
                .AllowAnyMethod() // Temporarily allow any method
                .AllowAnyHeader(); // Temporarily allow any header
