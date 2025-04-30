@@ -1,4 +1,5 @@
 ﻿using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 
 namespace Testing_for_Project
 {

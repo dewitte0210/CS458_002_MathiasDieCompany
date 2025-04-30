@@ -1,55 +1,12 @@
 ﻿
 using FeatureRecognitionAPI.Models;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Features;
 
 namespace Testing_for_Project
 {
     internal class CompareAndEqualMethodTests
     {
-        [Test]
-        public void CompareMethodLine()
-        {
-            Line line1 = new(1, 1, 2, 2);
-            Line line2 = new(2, 2, 3, 3);
-            Line line3 = new(1, 2, 2, 2);
-
-            bool equals1 = line1.Compare(line2);
-
-            bool equals2 = line1.Compare(line3);
-
-            Assert.IsTrue(equals1);
-
-            Assert.IsFalse(equals2);
-        }
-
-        [Test]
-        public void EqualsOverrideArc()
-        {
-            Arc arc1 = new(4, 2, 4.5, 30, 50);
-            Arc arc2 = new(3, 9, 4.5, 30, 50);
-            Arc arc3 = new(4, 2, 5, 30, 50);
-
-            bool equals1 = arc1.Compare(arc2);
-            bool equals2 = arc1.Compare(arc3);
-
-            Assert.That(equals1, Is.EqualTo(true));
-            Assert.That(equals2, Is.EqualTo(false));
-        }
-
-        [Test]
-        public void EqualsOverrideCircle()
-        {
-            Circle circle1 = new(5, 5, 5);
-            Circle circle2 = new(4, 4, 5);
-            Circle circle3 = new(5, 4, 4);
-
-            bool equals1 = circle1.Compare(circle2);
-            bool equals2 = circle1.Compare(circle3);
-
-            Assert.That(equals1, Is.EqualTo(true));
-            Assert.That(equals2, Is.EqualTo(false));
-        }
-
         [Test]
         public void EqualsOverrideFeature()
         {

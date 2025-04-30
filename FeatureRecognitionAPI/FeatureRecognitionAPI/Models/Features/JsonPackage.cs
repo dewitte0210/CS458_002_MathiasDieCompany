@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FeatureRecognitionAPI.Models.Entities;
+using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features;
 

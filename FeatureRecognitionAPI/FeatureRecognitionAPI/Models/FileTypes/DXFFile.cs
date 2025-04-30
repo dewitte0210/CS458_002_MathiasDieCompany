@@ -1,5 +1,6 @@
 ﻿using ACadSharp;
 using ACadSharp.IO;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 
 namespace FeatureRecognitionAPI.Models

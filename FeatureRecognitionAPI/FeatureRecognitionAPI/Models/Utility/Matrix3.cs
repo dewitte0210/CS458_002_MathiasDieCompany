@@ -1,4 +1,5 @@
 ﻿using CSMath;
+using FeatureRecognitionAPI.Models.Entities;
 
 namespace FeatureRecognitionAPI.Models.Utility;
 
