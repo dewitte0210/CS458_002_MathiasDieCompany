@@ -66,7 +66,7 @@ namespace FeatureRecognitionAPI.Models
             }
             
             //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
-            if (FeatureGroups.Any(group => group.Count > 1))
+            if (FeatureGroups.Any(group => group.NumIdenticalFeatureGroups > 1))
             {
                 foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
                 {
