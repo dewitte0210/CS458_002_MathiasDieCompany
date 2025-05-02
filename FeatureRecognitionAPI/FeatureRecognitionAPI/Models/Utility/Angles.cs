@@ -40,7 +40,21 @@ namespace FeatureRecognitionAPI.Models.Utility
 		{
 			return Math.Abs(value - target) < Tolerance;
 		}
-
+		
+		public static bool WithinTolerance(Angle value, Angle target)
+		{
+			return Math.Abs(value.GetDegrees() - target.GetDegrees()) < Tolerance;
+		}
+		
+		public static bool WithinTolerance(double value, Angle target)
+		{
+			return Math.Abs(value - target.GetDegrees()) < Tolerance;
+		}
+		public static bool WithinTolerance(Angle value, double target)
+		{
+			return Math.Abs(value.GetDegrees() - target) < Tolerance;
+		}
+		
 		public class Degrees(double value)
 		{
 			//set internal, only use through implicit cast to double

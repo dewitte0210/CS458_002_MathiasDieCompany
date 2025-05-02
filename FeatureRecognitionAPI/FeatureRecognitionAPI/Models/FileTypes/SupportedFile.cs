@@ -462,34 +462,47 @@ namespace FeatureRecognitionAPI.Models
             return false;
         }
 
-        public void CornerNotchFlagHelper(Line entity)
+        public bool CornerNotchReqCheck(List<Entity> entities, bool isRadius)
         {
-            if (entity.AdjList.Count != 2) { return; }
+            if (entities.Count != 4 && entities.Count != 6) {return false;}
+            Angles.Angle innerAngle;
+            Angles.Angle outerAngleClose;
+            Angles.Angle outerAngleFar;
+            Angles.Angle overallAngle;
 
-            Angles.Angle innerAngle = null;
-            Angles.Angle outerAngleClose = null;
-            Angles.Angle outerAngleFar = null;
-            for (int i = 0; i < entity.AdjList.Count; i++)
+            if (!isRadius)
             {
-                if (entity.AdjList[i] is Line { AdjList.Count: 2 } e && entity.GetLength() == e.GetLength())
-                {
-                    innerAngle = Angles.GetAngle(entity, e);
-                    outerAngleClose = Angles.GetAngle(entity, (Line)entity.AdjList[1-i]);
-
-                    for (int j = i + 1; j < e.AdjList.Count; j++)
-                    {
-                        if (!e.AdjList[j].Equals(entity))
-                        {
-                            outerAngleFar = Angles.GetAngle(e, (Line)e.AdjList[j]);
-                        }
-                    }
-                }
+                innerAngle = Angles.GetAngle(entities[1] as Line, entities[2] as Line);
+                outerAngleClose = Angles.GetAngle(entities[0] as Line, entities[1] as Line);
+                outerAngleFar = Angles.GetAngle(entities[2] as Line, entities[3] as Line);
+                overallAngle = Angles.GetAngle(entities[0] as Line, entities[3] as Line);
+            }
+            else 
+            {
+                innerAngle = Angles.GetAngle(entities[2] as Line, entities[3] as Line);
+                outerAngleClose = Angles.GetAngle(entities[0] as Line, entities[2] as Line);
+                outerAngleFar = Angles.GetAngle(entities[3] as Line, entities[5] as Line);
+                overallAngle = Angles.GetAngle(entities[0] as Line, entities[5] as Line);
+            }
+            // At this point all angles are on the same side of the lines
+            // inner angle should be on the opposite side to all other angles
+            
+            
+            // Check sum of angles
+            
+            // first case where innerAngle is flipped
+            if (!Angles.WithinTolerance(overallAngle, 180) &&
+                outerAngleClose.GetDegrees() < 180 &&
+                outerAngleFar.GetDegrees() < 180 &&
+                outerAngleFar.GetDegrees() + outerAngleClose.GetDegrees() < 360 - innerAngle.GetDegrees())
+            {
+                return true;
             }
 
-            if (innerAngle != null && outerAngleClose != null && outerAngleFar != null)
-            {
-                
-            }
+            return !Angles.WithinTolerance(360 - overallAngle.GetDegrees(), 180) &&
+                   360 - outerAngleClose.GetDegrees() < 180 &&
+                   360 - outerAngleFar.GetDegrees() < 180 &&
+                   (360 -outerAngleFar.GetDegrees()) + (360 - outerAngleClose.GetDegrees()) > innerAngle.GetDegrees();
         }
         public  List<Entity> GetEntities() {return EntityList;}
         public void SetEntities(List<Entity> entities) { EntityList = entities; }

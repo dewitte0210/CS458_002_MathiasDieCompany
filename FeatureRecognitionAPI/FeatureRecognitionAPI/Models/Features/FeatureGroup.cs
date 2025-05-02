@@ -60,7 +60,6 @@ public class FeatureGroup
         }
         // add the new chamfer features to the group
         features.AddRange(featuresToAdd);
-        Count += featuresToAdd.Count;
         featuresToAdd.Clear();
     }
 
@@ -74,7 +73,7 @@ public class FeatureGroup
             features[i].SeperateBaseEntities();
             features[i].SeperatePerimeterEntities();
             features[i].DetectFeatures();
-            for (int j = 0; j < features[i].PerimeterFeatureList.Count(); j++)
+            for (int j = 0; j < features[i].PerimeterFeatureList.Count; j++)
             {
                 featToAdd.Add(features[i].PerimeterFeatureList[j]);
             }

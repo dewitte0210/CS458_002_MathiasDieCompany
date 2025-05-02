@@ -881,6 +881,21 @@ namespace Testing_for_Project
             List<Entity> cList = testFile.FindCornerNotchPattern();
             Assert.IsTrue(cList.Count == 0);
         }
+
+        [Test]
+        public void CornerNotchPatternAndAngles()
+        {
+            Line line1 = new(0, 0, 0, 2);
+            Line line2 = new(0, 2, 1, 2);
+            Line line3 = new(1, 2, 1, 3);
+            Line line4 = new(1, 3, 2, 3);
+            List<Entity> entities = new List<Entity>() { line1, line2, line3, line4 };
+            DXFFile testFile = new DXFFile(entities);
+            testFile.GroupFeatureEntities();
+            List<Entity> cList = testFile.FindCornerNotchPattern();
+            Assert.IsTrue(cList.Count == 4);
+            Assert.IsTrue(testFile.CornerNotchReqCheck(cList, isRadius: false));
+        }
         #endregion
     }
 }
