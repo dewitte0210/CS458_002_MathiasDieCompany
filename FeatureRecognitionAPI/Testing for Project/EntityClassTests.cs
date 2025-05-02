@@ -1,5 +1,4 @@
-﻿using FeatureRecognitionAPI.Models;
-using FeatureRecognitionAPI.Models.Entities;
+﻿using FeatureRecognitionAPI.Models.Entities;
 using static FeatureRecognitionAPI.Models.Utility.Intersect;
 
 namespace Testing_for_Project
@@ -58,7 +57,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(-2, -1, 0, 5);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.False);
         }
 
@@ -67,7 +66,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(1, 0, 4, 3);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.True);
         }
 
@@ -76,7 +75,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(3, -1, 4, 7);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.True);
         }
 
@@ -85,7 +84,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(0, 6, 4, 6);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.False);
         }
 
@@ -94,7 +93,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(3, 2, 5, 2);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.True);
         }
 
@@ -103,7 +102,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(4, 0, 4, 6);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.False);
         }
 
@@ -112,7 +111,7 @@ namespace Testing_for_Project
         {
             Line resultLine = new(3, -1, 3, 6);
             Arc resultArc = new(1, 2, Math.Sqrt(8), 315, 45);
-            bool result = FindIntersectPointHelper(resultLine, resultArc) != null;
+            bool result = GetIntersectPoint(resultLine, resultArc) != null;
             Assert.That(result, Is.True);
         }
         #endregion
@@ -123,7 +122,7 @@ namespace Testing_for_Project
         {
             Arc arc1 = new Arc(0.0, 0.0, 10, 270, 90);
             Arc arc2 = new Arc(20.0, 0.0, 10, 90, 280);
-            bool result = FindIntersectPointHelper(arc1, arc2) != null;
+            bool result = GetIntersectPoint(arc1, arc2) != null;
             Assert.That(result, Is.True);
         }
 
@@ -132,7 +131,7 @@ namespace Testing_for_Project
         {
             Arc arc1 = new Arc(0.0, 0.0, 10, 270, 90);
             Arc arc2 = new Arc(25.0, 0.0, 10, 90, 280);
-            bool result = FindIntersectPointHelper(arc1, arc2) != null;
+            bool result = GetIntersectPoint(arc1, arc2) != null;
             Assert.That(result, Is.False);
         }
 
@@ -141,7 +140,7 @@ namespace Testing_for_Project
         {
             Arc arc1 = new Arc(0.0, 0.0, 10, 270, 90);
             Arc arc2 = new Arc(19.0, 0.0, 10, 90, 270);
-            bool result = FindIntersectPointHelper(arc1, arc2) != null;
+            bool result = GetIntersectPoint(arc1, arc2) != null;
             Assert.That(result, Is.True);
         }
         #endregion
@@ -152,7 +151,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 5.0);
             Line line2 = new(0.0, 5.0, 5.0, 0.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.True);
         }
 
@@ -161,7 +160,7 @@ namespace Testing_for_Project
         {
             Line line2 = new(0.0, 0.0, 5.0, 5.0);
             Line line1 = new(2.0, -1.0, 2.0, 6.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.True);
         }
 
@@ -170,7 +169,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 5.0);
             Line line2 = new(2.0, -1.0, 2.0, 6.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.True);
         }
 
@@ -179,7 +178,7 @@ namespace Testing_for_Project
         {
             Line line2 = new(0.0, 0.0, 5.0, 5.0);
             Line line1 = new(-1.0, 3.0, 6.0, 3.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.True);
         }
 
@@ -188,7 +187,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 5.0);
             Line line2 = new(-1.0, 3.0, 6.0, 3.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.True);
         }
 
@@ -197,7 +196,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 1.0);
             Line line2 = new(5.0, 5.0, 5.0, 4.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.False);
         }
 
@@ -206,7 +205,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(0.0, 0.0, 5.0, 0.0);
             Line line2 = new(0.0, 5.0, 5.0, 5.0);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.False);
         }
 
@@ -215,7 +214,7 @@ namespace Testing_for_Project
         {
             Line line1 = new(2, 2, 12, 2);
             Line line2 = new(2, 2, 2, 8);
-            bool result = FindIntersectPointHelper(line1, line2) != null;
+            bool result = GetIntersectPoint(line1, line2) != null;
             Assert.That(result, Is.True);
         }
         #endregion
@@ -226,35 +225,35 @@ namespace Testing_for_Project
         {
             Ellipse ellipse1 = new Ellipse(1, 1, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-4, -2, 4, 2);
-            Assert.That(FindIntersectPointHelper(line1, ellipse1) != null, Is.True);
+            Assert.That(GetIntersectPoint(line1, ellipse1) != null, Is.True);
         }
         [Test]
         public void IntersectLineWithEllipse_OneIntersect_ReturnsTrue()
         {
             Ellipse ellipse1 = new Ellipse(1, 1, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(4, -2, 4, 4);
-            Assert.That(FindIntersectPointHelper(line1, ellipse1) != null, Is.True);
+            Assert.That(GetIntersectPoint(line1, ellipse1) != null, Is.True);
         }
         [Test]
         public void IntersectLineWithEllipse_NoIntersects_ReturnsFalse()
         {
             Ellipse ellipse1 = new Ellipse(1, 1, 3, 0, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-6, 3, 5, 6);
-            Assert.That(FindIntersectPointHelper(line1, ellipse1) != null, Is.False);
+            Assert.That(GetIntersectPoint(line1, ellipse1) != null, Is.False);
         }
         [Test]
         public void IntersectLineWithEllipse_OneIntersectWithRotation_ReturnsTrue()
         {
             Ellipse ellipse1 = new Ellipse(1, 1, 0, 3, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-2, 4, 2, 4);
-            Assert.That(FindIntersectPointHelper(line1, ellipse1) != null, Is.True);
+            Assert.That(GetIntersectPoint(line1, ellipse1) != null, Is.True);
         }
         [Test]
         public void IntersectLineWithEllipse_OneIntersectWithRotationLineStartingInsideEllipse_ReturnsTrue()
         {
             Ellipse ellipse1 = new Ellipse(1, 1, 0, 3, 2.0 / 3.0, 0, 2 * Math.PI);
             Line line1 = new Line(-2, 2, 2, 2);
-            Assert.That(FindIntersectPointHelper(line1, ellipse1) != null, Is.True);
+            Assert.That(GetIntersectPoint(line1, ellipse1) != null, Is.True);
         }
         #endregion
     }
