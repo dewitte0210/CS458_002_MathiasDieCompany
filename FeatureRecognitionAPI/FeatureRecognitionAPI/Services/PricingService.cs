@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Services
 {
+    /// <summary>
+    /// Service class to perform pricing estimates on feature data
+    /// </summary>
     public class PricingService : IPricingService
     {
         // Change these as necessary
@@ -23,7 +26,12 @@ namespace FeatureRecognitionAPI.Services
         private readonly List<PunchPrice> _tubePunchList, _soPunchList, _hdsoPunchList,
             _ftPunchList, _swPunchList, _retractList;
         private readonly List<FeaturePrice> _featurePriceList;
-        private readonly IPricingDataService _dataService; 
+        private readonly IPricingDataService _dataService;
+        
+        /// <summary>
+        /// Primary constructor for the Pricing service loads all of the pricing data from the data service
+        /// </summary>
+        /// <param name="dataService"></param>
         public PricingService(IPricingDataService dataService)
         {
             _dataService = dataService;
@@ -45,6 +53,12 @@ namespace FeatureRecognitionAPI.Services
             DISCOUNT = rates.Discount;
         }
 
+        /// <summary>
+        /// This function estimates the price of a files detection output we first detect if the current element is a
+        /// feature or a punch and then use different logic depending on the check
+        /// </summary>
+        /// <param name="param">The file feature data from the website</param>
+        /// <returns></returns>
         public (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param)
         {
             try
@@ -87,12 +101,6 @@ namespace FeatureRecognitionAPI.Services
                     // Setup Cost = hour/part to set up * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
                     // Difficulty Factor * mMain.ShopRate $/hr * hour/part * quantity of parts
-                    // For punches, there should be a checkbox that denotes if the height of the punch is .918 instead
-                    // of .937
-                    /*
-                        Setupcost = 0.22 * mMain.Shoprate
-                        RunCost = 1 * mMain.Shoprate * 0.04 * 4
-                    */
                     
                     FeaturePrice? featureData =
                         _featurePriceList.Find(element => element.Type == feature.FeatureType);
@@ -125,7 +133,7 @@ namespace FeatureRecognitionAPI.Services
                             runCost += (tempCost / 2);
                         }
 
-                        // Includes a discount depending on the quantity of the feature
+                        // Applies a proggressive discount depending on the quantity of the feature 
                         double costSub1 = runCost;
                         double minCost = runCost * 0.25;
                         for (int i = 1; i <= quantity; i++)
@@ -183,7 +191,7 @@ namespace FeatureRecognitionAPI.Services
                             setupCost = punch.SetupCost * 1.2;
                             runCost = punch.RunCost;
 
-                            var punchCost = quantity * runCost;// * PunchPrice.PunchDiscount(feature.FeatureType, quantity);
+                            var punchCost = quantity * runCost;
                             featureCost = punchCost + (quantity * setupCost);
                             totalFeatureCost += featureCost;
                     }
@@ -200,6 +208,13 @@ namespace FeatureRecognitionAPI.Services
                 return (OperationStatus.ExternalApiFailure, ex.Message, null);
             }
         }
+        
+        /// <summary>
+        /// Sets a discount for the setup cost of a feature depending on the number of that feature, SHOULD NOT BE
+        /// USED ON PUNCHES
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         private double SetupDiscount(int count)
         {
             return count switch
