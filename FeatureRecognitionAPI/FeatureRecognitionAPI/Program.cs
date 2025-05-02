@@ -1,4 +1,5 @@
 using FeatureRecognitionAPI.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IFeatureRecognitionService, FeatureRecognitionService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IPricingDataService, PricingDataService>();
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.ConfigureKestrel(opts =>
+    {
+        opts.ConfigureHttpsDefaults(httpsOpts =>
+        {
+            httpsOpts.ClientCertificateMode = ClientCertificateMode.NoCertificate;
+        });
+    });
+}
 
 builder.Services.AddCors(options =>
 {
