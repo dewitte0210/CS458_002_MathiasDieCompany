@@ -59,9 +59,22 @@ namespace FeatureRecognitionAPI.Models
             GroupFeatureEntities();
             SetFeatureGroups();
 
+            //if there is a num-up here, only one copy of the die will have its lines identified as recognized or unrecognized
             foreach (FeatureGroup featureGroup in FeatureGroups)
             {
                 featureGroup.FindFeatureTypes();
+            }
+            
+            //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
+            if (FeatureGroups.Any(group => group.Count > 1))
+            {
+                foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
+                {
+                   feature.ExtendAllEntities();
+                   feature.SeperateBaseEntities();
+                   feature.SeperatePerimeterEntities();
+                   feature.DetectFeatures();
+                }
             }
         }
 
@@ -172,7 +185,6 @@ namespace FeatureRecognitionAPI.Models
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
-                feature.CountEntities();
             }
         }
         
@@ -198,10 +210,9 @@ namespace FeatureRecognitionAPI.Models
             Point tempMinPoint;
             Point tempMaxPoint;
 
-            //bool firstrun = true;
             while (features.Count > 0)
             {
-                //Set max values to zero before run, if its not the first one
+                //Set max values to zero before run
                 maxDiffIndex = 0;
                 maxDiff.X = 0;
                 maxDiff.Y = 0;
@@ -216,7 +227,6 @@ namespace FeatureRecognitionAPI.Models
                     tempMaxPoint = features[i].FindMaxPoint();
                     tempDiff.X = (tempMaxPoint.X - tempMinPoint.X);
                     tempDiff.Y = (tempMaxPoint.Y - tempMinPoint.Y);
-
 
                     if (tempDiff.X > maxDiff.X && tempDiff.Y > maxDiff.Y)
                     {
