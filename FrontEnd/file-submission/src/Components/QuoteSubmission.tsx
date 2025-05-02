@@ -30,7 +30,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
         ejecMethod: "",
     });
     const [priceJSON, setPriceJSON] = useState<number | null>(null);
-
+    const [allKissCut, setAllKissCut] = useState(false);
 
     /*
       Event handler for when the user changes a field in the form.
@@ -189,10 +189,14 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
     };
 
     const CheckAllKissCut = async (event: React.FormEvent) => {
-        setData((prev) => 
-        {
-           return prev.map((feature) => feature.kissCut = !feature.kissCut) 
-        })
+      setData(data.map((group) => ({ 
+            ...group,
+            feature: group.features.map((feature) => {
+                feature.KissCut = !allKissCut
+                return feature
+            }),
+        })))
+				setAllKissCut(!allKissCut);
     }
 
     return (
@@ -296,8 +300,10 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                     <th>Perimeter/Diameter</th>
                                     <th>Multiple Radii</th>
                                     <th>Kiss Cut
+                                        <br/> 
                                         <input type="checkbox"     
-
+                                          checked={allKissCut} 
+                                          onChange={(e) => CheckAllKissCut(e)}
                                         />
                                     </th>
                                     <th>Actions</th>
@@ -403,7 +409,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                         <td>
                                                             <input
                                                                 type="checkbox"
-                                                                checked={feature.kissCut}
+                                                                checked={feature.KissCut}
                                                                 onChange={(e) => handleChange(
                                                                     "kissCut",
                                                                     e.target.checked,
@@ -469,7 +475,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                         <td>
                                                             <input
                                                                 type="checkbox"
-                                                                checked={feature.kissCut}
+                                                                checked={feature.KissCut}
                                                                 onChange={(e) => handleChange(
                                                                     "kissCut",
                                                                     e.target.checked,
