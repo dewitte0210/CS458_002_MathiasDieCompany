@@ -1545,6 +1545,49 @@ public class Feature
     {
         foreach (Feature feature in PerimeterFeatureList)
         {
+            
+            //check for chamfer
+            if (feature.EntityList.Count == 1)
+            {
+                
+                Line LineA = (Line)feature.EntityList[0].AdjList[0];
+                Line LineB = (Line)feature.EntityList[0].AdjList[1];
+
+                
+                
+                Point? LineAIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineA);
+                Point? LineBIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineB);
+
+                if (LineAIntersect == null || LineBIntersect == null)
+                {
+                    return;
+                }
+
+                Line LineA1 = new Line(LineA.Start, LineAIntersect);
+                Line LineA2 = new Line(LineAIntersect, LineA.End);
+                    
+                Line LineB1 = new Line(LineB.Start, LineAIntersect);
+                Line LineB2 = new Line(LineBIntersect, LineB.End);
+
+
+                baseEntityList.Remove(feature.EntityList[0].AdjList[0]);
+                baseEntityList.Remove(feature.EntityList[0].AdjList[1]);
+                    
+                baseEntityList.Add(LineA1);
+                baseEntityList.Add(LineA2);
+                baseEntityList.Add(LineB1);
+                baseEntityList.Add(LineB2);
+
+
+                /*ExtendedEntityList = baseEntityList;
+                baseEntityList.Clear();
+                SeperateBaseEntities();
+                */
+
+
+
+            }
+            
             for (int i = 0; i < feature.EntityList.Count; i++)
             {
                 for (int j = 0; j < feature.EntityList[i].AdjList.Count; j++)
@@ -1558,35 +1601,7 @@ public class Feature
                 }
             }
 
-            //check for chamfer
-            /* if (feature.EntityList.Count == 1)
-            {
-                
-                Line LineA = (Line)feature.EntityList[0].AdjList[0];
-                Line LineB = (Line)feature.EntityList[0].AdjList[1];
-
-                
-                
-                    Point? LineAIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineA);
-                    Point? LineBIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineB);
-
-                    if (LineAIntersect == null || LineBIntersect == null)
-                    {
-                        return;
-                    }
-
-                    Line LineA1 = new Line(LineA.Start, LineAIntersect);
-                    Line LineA2 = new Line(LineAIntersect, LineA.End);
-                    
-                    Line LineB1 = new Line(LineB.Start, LineAIntersect);
-                    Line LineB2 = new Line(LineBIntersect, LineB.End);
-                    
-                    
-                
-                    
-
-            }
-            */
+            
         }
     }
 
@@ -1602,6 +1617,8 @@ public class Feature
     {
         foreach (Feature feature in PerimeterFeatureList)
         {
+            
+            
             if (!(feature is not { numLines: 2, numArcs: 1 } && feature is not { numLines: 3, numArcs: 0 or 2 }) && !feature.KissCut)
             {
                 bool con = true;
@@ -1991,6 +2008,9 @@ public class Feature
                     }
                 }
             }
+            
+            
+            
         }
         //this point in the function means nothing is touching current entity
 
