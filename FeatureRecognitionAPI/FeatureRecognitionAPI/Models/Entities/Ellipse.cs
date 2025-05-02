@@ -56,7 +56,7 @@ public class Ellipse : Entity
             End.X += Center.X;
             End.Y += Center.Y;
         }
-        if (DoubleEquals(startParameter, 0) && DoubleEquals(endParameter, 2 * Math.PI))
+        if (DEQ(startParameter, 0) && DEQ(endParameter, 2 * Math.PI))
         {
             IsFullEllipse = true;
         }
@@ -200,11 +200,11 @@ public class Ellipse : Entity
         double y = point.Y - Center.Y;
         double x = point.X - Center.X;
         double pointAngle;
-        if (DoubleEquals(x, 0))
+        if (DEQ(x, 0))
         {
             pointAngle = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
         }
-        else if (DoubleEquals(y, 0))
+        else if (DEQ(y, 0))
         {
             pointAngle = x > 0 ? 0 : Math.PI;
         }
@@ -225,11 +225,11 @@ public class Ellipse : Entity
         double ellipseY = MajorAxisEndPoint.Y - Center.Y;
         double ellipseX = MajorAxisEndPoint.X - Center.X;
         double ellipseRotation;
-        if (DoubleEquals(ellipseX, 0))
+        if (DEQ(ellipseX, 0))
         {
             ellipseRotation = ellipseY > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
         }
-        else if (DoubleEquals(ellipseY, 0))
+        else if (DEQ(ellipseY, 0))
         {
             ellipseRotation = ellipseX > 0 ? 0 : Math.PI;
         }
@@ -273,26 +273,26 @@ public class Ellipse : Entity
     public override double MinX()
     {
         //Base cases
-        if (DoubleEquals(Rotation, 0) || DoubleEquals(Rotation, Math.PI))
+        if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
             //If the major axis is not in the partial ellipse, the end points have to be the min
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, 0) && !(Math.PI >= StartParameter && Math.PI <= EndParameter))
-                     || (DoubleEquals(Rotation, Math.PI) && !(0 >= StartParameter && 0 <= EndParameter)))
+                if ((DEQ(Rotation, 0) && !(Math.PI >= StartParameter && Math.PI <= EndParameter))
+                     || (DEQ(Rotation, Math.PI) && !(0 >= StartParameter && 0 <= EndParameter)))
                 {
                     return Math.Min(Start.X, End.X);
                 }
             }
             return Center.X - MajorAxis;
         }
-        else if (DoubleEquals(Rotation, Math.PI / 2) || DoubleEquals(Rotation, 3 * Math.PI / 2))
+        else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             //If the minor axis is not in the partial ellipse, the end points have to be the min
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, Math.PI / 2) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter))
-                     || (DoubleEquals(Rotation, 3 * Math.PI / 2) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
+                if ((DEQ(Rotation, Math.PI / 2) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter))
+                     || (DEQ(Rotation, 3 * Math.PI / 2) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                 {
                     return Math.Min(Start.X, End.X);
                 }
@@ -318,13 +318,13 @@ public class Ellipse : Entity
     public override double MinY()
     {
         //Base cases
-        if (DoubleEquals(Rotation, 0) || DoubleEquals(Rotation, Math.PI))
+        if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
             //If the minor axis is not in the partial ellipse, the end points have to be the min
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, 0) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter))
-                    || (DoubleEquals(Rotation, Math.PI) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
+                if ((DEQ(Rotation, 0) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter))
+                    || (DEQ(Rotation, Math.PI) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                 {
                     return Math.Min(Start.Y, End.Y);
                 }
@@ -332,12 +332,12 @@ public class Ellipse : Entity
             return Center.Y - MinorAxis;
         }
         //If the major axis is not in the partial ellipse, the end points have to be the min
-        else if (DoubleEquals(Rotation, Math.PI / 2) || DoubleEquals(Rotation, 3 * Math.PI / 2))
+        else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) 
-                     || (DoubleEquals(Rotation, 3 * Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter)))
+                if ((DEQ(Rotation, Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) 
+                     || (DEQ(Rotation, 3 * Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter)))
                 {
                     return Math.Min(Start.Y, End.Y);
                 }
@@ -363,13 +363,13 @@ public class Ellipse : Entity
     public override double MaxX()
     {
         //Base cases
-        if (DoubleEquals(Rotation, 0) || DoubleEquals(Rotation, Math.PI))
+        if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
             //If the major axis is not in the partial ellipse, the end points have to be the max
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, 0) && !(0 >= StartParameter && 0 <= EndParameter)) 
-                     || (DoubleEquals(Rotation, Math.PI) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
+                if ((DEQ(Rotation, 0) && !(0 >= StartParameter && 0 <= EndParameter)) 
+                     || (DEQ(Rotation, Math.PI) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                 {
                     return Math.Max(Start.X, End.X);
                 }
@@ -377,12 +377,12 @@ public class Ellipse : Entity
             return Center.X + MajorAxis;
         }
         //If the minor axis is not in the partial ellipse, the end points have to be the max
-        else if (DoubleEquals(Rotation, Math.PI / 2) || DoubleEquals(Rotation, 3 * Math.PI / 2))
+        else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, Math.PI / 2) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) 
-                     || (DoubleEquals(Rotation, 3 * Math.PI / 2) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
+                if ((DEQ(Rotation, Math.PI / 2) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) 
+                     || (DEQ(Rotation, 3 * Math.PI / 2) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                 {
                     return Math.Max(Start.X, End.X);
                 }
@@ -408,13 +408,13 @@ public class Ellipse : Entity
     public override double MaxY()
     {
         //Base cases
-        if (DoubleEquals(Rotation, 0) || DoubleEquals(Rotation, Math.PI))
+        if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
             //If the minor axis is not in the partial ellipse, the end points have to be the max
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, 0) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) 
-                    || (DoubleEquals(Rotation, Math.PI) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
+                if ((DEQ(Rotation, 0) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) 
+                    || (DEQ(Rotation, Math.PI) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                 {
                     return Math.Max(Start.Y, End.Y);
                 }
@@ -422,12 +422,12 @@ public class Ellipse : Entity
             return Center.Y + MinorAxis;
         }
         //If the major axis is not in the partial ellipse, the end points have to be the max
-        else if (DoubleEquals(Rotation, Math.PI / 2) || DoubleEquals(Rotation, 3 * Math.PI / 2))
+        else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             if (!IsFullEllipse)
             {
-                if ((DoubleEquals(Rotation, Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter)) 
-                    || (DoubleEquals(Rotation, 3 * Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
+                if ((DEQ(Rotation, Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter)) 
+                    || (DEQ(Rotation, 3 * Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                 {
                     return Math.Max(Start.Y, End.Y);
                 }

@@ -28,7 +28,7 @@ public class Point
     {
         if (obj is Point point)
         {
-            return DoubleEquals(X, point.X) && DoubleEquals(Y, point.Y);
+            return DEQ(X, point.X) && DEQ(Y, point.Y);
         }
         return false;
     }

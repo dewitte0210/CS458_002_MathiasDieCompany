@@ -66,7 +66,7 @@ public class Line : Entity
         if (obj == null) return false;
         
         //If both lines have the same length , and the slopes are equal (within tight tolerance)
-        if (obj is Line lineComp && MdcMath.DoubleEquals(GetLength(), lineComp.GetLength()))
+        if (obj is Line lineComp && MdcMath.DEQ(GetLength(), lineComp.GetLength()))
         {
             double slopeDifY = Math.Abs(GetSlopeY() - lineComp.GetSlopeY());
             double slopeDifX = Math.Abs(GetSlopeX() - lineComp.GetSlopeX());

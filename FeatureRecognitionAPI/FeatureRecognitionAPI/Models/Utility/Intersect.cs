@@ -109,7 +109,7 @@ public static class Intersect
         double diffCross = CrossProduct(xDiff, yDiff);
 
         //lines are parallel
-        if (DoubleEquals(diffCross, 0)) return null;
+        if (DEQ(diffCross, 0)) return null;
 
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
@@ -131,7 +131,7 @@ public static class Intersect
         double diffCross = CrossProduct(xDiff, yDiff);
 
         // lines are parallel, don't say they intersect even if they are actually collinear
-        if (DoubleEquals(diffCross, 0)) return null;
+        if (DEQ(diffCross, 0)) return null;
 
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
@@ -161,7 +161,7 @@ public static class Intersect
 
         //  This is to check for a vertical line, since it would crash the program
         //  trying to divide by 0
-        if (DoubleEquals(line.End.X, line.Start.X))
+        if (DEQ(line.End.X, line.Start.X))
         {
             a = 1;
             b = 0;
@@ -171,7 +171,7 @@ public static class Intersect
         {
             double xDif = line.End.X - line.Start.X;
             
-            if (DoubleEquals(xDif, 0)) slope = 0;
+            if (DEQ(xDif, 0)) slope = 0;
             else slope = (line.End.Y - line.Start.Y) / xDif;
 
             if (slope is > 1000000 or < -1000000) slope = 0;
@@ -199,7 +199,7 @@ public static class Intersect
             List<double> solutions = new();
 
             //  Special case for vertical line
-            if (DoubleEquals(line.End.X, line.Start.X))
+            if (DEQ(line.End.X, line.Start.X))
             {
                 double[] tempSolutions = QuadraticFormula(
                     1,
@@ -271,11 +271,11 @@ public static class Intersect
         double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
         double y = ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y;
         double rotation;
-        if (DoubleEquals(x, 0))
+        if (DEQ(x, 0))
         {
             rotation = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
         }
-        else if (DoubleEquals(y, 0))
+        else if (DEQ(y, 0))
         {
             rotation = x > 0 ? 0 : Math.PI;
         }
@@ -417,7 +417,7 @@ public static class Intersect
         // Second case, one circle is entirely inside the other but not intersecting.
         if (between.GetLength() > (arc1.Radius + arc2.Radius) 
             || between.GetLength() < (Math.Abs(arc1.Radius - arc2.Radius)) 
-            || DoubleEquals(between.GetLength(), 0))
+            || DEQ(between.GetLength(), 0))
         {
             return null;
         }

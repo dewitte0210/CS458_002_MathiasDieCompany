@@ -25,7 +25,7 @@ public static class EntityTools
         double cross1 = double.Abs(CrossProduct(p1, p2));
         double cross2 = double.Abs(CrossProduct(p1, p3));
 
-        return MdcMath.DoubleEquals(cross1, 0) && MdcMath.DoubleEquals(cross2, 0);
+        return MdcMath.DEQ(cross1, 0) && MdcMath.DEQ(cross2, 0);
     }
 
     /// <summary>

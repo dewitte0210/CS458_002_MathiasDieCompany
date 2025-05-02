@@ -71,8 +71,8 @@ namespace FeatureRecognitionAPI.Models
                 foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
                 {
                    feature.ExtendAllEntities();
-                   feature.SeperateBaseEntities();
-                   feature.SeperatePerimeterEntities();
+                   feature.SeparateBaseEntities();
+                   feature.SeparatePerimeterEntities();
                    feature.DetectFeatures();
                 }
             }

@@ -71,8 +71,8 @@ public class FeatureGroup
         {
 
             feature.ExtendAllEntities();
-            feature.SeperateBaseEntities();
-            feature.SeperatePerimeterEntities();
+            feature.SeparateBaseEntities();
+            feature.SeparatePerimeterEntities();
             feature.DetectFeatures();
             
             foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
@@ -98,7 +98,7 @@ public class FeatureGroup
             {
                 if (features[i].Equals(features[j]))
                 {
-                    features[i].count += features[j].count;
+                    features[i].Count += features[j].Count;
                     features.RemoveAt(j);
                     j--;
                 }
@@ -140,8 +140,8 @@ public class FeatureGroup
         }
 
         //Sort by perimeter
-        features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
-        ((FeatureGroup)obj).features.Sort((x, y) => x.perimeter.CompareTo((y.perimeter)));
+        features.Sort((x, y) => x.Perimeter.CompareTo(y.Perimeter));
+        ((FeatureGroup)obj).features.Sort((x, y) => x.Perimeter.CompareTo((y.Perimeter)));
 
 
         for (int i = 0; i < features.Count; i++)
@@ -150,7 +150,7 @@ public class FeatureGroup
             int j = i;
             bool checkPoint = false;
             while (j < features.Count
-                   && Math.Abs(features[i].perimeter - ((FeatureGroup)obj).features[j].perimeter) <
+                   && Math.Abs(features[i].Perimeter - ((FeatureGroup)obj).features[j].Perimeter) <
                    Entity.EntityTolerance)
             {
                 if (features[i].Equals(features[j]))

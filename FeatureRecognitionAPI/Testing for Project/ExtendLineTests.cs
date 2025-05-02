@@ -1,5 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Entities;
+using FeatureRecognitionAPI.Models.Features;
 
 namespace Testing_for_Project
 {
@@ -239,8 +240,8 @@ namespace Testing_for_Project
             testFile.FeatureList[0].ExtendAllEntities();
             // Check lines were extended properly (just to be sure)
             Assert.IsTrue(testFile.FeatureList[0].ExtendedEntityList.Count == 5);
-            testFile.FeatureList[0].SeperateBaseEntities();
-            testFile.FeatureList[0].SeperatePerimeterEntities();
+            testFile.FeatureList[0].SeparateBaseEntities();
+            testFile.FeatureList[0].SeparatePerimeterEntities();
             Assert.IsTrue(testFile.FeatureList[0].PerimeterFeatureList.Count == 2);
             Assert.IsTrue(testFile.FeatureList[0].PerimeterFeatureList[0].EntityList.Count == 1);
             Assert.IsTrue(testFile.FeatureList[0].PerimeterFeatureList[1].EntityList.Count == 1);
@@ -322,7 +323,7 @@ namespace Testing_for_Project
             Assert.IsTrue(testFeature.EntityList.Count == 8);
 
             // Seperate base entities
-            testFeature.SeperateBaseEntities();
+            testFeature.SeparateBaseEntities();
 
             // Make sure these still pass
             // Checks for ExtendedEntityList
@@ -358,7 +359,7 @@ namespace Testing_for_Project
 
             // Checks for baseEntityList
             hasExtendedLine = false;
-            foreach (Entity entity in testFeature.baseEntityList)
+            foreach (Entity entity in testFeature.BaseEntityList)
             {
                 Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
                 if (entity is ExtendedLine)
@@ -403,11 +404,11 @@ namespace Testing_for_Project
 
             testFeature.ExtendAllEntities();
 
-            testFeature.SeperateBaseEntities();
+            testFeature.SeparateBaseEntities();
 
             // Checks for baseEntityList
             bool hasExtendedLine = false;
-            foreach (Entity entity in testFeature.baseEntityList)
+            foreach (Entity entity in testFeature.BaseEntityList)
             {
                 Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
                 if (entity is ExtendedLine)
@@ -487,11 +488,11 @@ namespace Testing_for_Project
 
             testFeature.ExtendAllEntities();
 
-            testFeature.SeperateBaseEntities();
+            testFeature.SeparateBaseEntities();
 
             // Checks for baseEntityList
             bool hasExtendedLine = false;
-            foreach (Entity entity in testFeature.baseEntityList)
+            foreach (Entity entity in testFeature.BaseEntityList)
             {
                 Assert.IsTrue(testFeature.ExtendedEntityList.Contains(entity));
                 if (entity is ExtendedLine)
@@ -566,9 +567,9 @@ namespace Testing_for_Project
 
             testFeature.ExtendAllEntities();
 
-            testFeature.SeperateBaseEntities();
+            testFeature.SeparateBaseEntities();
 
-            testFeature.SeperatePerimeterEntities();
+            testFeature.SeparatePerimeterEntities();
 
             Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 1);
             Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Count == 3);
@@ -604,9 +605,9 @@ namespace Testing_for_Project
 
             testFeature.ExtendAllEntities();
 
-            testFeature.SeperateBaseEntities();
+            testFeature.SeparateBaseEntities();
 
-            testFeature.SeperatePerimeterEntities();
+            testFeature.SeparatePerimeterEntities();
 
             Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 2);
             Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Count == 3 && testFeature.PerimeterFeatureList[1].EntityList.Count == 3);
@@ -661,9 +662,9 @@ namespace Testing_for_Project
 
             testFeature.ExtendAllEntities();
 
-            testFeature.SeperateBaseEntities();
+            testFeature.SeparateBaseEntities();
 
-            testFeature.SeperatePerimeterEntities();
+            testFeature.SeparatePerimeterEntities();
 
             Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 2);
             Assert.IsTrue(testFeature.PerimeterFeatureList[0].EntityList.Count == 3 && testFeature.PerimeterFeatureList[1].EntityList.Count == 3);
@@ -714,11 +715,11 @@ namespace Testing_for_Project
                                         // baseEntityList wont be initialized
             {
                 bool equalLists = false;
-                if (featureList[i].EntityList.Count == featureList[i].baseEntityList.Count)
+                if (featureList[i].EntityList.Count == featureList[i].BaseEntityList.Count)
                 {
                     for (int j = 0; j < featureList[i].EntityList.Count; j++)
                     {
-                        if (featureList[i].baseEntityList.Contains(featureList[i].EntityList[j]))
+                        if (featureList[i].BaseEntityList.Contains(featureList[i].EntityList[j]))
                         {
                             equalLists = true;
                         }
@@ -726,7 +727,7 @@ namespace Testing_for_Project
                 }
 
                 Assert.IsTrue(equalLists);//base entity list and normal entity list is the same (only works for example 1)
-                Feature testFeature = new Feature(featureList[i].baseEntityList);
+                Feature testFeature = new Feature(featureList[i].BaseEntityList);
                 testFeature.DetectFeatures();
                 Assert.IsTrue(featureList[i].Equals(testFeature));
             }
@@ -747,14 +748,14 @@ namespace Testing_for_Project
             foreach (Feature feature in exampleOne.FeatureList)
             {
                 feature.ExtendAllEntities();
-                feature.SeperateBaseEntities();
+                feature.SeparateBaseEntities();
             }
 
             List<Feature> featureList = exampleOne.FeatureList;
             foreach (Feature feature in featureList)
             {
                 bool inBaseList = false;
-                for (int i = 0; i < feature.baseEntityList.Count; i++)
+                for (int i = 0; i < feature.BaseEntityList.Count; i++)
                 {
                     if (feature.EntityList.Contains(feature.ExtendedEntityList[i]))
                     {
@@ -807,7 +808,7 @@ namespace Testing_for_Project
                             if (feature.EntityList.Contains(entity)) { inBaseList = true; }
                             else { inBaseList = false; }
                         }
-                        perimeterFeature.CountEntities(perimeterFeature.EntityList, out int numLines, out int numArcs, out int numCircles, out int numEllipses);
+                        Feature.CountEntities(perimeterFeature.EntityList, out int numLines, out int numArcs, out int numCircles, out int numEllipses);
                         Assert.IsTrue(numCircles == 0 && numEllipses == 0);
                         if (numLines == 3 && numArcs == 2) { hasSquareFeature = true; }
                         if (numLines == 2 && numArcs == 1) { hasCircleFeature = true; }
@@ -838,23 +839,23 @@ namespace Testing_for_Project
             exampleTwo.DetectAllFeatureTypes();
 
             Assert.IsTrue(exampleTwo.FeatureGroups.Count == 1); // one overall feature when combined
-            Assert.IsTrue(exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups == 6); // 6 identical features
+            Assert.IsTrue(exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups == 7); // 6 identical features
             List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].GetFeatures();
 
             int count = 0;
             foreach (Feature feature in singleFeatureList)
             {
-                count += feature.count;
+                count += feature.Count;
             }
             Assert.IsTrue(count == 9); // 9 features make up the die
             
             int totalFeatures = 0;
             foreach (Feature feature in singleFeatureList)
             {
-                totalFeatures += feature.count;
+                totalFeatures += feature.Count;
             }
             totalFeatures *= exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups;
-            Assert.IsTrue(totalFeatures == 54); // number of features accounting for combined features
+            Assert.IsTrue(totalFeatures == 63); // number of features accounting for combined features
         }
 
         #endregion
