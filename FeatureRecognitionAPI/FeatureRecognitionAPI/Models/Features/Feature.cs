@@ -12,16 +12,32 @@ using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NHibernate.Dialect.Function;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
 using static FeatureRecognitionAPI.Models.Utility.Intersect;
 
 public class Feature
 {
-    [JsonProperty] public PossibleFeatureTypes FeatureType { get; set; }
-    
-    //list of touching entities that make up the feature
-    [JsonProperty] public List<Entity> EntityList { get; set; }
+    private PossibleFeatureTypes? _featureType;
+    [JsonProperty]
+    public PossibleFeatureTypes? FeatureType
+    {
+        get { return _featureType; }
+        set
+        {
+            _featureType = value;
+            bool isRecognized = FeatureType != PossibleFeatureTypes.Unknown;
+        
+            EntityList?.ForEach(e => e.IsRecognized = isRecognized);
+            baseEntityList?.ForEach(e => e.IsRecognized = isRecognized);
+            ExtendedEntityList?.ForEach(e => e.IsRecognized = isRecognized);
+            PerimeterFeatureList?.ForEach(eList =>
+            {
+                eList?.EntityList.ForEach(e => e.IsRecognized = isRecognized);
+            });
+        }
+    }
+
+    [JsonProperty] public List<Entity> EntityList { get; set; } //list of touching entities that make up the feature
     [JsonProperty] public bool KissCut;
     [JsonProperty] public int multipleRadius;
     [JsonProperty] public bool roundedCorner;
@@ -129,13 +145,9 @@ public class Feature
     
     #region FeatureDetection
 
-    public void CountEntities()
-    {
-        CountEntities(EntityList, out numLines, out numArcs, out numCircles, out numEllipses);
-    }
 
     /// <summary>
-    /// Counts the Lines, Arcs, and Circles in the EntityList.
+    /// Counts the entities in the EntityList.
     /// </summary>
     /// <param name="entityList"> the list that is being looped through. Note that it is passed by reference
     /// and any changes to the list in this function will change the list in the scope of wherever this
@@ -218,6 +230,14 @@ public class Feature
         CheckGroup6Perimeter();
         CheckGroup9();
         CheckGroup17();
+
+        foreach (Feature feature in PerimeterFeatureList)
+        {
+            if (feature.FeatureType == null)
+            {
+                feature.FeatureType = PossibleFeatureTypes.Unknown;
+            }
+        }
             
         //calculate and set the perimeter of the feature
         CalcPerimeter();
@@ -1605,7 +1625,6 @@ public class Feature
         }
     }
 
-
     #endregion
 
     #region Group5
@@ -1713,11 +1732,20 @@ public class Feature
     /// <returns> true if the objects are equal </returns>
     public override bool Equals(object obj)
     {
-        if (!(obj is Feature) || (obj == null))
+        if (obj == null)
         {
             return false;
         }
-        else if (obj == this) return true;
+
+        if (!(obj is Feature feature))
+        {
+            return false;
+        }
+
+        if (obj == this)
+        {
+            return true;
+        }
         /*
          * Way to quickly determine that it's likely that the features are equal.
          * There are edge cases where two features that aren't the same could be set as equal,
@@ -1738,32 +1766,32 @@ public class Feature
         }
         */
 
-        // If there are the same number of arcs lines and circles, and perimeters match,
-        // then check to see if all entities have a corresponding entity with matching values
-        if (((Feature)obj).numLines == this.numLines
-            && ((Feature)obj).numCircles == this.numCircles
-            && ((Feature)obj).numArcs == this.numArcs
-            && Math.Abs(((Feature)obj).perimeter - this.perimeter) < Entity.EntityTolerance)
+        /*
+         * If there are the same number of arcs lines and circles, and permiters match,
+         * then check to see if all entities have a corresponding entity with matching values
+         */
+        if (feature.numLines != this.numLines
+            || feature.numCircles != this.numCircles
+            || feature.numArcs != this.numArcs
+            || Math.Abs(feature.perimeter - this.perimeter) >= Entity.EntityTolerance)
         {
-            //Genuinely my first time ever using lambda expression for something actually useful
-            //sort both lists by length
-            EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
-            ((Feature)obj).EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
-
-            //For each entity in this.EntityList check for a corresponding entity obj.EntityList
-            bool equalLists = true;
-            foreach (Entity j in ((Feature)obj).EntityList)
-            {
-                if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
-                {
-                    equalLists = false;
-                    break;
-                }
-            }
-
-            return equalLists;
+            return false;
         }
-        else return false;
+
+        //sort both lists by length
+        EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+        feature.EntityList.Sort((x, y) => x.GetLength().CompareTo(y.GetLength()));
+
+        //For each entity in this.EntityList check for a corresponding entity obj.EntityList
+        foreach (Entity j in ((Feature)obj).EntityList)
+        {
+            if (!EntityList.Any(e => Math.Abs(e.GetLength() - j.GetLength()) < Entity.EntityTolerance))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public bool Compare(object obj)
@@ -2091,8 +2119,7 @@ public class Feature
         }
 
         List<Entity> touchingList = new List<Entity>();
-        // adds all entities in unusedEntities that touch curEntity to Path and touchinglist and removes them from unusedEntities
-        for (int i = 0; i < unusedEntities.Count; i++) 
+        for (int i = 0; i < unusedEntities.Count; i++) // adds all entities in unusedEntities that touch curEntity to Path and touchingList and removes them from unusedEntities
         {
             if (DoesIntersect(currentEntity, unusedEntities[i]))
             {

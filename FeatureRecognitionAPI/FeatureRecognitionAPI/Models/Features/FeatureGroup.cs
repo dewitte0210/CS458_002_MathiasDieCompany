@@ -60,23 +60,23 @@ public class FeatureGroup
         }
         // add the new chamfer features to the group
         features.AddRange(featuresToAdd);
-        Count += featuresToAdd.Count;
         featuresToAdd.Clear();
     }
 
     public void FindFeatureTypes()
     {
         List<Feature> featToAdd = new List<Feature>();
-        for (int i = 0; i < features.Count; i++)
+        foreach (Feature feature in features)
         {
 
-            features[i].ExtendAllEntities();
-            features[i].SeperateBaseEntities();
-            features[i].SeperatePerimeterEntities();
-            features[i].DetectFeatures();
-            for (int j = 0; j < features[i].PerimeterFeatureList.Count(); j++)
+            feature.ExtendAllEntities();
+            feature.SeperateBaseEntities();
+            feature.SeperatePerimeterEntities();
+            feature.DetectFeatures();
+            
+            foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
             {
-                featToAdd.Add(features[i].PerimeterFeatureList[j]);
+                featToAdd.Add(perimeterFeature);
             }
         }
         features.AddRange(featToAdd);
@@ -87,10 +87,15 @@ public class FeatureGroup
         // Group identical features together
         for (int i = 0; i < features.Count; i++)
         {
+            //ignore group 3 chamfer check because equals sees them as the same even though they are not
+            if (features[i].FeatureType == PossibleFeatureTypes.Group3)
+            {
+                continue;
+            }
+            
             for (int j = i + 1; j < features.Count; j++)
             {
-                //ignore group 3 chamfer check because equals sees them as the same even though they are not
-                if (features[i].Equals(features[j]) && features[i].FeatureType != PossibleFeatureTypes.Group3)
+                if (features[i].Equals(features[j]))
                 {
                     features[i].count += features[j].count;
                     features.RemoveAt(j);

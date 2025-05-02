@@ -19,6 +19,7 @@ public abstract class Entity
         
     public const double EntityTolerance = 0.00005;
 
+    public bool? IsRecognized { get; set; } //for changing how lines look on the front end if the feature is not recognized
     protected Entity()
     {
         AdjList = new List<Entity>();
