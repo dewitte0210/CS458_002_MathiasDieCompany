@@ -66,7 +66,6 @@ namespace FeatureRecognitionAPI.Services
                 if (param.FeatureGroups.Count < 1)
                     return (OperationStatus.BadRequest, "No features detected", null);
 
-                double totalEstimate = 0.00;
                 double totalPerimeter = 0.00;
                 double ruleFactor = 0.00;
                 double setupCostTotal = 0.00;
@@ -128,12 +127,11 @@ namespace FeatureRecognitionAPI.Services
 
                         if (isOverSized)
                         {
-                            // NOTE: Currently feature detection does not support knifed features
                             var tempCost = feature.Perimeter * .19;
                             runCost += (tempCost / 2);
                         }
 
-                        // Applies a proggressive discount depending on the quantity of the feature 
+                        // Applies a progressive discount depending on the quantity of the feature 
                         double costSub1 = runCost;
                         double minCost = runCost * 0.25;
                         for (int i = 1; i <= quantity; i++)
@@ -141,9 +139,11 @@ namespace FeatureRecognitionAPI.Services
                             if (costSub1 > minCost)
                             {
                                 featureCost += costSub1;
-
+                                
+                                // Efficiency slope comes from MDC business logic, will apply a progressive discount
+                                // with each subsequent duplicate feature
                                 var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); 
-                               costSub1 *= efficiencySlope;
+                                costSub1 *= efficiencySlope;
                             }
                             else
                             {
@@ -157,11 +157,12 @@ namespace FeatureRecognitionAPI.Services
                         totalFeatureCost += featureCost;
                         setupCostTotal += featureSetup;
 
-                        totalPerimeter += (feature.Perimeter * quantity);
+                        totalPerimeter += feature.Perimeter * quantity;
                     }
                     else
                     { 
-                        // For punch pricing we get the closest punch by comparing the perimeter with the punch sizes in our lists 
+                        // For punch pricing we get the closest punch in our data lists by matching the diameter of the 
+                        // current feature (which is a punch)
                         PunchPrice punch; 
                         switch (feature.FeatureType)
                         { 
@@ -199,8 +200,8 @@ namespace FeatureRecognitionAPI.Services
                 }
 
                 double perimeterCost = totalPerimeter * 0.46;    
-                totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost)) + perimeterCost;
-
+                var totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost)) + perimeterCost;
+                totalEstimate = Math.Ceiling(totalEstimate);
                 return (OperationStatus.Ok, "Successfully estimated price", totalEstimate.ToString(CultureInfo.CurrentCulture));
             }
             catch (Exception ex)

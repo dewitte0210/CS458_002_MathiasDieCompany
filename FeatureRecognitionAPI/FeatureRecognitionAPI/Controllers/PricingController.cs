@@ -16,6 +16,11 @@ namespace FeatureRecognitionAPI.Controllers
     public class PricingController(IPricingService pricingService, IPricingDataService dataService)
         : ControllerBase
     {
+        /// <summary>
+        /// Estimates the price of a given file 
+        /// </summary>
+        /// <param name="param"> a QuoteSubmissionDto object containing feature data</param>
+        /// <returns></returns>
         [Microsoft.AspNetCore.Mvc.HttpPost("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
