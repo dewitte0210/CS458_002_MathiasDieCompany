@@ -1,28 +1,37 @@
 ﻿using CSMath;
+using FeatureRecognitionAPI.Models.Entities;
 
 namespace FeatureRecognitionAPI.Models.Utility;
 
-/**
- * Wrapper around Matrix4 so we can resuse rotate, scale, transform, etc. from that class.
- */
+/// <summary>
+/// Wrapper around Matrix4 so we can reuse rotate, scale, transform, etc. from that class.
+/// </summary>
 public class Matrix3
 {
-    private Matrix4 matrix;
+    private Matrix4 _matrix;
 
     public Matrix3()
     {
-        matrix = Matrix4.Identity;
+        _matrix = Matrix4.Identity;
+    }
+
+    public Matrix3(Matrix4 mtx4)
+    {
+        _matrix = new Matrix4(
+            mtx4.m00, mtx4.m10, mtx4.m20, 0,
+            mtx4.m01, mtx4.m11, mtx4.m21, 0,
+            mtx4.m02, mtx4.m12, mtx4.m22, 0,
+            0, 0, 0, 0);
     }
 
     public Matrix3(double a, double b, double c, double d, double e, double f, double g, double h, double i)
     {
-        matrix = new Matrix4(new double[]
-        {
+        _matrix = new Matrix4([
             a, b, c, 0,
             d, e, f, 0,
             g, h, i, 0,
             0, 0, 0, 1
-        });
+        ]);
     }
 
     public static Matrix3 Scale(double xScale, double yScale)
@@ -34,8 +43,7 @@ public class Matrix3
     }
 
 
-
-   public static Matrix3 Rotate(double radians)
+    public static Matrix3 Rotate(double radians)
     {
         double sinTheta = Math.Sin(radians);
         double cosTheta = Math.Cos(radians);
@@ -56,28 +64,19 @@ public class Matrix3
 
     public Matrix4 GetUnderlyingMatrix()
     {
-        return matrix;
+        return _matrix;
     }
 
-    public static Matrix3 ConvertToMatrix3(Matrix4 mtx4)
-    {
-        return new Matrix3(
-            mtx4.m00, mtx4.m10, mtx4.m20,
-            mtx4.m01, mtx4.m11, mtx4.m21,
-            mtx4.m02, mtx4.m12, mtx4.m22);
-    }
+    public static Matrix3 operator *(Matrix3 a, Matrix3 b) => new(Matrix4.Multiply(a._matrix, b._matrix));
 
-
-    public static Matrix3 operator *(Matrix3 a, Matrix3 b) => ConvertToMatrix3(Matrix4.Multiply(a.matrix, b.matrix));
-    
     public static Point operator *(Matrix3 matrix, Point value)
     {
-      XYZM right = new XYZM(value.X, value.Y, 1, 1.0);
-      List<XYZM> rows = matrix.matrix.GetRows();
-      return new Point()
-      {
-        X = rows[0].Dot<XYZM>(right),
-        Y = rows[1].Dot<XYZM>(right),
-      };
+        XYZM right = new(value.X, value.Y, 1, 1.0);
+        List<XYZM> rows = matrix._matrix.GetRows();
+        return new Point()
+        {
+            X = rows[0].Dot(right),
+            Y = rows[1].Dot(right),
+        };
     }
 }

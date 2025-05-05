@@ -2,101 +2,92 @@ using FeatureRecognitionAPI.Models.Utility;
 using Convert = System.Convert;
 using Math = System.Math;
 
-namespace FeatureRecognitionAPI.Models;
+namespace FeatureRecognitionAPI.Models.Entities;
 
-/**
- * Class that represents a Arc object that extends Entity
- * Inherits entityType and Length fields
- */
+/// <summary>
+/// Class that represents an Arc object that extends Entity
+/// Inherits entityType and Length fields 
+/// </summary>
 public class Arc : Entity
 {
     public Point Center { get; set; } //Central point
-    public Point Start { get; set; } //Start point
-    public Point End { get; set; } //End point
     public double Radius { get; set; } //Radius value
     public double StartAngle { get; set; } //angle from central point to start point
     public double EndAngle { get; set; } //angle from central point to end point
     public double CentralAngle { get; } //angle of the arc
 
-    /**
-     * Creates an arc and calculates the starting and ending coordinates as well
-     * as the length of the arc. Makes it so Arc has no default constructor
-     *
-     * @param CenterX the x value of the center of the arc
-     * @param CenterY the y value of the center of the arc
-     * @param radius the radius value of the arc
-     * @param startAngle the angle the arc starts at
-     * @param endAngle the angle the arc ends at
-     */
+    /// <summary>
+    /// Creates an arc and calculates the starting and ending coordinates as well
+    /// as the length of the arc. Makes it so Arc has no default constructor
+    /// </summary>
+    /// <param name="centerX"> the x value of the center of the arc </param>
+    /// <param name="centerY"> the y value of the center of the arc </param>
+    /// <param name="radius"> the radius value of the arc </param>
+    /// <param name="startAngle"> the angle the arc starts at </param>
+    /// <param name="endAngle"> the angle the arc ends at </param>
     public Arc(double centerX, double centerY, double radius, double startAngle, double endAngle)
     {
         Center = new Point(centerX, centerY);
-        this.Radius = radius;
-        this.StartAngle = startAngle;
-        this.EndAngle = endAngle;
-        Start = new(calcXCoord(centerX, radius, startAngle), calcYCoord(centerY, radius, startAngle));
-        End = new Point(calcXCoord(centerX, radius, endAngle), calcYCoord(centerY, radius, endAngle));
-        this.CentralAngle = calcCentralAngle(startAngle, endAngle);
-        this.Length = (calcLength(radius, CentralAngle));
+        Radius = radius;
+        StartAngle = startAngle;
+        EndAngle = endAngle;
+        Start = new(CalcXCoord(centerX, radius, startAngle), CalcYCoord(centerY, radius, startAngle));
+        End = new Point(CalcXCoord(centerX, radius, endAngle), CalcYCoord(centerY, radius, endAngle));
+        CentralAngle = CalcCentralAngle(startAngle, endAngle);
     }
 
-    /**
-     * Function to calculate the x coordinate given the center point, Radius
-     * and an angle.
-     */
-    private static double calcXCoord(double x, double radius, double angle)
+    /// <summary>
+    /// Function to calculate the length of the arc for perimeter length checks 
+    /// </summary>
+    /// <returns>the calculated length (partial circumference) of the arc</returns>
+    public override double GetLength()
+    {
+        return (2 * Math.PI * Radius * (CentralAngle / 360));
+    }
+    
+    /// <summary>
+    /// Function to calculate the x coordinate given the center point, Radius
+    /// and an angle. 
+    /// </summary>
+    private static double CalcXCoord(double x, double radius, double angle)
     {
         return (radius * Math.Cos(Angles.DegToRadians(angle)) + x);
     }
 
-    /**
-     * Function to calculate the y coordinate given the center point, Radius
-     * and an angle.
-     */
-    private static double calcYCoord(double y, double radius, double angle)
+    /// <summary>
+    /// Function to calculate the y coordinate given the center point, Radius
+    /// and an angle.
+    /// </summary>
+    private static double CalcYCoord(double y, double radius, double angle)
     {
         return (radius * Math.Sin(Angles.DegToRadians(angle)) + y);
     }
 
-        /**
-         * Function to calculate the central angle
-         * 
-         * @param startAngle the start angle of the arc being calculated
-         * @param endAngle the end angle of the arc being calculated
-         * @return the calculated the length of the arc
-         */
-        internal static double calcCentralAngle(double startAngle, double endAngle)
-        {
-            //The subtraction result would be negative, need to add 360 to get correct value
-            if (endAngle < startAngle)
-                return endAngle - startAngle + 360;
-            return endAngle - startAngle;
-        }
-
-    /**
-     * Function to calculate the length of the arc for perimeter length checks
-     *
-     * @param radius the radius value of the arc being calculated
-     * @param centralAngle the central angle for the arc being calculated
-     * @return the calculated length (partial circumference) of the arc
-     */
-    private static double calcLength(double radius, double centralAngle)
+    /// <summary>
+    /// Function to calculate the central angle 
+    /// </summary>
+    /// <param name="startAngle"> the start angle of the arc being calculated </param>
+    /// <param name="endAngle"> the end angle of the arc being calculated </param>
+    /// <returns> the calculated the length of the arc </returns>
+    internal static double CalcCentralAngle(double startAngle, double endAngle)
     {
-        return (2 * Math.PI * radius * (centralAngle / 360));
+        //The subtraction result would be negative, need to add 360 to get correct value
+        if (endAngle < startAngle)
+            return endAngle - startAngle + 360;
+        return endAngle - startAngle;
     }
-
-    /**
-     * Overides .Equals function for the Arc object
-     *
-     * @param obj object being compared to this
-     * @return true if the same arc, false if not
-     */
+    
+    /// <summary>
+    /// Overrides .Equals function for the Arc object
+    /// </summary>
+    /// <param name="obj"> object being compared to this </param>
+    /// <returns> true if the same arc, false if not </returns>
     public override bool Equals(object? obj)
     {
         if (obj is Arc)
         {
             //IDE Mapped everything to work with tolerance in one tab push :O
-            if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
+            if (Math.Abs(((Arc)obj).GetLength() - this.GetLength()) < EntityTolerance
                 && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
                 && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
                 && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance
@@ -109,29 +100,13 @@ public class Arc : Entity
         else return false;
     }
 
-    public override bool Compare(object? obj)
-    {
-        if (obj is Arc)
-        {
-            if (Math.Abs(((Arc)obj).Length - this.Length) < EntityTolerance
-                && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
-                && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
-                && Math.Abs(((Arc)obj).EndAngle - this.EndAngle) < EntityTolerance)
-            {
-                return true;
-            }
-            else return false;
-        }
-        else return false;
-    }
-
-    /**
-     * Function that determines if a point is in between the start and end angles
-     * (already checked to be on the line if the arc is treated as a circle)
-     * Mostly used in the intersect functions
-     *
-     * @param point is the point being checked
-     */
+    /// <summary>
+    /// Function that determines if a point is in between the start and end angles
+    /// (already checked to be on the line if the arc is treated as a circle)
+    /// Mostly used in the intersect functions
+    /// </summary>
+    /// <param name="point"> the point being checked </param>
+    /// <returns></returns>
     internal bool IsInArcRange(Point point)
     {
         double y = point.Y - Center.Y;
@@ -189,15 +164,15 @@ public class Arc : Entity
         return middleAngle;
     }
 
-    public int GetHashCode()
+    public override int GetHashCode()
     {
         //hash is built using ellipse center and arc radius
         //so two arcs with the same center and arc radius will have the same hash
+        //Note: this hash may not be robust enough
         return Convert.ToInt32(
             Center.X * 10010111 +
             Center.Y * 10000379 +
             Radius * 10006721);
-        //Note: this hash may not be robust enough
     }
 
     public override double MinX()
@@ -240,12 +215,15 @@ public class Arc : Entity
         public double width { get; init; }
         public double height { get; init; }
     }
-
-    //This function and its helper methods are adapted from the Java.awt library.
-    // Note: comments which appeared in the original source code will be labelled as //**
+    
+    /// <summary>
+    /// This function and its helper methods are adapted from the Java.awt library.
+    /// Note: comments which appeared in the original source code will be labelled as //**
+    /// </summary>
     public Rect GetBounds()
     {
-        double x1, y1, x2, y2; //these numbers are coordinates relative to the unit circle
+        //these numbers are coordinates relative to the unit circle
+        double x1, y1, x2, y2;
         x1 = y1 = 1.0;
         x2 = y2 = -1.0;
         double angle = 0.0;
@@ -316,11 +294,10 @@ public class Arc : Entity
 
         return (angle >= 0.0) && (angle < angExt);
     }
-
-
-    /*
-     * ** Normalizes the specified angle into the range -180 to 180.
-     */
+    
+    /// <summary>
+    /// ** Normalizes the specified angle into the range -180 to 180.
+    /// </summary>
     static double NormalizeDegrees(double angle)
     {
         if (angle > 180.0)
@@ -332,7 +309,7 @@ public class Arc : Entity
             else
             {
                 angle = Math.IEEERemainder(angle, 360.0);
-                //** IEEEremainder can return -180 here for some input values...
+                //** IEEERemainder can return -180 here for some input values...
                 if (angle == -180.0)
                 {
                     angle = 180.0;
@@ -348,7 +325,7 @@ public class Arc : Entity
             else
             {
                 angle = Math.IEEERemainder(angle, 360.0);
-                //** IEEEremainder can return -180 here for some input values...
+                //** IEEERemainder can return -180 here for some input values...
                 if (angle == -180.0)
                 {
                     angle = 180.0;
@@ -359,9 +336,9 @@ public class Arc : Entity
         return angle;
     }
 
-    /**
-     * Return true if this and other should be combined into one larger arc.
-     */
+    /// <summary>
+    /// Return true if this and other should be combined into one larger arc.
+    /// </summary>
     public bool ConnectsTo(Arc other)
     {
         return !Equals(other) &&

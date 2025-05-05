@@ -1,8 +1,6 @@
-﻿using ACadSharp;
-using ACadSharp.IO;
-using FeatureRecognitionAPI.Models;
+﻿using FeatureRecognitionAPI.Models.Entities;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
-using static FeatureRecognitionAPI.Models.Utility.MDCMath;
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
 namespace Testing_for_Project
 {
