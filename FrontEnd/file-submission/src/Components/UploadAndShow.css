@@ -17,27 +17,42 @@
 
 .table-and-visual{
   display:flex;
+  flex-direction: row;
   flex-wrap:wrap;
   justify-content:center;
-  align-items:center;
+  align-items: flex-start;
   gap:16px;
 
   margin-top: 50px;
   margin-bottom: 50px;
   margin-right: 0px;
   margin-left: 0px;
+  box-sizing: border-box;
+  overflow-y: visible;
+}
+.table-and-visual > * {
+  flex: 1 1 400px;
+  min-width: 300px;
+  max-width: 100%; 
+  box-sizing: border-box;
+  overflow-x: auto;
+  
 }
 
 .table-data{
   padding-right: 32px;
   border-right:4px solid black;
+  border-collapse: collapse;
 }
 
 .visual{
 }
 
 .response-container{
-  
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
 }
 
 .upload-container {
