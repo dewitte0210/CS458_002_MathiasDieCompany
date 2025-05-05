@@ -99,7 +99,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                 perimeter: 0,
                                 diameter: 0,
                                 multipleRadius: 1,
-                                kissCut: false,
+                                KissCut: false,
                                 EntityList: [],
                             },
                         ],
@@ -411,7 +411,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                                 type="checkbox"
                                                                 checked={feature.KissCut}
                                                                 onChange={(e) => handleChange(
-                                                                    "kissCut",
+                                                                    "KissCut",
                                                                     e.target.checked,
                                                                     groupIndex,
                                                                     featureIndex
@@ -477,7 +477,7 @@ const QuoteSubmission: React.FC<QuoteSubmissionProps> = ({
                                                                 type="checkbox"
                                                                 checked={feature.KissCut}
                                                                 onChange={(e) => handleChange(
-                                                                    "kissCut",
+                                                                    "KissCut",
                                                                     e.target.checked,
                                                                     groupIndex,
                                                                     featureIndex
