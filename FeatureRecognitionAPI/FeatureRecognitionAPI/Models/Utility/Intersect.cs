@@ -227,14 +227,19 @@ public static class Intersect
             }
             else
             {
-                // todo what is going on here?
-                decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1),
-                    (decimal)(-2.0 * arc.Center.X) + (decimal)(2 * (intercept * slope)) -
-                    (decimal)(2 * (arc.Center.Y * slope)),
-                    (decimal)Math.Pow(arc.Center.X, 2) + (decimal)Math.Pow(intercept, 2) -
-                    (decimal)(2 * (intercept * arc.Center.Y)) + (decimal)Math.Pow(arc.Center.Y, 2) -
-                    (decimal)Math.Pow(arc.Radius, 2));
-                foreach (decimal number in tempSolns)
+                // Decimal is a 16 byte float
+                decimal decA = (decimal)(Math.Pow(slope, 2) + 1);
+                decimal decB = (decimal)(-2.0 * arc.Center.X) 
+                               + (decimal)(2 * (intercept * slope)) 
+                               - (decimal)(2 * (arc.Center.Y * slope));
+                decimal decC = (decimal)Math.Pow(arc.Center.X, 2) 
+                               + (decimal)Math.Pow(intercept, 2) 
+                               - (decimal)(2 * (intercept * arc.Center.Y)) 
+                               + (decimal)Math.Pow(arc.Center.Y, 2) 
+                               - (decimal)Math.Pow(arc.Radius, 2);
+                
+                decimal[] tempSolutions = DecimalEx.SolveQuadratic(decA, decB, decC);
+                foreach (decimal number in tempSolutions)
                 {
                     solutions.Add((double)number);
                 }

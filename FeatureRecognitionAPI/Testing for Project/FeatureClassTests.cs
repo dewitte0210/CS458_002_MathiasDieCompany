@@ -119,7 +119,7 @@ namespace Testing_for_Project
 
             List<FeatureGroup> fGroups = example3.FeatureGroups;
 
-            List<Feature> fList = fGroups[0].GetFeatures();
+            List<Feature> fList = fGroups[0].FeatureList;
 
             Feature baseShape = fList[1];
 
@@ -487,11 +487,11 @@ namespace Testing_for_Project
             int numChamfers = 0;
             foreach (FeatureGroup fg in squareFile.FeatureGroups)
             {
-                numChamfers += GetNumChamferFeatures(fg.GetFeatures());
+                numChamfers += GetNumChamferFeatures(fg.FeatureList);
             }
             
             Assert.That(GetNumChamferFeatures(squareFile.FeatureGroups), Is.EqualTo(1));
-            foreach (Entity entity in squareFile.FeatureGroups[0].GetFeatures()[0].EntityList)
+            foreach (Entity entity in squareFile.FeatureGroups[0].FeatureList[0].EntityList)
             {
                 // todo: actually test for this when getLength function is implemented
                 //Assert.That(entity.);
@@ -511,7 +511,7 @@ namespace Testing_for_Project
             int numChamfers = 0;
             foreach (FeatureGroup fg in squareFile.FeatureGroups)
             {
-                numChamfers += GetNumChamferFeatures(fg.GetFeatures());
+                numChamfers += GetNumChamferFeatures(fg.FeatureList);
             }
             
             Assert.That(numChamfers, Is.EqualTo(2));
@@ -535,7 +535,7 @@ namespace Testing_for_Project
             int numChamfers = 0;
             foreach (FeatureGroup f in featureGroupList)
             {
-                numChamfers += GetNumChamferFeatures(f.GetFeatures());
+                numChamfers += GetNumChamferFeatures(f.FeatureList);
             }
             return numChamfers;
         }

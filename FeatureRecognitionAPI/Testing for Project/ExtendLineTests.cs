@@ -840,7 +840,7 @@ namespace Testing_for_Project
 
             Assert.IsTrue(exampleTwo.FeatureGroups.Count == 1); // one overall feature when combined
             Assert.IsTrue(exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups == 7); // 6 identical features
-            List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].GetFeatures();
+            List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].FeatureList;
 
             int count = 0;
             foreach (Feature feature in singleFeatureList)

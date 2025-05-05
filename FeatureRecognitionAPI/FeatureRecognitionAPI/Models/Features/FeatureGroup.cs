@@ -1,39 +1,48 @@
 ﻿using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features;
 
 public class FeatureGroup
 {
-    // todo: just make Count return length of feature list
     //Track how many feature groups of this type are found
     public int NumIdenticalFeatureGroups { get; set; }
-    private int totalArcs;
-    private int totalLines;
-    private int totalCircles;
-    [JsonProperty] protected List<Feature> features;
+    private readonly int _totalArcs;
+    private readonly int _totalLines;
+    private readonly int _totalCircles;
+    [JsonProperty] protected internal List<Feature> FeatureList { get; set; }
 
-    public FeatureGroup(List<Feature> features)
+    public FeatureGroup(List<Feature> featureList)
     {
-        // this.count = count;
-        this.features = features;
+        FeatureList = featureList;
 
-        foreach (Feature feature in features)
+        foreach (Feature feature in featureList)
         {
-            this.totalArcs += feature.GetNumArcs();
-            this.totalLines += feature.GetNumLines();
-            this.totalCircles += feature.GetNumCircles();
+            _totalArcs += feature.GetNumArcs();
+            _totalLines += feature.GetNumLines();
+            _totalCircles += feature.GetNumCircles();
         }
     }
     
+    /// <summary>
+    /// After feature detection, chamfered lines are only flagged and should be their own feature.
+    /// This function breaks those flagged chamfers into their own feature.
+    /// There is also an option to remove the chamfer from its original feature as well (removeChamfers bool)
+    /// </summary>
     private void BreakOutChamfers()
     {
         List<Feature> featuresToAdd = new();
-        foreach (Feature feature in features)
+        foreach (Feature feature in FeatureList)
         {
             if (feature.ChamferList.Count <= 0) continue;
 
+            // Manually set to true to remove chamfers from their base feature
+            // doing this messes with the front end display so if you do
+            // want to use this, that will need to be corrected
+            bool removeChamfers = false;
+            
             List<Line> chamfersToRemove = new();
             List<Entity> newEntityList = feature.EntityList.ToList();
             foreach (ChamferGroup cg in feature.ChamferList)
@@ -44,22 +53,28 @@ public class FeatureGroup
                 // add to a new list so that the indexes in entity list stay the same
                 chamfersToRemove.Add(cg.Chamfer);
 
-                // todo: decide whether to remove the chamfers because it shows up in front end weird
-                //EntityTools.ExtendTwoLines(newEntityList[cg.LineAIndex] as Line,
-                //    newEntityList[cg.LineBIndex] as Line);
+                if (removeChamfers)
+                {
+                    EntityTools.ExtendTwoLines(newEntityList[cg.LineAIndex] as Line,
+                        newEntityList[cg.LineBIndex] as Line);
+                }
             }
 
             // actually remove the chamfers
-            //foreach (Line chamfer in chamfersToRemove)
-            //{
-            //    newEntityList.Remove(chamfer);
-            //}
+            if (removeChamfers)
+            {
+                foreach (Line chamfer in chamfersToRemove)
+                {
+                    newEntityList.Remove(chamfer);
+                }                
+            }
+            
             feature.ChamferList.Clear();
             chamfersToRemove.Clear();
             feature.EntityList = newEntityList;
         }
         // add the new chamfer features to the group
-        features.AddRange(featuresToAdd);
+        FeatureList.AddRange(featuresToAdd);
         NumIdenticalFeatureGroups += featuresToAdd.Count;
         featuresToAdd.Clear();
     }
@@ -67,7 +82,7 @@ public class FeatureGroup
     public void FindFeatureTypes()
     {
         List<Feature> featToAdd = new List<Feature>();
-        foreach (Feature feature in features)
+        foreach (Feature feature in FeatureList)
         {
 
             feature.ExtendAllEntities();
@@ -80,80 +95,60 @@ public class FeatureGroup
                 featToAdd.Add(perimeterFeature);
             }
         }
-        features.AddRange(featToAdd);
+        FeatureList.AddRange(featToAdd);
         
         // break out chamfers
         BreakOutChamfers();
 
         // Group identical features together
-        for (int i = 0; i < features.Count; i++)
+        for (int i = 0; i < FeatureList.Count; i++)
         {
             //ignore group 3 chamfer check because equals sees them as the same even though they are not
-            if (features[i].FeatureType == PossibleFeatureTypes.Group3)
+            if (FeatureList[i].FeatureType == PossibleFeatureTypes.Group3)
             {
                 continue;
             }
             
-            for (int j = i + 1; j < features.Count; j++)
+            for (int j = i + 1; j < FeatureList.Count; j++)
             {
-                if (features[i].Equals(features[j]))
+                if (FeatureList[i].Equals(FeatureList[j]))
                 {
-                    features[i].Count += features[j].Count;
-                    features.RemoveAt(j);
+                    FeatureList[i].Count += FeatureList[j].Count;
+                    FeatureList.RemoveAt(j);
                     j--;
                 }
             }
         }
     }
 
-    public void SetFeatureList(List<Feature> features)
-    {
-        this.features = features;
-    }
-
-    public List<Feature> GetFeatures()
-    {
-        return this.features;
-    }
-        
     /// <summary>
     /// Check of all features in the group have a corresponding feature in other group, return true if they do 
     /// </summary>
     public override bool Equals(object? obj)
     {
-        if (!(obj is FeatureGroup) || obj == null)
-        {
-            return false;
-        }
+        if (obj is not FeatureGroup fg) return false;
 
-        if (obj == this)
-        {
-            return true;
-        }
+        if (fg == this) return true;
 
         //If here, obj is a FeatureGroup
-        if (!(this.totalArcs == ((FeatureGroup)obj).totalArcs
-              && this.totalLines == ((FeatureGroup)obj).totalLines
-              && this.totalCircles == ((FeatureGroup)obj).totalCircles
-            )) {
+        if (!(_totalArcs == fg._totalArcs && _totalLines == fg._totalLines && _totalCircles == fg._totalCircles))
+        {
             return false;
         }
 
         //Sort by perimeter
-        features.Sort((x, y) => x.Perimeter.CompareTo(y.Perimeter));
-        ((FeatureGroup)obj).features.Sort((x, y) => x.Perimeter.CompareTo((y.Perimeter)));
+        FeatureList.Sort((x, y) => x.Perimeter.CompareTo(y.Perimeter));
+        fg.FeatureList.Sort((x, y) => x.Perimeter.CompareTo(y.Perimeter));
 
-
-        for (int i = 0; i < features.Count; i++)
+        for (int i = 0; i < FeatureList.Count; i++)
         {
             //While this features @ i has same perimeter as obj.features[j] check if any j = features[i]
             int j = i;
             bool checkPoint = false;
-            while (j < features.Count
-                   && Math.Abs(features[i].Perimeter - ((FeatureGroup)obj).features[j].Perimeter) <
-                   Entity.EntityTolerance)
+            while (j < FeatureList.Count && 
+                   Math.Abs(FeatureList[i].Perimeter - fg.FeatureList[j].Perimeter) < Entity.EntityTolerance)
             {
-                if (features[i].Equals(features[j]))
+                if (FeatureList[i].Equals(FeatureList[j]))
                 {
                     checkPoint = true;
                     break;
@@ -163,13 +158,10 @@ public class FeatureGroup
                 j++;
             }
 
-            if (!checkPoint)
-            {
-                return false;
-            }
+            if (!checkPoint) return false;
         }
 
-        //If we got here, checkPoint was never false, so return true;
+        // If we got here, checkPoint was never false, so return true
         return true;
     }
         
