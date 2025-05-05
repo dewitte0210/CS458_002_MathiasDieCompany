@@ -57,8 +57,7 @@ export default function PunchTable({ tableData, tableID }) {
                 }
                 await fetch(`${process.env.REACT_APP_API_BASEURL}api/Pricing/UpdatePunchPrice/${tableID}`, postData)
                 alert("Successfully Updated Table")
-            }catch(e){
-                console.error(e)
+            }catch(err){
                 alert("Error in updating table. Check that all values are numbers")
             }
         }
