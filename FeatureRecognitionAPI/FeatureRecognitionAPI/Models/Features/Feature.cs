@@ -72,8 +72,7 @@ public class Feature
     private int _numLines;
     private int _numArcs;
     private int _numCircles;
-    private const double LowAngleTolerance = 359.9;
-    private const double HighAngleTolerance = 360.09;
+    
 
     #region Constructors
 
@@ -2015,7 +2014,6 @@ public class Feature
             maxX = Math.Max(maxX, entity.MaxX());
             maxY = Math.Max(maxY, entity.MaxY());
         }
-
         return new Point(maxX, maxY);
     }
 
@@ -2029,7 +2027,6 @@ public class Feature
             minX = Math.Min(minX, entity.MinX());
             minY = Math.Min(minY, entity.MinY());
         }
-
         return new Point(minX, minY);
     }
 
@@ -2041,13 +2038,10 @@ public class Feature
         double sumAngles = 0;
         BaseEntityList.ForEach(entity =>
         {
-            if (entity is Arc arcEntity)
-            {
-                sumAngles += arcEntity.CentralAngle;
-            }
+            if (entity is Arc arcEntity) sumAngles += arcEntity.CentralAngle;
         });
 
-        return sumAngles is > LowAngleTolerance and < HighAngleTolerance;
+        return sumAngles is > 359.9 and < 360.09;
     }
 
     /// <summary>
@@ -2064,12 +2058,10 @@ public class Feature
                 if (e1 is Line line1 && e2 is Line line2)
                 {
                     if (line1 == line2) continue;
-
                     if (IsParallel(line1, line2)) return true;
                 }
             }
         }
-
         return false;
     }
 
@@ -2107,7 +2099,7 @@ public class Feature
             if (FeatureType == PossibleFeatureTypes.Group2A2) return;
 
             // Create a new list containing only the arc entities
-            List<Entity> arcList = new List<Entity>();
+            List<Entity> arcList = new();
             foreach (Entity entity in BaseEntityList)
             {
                 if (entity is Arc)
