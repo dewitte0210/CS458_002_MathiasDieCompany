@@ -205,38 +205,33 @@ canvas {
 
 @keyframes slide-in-button {
     from {
-/*        transform: translateX(100%);*/
-        right: 1vw;
+        right: 1.25vw;
     }
     to {
-/*        transform: translateX(-1165%);*/
-        right: 39vw;
+        right: 39.25vw;
     }
 }
 
 @keyframes slide-out-button {
     from {
-/*        transform: translateX(-1165%);*/
-        right: 39vw;
+        right: 39.25vw;
     }
 
     to {
-/*        transform: translateX(100%);*/
-        right: 1vw;
+        right: 1.25vw;
     }
 }
 
 .manual-toggle-button {
     position: fixed;
     top: 20px;
-    right: 2.4vw;
     transform: translateX(50%);
-    background-color: #0e5d95;
+    background-color: #5472d2;
     color: white;
     border: none;
     border-radius: 10%;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     z-index: 1001;
     cursor: pointer;
     font-size: 18px;
@@ -256,23 +251,28 @@ canvas {
 
 
 .manual-sidebar {
-  width: 135px; /* Adjusted width to keep the sidebar proportional */
-  background-color: #0e5d95;
-  color: white;
-  padding: 10px;
-  box-sizing: border-box;
-  overflow-y: auto;
+    width: 135px; /* Adjusted width to keep the sidebar proportional */
+    background-color: #5472d2;
+    color: white;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.manual-sidebar li {
+    line-height: 1;
+    margin-bottom: 1rem;
 }
 
 .manual-sidebar ul {
-  list-style: none;
-  padding: 0;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
 }
 
 .manual-sidebar ul li {
   cursor: pointer;
   color: #ffffff;
-  margin: 10px 0;
   transition: color 0.3s ease;
 }
 

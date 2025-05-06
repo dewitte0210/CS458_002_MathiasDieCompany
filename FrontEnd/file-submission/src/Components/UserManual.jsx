@@ -121,7 +121,7 @@ export default function UserManual (){
               className={`${styles["manual-toggle-button"]} ${isManualHidden ? styles["button-slide-out"] : styles["button-slide-in"]}`}
               onClick={() => setIsManualHidden(prev => !prev)}
           >
-              {isManualHidden ? "▶" : "◀"}
+              {isManualHidden ? < i className='fa-solid fa-question'></i> : <i className='fa-solid fa-caret-right'></i>}
           </button>
 
         {/* Manual Panel */}
