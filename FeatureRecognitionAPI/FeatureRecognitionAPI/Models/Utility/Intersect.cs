@@ -119,7 +119,7 @@ public static class Intersect
     }
     
     // line with line
-    internal static Point? FindIntersectPointHelper(Line line1, Line line2)
+    private static Point? FindIntersectPointHelper(Line line1, Line line2)
     {
         Point l1Delta = line1.GetDelta();
         Point l2Delta = line2.GetDelta();
@@ -146,7 +146,7 @@ public static class Intersect
     }
 
     // line with arc
-    internal static Point? FindIntersectPointHelper(Line line, Arc arc)
+    private static Point? FindIntersectPointHelper(Line line, Arc arc)
     {
         //  Get line in the slope-intercept form, then transform it to the
         //  general form: Ax + By + C = 0
@@ -265,7 +265,7 @@ public static class Intersect
     }
 
     // line with ellipse
-    internal static Point? FindIntersectPointHelper(Line line, Ellipse ellipse)
+    private static Point? FindIntersectPointHelper(Line line, Ellipse ellipse)
     {
         //Need to rotate the line around the origin for rotated ellipses
         double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
@@ -408,7 +408,7 @@ public static class Intersect
     }
 
     // arc with arc
-    internal static Point? FindIntersectPointHelper(Arc arc1, Arc arc2)
+    private static Point? FindIntersectPointHelper(Arc arc1, Arc arc2)
     {
         // Treat both Arcs circles, get the line between their centers
         Line between = new Line(arc1.Center.X, arc1.Center.Y, arc2.Center.X, arc2.Center.Y);
