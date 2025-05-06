@@ -109,10 +109,25 @@ namespace FeatureRecognitionAPI.Models
 
                     // Check to flag an entity as Kisscut
                     count++;
-                    if (count == 4 && EntityList[i] is Line tempLine)
+                    if (count == 4)
                     {
-                        tempLine.KissCut = true;
+                        EntityList[i].KissCut = true;
                     }
+
+                    bool endPointBool = true;
+                    for (int k = 0; k < EntityList[i].AdjList.Count; k++)
+                    {
+                        if(Intersect.AreEndpointsTouching(EntityList[i], EntityList[i].AdjList[k]))
+                        {
+                            endPointBool = false;
+                        }
+                    }
+
+                    if (endPointBool)
+                    {
+                        EntityList[i].KissCut = true;
+                    }
+                    
 
                     // checks that either i or j still needs to be mapped
                     // say there is a third entity k that touches i and j.

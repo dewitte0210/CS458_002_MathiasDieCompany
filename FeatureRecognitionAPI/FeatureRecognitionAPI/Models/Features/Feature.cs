@@ -1586,7 +1586,7 @@ public class Feature
                 Line LineA1 = new Line(LineA.Start, LineAIntersect);
                 Line LineA2 = new Line(LineAIntersect, LineA.End);
                     
-                Line LineB1 = new Line(LineB.Start, LineAIntersect);
+                Line LineB1 = new Line(LineB.Start, LineBIntersect);
                 Line LineB2 = new Line(LineBIntersect, LineB.End);
 
 
@@ -1599,13 +1599,10 @@ public class Feature
                 baseEntityList.Add(LineB2);
 
 
-                /*ExtendedEntityList = baseEntityList;
+                
+                ExtendedEntityList = new (baseEntityList);
                 baseEntityList.Clear();
                 SeperateBaseEntities();
-                */
-
-
-
             }
             
             for (int i = 0; i < feature.EntityList.Count; i++)
@@ -1921,7 +1918,7 @@ public class Feature
     {
         // make the extended line's adjacency list
         exLine.AdjList = new List<Entity>(line1.AdjList);
-        exLine.AdjList.AddRange(line2.AdjList);
+        exLine.AdjList.AddRange(line2.AdjList.Where(e => !line1.AdjList.Contains(e)));
         exLine.AdjList.Remove(line1);
         exLine.AdjList.Remove(line2);
         
@@ -2026,15 +2023,35 @@ public class Feature
                 // checks if entity in loop is not the current entity being checked
                 if (AreEndpointsTouching(curPath.Peek(), entity) && !testedEntities.Contains(entity))
                 {
+                    
+                    //loop curPath.Peek() adj list
+                        //curPath.Push(kisscut line)
+                        bool kissCutBool = false;
+                        
+                        //Attempts to force base detection to take KissCut line
+                        //Currently breaks KissCut Completely
+                        /*for (int i = 0; i < curPath.Peek().AdjList.Count; i++)
+                        {
+                            if (curPath.Peek().AdjList[i].KissCut)
+                            {
+                                curPath.Push(curPath.Peek().AdjList[i]);
+                                kissCutBool = true;
+                            }
+                        }*/
+                    
                     // checks that the entity has not already been tested and is touching the entity
                     //adds to stack
-                    curPath.Push(entity);
-                    //recursive call with updated Path
-                    if (SeperateBaseEntitiesHelper(curPath, testedEntities, head))
+                    if (!kissCutBool)
                     {
-                        return true;
+                        curPath.Push(entity);
                     }
-                }
+
+                    //recursive call with updated Path
+                        if (SeperateBaseEntitiesHelper(curPath, testedEntities, head))
+                        {
+                            return true;
+                        }
+                    }
             }
             
             
