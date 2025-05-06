@@ -11,7 +11,7 @@ namespace Testing_for_Project
             int tmp = 0;
             foreach (FeatureGroup fGroup in file.FeatureGroups)
             {
-                tmp += fGroup.NumIdenticalFeatureGroups;
+                tmp += fGroup.Count;
             }
 
             return tmp;

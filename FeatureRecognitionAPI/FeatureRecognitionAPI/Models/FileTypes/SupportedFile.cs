@@ -66,7 +66,7 @@ public abstract class SupportedFile
         }
 
         //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
-        if (FeatureGroups.Any(group => group.NumIdenticalFeatureGroups > 1))
+        if (FeatureGroups.Any(group => group.Count > 1))
         {
             foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
             {
@@ -264,7 +264,7 @@ public abstract class SupportedFile
                 {
                     if (fGroup.Equals(newFeatureGroup))
                     {
-                        fGroup.NumIdenticalFeatureGroups++;
+                        fGroup.Count++;
                         added = true;
                         break;
                     }
@@ -273,13 +273,13 @@ public abstract class SupportedFile
                 //If the foreach loop was excited without adding anything add newFGroup to the featureGroup list
                 if (!added)
                 {
-                    newFeatureGroup.NumIdenticalFeatureGroups++;
+                    newFeatureGroup.Count++;
                     FeatureGroups.Add(newFeatureGroup);
                 }
             }
             else
             {
-                newFeatureGroup.NumIdenticalFeatureGroups++;
+                newFeatureGroup.Count++;
                 FeatureGroups.Add(newFeatureGroup);
             }
         }

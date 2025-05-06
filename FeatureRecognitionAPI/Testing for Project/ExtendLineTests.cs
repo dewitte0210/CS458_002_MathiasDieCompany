@@ -839,22 +839,22 @@ namespace Testing_for_Project
             exampleTwo.DetectAllFeatureTypes();
 
             Assert.IsTrue(exampleTwo.FeatureGroups.Count == 1); // one overall feature when combined
-            Assert.IsTrue(exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups == 7); // 6 identical features
-            List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].FeatureList;
+            Assert.IsTrue(exampleTwo.FeatureGroups[0].Count == 7); // 6 identical features
+            List<Feature> singleFeatureList = exampleTwo.FeatureGroups[0].features;
 
             int count = 0;
             foreach (Feature feature in singleFeatureList)
             {
-                count += feature.Count;
+                count += feature.count;
             }
             Assert.IsTrue(count == 9); // 9 features make up the die
             
             int totalFeatures = 0;
             foreach (Feature feature in singleFeatureList)
             {
-                totalFeatures += feature.Count;
+                totalFeatures += feature.count;
             }
-            totalFeatures *= exampleTwo.FeatureGroups[0].NumIdenticalFeatureGroups;
+            totalFeatures *= exampleTwo.FeatureGroups[0].Count;
             Assert.IsTrue(totalFeatures == 63); // number of features accounting for combined features
         }
 

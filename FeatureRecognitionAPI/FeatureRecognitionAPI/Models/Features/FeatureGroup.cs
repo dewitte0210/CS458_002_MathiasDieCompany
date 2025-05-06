@@ -8,17 +8,20 @@ namespace FeatureRecognitionAPI.Models.Features;
 public class FeatureGroup
 {
     //Track how many feature groups of this type are found
-    public int NumIdenticalFeatureGroups { get; set; }
+    // Don't rename Count unless you change it in the front end too
+    public int Count { get; set; }
     private readonly int _totalArcs;
     private readonly int _totalLines;
     private readonly int _totalCircles;
-    [JsonProperty] protected internal List<Feature> FeatureList { get; set; }
+    
+    // don't rename unless you change the front end as well
+    [JsonProperty] protected internal List<Feature> features { get; set; }
 
     public FeatureGroup(List<Feature> featureList)
     {
-        FeatureList = featureList;
+        features = featureList;
 
-        foreach (Feature feature in featureList)
+        foreach (Feature feature in features)
         {
             _totalArcs += feature.GetNumArcs();
             _totalLines += feature.GetNumLines();
@@ -34,7 +37,7 @@ public class FeatureGroup
     private void BreakOutChamfers()
     {
         List<Feature> featuresToAdd = new();
-        foreach (Feature feature in FeatureList)
+        foreach (Feature feature in features)
         {
             if (feature.ChamferList.Count <= 0) continue;
 
@@ -74,17 +77,15 @@ public class FeatureGroup
             feature.EntityList = newEntityList;
         }
         // add the new chamfer features to the group
-        FeatureList.AddRange(featuresToAdd);
-        NumIdenticalFeatureGroups += featuresToAdd.Count;
+        features.AddRange(featuresToAdd);
         featuresToAdd.Clear();
     }
 
     public void FindFeatureTypes()
     {
         List<Feature> featToAdd = new List<Feature>();
-        foreach (Feature feature in FeatureList)
+        foreach (Feature feature in features)
         {
-
             feature.ExtendAllEntities();
             feature.SeparateBaseEntities();
             feature.SeparatePerimeterEntities();
@@ -95,26 +96,26 @@ public class FeatureGroup
                 featToAdd.Add(perimeterFeature);
             }
         }
-        FeatureList.AddRange(featToAdd);
+        features.AddRange(featToAdd);
         
         // break out chamfers
         BreakOutChamfers();
 
         // Group identical features together
-        for (int i = 0; i < FeatureList.Count; i++)
+        for (int i = 0; i < features.Count; i++)
         {
             //ignore group 3 chamfer check because equals sees them as the same even though they are not
-            if (FeatureList[i].FeatureType == PossibleFeatureTypes.Group3)
+            if (features[i].FeatureType == PossibleFeatureTypes.Group3)
             {
                 continue;
             }
             
-            for (int j = i + 1; j < FeatureList.Count; j++)
+            for (int j = i + 1; j < features.Count; j++)
             {
-                if (FeatureList[i].Equals(FeatureList[j]))
+                if (features[i].Equals(features[j]))
                 {
-                    FeatureList[i].Count += FeatureList[j].Count;
-                    FeatureList.RemoveAt(j);
+                    features[i].count += features[j].count;
+                    features.RemoveAt(j);
                     j--;
                 }
             }
@@ -137,18 +138,18 @@ public class FeatureGroup
         }
 
         //Sort by perimeter
-        FeatureList.Sort((x, y) => x.Perimeter.CompareTo(y.Perimeter));
-        fg.FeatureList.Sort((x, y) => x.Perimeter.CompareTo(y.Perimeter));
+        features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
+        fg.features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
 
-        for (int i = 0; i < FeatureList.Count; i++)
+        for (int i = 0; i < features.Count; i++)
         {
             //While this features @ i has same perimeter as obj.features[j] check if any j = features[i]
             int j = i;
             bool checkPoint = false;
-            while (j < FeatureList.Count && 
-                   Math.Abs(FeatureList[i].Perimeter - fg.FeatureList[j].Perimeter) < Entity.EntityTolerance)
+            while (j < features.Count && 
+                   Math.Abs(features[i].perimeter - fg.features[j].perimeter) < Entity.EntityTolerance)
             {
-                if (FeatureList[i].Equals(FeatureList[j]))
+                if (features[i].Equals(features[j]))
                 {
                     checkPoint = true;
                     break;

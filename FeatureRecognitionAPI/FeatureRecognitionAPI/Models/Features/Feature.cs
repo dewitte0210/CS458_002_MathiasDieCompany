@@ -36,14 +36,15 @@ public class Feature
         }
     }
 
-    //list of touching entities that make up the feature
+    // list of touching entities that make up the feature
+    // don't rename these unless you also change the front end 
     [JsonProperty] public List<Entity> EntityList { get; set; } 
     [JsonProperty] public bool KissCut { get; set; }
-    [JsonProperty] public int MultipleRadius { get; set; }
-    [JsonProperty] public bool RoundedCorner { get; set; }
-    [JsonProperty] public double Perimeter { get; set; }
-    [JsonProperty] public double Diameter { get; set; }
-    [JsonProperty] public int Count { get; set; }
+    [JsonProperty] public int multipleRadius { get; set; }
+    [JsonProperty] public bool roundedCorner { get; set; }
+    [JsonProperty] public double perimeter { get; set; }
+    [JsonProperty] public double diameter { get; set; }
+    [JsonProperty] public int count { get; set; }
     public List<ChamferGroup> ChamferList { get; set; }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -89,7 +90,7 @@ public class Feature
     {
         EntityList = entityList;
         KissCut = kissCut;
-        MultipleRadius = multipleRadius;
+        this.multipleRadius = multipleRadius;
         BaseEntityList = new List<Entity>();
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
@@ -139,8 +140,8 @@ public class Feature
     // This got moved out so Initialization can be called after populating its EntityList
     public void ConstructFromEntityList()
     {
-        Count = 1;
-        MultipleRadius = 1;
+        count = 1;
+        multipleRadius = 1;
         BaseEntityList = new();
         ExtendedEntityList = new List<Entity>();
         PerimeterFeatureList = new List<Feature>();
@@ -1594,7 +1595,7 @@ public class Feature
         if (feature._numLines != _numLines
             || feature._numCircles != _numCircles
             || feature._numArcs != _numArcs
-            || Math.Abs(feature.Perimeter - Perimeter) >= Entity.EntityTolerance)
+            || Math.Abs(feature.perimeter - perimeter) >= Entity.EntityTolerance)
         {
             return false;
         }
@@ -2039,15 +2040,15 @@ public class Feature
     /// </summary>
     private void CalcPerimeter()
     {
-        Perimeter = 0;
+        perimeter = 0;
         foreach (Entity entity in EntityList)
         {
-            Perimeter += entity.GetLength();
+            perimeter += entity.GetLength();
         }
 
         if (FeatureType == PossibleFeatureTypes.Group1B1 || FeatureType == PossibleFeatureTypes.Punch)
         {
-            Diameter = Perimeter / Math.PI;
+            diameter = perimeter / Math.PI;
         }
     }
 
@@ -2089,7 +2090,7 @@ public class Feature
                 {
                     if (Math.Abs(iArc.Radius - jArc.Radius) > Entity.EntityTolerance)
                     {
-                        MultipleRadius += 1;
+                        multipleRadius += 1;
                     }
                 }
             }
