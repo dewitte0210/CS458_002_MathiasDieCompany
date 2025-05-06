@@ -35,14 +35,21 @@
   min-width: 300px;
   max-width: 100%; 
   box-sizing: border-box;
-  overflow-x: auto;
+  overflow: hidden;
   
 }
 
 .table-data{
   padding-right: 32px;
   border-right:4px solid black;
+  width: 100%;
+  overflow-x: auto;
+}
+.table-data table {
+  width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+  word-wrap: break-word;
 }
 
 .visual{
