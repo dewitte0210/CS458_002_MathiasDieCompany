@@ -1,4 +1,5 @@
 ﻿using FeatureRecognitionAPI.Models.Utility;
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
 namespace FeatureRecognitionAPI.Models.Entities;
 
@@ -63,21 +64,11 @@ public class Line : Entity
 
     public override bool Equals(object? obj)
     {
-        if (obj == null) return false;
-        
-        //If both lines have the same length , and the slopes are equal (within tight tolerance)
-        if (obj is Line lineComp && MdcMath.DEQ(GetLength(), lineComp.GetLength()))
+        if (obj is Line lineComp 
+            && ((Start.Equals(lineComp.Start) && End.Equals(lineComp.End))
+            || (Start.Equals(lineComp.End) && End.Equals(lineComp.Start))))
         {
-            double slopeDifY = Math.Abs(GetSlopeY() - lineComp.GetSlopeY());
-            double slopeDifX = Math.Abs(GetSlopeX() - lineComp.GetSlopeX());
-
-            if (slopeDifY < EntityTolerance
-                && slopeDifX < EntityTolerance
-                && this.HasPoint(lineComp.End)
-                && this.HasPoint(lineComp.Start))
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
