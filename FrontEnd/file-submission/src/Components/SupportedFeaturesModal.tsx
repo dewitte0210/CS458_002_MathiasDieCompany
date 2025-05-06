@@ -55,12 +55,6 @@ const ParentModal: React.FC<ParentModalProps> = ({
             ))}
           </div>
         </Modal.Body>
-        {/*<Modal.Footer>*/}
-        {/*  <button className="animated-button" onClick={handleCloseModal}>*/}
-        {/*    <span>Close</span>*/}
-        {/*    <span></span>*/}
-        {/*  </button>*/}
-        {/*</Modal.Footer>*/}
       </Modal>
 
       {/* Child Modal */}
@@ -75,12 +69,6 @@ const ParentModal: React.FC<ParentModalProps> = ({
             </>
           )}
         </Modal.Body>
-        {/*<Modal.Footer>*/}
-        {/*<button className="animated-button" onClick={handleCloseChildModal}>*/}
-        {/*    <span>Close</span>*/}
-        {/*    <span></span>*/}
-        {/*  </button>*/}
-        {/*</Modal.Footer>*/}
       </Modal>
     </>
   );
