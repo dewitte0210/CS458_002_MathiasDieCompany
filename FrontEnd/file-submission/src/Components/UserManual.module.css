@@ -148,24 +148,24 @@ canvas {
 @keyframes slide-in-manual {
     from {
 /*        transform: translateX(100%);*/
-        right: -38vw;
+        right: -38%;
     }
 
     to {
 /*        transform: translateX(0%);*/
-        right: 0vw;
+        right: 0%;
     }
 }
 
 @keyframes slide-out-manual {
     from {
 /*        transform: translateX(0%);*/
-        right: 0vw;
+        right: 0%;
     }
 
     to {
 /*        transform: translateX(100%);*/
-        right: -38vw;
+        right: -38%;
     }
 }
 
@@ -175,7 +175,7 @@ canvas {
     top: 0%;
     right: 0%;
     width: 38vw;
-    max-width: 30vw;
+    max-width: 38%;
     height: 100vh;
     display: flex;
     background-color: #ffffff;
@@ -201,20 +201,20 @@ canvas {
 
 @keyframes slide-in-button {
     from {
-        right: 1.25vw;
+        right: 1.25%;
     }
     to {
-        right: 30vw;
+        right: 39%;
     }
 }
 
 @keyframes slide-out-button {
     from {
-        right: 30vw;
+        right: 39%;
     }
 
     to {
-        right: 1.25vw;
+        right: 1.25%;
     }
 }
 
