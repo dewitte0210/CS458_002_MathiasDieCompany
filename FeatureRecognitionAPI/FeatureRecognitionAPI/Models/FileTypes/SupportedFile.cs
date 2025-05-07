@@ -57,6 +57,11 @@ public abstract class SupportedFile
     {
         SetEntities(EntityTools.CondenseArcs(GetEntities()));
         GroupFeatureEntities();
+        foreach (Feature feature in FeatureList)
+        {
+            feature.OrgList = new(feature.EntityList);
+            FindCornerNotchPattern(feature);
+        }
         SetFeatureGroups();
 
         //if there is a num-up here, only one copy of the die will have its lines identified as recognized or unrecognized
@@ -75,6 +80,11 @@ public abstract class SupportedFile
                 feature.SeparatePerimeterEntities();
                 feature.DetectFeatures();
             }
+        }
+
+        foreach (Feature feature in FeatureList)
+        {
+            feature.EntityList = new(feature.OrgList);
         }
     }
 
@@ -413,155 +423,156 @@ public abstract class SupportedFile
         }
     }
 
-        /**
-         * Finds a list of touching entities that follow one of two patterns that make up a corner notch:
-         *  1. Line -> Line -> Line -> Line
-         *  2. Line -> Arc -> Line -> Line -> Arc -> Line
-         */
-        public static void FindCornerNotchPattern(Feature feature)
+    /**
+     * Finds a list of touching entities that follow one of two patterns that make up a corner notch:
+     *  1. Line -> Line -> Line -> Line
+     *  2. Line -> Arc -> Line -> Line -> Arc -> Line
+     */
+    public static void FindCornerNotchPattern(Feature feature)
+    {
+        for (int i = 0; i < feature.EntityList.Count; i++)
         {
-            for (int i = 0; i < feature.EntityList.Count; i++)
+            Entity entity = feature.EntityList[i];
+            List<Entity> posNotch = new List<Entity>();
+            if (FindCornerNotchPatternHelper(entity, posNotch) &&
+                CornerNotchReqCheck(posNotch, posNotch.Count == 6))
             {
-                Entity entity = feature.EntityList[i];
-                List<Entity> posNotch = new List<Entity>();
-                if (FindCornerNotchPatternHelper(entity, posNotch) &&
-                    CornerNotchReqCheck(posNotch, posNotch.Count == 6))
+                // returned is made up of entities that are considered a corner notch
+                // add it as a perimeter feature
+                // remove middle entities from entity List to prevent improper extension and extend outward entities to touch
+                Feature notch = new(posNotch.GetRange(1, posNotch.Count - 2))
                 {
-                    // returned is made up of entities that are considered a corner notch
-                    // add it as a perimeter feature
-                    // remove middle entities from entity List to prevent improper extension and extend outward entities to touch
-                    Feature notch = new(posNotch.GetRange(1, posNotch.Count - 2))
-                    {
-                        FeatureType = PossibleFeatureTypes.Group4
-                    };
-                    feature.PerimeterFeatureList.Add(notch);
+                    FeatureType = PossibleFeatureTypes.Group4
+                };
+                feature.PerimeterFeatureList.Add(notch);
 
-                    EntityTools.ExtendTwoLines(posNotch[0] as Line, posNotch[^1] as Line);
+                feature.OrgList = new(feature.EntityList);
+                EntityTools.ExtendTwoLines(posNotch[0] as Line, posNotch[^1] as Line);
 
-                    // remove 0 to ^2 from entity List
-                    foreach (Entity e in posNotch.GetRange(1, posNotch.Count - 2))
-                    {
-                        feature.EntityList.Remove(e);
-                    }
+                // remove 0 to ^2 from entity List
+                foreach (Entity e in posNotch.GetRange(1, posNotch.Count - 2))
+                {
+                    feature.EntityList.Remove(e);
                 }
             }
         }
-        
-        /**
-         *  Helper function to FindCornerNotchPattern
-         *  This is recursive to check entities in touching order.
-         *  Returns true if curEntity leads to one of the patterns
-         */
-        private static bool FindCornerNotchPatternHelper(Entity curEntity, List<Entity> path)
+    }
+    
+    /**
+     *  Helper function to FindCornerNotchPattern
+     *  This is recursive to check entities in touching order.
+     *  Returns true if curEntity leads to one of the patterns
+     */
+    private static bool FindCornerNotchPatternHelper(Entity curEntity, List<Entity> path)
+    {
+        bool added = false;
+        // Expecting second arc while first is in index 1
+        if (path is [_, Arc, _, _])
         {
-            bool added = false;
-            // Expecting second arc while first is in index 1
-            if (path is [_, Arc, _, _])
-            {
-                if (curEntity is Arc)
-                {
-                    path.Add(curEntity);
-                    added = true;
-                }
-                else
-                {
-                    // Can't have just 1 arc in the list
-                    return false;
-                }
-            }
-            // Index 1 can have arc or line
-            else if (path.Count == 1)
-            {
-                if (curEntity is Arc or Line)
-                {
-                    path.Add(curEntity);
-                    added = true;
-                }
-            }
-            else if (curEntity is Line)
+            if (curEntity is Arc)
             {
                 path.Add(curEntity);
                 added = true;
             }
-
-            if (added)
+            else
             {
-                // base case: completed list
-                if (path is [_, not Arc, _, _] || path.Count == 6)
-                {
-                    return true;
-                }
-                
-                // Go to next entity
-                if (path.Count == 1) {
-                    if (curEntity.AdjList.Any(e => FindCornerNotchPatternHelper(e, path)))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (curEntity.AdjList.Where(e => !e.Equals(path[^2]))
-                        .Any(e => FindCornerNotchPatternHelper(e, path)))
-                    {
-                        return true;
-                    }
-                }
-
-                // No possible path so remove the last entity added
-                path.RemoveAt(path.Count - 1);
+                // Can't have just 1 arc in the list
+                return false;
             }
-
-            return false;
+        }
+        // Index 1 can have arc or line
+        else if (path.Count == 1)
+        {
+            if (curEntity is Arc or Line)
+            {
+                path.Add(curEntity);
+                added = true;
+            }
+        }
+        else if (curEntity is Line)
+        {
+            path.Add(curEntity);
+            added = true;
         }
 
-        private static bool CornerNotchReqCheck(List<Entity> entities, bool isRadius)
+        if (added)
         {
-            if (entities.Count != 4 && entities.Count != 6) {return false;}
-            Angles.Angle innerAngle;
-            Angles.Angle outerAngleClose;
-            Angles.Angle outerAngleFar;
-            Angles.Angle overallAngle;
-
-            if (!isRadius)
-            {
-                innerAngle = Angles.GetAngle(entities[1] as Line, entities[2] as Line);
-                outerAngleClose = Angles.GetAngle(entities[0] as Line, entities[1] as Line);
-                outerAngleFar = Angles.GetAngle(entities[2] as Line, entities[3] as Line);
-                overallAngle = Angles.GetAngle(entities[0] as Line, entities[3] as Line);
-            }
-            else 
-            {
-                innerAngle = Angles.GetAngle(entities[2] as Line, entities[3] as Line);
-                outerAngleClose = Angles.GetAngle(entities[0] as Line, entities[2] as Line);
-                outerAngleFar = Angles.GetAngle(entities[3] as Line, entities[5] as Line);
-                overallAngle = Angles.GetAngle(entities[0] as Line, entities[5] as Line);
-            }
-            // At this point all angles are on the same side of the lines
-            // inner angle should be on the opposite side to all other angles
-            
-            
-            // Check sum of angles
-            
-            // first case where innerAngle is flipped
-            if (!Angles.WithinTolerance(overallAngle, 180) &&
-                outerAngleClose.GetDegrees() < 180 &&
-                outerAngleFar.GetDegrees() < 180 &&
-                outerAngleFar.GetDegrees() + outerAngleClose.GetDegrees() < 360 - innerAngle.GetDegrees())
+            // base case: completed list
+            if (path is [_, not Arc, _, _] || path.Count == 6)
             {
                 return true;
             }
+            
+            // Go to next entity
+            if (path.Count == 1) {
+                if (curEntity.AdjList.Any(e => FindCornerNotchPatternHelper(e, path)))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (curEntity.AdjList.Where(e => !e.Equals(path[^2]))
+                    .Any(e => FindCornerNotchPatternHelper(e, path)))
+                {
+                    return true;
+                }
+            }
 
-            return !Angles.WithinTolerance(360 - overallAngle.GetDegrees(), 180) &&
-                   360 - outerAngleClose.GetDegrees() < 180 &&
-                   360 - outerAngleFar.GetDegrees() < 180 &&
-                   (360 -outerAngleFar.GetDegrees()) + (360 - outerAngleClose.GetDegrees()) > innerAngle.GetDegrees();
+            // No possible path so remove the last entity added
+            path.RemoveAt(path.Count - 1);
         }
-    
-        public List<Entity> GetEntities()
+
+        return false;
+    }
+
+    private static bool CornerNotchReqCheck(List<Entity> entities, bool isRadius)
+    {
+        if (entities.Count != 4 && entities.Count != 6) {return false;}
+        Angles.Angle innerAngle;
+        Angles.Angle outerAngleClose;
+        Angles.Angle outerAngleFar;
+        Angles.Angle overallAngle;
+
+        if (!isRadius)
         {
-            return EntityList;
-        }    
+            innerAngle = Angles.GetAngle(entities[1] as Line, entities[2] as Line);
+            outerAngleClose = Angles.GetAngle(entities[0] as Line, entities[1] as Line);
+            outerAngleFar = Angles.GetAngle(entities[2] as Line, entities[3] as Line);
+            overallAngle = Angles.GetAngle(entities[0] as Line, entities[3] as Line);
+        }
+        else 
+        {
+            innerAngle = Angles.GetAngle(entities[2] as Line, entities[3] as Line);
+            outerAngleClose = Angles.GetAngle(entities[0] as Line, entities[2] as Line);
+            outerAngleFar = Angles.GetAngle(entities[3] as Line, entities[5] as Line);
+            overallAngle = Angles.GetAngle(entities[0] as Line, entities[5] as Line);
+        }
+        // At this point all angles are on the same side of the lines
+        // inner angle should be on the opposite side to all other angles
+        
+        
+        // Check sum of angles
+        
+        // first case where innerAngle is flipped
+        if (!Angles.WithinTolerance(overallAngle, 180) &&
+            outerAngleClose.GetDegrees() < 180 &&
+            outerAngleFar.GetDegrees() < 180 &&
+            outerAngleFar.GetDegrees() + outerAngleClose.GetDegrees() > 360 - innerAngle.GetDegrees())
+        {
+            return true;
+        }
+
+        return !Angles.WithinTolerance(360 - overallAngle.GetDegrees(), 180) &&
+               360 - outerAngleClose.GetDegrees() < 180 &&
+               360 - outerAngleFar.GetDegrees() < 180 &&
+               (360 -outerAngleFar.GetDegrees()) + (360 - outerAngleClose.GetDegrees()) > innerAngle.GetDegrees();
+    }
+    
+    public List<Entity> GetEntities()
+    {
+        return EntityList;
+    }    
         
     public void SetEntities(List<Entity> entities)
     {

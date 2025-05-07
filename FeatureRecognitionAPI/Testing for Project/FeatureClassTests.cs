@@ -3,6 +3,7 @@ using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.FileTypes;
 using FeatureRecognitionAPI.Models.Utility;
 using FeatureRecognitionAPI.Services;
 using Microsoft.AspNetCore.Http;

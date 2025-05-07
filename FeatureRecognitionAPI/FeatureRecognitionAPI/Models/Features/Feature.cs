@@ -38,7 +38,9 @@ public class Feature
 
     // list of touching entities that make up the feature
     // don't rename these unless you also change the front end 
-    [JsonProperty] public List<Entity> EntityList { get; set; } 
+    [JsonProperty] public List<Entity> EntityList { get; set; }
+    
+    [JsonProperty] public List<Entity> OrgList { get; set; }
     [JsonProperty] public bool KissCut { get; set; }
     [JsonProperty] public int multipleRadius { get; set; }
     [JsonProperty] public bool roundedCorner { get; set; }

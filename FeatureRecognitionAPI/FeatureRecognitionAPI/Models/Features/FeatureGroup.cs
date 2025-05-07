@@ -88,8 +88,8 @@ public class FeatureGroup
         {
 
             features[i].ExtendAllEntities();
-            features[i].SeperateBaseEntities();
-            features[i].SeperatePerimeterEntities();
+            features[i].SeparateBaseEntities();
+            features[i].SeparatePerimeterEntities();
             features[i].DetectFeatures();
             
             for (int j = 0; j < features[i].PerimeterFeatureList.Count; j++)
