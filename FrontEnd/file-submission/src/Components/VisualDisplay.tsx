@@ -27,7 +27,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
 
             // Padding to ensure the shapes aren't clipped
             const PADDING = 0.1;
-            const SCALE = 400;
+            const SCALE = 800;
 
             minX -= PADDING;
             minY -= PADDING;
@@ -59,23 +59,21 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             let yOffset = Math.abs(Math.min(0, minY));
 
             // Iterate over each shape and draw it on the canvas
-            touchingEntities.forEach((object) => {
-                object.forEach((shape) => {
-                    if (shape["$type"].includes('Line')) {
-                        drawLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (shape["$type"].includes('Arc')) {
-                        drawArc(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (shape["$type"].includes('Circle')) {
-                        drawCircle(ctx, shape, scaleFactor, xOffset, yOffset);
-                    } else if (shape["$type"].includes('Ellipse')) {
-                        drawEllipse(ctx, shape, scaleFactor, xOffset, yOffset);
-                    }
-                    //else if (shape["$type"].includes() === 'quadcurve2d') {
-                    //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                    // } else if (shape["$type"].includes() === 'cubiccurve2d') {
-                    //     drawCubicLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                    // }
-                });
+            touchingEntities.forEach((shape) => {
+                if (shape["$type"].includes('Line')) {
+                    drawLine(ctx, shape, scaleFactor, xOffset, yOffset);
+                } else if (shape["$type"].includes('Arc')) {
+                    drawArc(ctx, shape, scaleFactor, xOffset, yOffset);
+                } else if (shape["$type"].includes('Circle')) {
+                    drawCircle(ctx, shape, scaleFactor, xOffset, yOffset);
+                } else if (shape["$type"].includes('Ellipse')) {
+                    drawEllipse(ctx, shape, scaleFactor, xOffset, yOffset);
+                }
+                //else if (shape["$type"].includes() === 'quadcurve2d') {
+                //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
+                // } else if (shape["$type"].includes() === 'cubiccurve2d') {
+                //     drawCubicLine(ctx, shape, scaleFactor, xOffset, yOffset);
+                // }
             });
         };
 
@@ -87,8 +85,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             ctx.moveTo((startPoint.X + xOffset) * scaleFactor, (startPoint.Y + yOffset) * scaleFactor);
             ctx.lineTo((endPoint.X + xOffset) * scaleFactor, (endPoint.Y + yOffset) * scaleFactor);
 
-            // Sets the color of the line based on whether it is a kiss cut (green) or not (black)
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = shape.IsRecognized ? 'black' : 'red';
             ctx.setLineDash([]);
             ctx.lineWidth = 2;
             ctx.stroke();
@@ -105,8 +102,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                 shape.StartAngle * (Math.PI / 180),
                 true
             );
-            // Sets the color of the arc based on whether it is a kiss cut (green) or not (red)
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = shape.IsRecognized ? 'black' : 'red';
             ctx.setLineDash([]);
             ctx.lineWidth = 2;
             ctx.stroke();
@@ -122,8 +118,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                 0,
                 2 * Math.PI
             );
-            // Sets the color of the circle based on whether it is a kiss cut (green) or not (blue)
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = shape.IsRecognized ? 'black' : 'red';
             ctx.setLineDash([]);
             ctx.lineWidth = 2;
             ctx.stroke();
@@ -140,8 +135,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                 shape.StartParameter,
                 shape.EndParameter, 
             );
-            // Sets the color of the circle based on whether it is a kiss cut (green) or not (blue)
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = shape.IsRecognized ? 'black' : 'red';
             ctx.setLineDash([]);
             ctx.lineWidth = 2;
             ctx.stroke();

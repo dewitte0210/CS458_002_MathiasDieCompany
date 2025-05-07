@@ -1,6 +1,7 @@
 ﻿using ACadSharp;
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.FileTypes;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -16,14 +17,14 @@ namespace FeatureRecognitionAPI.Models
             }
 
             DwgReader reader = new DwgReader(path);
-            doc = reader.Read();
+            Doc = reader.Read();
             ParseFile();
         }
 
         public DWGFile(Stream stream)
         {
             DwgReader reader = new DwgReader(stream);
-            doc = reader.Read();
+            Doc = reader.Read();
             ParseFile();
         }
     }

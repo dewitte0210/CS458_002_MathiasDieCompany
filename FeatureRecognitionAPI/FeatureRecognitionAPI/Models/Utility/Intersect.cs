@@ -109,7 +109,7 @@ public static class Intersect
         double diffCross = CrossProduct(xDiff, yDiff);
 
         //lines are parallel
-        if (DoubleEquals(diffCross, 0)) return null;
+        if (DEQ(diffCross, 0)) return null;
 
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
@@ -119,7 +119,7 @@ public static class Intersect
     }
     
     // line with line
-    internal static Point? FindIntersectPointHelper(Line line1, Line line2)
+    private static Point? FindIntersectPointHelper(Line line1, Line line2)
     {
         Point l1Delta = line1.GetDelta();
         Point l2Delta = line2.GetDelta();
@@ -131,7 +131,7 @@ public static class Intersect
         double diffCross = CrossProduct(xDiff, yDiff);
 
         // lines are parallel, don't say they intersect even if they are actually collinear
-        if (DoubleEquals(diffCross, 0)) return null;
+        if (DEQ(diffCross, 0)) return null;
 
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
@@ -146,7 +146,7 @@ public static class Intersect
     }
 
     // line with arc
-    internal static Point? FindIntersectPointHelper(Line line, Arc arc)
+    private static Point? FindIntersectPointHelper(Line line, Arc arc)
     {
         //  Get line in the slope-intercept form, then transform it to the
         //  general form: Ax + By + C = 0
@@ -161,7 +161,7 @@ public static class Intersect
 
         //  This is to check for a vertical line, since it would crash the program
         //  trying to divide by 0
-        if (DoubleEquals(line.End.X, line.Start.X))
+        if (DEQ(line.End.X, line.Start.X))
         {
             a = 1;
             b = 0;
@@ -171,7 +171,7 @@ public static class Intersect
         {
             double xDif = line.End.X - line.Start.X;
             
-            if (DoubleEquals(xDif, 0)) slope = 0;
+            if (DEQ(xDif, 0)) slope = 0;
             else slope = (line.End.Y - line.Start.Y) / xDif;
 
             if (slope is > 1000000 or < -1000000) slope = 0;
@@ -199,7 +199,7 @@ public static class Intersect
             List<double> solutions = new();
 
             //  Special case for vertical line
-            if (DoubleEquals(line.End.X, line.Start.X))
+            if (DEQ(line.End.X, line.Start.X))
             {
                 double[] tempSolutions = QuadraticFormula(
                     1,
@@ -227,14 +227,19 @@ public static class Intersect
             }
             else
             {
-                // todo what is going on here?
-                decimal[] tempSolns = DecimalEx.SolveQuadratic((decimal)(Math.Pow(slope, 2) + 1),
-                    (decimal)(-2.0 * arc.Center.X) + (decimal)(2 * (intercept * slope)) -
-                    (decimal)(2 * (arc.Center.Y * slope)),
-                    (decimal)Math.Pow(arc.Center.X, 2) + (decimal)Math.Pow(intercept, 2) -
-                    (decimal)(2 * (intercept * arc.Center.Y)) + (decimal)Math.Pow(arc.Center.Y, 2) -
-                    (decimal)Math.Pow(arc.Radius, 2));
-                foreach (decimal number in tempSolns)
+                // Decimal is a 16 byte float
+                decimal decA = (decimal)(Math.Pow(slope, 2) + 1);
+                decimal decB = (decimal)(-2.0 * arc.Center.X) 
+                               + (decimal)(2 * (intercept * slope)) 
+                               - (decimal)(2 * (arc.Center.Y * slope));
+                decimal decC = (decimal)Math.Pow(arc.Center.X, 2) 
+                               + (decimal)Math.Pow(intercept, 2) 
+                               - (decimal)(2 * (intercept * arc.Center.Y)) 
+                               + (decimal)Math.Pow(arc.Center.Y, 2) 
+                               - (decimal)Math.Pow(arc.Radius, 2);
+                
+                decimal[] tempSolutions = DecimalEx.SolveQuadratic(decA, decB, decC);
+                foreach (decimal number in tempSolutions)
                 {
                     solutions.Add((double)number);
                 }
@@ -265,17 +270,17 @@ public static class Intersect
     }
 
     // line with ellipse
-    internal static Point? FindIntersectPointHelper(Line line, Ellipse ellipse)
+    private static Point? FindIntersectPointHelper(Line line, Ellipse ellipse)
     {
         //Need to rotate the line around the origin for rotated ellipses
         double x = ellipse.MajorAxisEndPoint.X - ellipse.Center.X;
         double y = ellipse.MajorAxisEndPoint.Y - ellipse.Center.Y;
         double rotation;
-        if (DoubleEquals(x, 0))
+        if (DEQ(x, 0))
         {
             rotation = y > 0 ? Math.PI / 2 : 3 * Math.PI / 2;
         }
-        else if (DoubleEquals(y, 0))
+        else if (DEQ(y, 0))
         {
             rotation = x > 0 ? 0 : Math.PI;
         }
@@ -393,7 +398,7 @@ public static class Intersect
                 double roundedStartY = Math.Round(line.Start.Y, IntersectTolerance);
                 double roundedEndY = Math.Round(line.End.Y, IntersectTolerance);
                 
-                if (ellipse.isInEllipseRange(new Point(compX, compY))
+                if (ellipse.IsInEllipseRange(new Point(compX, compY))
                     && Math.Min(roundedStartX, roundedEndX) <= compX
                     && Math.Max(roundedStartX, roundedEndX) >= compX
                     && Math.Min(roundedStartY, roundedEndY) <= compY
@@ -408,7 +413,7 @@ public static class Intersect
     }
 
     // arc with arc
-    internal static Point? FindIntersectPointHelper(Arc arc1, Arc arc2)
+    private static Point? FindIntersectPointHelper(Arc arc1, Arc arc2)
     {
         // Treat both Arcs circles, get the line between their centers
         Line between = new Line(arc1.Center.X, arc1.Center.Y, arc2.Center.X, arc2.Center.Y);
@@ -417,7 +422,7 @@ public static class Intersect
         // Second case, one circle is entirely inside the other but not intersecting.
         if (between.GetLength() > (arc1.Radius + arc2.Radius) 
             || between.GetLength() < (Math.Abs(arc1.Radius - arc2.Radius)) 
-            || DoubleEquals(between.GetLength(), 0))
+            || DEQ(between.GetLength(), 0))
         {
             return null;
         }

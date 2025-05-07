@@ -16,6 +16,14 @@ public static class MdcMath
     {
         return a > b - tolerance && a < b + tolerance;
     }
+    
+    /// <summary>
+    /// Shorter alias for DoubleEquals 
+    /// </summary>
+    public static bool DEQ(double a, double b, double tolerance = DoubleTolerance)
+    {
+        return DoubleEquals(a, b, tolerance);
+    }
 
     /// <summary>
     /// Determine if the given value is between values a and b.
@@ -47,7 +55,7 @@ public static class MdcMath
     internal static List<double> QuadraticFormula(double a, double b, double c)
     {
         List<double> solutions = new();
-        if (DoubleEquals(a, 0))
+        if (DEQ(a, 0))
         {
             return solutions;
         }
@@ -60,7 +68,7 @@ public static class MdcMath
             solutions.Add(((-1 * b) - Math.Sqrt(insideSqrt)) / (2 * a));
         }
         //One real solution
-        else if (DoubleEquals(insideSqrt, 0))
+        else if (DEQ(insideSqrt, 0))
         {
             solutions.Add((-1 * b) / (2 * a));
         }

@@ -2,6 +2,7 @@
 using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.FileTypes;
 using FeatureRecognitionAPI.Models.Utility;
 using iText.Commons.Utils;
 using Newtonsoft.Json;
@@ -11,10 +12,6 @@ namespace FeatureRecognitionAPI.Services
 {
     public class FeatureRecognitionService : IFeatureRecognitionService
     {
-        public FeatureRecognitionService()
-        {
-        }
-
         /// <summary>
         /// Handles an uploaded file by performing feature detection based on its extension
         /// and returning the results in JSON format for the frontend.
@@ -32,45 +29,33 @@ namespace FeatureRecognitionAPI.Services
                 throw new IOException("Error detecting file extension");
             }
 
-
             SupportedFile supportedFile;
             using (Stream stream = file.OpenReadStream())
             {
-                switch (ext.ToLower())
+                supportedFile = ext.ToLower() switch
                 {
-                    case ".dxf":
-                        supportedFile = new DXFFile(stream);
-
-                        break;
-                    case ".dwg":
-                        supportedFile = new DWGFile(stream);
-
-                        break;
-                    default:
-                        throw new IOException("Invalid file extension: " + ext);
-                }
+                    ".dxf" => new DXFFile(stream),
+                    ".dwg" => new DWGFile(stream),
+                    _ => throw new IOException("Invalid file extension: " + ext)
+                };
             }
-
-            // supportedFile.GroupFeatureEntities();
 
             supportedFile.SetEntities(EntityTools.CondenseArcs(supportedFile.GetEntities()));
 
             supportedFile.DetectAllFeatureTypes();
 
-            // Set the feature groups
-            List<List<Entity>> touchingEntityList = new List<List<Entity>>();
+            List<Entity> touchingEntityList = new List<Entity>();
             foreach (Feature feature in supportedFile.FeatureList)
             {
-                touchingEntityList.Add(feature.EntityList);
+                touchingEntityList.AddRange(feature.EntityList);
             }
 
             // Create JSON that will be sent to the frontend
             var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
             settings.Converters.Add(new StringEnumConverter());
 
-            return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups), settings);
+            return JsonConvert.SerializeObject(new JsonPackage(touchingEntityList, supportedFile.FeatureGroups),
+                settings);
         }
-
-        
     }
 }
