@@ -28,11 +28,16 @@ public class Point
     {
         if (obj is Point point)
         {
-            return DoubleEquals(X, point.X) && DoubleEquals(Y, point.Y);
+            return DEQ(X, point.X) && DEQ(Y, point.Y);
         }
         return false;
     }
-        
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y);
+    }
+
     public static double Distance(Point p1, Point p2)
     {
         return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));

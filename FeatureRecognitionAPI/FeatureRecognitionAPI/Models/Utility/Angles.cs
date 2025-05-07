@@ -64,7 +64,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 				
 				if (obj is Degrees objD)
 				{
-					return DoubleEquals(objD, Value);
+					return DEQ(objD, Value);
 				}
 				return false;
 			}
@@ -102,7 +102,7 @@ namespace FeatureRecognitionAPI.Models.Utility
 				
 				if (obj is Degrees objR)
 				{
-					return DoubleEquals(objR, Value, AngleTolRad);
+					return DEQ(objR, Value, AngleTolRad);
 				}
 				return false;
 			}
@@ -228,7 +228,7 @@ namespace FeatureRecognitionAPI.Models.Utility
         // may not handle all cases yet, to be tested
         public static Angle GetAngle(Line a, Line b, Side targetSide = Side.Interior, Orientation ori = Orientation.Counter)
 		{
-			if (DoubleEquals(a.GetLength(), 0) || DoubleEquals(b.GetLength(), 0))
+			if (DEQ(a.GetLength(), 0) || DEQ(b.GetLength(), 0))
 			{
 				return new Angle(new Degrees(0), Side.Unknown);
 			}
@@ -258,8 +258,8 @@ namespace FeatureRecognitionAPI.Models.Utility
 
 			//prefer 0 degrees interior over 360 for opposite facing parallel lines
 			//since it can return 0 or 360 depending on orientation
-			if ((DoubleEquals(returnAngle, 360) 
-			     || DoubleEquals(returnAngle, 0)) 
+			if ((DEQ(returnAngle, 360) 
+			     || DEQ(returnAngle, 0)) 
 			    && ori == Orientation.Clockwise)
 			{
 				returnAngle = returnAngle.GetOppositeAngle();
@@ -284,14 +284,14 @@ namespace FeatureRecognitionAPI.Models.Utility
 		public static bool IsPerpendicular(Line a, Line b)
 		{
 			Degrees angle = GetAngle(a, b).GetDegrees();
-			return DoubleEquals(Math.Round(angle + 90, 4) % 180, Entity.EntityTolerance);
+			return DEQ(Math.Round(angle + 90, 4) % 180, Entity.EntityTolerance);
 		}
 
 		public static bool IsParallel(Line a, Line b)
 		{
 			// round because angle can be 179.999 and modulus won't work
-			double angle = Math.Round(GetAngle(a, b).GetDegrees(), 4);
-			return DoubleEquals((angle % 180), 0);
+			double angle = Double.Round(GetAngle(a, b).GetDegrees());
+			return DEQ((angle % 180), 0);
 		}
 	}
 }

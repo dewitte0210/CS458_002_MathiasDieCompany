@@ -14,14 +14,14 @@ public class Circle : Entity
         
     [JsonIgnore] public new Point Start
     {
-        get { throw new NotSupportedException("Circle does not have a start point.");}
-        set{ throw new NotSupportedException("Circle does not have a start point.");}
+        get => throw new NotSupportedException("Circle does not have a start point.");
+        set => throw new NotSupportedException("Circle does not have a start point.");
     }
 
     [JsonIgnore] public new Point End
     {
-        get { throw new NotSupportedException("Circle does not have an end point."); }
-        set { throw new NotSupportedException("Circle does not have an end point."); }
+        get => throw new NotSupportedException("Circle does not have an end point.");
+        set => throw new NotSupportedException("Circle does not have an end point.");
     }
 
     /// <summary>
@@ -54,9 +54,9 @@ public class Circle : Entity
     public override bool Equals(object? obj)
     {
         //If the object is a circle, and the circles have even Radius, within tolerance then the circles are equal
-        if (obj is Circle)
+        if (obj is Circle circle)
         {
-            if (Math.Abs(((Circle)obj).Radius - this.Radius) < EntityTolerance)
+            if (Math.Abs(circle.Radius - this.Radius) < EntityTolerance)
             {
                 return true;
             }

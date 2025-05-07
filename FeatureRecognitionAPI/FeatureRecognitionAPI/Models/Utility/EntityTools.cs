@@ -1,5 +1,6 @@
 using FeatureRecognitionAPI.Models.Entities;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
+using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
 namespace FeatureRecognitionAPI.Models.Utility;
 
@@ -25,7 +26,7 @@ public static class EntityTools
         double cross1 = double.Abs(CrossProduct(p1, p2));
         double cross2 = double.Abs(CrossProduct(p1, p3));
 
-        return MdcMath.DoubleEquals(cross1, 0) && MdcMath.DoubleEquals(cross2, 0);
+        return DEQ(cross1, 0) && DEQ(cross2, 0);
     }
 
     /// <summary>
