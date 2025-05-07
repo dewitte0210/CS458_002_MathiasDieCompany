@@ -17,10 +17,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-
-
-
-
 .button-group {
     display: flex;
     justify-content: space-between;
@@ -179,7 +175,7 @@ canvas {
     top: 0%;
     right: 0%;
     width: 38vw;
-    max-width: 500px;
+    max-width: 30vw;
     height: 100vh;
     display: flex;
     background-color: #ffffff;
@@ -208,13 +204,13 @@ canvas {
         right: 1.25vw;
     }
     to {
-        right: 39.25vw;
+        right: 30vw;
     }
 }
 
 @keyframes slide-out-button {
     from {
-        right: 39.25vw;
+        right: 30vw;
     }
 
     to {
@@ -361,7 +357,7 @@ canvas {
     position: fixed;
     top: 60px;
     right: 0;
-    width: 500px; /* Adjust width as needed */
+    width: 38%; /* Adjust width as needed */
     background-color: #f4f4f4;
     padding: 10px;
     box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);

@@ -20,6 +20,7 @@ export default function UserManual (){
   
   const [isManualVisible, setIsManualVisible] = useState(false); //Saves panel state during redraws
   const [isManualHidden, setIsManualHidden] = useState(true);
+  
   //const [panelPosition, setPanelPosition] = useState({ x: 100, y: 100 }); // Initial panel position
   const [dragging, setDragging] = useState(false); // State for dragging
   const [offset, setOffset] = useState({ x: 0, y: 0 }); // Offset to handle smooth dragging
