@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Services;
 
+/// <summary>
+/// Service class to perform CRUD operations on Pricing data
+/// </summary>
 public class PricingDataService : IPricingDataService
 {
     private static readonly string BASE_PATH = Path.Combine(Directory.GetCurrentDirectory(), "PricingData");
@@ -26,6 +29,9 @@ public class PricingDataService : IPricingDataService
 
     private RatesPrices _ratesPrices { get; set; }
 
+    /// <summary>
+    /// Default Constructor reads all of the pricing data from their respective file in the JSON "Database"
+    /// </summary>
     public PricingDataService()
     {
         var featurePriceReader = new StreamReader(FEATURE_PATH);
@@ -82,7 +88,7 @@ public class PricingDataService : IPricingDataService
     
     public async Task<bool> UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices)
     {
-        bool success = false;
+        bool success;
         switch (type)
         {
             case PossibleFeatureTypes.StdTubePunch:
@@ -125,7 +131,7 @@ public class PricingDataService : IPricingDataService
 
     public async Task<bool> AddPunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice)
     {
-        bool success = false;
+        bool success;
         switch (type)
         {
             case PossibleFeatureTypes.StdTubePunch:
@@ -164,9 +170,14 @@ public class PricingDataService : IPricingDataService
         _ratesPrices = newRates;
          return await WriteToDBFile("BasePrices", _ratesPrices);
     }
-    
-    /// <param name="fileName">filename without extenstion</param>
-    /// <param name="obj"></param>
+   
+    /// <summary>
+    /// Funcion locks out a file and saves the object to a specified file. It also creates or writes the current
+    /// contents to a backup file incase there is an error made while saving 
+    /// </summary>
+    /// <param name="fileName">filename without the extension</param>
+    /// <param name="obj">the object to write to file</param>
+    /// <returns> Whether the write operation was successful</returns>
     private async Task<bool> WriteToDBFile(string fileName, Object obj)
     {
         object writeLock = new(); 
