@@ -1433,47 +1433,37 @@ public class Feature
     {
         foreach (Feature feature in PerimeterFeatureList)
         {
-            
             //check for chamfer
             if (feature.EntityList.Count == 1)
             {
-                
-                Line LineA = (Line)feature.EntityList[0].AdjList[0];
-                Line LineB = (Line)feature.EntityList[0].AdjList[1];
-
-                
-                
-                Point? LineAIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineA);
-                Point? LineBIntersect = Intersect.GetIntersectPoint(feature.EntityList[0], LineB);
-
-                if (LineAIntersect == null || LineBIntersect == null)
+                if (feature.EntityList[0].AdjList[0] is Line lineA && feature.EntityList[0].AdjList[1] is Line lineB)
                 {
-                    return;
-                }
+                    Point? lineAIntersect = GetIntersectPoint(feature.EntityList[0], lineA);
+                    Point? lineBIntersect = GetIntersectPoint(feature.EntityList[0], lineB);
 
-                Line LineA1 = new Line(LineA.Start, LineAIntersect);
-                Line LineA2 = new Line(LineAIntersect, LineA.End);
+                    if (lineAIntersect == null || lineBIntersect == null) return;
+
+                    Line lineA1 = new(lineA.Start, lineAIntersect);
+                    Line lineA2 = new(lineAIntersect, lineA.End);
                     
-                Line LineB1 = new Line(LineB.Start, LineBIntersect);
-                Line LineB2 = new Line(LineBIntersect, LineB.End);
+                    Line lineB1 = new(lineB.Start, lineBIntersect);
+                    Line lineB2 = new(lineBIntersect, lineB.End);
 
-
-                baseEntityList.Remove(feature.EntityList[0].AdjList[0]);
-                baseEntityList.Remove(feature.EntityList[0].AdjList[1]);
+                    BaseEntityList.Remove(feature.EntityList[0].AdjList[0]);
+                    BaseEntityList.Remove(feature.EntityList[0].AdjList[1]);
                     
-                baseEntityList.Add(LineA1);
-                baseEntityList.Add(LineA2);
-                baseEntityList.Add(LineB1);
-                baseEntityList.Add(LineB2);
-
-
+                    BaseEntityList.Add(lineA1);
+                    BaseEntityList.Add(lineA2);
+                    BaseEntityList.Add(lineB1);
+                    BaseEntityList.Add(lineB2);
                 
-                ExtendedEntityList = new (baseEntityList);
-                baseEntityList.Clear();
-                SeperateBaseEntities();
+                    ExtendedEntityList = new (BaseEntityList);
+                    BaseEntityList.Clear();
+                    SeparateBaseEntities();
+                }
             }
             
-            for (int i = 0; i < feature.EntityList.Count; i++)
+            foreach (Entity entity in EntityList)
             {
                 foreach (Entity adjEntity in entity.AdjList)
                 {
