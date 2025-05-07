@@ -1,32 +1,39 @@
 ﻿using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.Utility;
 using Newtonsoft.Json;
 
 namespace FeatureRecognitionAPI.Models.Features;
 
 public class FeatureGroup
 {
-    // todo: just make Count return length of feature list
     //Track how many feature groups of this type are found
+    // Don't rename Count unless you change it in the front end too
     public int Count { get; set; }
-    private int totalArcs;
-    private int totalLines;
-    private int totalCircles;
-    [JsonProperty] protected List<Feature> features;
+    private readonly int _totalArcs;
+    private readonly int _totalLines;
+    private readonly int _totalCircles;
+    
+    // don't rename unless you change the front end as well
+    [JsonProperty] protected internal List<Feature> features { get; set; }
 
-    public FeatureGroup(List<Feature> features)
+    public FeatureGroup(List<Feature> featureList)
     {
-        // this.count = count;
-        this.features = features;
+        features = featureList;
 
         foreach (Feature feature in features)
         {
-            this.totalArcs += feature.GetNumArcs();
-            this.totalLines += feature.GetNumLines();
-            this.totalCircles += feature.GetNumCircles();
+            _totalArcs += feature.GetNumArcs();
+            _totalLines += feature.GetNumLines();
+            _totalCircles += feature.GetNumCircles();
         }
     }
     
+    /// <summary>
+    /// After feature detection, chamfered lines are only flagged and should be their own feature.
+    /// This function breaks those flagged chamfers into their own feature.
+    /// There is also an option to remove the chamfer from its original feature as well (removeChamfers bool)
+    /// </summary>
     private void BreakOutChamfers()
     {
         List<Feature> featuresToAdd = new();
@@ -34,6 +41,11 @@ public class FeatureGroup
         {
             if (feature.ChamferList.Count <= 0) continue;
 
+            // Manually set to true to remove chamfers from their base feature
+            // doing this messes with the front end display so if you do
+            // want to use this, that will need to be corrected
+            bool removeChamfers = false;
+            
             List<Line> chamfersToRemove = new();
             List<Entity> newEntityList = feature.EntityList.ToList();
             foreach (ChamferGroup cg in feature.ChamferList)
@@ -44,16 +56,22 @@ public class FeatureGroup
                 // add to a new list so that the indexes in entity list stay the same
                 chamfersToRemove.Add(cg.Chamfer);
 
-                // todo: decide whether to remove the chamfers because it shows up in front end weird
-                //EntityTools.ExtendTwoLines(newEntityList[cg.LineAIndex] as Line,
-                //    newEntityList[cg.LineBIndex] as Line);
+                if (removeChamfers)
+                {
+                    EntityTools.ExtendTwoLines(newEntityList[cg.LineAIndex] as Line,
+                        newEntityList[cg.LineBIndex] as Line);
+                }
             }
 
             // actually remove the chamfers
-            //foreach (Line chamfer in chamfersToRemove)
-            //{
-            //    newEntityList.Remove(chamfer);
-            //}
+            if (removeChamfers)
+            {
+                foreach (Line chamfer in chamfersToRemove)
+                {
+                    newEntityList.Remove(chamfer);
+                }                
+            }
+            
             feature.ChamferList.Clear();
             chamfersToRemove.Clear();
             feature.EntityList = newEntityList;
@@ -68,10 +86,9 @@ public class FeatureGroup
         List<Feature> featToAdd = new List<Feature>();
         foreach (Feature feature in features)
         {
-
             feature.ExtendAllEntities();
-            feature.SeperateBaseEntities();
-            feature.SeperatePerimeterEntities();
+            feature.SeparateBaseEntities();
+            feature.SeparatePerimeterEntities();
             feature.DetectFeatures();
             
             foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
@@ -105,52 +122,32 @@ public class FeatureGroup
         }
     }
 
-    public void SetFeatureList(List<Feature> features)
-    {
-        this.features = features;
-    }
-
-    public List<Feature> GetFeatures()
-    {
-        return this.features;
-    }
-        
     /// <summary>
     /// Check of all features in the group have a corresponding feature in other group, return true if they do 
     /// </summary>
     public override bool Equals(object? obj)
     {
-        if (!(obj is FeatureGroup) || obj == null)
-        {
-            return false;
-        }
+        if (obj is not FeatureGroup fg) return false;
 
-        if (obj == this)
-        {
-            return true;
-        }
+        if (fg == this) return true;
 
         //If here, obj is a FeatureGroup
-        if (!(this.totalArcs == ((FeatureGroup)obj).totalArcs
-              && this.totalLines == ((FeatureGroup)obj).totalLines
-              && this.totalCircles == ((FeatureGroup)obj).totalCircles
-            )) {
+        if (!(_totalArcs == fg._totalArcs && _totalLines == fg._totalLines && _totalCircles == fg._totalCircles))
+        {
             return false;
         }
 
         //Sort by perimeter
         features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
-        ((FeatureGroup)obj).features.Sort((x, y) => x.perimeter.CompareTo((y.perimeter)));
-
+        fg.features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
 
         for (int i = 0; i < features.Count; i++)
         {
             //While this features @ i has same perimeter as obj.features[j] check if any j = features[i]
             int j = i;
             bool checkPoint = false;
-            while (j < features.Count
-                   && Math.Abs(features[i].perimeter - ((FeatureGroup)obj).features[j].perimeter) <
-                   Entity.EntityTolerance)
+            while (j < features.Count && 
+                   Math.Abs(features[i].perimeter - fg.features[j].perimeter) < Entity.EntityTolerance)
             {
                 if (features[i].Equals(features[j]))
                 {
@@ -162,13 +159,10 @@ public class FeatureGroup
                 j++;
             }
 
-            if (!checkPoint)
-            {
-                return false;
-            }
+            if (!checkPoint) return false;
         }
 
-        //If we got here, checkPoint was never false, so return true;
+        // If we got here, checkPoint was never false, so return true
         return true;
     }
         

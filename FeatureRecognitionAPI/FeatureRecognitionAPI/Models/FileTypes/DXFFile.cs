@@ -2,6 +2,7 @@
 using ACadSharp.IO;
 using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
+using FeatureRecognitionAPI.Models.FileTypes;
 
 namespace FeatureRecognitionAPI.Models
 {
@@ -17,7 +18,7 @@ namespace FeatureRecognitionAPI.Models
         {
             FileType = SupportedExtensions.Dxf;
             DxfReader reader = new DxfReader(stream);
-            doc = reader.Read();
+            Doc = reader.Read();
             ParseFile();
         }
 
@@ -28,7 +29,7 @@ namespace FeatureRecognitionAPI.Models
             if (File.Exists(path))
             {
                 DxfReader reader = new DxfReader(Path);
-                doc = reader.Read();
+                Doc = reader.Read();
                 ParseFile();
             }
             else

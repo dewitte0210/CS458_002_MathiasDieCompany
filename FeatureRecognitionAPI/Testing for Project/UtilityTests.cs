@@ -298,7 +298,7 @@ namespace Testing_for_Project
         [Test]
         public void DoubleEqualsTest()
         {
-            Assert.That(DoubleEquals(0.0, 0.0), Is.True);
+            Assert.That(DEQ(0.0, 0.0), Is.True);
         }
 
         #endregion

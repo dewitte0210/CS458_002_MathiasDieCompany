@@ -27,7 +27,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
 
             // Padding to ensure the shapes aren't clipped
             const PADDING = 0.1;
-            const SCALE = 400;
+            const SCALE = 800;
 
             minX -= PADDING;
             minY -= PADDING;

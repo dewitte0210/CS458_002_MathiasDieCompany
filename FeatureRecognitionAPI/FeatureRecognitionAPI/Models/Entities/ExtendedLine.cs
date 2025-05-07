@@ -23,9 +23,6 @@ public class ExtendedLine : Line
         Parent1 = parent1;
         Parent2 = parent2;
         CalcPoints();
-
-        //SlopeY = End.Y - Start.Y;
-        //SlopeX = End.X - Start.X;
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using FeatureRecognitionAPI.Models;
 using FeatureRecognitionAPI.Models.Features;
+using FeatureRecognitionAPI.Models.FileTypes;
 
 namespace Testing_for_Project
 {
