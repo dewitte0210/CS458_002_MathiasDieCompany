@@ -817,24 +817,9 @@ namespace Testing_for_Project
         }
         
         #region CornerNotches
-
-        [Test]
-        public void TestCornerNotchPattern1()
-        {
-            Line line1 = new(0, 0, 0, 1);
-            Line line2 = new(0, 1, 0, 2);
-            Line line3 = new(0, 2, 0, 3);
-            Line line4 = new(0, 3, 0, 4);
-            List<Entity> entities = new List<Entity>() { line1, line2, line3, line4 };
-            DXFFile testFile = new DXFFile(entities);
-            testFile.GroupFeatureEntities();
-            List<Entity> cList = testFile.FindCornerNotchPattern();
-            Assert.IsTrue(cList.Count == entities.Count);
-            Assert.IsTrue(cList.All(entities.Contains));
-        }
         
         [Test]
-        public void TestCornerNotchPattern2()
+        public void TestCornerNotchPattern1()
         {
             Line line1 = new(0, 0, 1, 0);
             Arc arc1 = new(2, 0, 1, 180, 90);
@@ -845,9 +830,11 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, line3, arc2, line4 };
             DXFFile testFile = new DXFFile(entities);
             testFile.GroupFeatureEntities();
-            List<Entity> cList = testFile.FindCornerNotchPattern();
-            Assert.IsTrue(cList.Count == entities.Count);
-            Assert.IsTrue(cList.All(entities.Contains));
+            Assert.IsTrue(testFile.FeatureList.Count == 1);
+            Feature testFeature = testFile.FeatureList[0];
+            SupportedFile.FindCornerNotchPattern(testFeature);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 1);
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].FeatureType == PossibleFeatureTypes.Group4);
         }
         
         [Test]
@@ -861,9 +848,11 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2, line3, line4, line5 };
             DXFFile testFile = new DXFFile(entities);
             testFile.GroupFeatureEntities();
-            List<Entity> cList = testFile.FindCornerNotchPattern();
-            Assert.IsTrue(cList.Count == 4);
-            Assert.IsTrue(cList.All(e => e is Line));
+            Assert.IsTrue(testFile.FeatureList.Count == 1);
+            Feature testFeature = testFile.FeatureList[0];
+            SupportedFile.FindCornerNotchPattern(testFeature);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 1);
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].FeatureType == PossibleFeatureTypes.Group4);
         }
         
         [Test]
@@ -878,12 +867,14 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, arc1, line2, line3, line4, line5 };
             DXFFile testFile = new DXFFile(entities);
             testFile.GroupFeatureEntities();
-            List<Entity> cList = testFile.FindCornerNotchPattern();
-            Assert.IsTrue(cList.Count == 0);
+            Assert.IsTrue(testFile.FeatureList.Count == 1);
+            Feature testFeature = testFile.FeatureList[0];
+            SupportedFile.FindCornerNotchPattern(testFeature);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 0);
         }
 
         [Test]
-        public void CornerNotchPatternAndAngles()
+        public void CornerNotchPatternAndArc()
         {
             Line line1 = new(0, 0, 0, 2);
             Line line2 = new(0, 2, 1, 2);
@@ -892,9 +883,11 @@ namespace Testing_for_Project
             List<Entity> entities = new List<Entity>() { line1, line2, line3, line4 };
             DXFFile testFile = new DXFFile(entities);
             testFile.GroupFeatureEntities();
-            List<Entity> cList = testFile.FindCornerNotchPattern();
-            Assert.IsTrue(cList.Count == 4);
-            Assert.IsTrue(testFile.CornerNotchReqCheck(cList, isRadius: false));
+            Assert.IsTrue(testFile.FeatureList.Count == 1);
+            Feature testFeature = testFile.FeatureList[0];
+            SupportedFile.FindCornerNotchPattern(testFeature);
+            Assert.IsTrue(testFeature.PerimeterFeatureList.Count == 1);
+            Assert.IsTrue(testFeature.PerimeterFeatureList[0].FeatureType == PossibleFeatureTypes.Group4);
         }
         #endregion
     }

@@ -49,7 +49,9 @@ public static class EntityTools
         Point? intPoint = Intersect.GetInfiniteLineIntersect(line1, line2);
         if (intPoint == null) return false;
 
-        // todo: update line adjacency lists
+        // update adjacency list. Does not remove entities in between
+        line1.AdjList.Add(line2);
+        line2.AdjList.Add(line1);
         double line1StartDistance = Point.Distance(line1.Start, intPoint);
         double line1EndDistance = Point.Distance(line1.End, intPoint);
         //if start is closer to intersect set that as new start

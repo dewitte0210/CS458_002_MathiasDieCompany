@@ -1896,7 +1896,7 @@ public class Feature
     {
         // make the extended line's adjacency list
         exLine.AdjList = new List<Entity>(line1.AdjList);
-        exLine.AdjList.AddRange(line2.AdjList);
+        exLine.AdjList.AddRange(line2.AdjList.Where(e => !line1.AdjList.Contains(e)));
         exLine.AdjList.Remove(line1);
         exLine.AdjList.Remove(line2);
         

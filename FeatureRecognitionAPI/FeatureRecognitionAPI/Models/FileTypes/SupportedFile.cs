@@ -172,7 +172,6 @@ namespace FeatureRecognitionAPI.Models
             foreach (Feature feature in FeatureList)
             {
                 feature.ConstructFromEntityList();
-                feature.CountEntities();
             }
         }
         
@@ -398,11 +397,33 @@ namespace FeatureRecognitionAPI.Models
          *  1. Line -> Line -> Line -> Line
          *  2. Line -> Arc -> Line -> Line -> Arc -> Line
          */
-        public List<Entity> FindCornerNotchPattern()
+        public static void FindCornerNotchPattern(Feature feature)
         {
-            List<Entity> returned = new List<Entity>();
-            FindCornerNotchPatternHelper(EntityList[0], returned);
-            return returned;
+            for (int i = 0; i < feature.EntityList.Count; i++)
+            {
+                Entity entity = feature.EntityList[i];
+                List<Entity> posNotch = new List<Entity>();
+                if (FindCornerNotchPatternHelper(entity, posNotch) &&
+                    CornerNotchReqCheck(posNotch, posNotch.Count == 6))
+                {
+                    // returned is made up of entities that are considered a corner notch
+                    // add it as a perimeter feature
+                    // remove middle entities from entity List to prevent improper extension and extend outward entities to touch
+                    Feature notch = new(posNotch.GetRange(1, posNotch.Count - 2))
+                    {
+                        FeatureType = PossibleFeatureTypes.Group4
+                    };
+                    feature.PerimeterFeatureList.Add(notch);
+
+                    EntityTools.ExtendTwoLines(posNotch[0] as Line, posNotch[^1] as Line);
+
+                    // remove 0 to ^2 from entity List
+                    foreach (Entity e in posNotch.GetRange(1, posNotch.Count - 2))
+                    {
+                        feature.EntityList.Remove(e);
+                    }
+                }
+            }
         }
         
         /**
@@ -410,14 +431,8 @@ namespace FeatureRecognitionAPI.Models
          *  This is recursive to check entities in touching order.
          *  Returns true if curEntity leads to one of the patterns
          */
-        private bool FindCornerNotchPatternHelper(Entity curEntity, List<Entity> path)
+        private static bool FindCornerNotchPatternHelper(Entity curEntity, List<Entity> path)
         {
-            // base case: completed list
-            if (path is [_, not Arc, _, _] || path.Count == 6)
-            {
-                return true;
-            }
-
             bool added = false;
             // Expecting second arc while first is in index 1
             if (path is [_, Arc, _, _])
@@ -450,19 +465,36 @@ namespace FeatureRecognitionAPI.Models
 
             if (added)
             {
-                // Go to next entity
-                if (curEntity.AdjList.Where(e => !e.Equals(path[^1])).Any(e => FindCornerNotchPatternHelper(e, path)))
+                // base case: completed list
+                if (path is [_, not Arc, _, _] || path.Count == 6)
                 {
                     return true;
                 }
+                
+                // Go to next entity
+                if (path.Count == 1) {
+                    if (curEntity.AdjList.Any(e => FindCornerNotchPatternHelper(e, path)))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (curEntity.AdjList.Where(e => !e.Equals(path[^2]))
+                        .Any(e => FindCornerNotchPatternHelper(e, path)))
+                    {
+                        return true;
+                    }
+                }
 
+                // No possible path so remove the last entity added
                 path.RemoveAt(path.Count - 1);
             }
 
             return false;
         }
 
-        public bool CornerNotchReqCheck(List<Entity> entities, bool isRadius)
+        private static bool CornerNotchReqCheck(List<Entity> entities, bool isRadius)
         {
             if (entities.Count != 4 && entities.Count != 6) {return false;}
             Angles.Angle innerAngle;
