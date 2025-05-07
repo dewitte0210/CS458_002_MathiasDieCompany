@@ -69,11 +69,6 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
                 } else if (shape["$type"].includes('Ellipse')) {
                     drawEllipse(ctx, shape, scaleFactor, xOffset, yOffset);
                 }
-                //else if (shape["$type"].includes() === 'quadcurve2d') {
-                //     drawQuadLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                // } else if (shape["$type"].includes() === 'cubiccurve2d') {
-                //     drawCubicLine(ctx, shape, scaleFactor, xOffset, yOffset);
-                // }
             });
         };
 
