@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { MdClear } from "react-icons/md";
 
-/*
-  Displays selected file with option to remove.
+/**
+   Displays selected file with option to remove.
 */
 interface FileDisplayProps {
   file: File;

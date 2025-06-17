@@ -9,10 +9,13 @@ interface VisualDisplayProps {
 }
 
 const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, maxX, minY, maxY}) => {
-    // Reference to the canvas element
+    // Reference to the canvas element.
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    // useEffect hook is used to handle the drawing logic when the component mounts or when drawData or scaleFactor changes
+    /** 
+     * useEffect hook is used to handle the drawing logic when the component 
+     * mounts or when drawData or scaleFactor changes.
+     */
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -20,12 +23,12 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Function to draw all shapes
+        // Function to draw all shapes.
         const drawCanvas = () => {
-            // Clear the canvas before redrawing
+            // Clear the canvas before redrawing.
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Padding to ensure the shapes aren't clipped
+            // Padding to ensure the shapes aren't clipped.
             const PADDING = 0.1;
             const SCALE = 800;
 
@@ -34,10 +37,10 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             maxX += PADDING;
             maxY += PADDING;
 
-            // Calculate scaling factor to fit all shapes within the canvas
+            // Calculate scaling factor to fit all shapes within the canvas.
             const scaleFactor = Math.abs(SCALE / Math.max(maxX - minX, maxY - minY));
 
-            // Set canvas dimensions based on the bounding box
+            // Set canvas dimensions based on the bounding box.
             canvas.width = (maxX - minX) * scaleFactor;
             canvas.height = (maxY - minY) * scaleFactor;
 
@@ -45,20 +48,20 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             canvas.style.display = 'block';
             canvas.style.margin = '0 auto';
 
-            // Flip y-axis (canvas coordinates vs. typical 2D Cartesian coordinates)
+            // Flip y-axis (canvas coordinates vs. typical 2D Cartesian coordinates).
             ctx.setTransform(1, 0, 0, -1, 0, canvas.height);
 
-            // Dashed border, useful for debugging
+            // Dashed border, useful for debugging.
             // ctx.setLineDash([5, 10]);
             // ctx.strokeRect(0, 0, canvas.width, canvas.height);
             
-            ctx.setLineDash([]); // Reset to solid lines
+            ctx.setLineDash([]); // Reset to solid lines.
 
-            // Calculate offsets to shift shapes into the visible area
+            // Calculate offsets to shift shapes into the visible area.
             let xOffset = Math.abs(Math.min(0, minX));
             let yOffset = Math.abs(Math.min(0, minY));
 
-            // Iterate over each shape and draw it on the canvas
+            // Iterate over each shape and draw it on the canvas.
             touchingEntities.forEach((shape) => {
                 if (shape["$type"].includes('Line')) {
                     drawLine(ctx, shape, scaleFactor, xOffset, yOffset);
@@ -151,7 +154,7 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
             ctx.strokeStyle = 'purple';
             ctx.setLineDash([]);
-            ctx.lineWidth = 2; // Set line width
+            ctx.lineWidth = 2; // Set line width.
             ctx.stroke();
         };
 
@@ -173,13 +176,13 @@ const VisualDisplay: React.FC<VisualDisplayProps> = ({touchingEntities, minX, ma
             ctx.bezierCurveTo(ctrl1X, ctrl1Y, ctrl2X, ctrl2Y, endX, endY);
             ctx.strokeStyle = 'orange';
             ctx.setLineDash([]);
-            ctx.lineWidth = 2; // Set line width
+            ctx.lineWidth = 2; // Set line width.
             ctx.stroke();
         };
         drawCanvas();
     }, [touchingEntities]);
 
-    // Return the canvas element
+    // Return the canvas element.
     return (
         <div id="container">
             <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}/>
