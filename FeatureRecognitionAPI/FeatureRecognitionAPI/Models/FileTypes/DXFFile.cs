@@ -8,10 +8,7 @@ namespace FeatureRecognitionAPI.Models
 {
     public class DXFFile : SupportedFile
     {
-        public DXFFile()
-        {
-        }
-
+        public DXFFile() {}
         public DXFFile(List<Entity> entities) : base(entities) {}
 
         public DXFFile(Stream stream)

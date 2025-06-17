@@ -9,7 +9,7 @@ public interface IPricingDataService
     PunchPriceReturn GetPunchPrices();
     List<FeaturePrice> GetFeaturePrices();
     RatesPrices GetRates();
-    
+
     Task<bool> UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices);
     Task<bool> UpdateFeaturePrice(List<FeaturePrice> prices);
     Task<bool> AddPunchPrice(PossibleFeatureTypes type, PunchPrice punchPrice);

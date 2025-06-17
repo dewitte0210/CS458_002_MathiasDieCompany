@@ -18,21 +18,21 @@ public class FeaturePrice
         Type = type;
     }
     /// <summary>
-    ///  Denotes the hour/part rate of setting up the cut
+    ///  Denotes the hour/part rate of setting up the cut.
     /// </summary>
     public double SetupRate { get; set; }
 
     /// <summary>
-    /// Denotes the hour/part rate of running the cut
+    /// Denotes the hour/part rate of running the cut.
     /// </summary>
     public double RunRate { get; set; }
 
     public double DifficultyFactor { get; set; }
 
     /// <summary>
-    /// Denotes the Part Quantity used to make the feature
+    /// Denotes the Part Quantity used to make the feature.
     /// </summary>
     public int Quantity { get; set; }
-    public int MaxRadius { get; set; } 
+    public int MaxRadius { get; set; }
     public PossibleFeatureTypes Type { get; set; }
 }

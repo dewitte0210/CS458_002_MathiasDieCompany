@@ -15,15 +15,15 @@ import Contact from "./UserManualContents/Contact";
  */
 export default function UserManual() {
 
-    const [isManualVisible, setIsManualVisible] = useState(false); //Saves panel state during redraws
+    const [isManualVisible, setIsManualVisible] = useState(false); //Saves panel state during redraws.
     const [isManualHidden, setIsManualHidden] = useState(true);
 
-    //State to keep track of the active manual section
+    //State to keep track of the active manual section.
     const [activeSection, setActiveSection] = useState("introduction");
-    const manualButtonRef = useRef(null); // Reference to the manual button
+    const manualButtonRef = useRef(null); // Reference to the manual button.
 
 
-    // Function to set manual panel position dynamically based on the button position
+    // Function to set manual panel position dynamically based on the button position.
     const toggleManual = () => {
         if (!isManualVisible && manualButtonRef.current) {
             const buttonRect = manualButtonRef.current.getBoundingClientRect();

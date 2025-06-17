@@ -15,6 +15,6 @@ const uploadFile = async (file)  => {
     }
 };
 
-// Export the uploadFile function
+// Export the uploadFile function.
 export { uploadFile };
 

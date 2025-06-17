@@ -7,35 +7,35 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import VisualDisplay from "./VisualDisplay";
 import {translate} from "../translator";
 
-/*
-  Defines the shape of the props that the UploadAndShow component accepts.
+/**
+   Defines the shape of the props that the UploadAndShow component accepts.
 */
 interface UploadAndShowProps {
     onFilesSelected?: (files: File[]) => void;
 }
 
 
-/*
-  Main component that handles drag-and-drop and file submission.
+/**
+   Main component that handles drag-and-drop and file submission.
 */
 const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
     // State hooks
-    const [file, setFile] = useState<File | null>(null); // Only allow one file
-    const [submitted, setSubmitted] = useState(false); // Tracks submission
-    const [jsonResponse, setJsonResponse] = useState<any>(null); // Stores JSON response
-    const [isLoading, setIsLoading] = useState(false); // State for loading
-    const [showModal, setShowModal] = useState(false); // State for modal
+    const [file, setFile] = useState<File | null>(null); // Only allow one file.
+    const [submitted, setSubmitted] = useState(false); // Tracks submission.
+    const [jsonResponse, setJsonResponse] = useState<any>(null); // Stores JSON response.
+    const [isLoading, setIsLoading] = useState(false); // State for loading.
+    const [showModal, setShowModal] = useState(false); // State for modal.
 
     const allowedFileExtensions = [".dwg", ".dxf"];
 
-    /*
-      Event handler for when the user clicks the submit file button.
-      Submits the file to the server and captures the JSON response.
+    /**
+       Event handler for when the user clicks the submit file button.
+       Submits the file to the server and captures the JSON response.
     */
     const handleSubmit = async () => {
         if (!file) return;
 
-        setIsLoading(true); // Start loading
+        setIsLoading(true); // Start loading.
 
         const formData = new FormData();
         formData.append("file", file);
@@ -53,34 +53,34 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                 throw new Error(`Server error: ${res.status} ${res.statusText}.\n${await res.json()}`);
             }
 
-            const jsonResponse = await res.json(); // Capture JSON responses
-            setJsonResponse(jsonResponse); // Store response in state
-            setSubmitted(true); // Update the state to indicate successful submission
+            const jsonResponse = await res.json(); // Capture JSON responses.
+            setJsonResponse(jsonResponse); // Store response in state.
+            setSubmitted(true); // Update the state to indicate successful submission.
         } catch (error) {
             if (error instanceof Error){
                 alert("An error occurred while submitting the file. Please try again.\n\n" + error.message);
             }
         } finally {
-            setIsLoading(false); // End loading
+            setIsLoading(false); // End loading.
         }
     };
 
     const handleCloseModal = () => setShowModal(false);
 
-    /*
-      Event handler for when the user clicks the back button after submission.
+    /**
+       Event handler for when the user clicks the back button after submission.
     */
     const backToUpload = () => {
         setSubmitted(false);
-        setFile(null); // Clear the file after submission
-        setJsonResponse(null); // Clear the JSON response on going back
+        setFile(null); // Clear the file after submission.
+        setJsonResponse(null); // Clear the JSON response on going back.
     };
 
     return (
         <div className="upload-and-show">
-            {isLoading ? ( // Display loading screen during file upload
+            {isLoading ? ( // Display loading screen during file upload.
                 <div className="loader"></div>
-            ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading
+            ) : !submitted ? ( // Display drag-and-drop area if not submitted and not loading.
                 <>
                     <div className="supported-features">
                         <p>Please view our supported features before submitting</p>
@@ -116,11 +116,11 @@ const UploadAndShow: React.FC<UploadAndShowProps> = ({onFilesSelected}) => {
                     </div>
                 </>
             ) : (
-                // Show retrieved data
+                // Show retrieved data.
                 <div className="response-container">
                     <div className="table-and-visual">
                         <div className="table-data">
-                            {jsonResponse && ( // Conditionally render the JSON response
+                            {jsonResponse && ( // Conditionally render the JSON response.
                                 <QuoteSubmission
                                     featureGroups={jsonResponse["_featureGroups"]}
                                     backToUpload={backToUpload}

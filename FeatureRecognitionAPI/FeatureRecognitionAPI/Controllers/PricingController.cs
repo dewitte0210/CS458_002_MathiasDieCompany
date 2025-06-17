@@ -17,9 +17,9 @@ namespace FeatureRecognitionAPI.Controllers
         : ControllerBase
     {
         /// <summary>
-        /// Estimates the price of a given file 
+        /// Estimates the price of a given file.
         /// </summary>
-        /// <param name="param"> a QuoteSubmissionDto object containing feature data</param>
+        /// <param name="param"> A QuoteSubmissionDto object containing feature data. </param>
         /// <returns></returns>
         [Microsoft.AspNetCore.Mvc.HttpPost("")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
@@ -67,15 +67,15 @@ namespace FeatureRecognitionAPI.Controllers
         {
             return Ok(dataService.GetRates());
         }
-        
+
         [Microsoft.AspNetCore.Mvc.HttpPost("{type}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdatePunchPrice(PossibleFeatureTypes type, [FromBody] List<PunchPrice> punches)
         {
-            // Punch is included here because we do not have prices for generic punches
-            // type > 7 is if a feature price was sent to the punch method
+            // Punch is included here because we do not have prices for generic punches.
+            // Type > 7 is if a feature price was sent to the punch method.
             if (type is PossibleFeatureTypes.Unknown or PossibleFeatureTypes.Punch
                 || (int)type > 7 || punches is null || punches.Count == 0)
             {
@@ -116,9 +116,9 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateRates([FromBody] RatesPrices rates)
         {
-            if(rates is null) { return BadRequest(); }
-           bool success = await dataService.UpdateRates(rates); 
-           return success ? Ok() : StatusCode(500);
+            if (rates is null) { return BadRequest(); }
+            bool success = await dataService.UpdateRates(rates);
+            return success ? Ok() : StatusCode(500);
         }
     }
 }

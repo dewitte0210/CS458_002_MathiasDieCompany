@@ -5,26 +5,26 @@ using Math = System.Math;
 namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Class that represents an Arc object that extends Entity
-/// Inherits entityType and Length fields 
+/// Class that represents an Arc object that extends Entity.
+/// Inherits entityType and Length fields.
 /// </summary>
 public class Arc : Entity
 {
-    public Point Center { get; set; } //Central point
-    public double Radius { get; set; } //Radius value
-    public double StartAngle { get; set; } //angle from central point to start point
-    public double EndAngle { get; set; } //angle from central point to end point
-    public double CentralAngle { get; } //angle of the arc
+    public Point Center { get; set; } // Central point.
+    public double Radius { get; set; } // Radius value.
+    public double StartAngle { get; set; } // Angle from central point to start point.
+    public double EndAngle { get; set; } // Angle from central point to end point.
+    public double CentralAngle { get; } // Angle of the arc.
 
     /// <summary>
     /// Creates an arc and calculates the starting and ending coordinates as well
-    /// as the length of the arc. Makes it so Arc has no default constructor
+    /// as the length of the arc. Makes it so Arc has no default constructor.
     /// </summary>
-    /// <param name="centerX"> the x value of the center of the arc </param>
-    /// <param name="centerY"> the y value of the center of the arc </param>
-    /// <param name="radius"> the radius value of the arc </param>
-    /// <param name="startAngle"> the angle the arc starts at </param>
-    /// <param name="endAngle"> the angle the arc ends at </param>
+    /// <param name="centerX"> The x value of the center of the arc. </param>
+    /// <param name="centerY"> The y value of the center of the arc. </param>
+    /// <param name="radius"> The radius value of the arc. </param>
+    /// <param name="startAngle"> The angle the arc starts at. </param>
+    /// <param name="endAngle"> The angle the arc ends at. </param>
     public Arc(double centerX, double centerY, double radius, double startAngle, double endAngle)
     {
         Center = new Point(centerX, centerY);
@@ -37,14 +37,14 @@ public class Arc : Entity
     }
 
     /// <summary>
-    /// Function to calculate the length of the arc for perimeter length checks 
+    /// Function to calculate the length of the arc for perimeter length checks.
     /// </summary>
-    /// <returns>the calculated length (partial circumference) of the arc</returns>
+    /// <returns> The calculated length (partial circumference) of the arc. </returns>
     public override double GetLength()
     {
         return (2 * Math.PI * Radius * (CentralAngle / 360));
     }
-    
+
     /// <summary>
     /// Function to calculate the x coordinate given the center point, Radius
     /// and an angle. 
@@ -64,29 +64,29 @@ public class Arc : Entity
     }
 
     /// <summary>
-    /// Function to calculate the central angle 
+    /// Function to calculate the central angle.
     /// </summary>
-    /// <param name="startAngle"> the start angle of the arc being calculated </param>
-    /// <param name="endAngle"> the end angle of the arc being calculated </param>
-    /// <returns> the calculated the length of the arc </returns>
+    /// <param name="startAngle"> The start angle of the arc being calculated. </param>
+    /// <param name="endAngle"> The end angle of the arc being calculated. </param>
+    /// <returns> The calculated the length of the arc. </returns>
     internal static double CalcCentralAngle(double startAngle, double endAngle)
     {
-        //The subtraction result would be negative, need to add 360 to get correct value
+        // The subtraction result would be negative, need to add 360 to get correct value.
         if (endAngle < startAngle)
             return endAngle - startAngle + 360;
         return endAngle - startAngle;
     }
-    
+
     /// <summary>
-    /// Overrides .Equals function for the Arc object
+    /// Overrides .Equals function for the Arc object.
     /// </summary>
-    /// <param name="obj"> object being compared to this </param>
-    /// <returns> true if the same arc, false if not </returns>
+    /// <param name="obj"> Object being compared to this. </param>
+    /// <returns> True if the same arc, false if not. </returns>
     public override bool Equals(object? obj)
     {
         if (obj is Arc)
         {
-            //IDE Mapped everything to work with tolerance in one tab push :O
+            // IDE Mapped everything to work with tolerance in one tab push :O.
             if (Math.Abs(((Arc)obj).GetLength() - this.GetLength()) < EntityTolerance
                 && Math.Abs(((Arc)obj).Radius - this.Radius) < EntityTolerance
                 && Math.Abs(((Arc)obj).StartAngle - this.StartAngle) < EntityTolerance
@@ -102,18 +102,17 @@ public class Arc : Entity
 
     /// <summary>
     /// Function that determines if a point is in between the start and end angles
-    /// (already checked to be on the line if the arc is treated as a circle)
-    /// Mostly used in the intersect functions
+    /// (already checked to be on the line if the arc is treated as a circle).
+    /// Mostly used in the intersect functions.
     /// </summary>
-    /// <param name="point"> the point being checked </param>
-    /// <returns></returns>
+    /// <param name="point"> The point being checked. </param>
     internal bool IsInArcRange(Point point)
     {
         double y = point.Y - Center.Y;
         double x = point.X - Center.X;
         double degrees;
 
-        // Figure out the angle the point is in. Special cases apply at x=0 and y=0
+        // Figure out the angle the point is in. Special cases apply at x=0 and y=0.
         if (x == 0)
         {
             degrees = y > 0 ? 90 : 270;
@@ -128,7 +127,7 @@ public class Arc : Entity
             degrees = Angles.RadToDegrees(tan);
         }
 
-        // rotate start and end angles to start at 0
+        // Rotate start and end angles to start at 0.
         double difference = 360 - StartAngle;
         double adjustedStart = 0;
         double adjustedEnd = EndAngle + difference;
@@ -154,7 +153,7 @@ public class Arc : Entity
 
     internal double AngleInMiddle()
     {
-        // rotate start and end angles to start at 0
+        // Rotate start and end angles to start at 0.
         double difference = 360 - StartAngle;
         double adjustedStart = 0;
         double adjustedEnd = EndAngle + difference;
@@ -166,9 +165,11 @@ public class Arc : Entity
 
     public override int GetHashCode()
     {
-        //hash is built using ellipse center and arc radius
-        //so two arcs with the same center and arc radius will have the same hash
-        //Note: this hash may not be robust enough
+        /**
+         * Hash is built using ellipse center and arc radius
+         * so two arcs with the same center and arc radius will have the same hash.
+         * Note: this hash may not be robust enough.
+         */
         return Convert.ToInt32(
             Center.X * 10010111 +
             Center.Y * 10000379 +
@@ -180,20 +181,20 @@ public class Arc : Entity
         Rect bounds = GetBounds();
         return bounds.x;
     }
-    
+
     public override double MinY()
     {
         Rect bounds = GetBounds();
         return bounds.y;
     }
-    
+
     public override double MaxX()
     {
-    
+
         Rect bounds = GetBounds();
         return bounds.x + bounds.width;
-}
-    
+    }
+
     public override double MaxY()
     {
         Rect bounds = GetBounds();
@@ -215,14 +216,14 @@ public class Arc : Entity
         public double width { get; init; }
         public double height { get; init; }
     }
-    
+
     /// <summary>
     /// This function and its helper methods are adapted from the Java.awt library.
     /// Note: comments which appeared in the original source code will be labelled as //**
     /// </summary>
     public Rect GetBounds()
     {
-        //these numbers are coordinates relative to the unit circle
+        // These numbers are coordinates relative to the unit circle.
         double x1, y1, x2, y2;
         x1 = y1 = 1.0;
         x2 = y2 = -1.0;
@@ -258,10 +259,10 @@ public class Arc : Entity
             y2 = Math.Max(y2, ye);
         }
 
-        double width = (x2 - x1) *  Radius;
+        double width = (x2 - x1) * Radius;
         double height = (y2 - y1) * Radius;
 
-        double x  = Center.X  + x1  * Radius;
+        double x = Center.X + x1 * Radius;
         double y = Center.Y + y1 * Radius;
         return new Rect(x, y, width, height);
     }
@@ -294,7 +295,7 @@ public class Arc : Entity
 
         return (angle >= 0.0) && (angle < angExt);
     }
-    
+
     /// <summary>
     /// ** Normalizes the specified angle into the range -180 to 180.
     /// </summary>
@@ -353,15 +354,15 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-            Point newCenter = transform * Center;
-            Point newStart = transform * Start;
-            
-            double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
-            
-            double newRadius = Point.Distance(newStart, newCenter);
-            double newAngleStart = StartAngle - rotation;
-            double newAngleEnd = EndAngle - rotation;
+        Point newCenter = transform * Center;
+        Point newStart = transform * Start;
 
-            return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
+        double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+
+        double newRadius = Point.Distance(newStart, newCenter);
+        double newAngleStart = StartAngle - rotation;
+        double newAngleEnd = EndAngle - rotation;
+
+        return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
     }
 }

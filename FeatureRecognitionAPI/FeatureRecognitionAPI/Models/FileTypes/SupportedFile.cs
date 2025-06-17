@@ -15,7 +15,7 @@ using Point = FeatureRecognitionAPI.Models.Entities.Point;
 namespace FeatureRecognitionAPI.Models.FileTypes;
 
 /// <summary>
-/// Abstract class to be inherited by every File child class - DWG, DXF
+/// Abstract class to be inherited by every File child class - DWG, DXF.
 /// </summary>
 public abstract class SupportedFile
 {
@@ -29,7 +29,7 @@ public abstract class SupportedFile
 
     #region Constructors
 
-    //protected keyword for nested enum is about granting 
+    // Protected keyword for nested enum is about granting.
     protected SupportedFile()
     {
         EntityList = new List<Entity>();
@@ -59,13 +59,13 @@ public abstract class SupportedFile
         GroupFeatureEntities();
         SetFeatureGroups();
 
-        //if there is a num-up here, only one copy of the die will have its lines identified as recognized or unrecognized
+        // If there is a num-up here, only one copy of the die will have its lines identified as recognized or unrecognized.
         foreach (FeatureGroup featureGroup in FeatureGroups)
         {
             featureGroup.FindFeatureTypes();
         }
 
-        //run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end
+        // Run feature detection on everything if there is a num-up so that unrecognized features can be highlighted in the front end.
         if (FeatureGroups.Any(group => group.Count > 1))
         {
             foreach (Feature feature in FeatureList.Where(f => f.FeatureType == null))
@@ -79,97 +79,105 @@ public abstract class SupportedFile
     }
 
     /// <summary>
-    /// This function takes in a list of entities and creates features based on groups of touching entities
-    /// it also constructs each entity's AdjList (Adjacency List)
+    /// This function takes in a list of entities and creates features based on groups of touching entities,
+    /// it also constructs each entity's AdjList (Adjacency List).
     /// </summary>
     public void GroupFeatureEntities()
     {
         if (FeatureList.Count > 0) return;
 
-        // parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1
+        // Parallel list to EntityList mapping them to an index in FeatureList. Initializes a value of -1.
         List<int> listMap = Enumerable.Repeat(-1, EntityList.Count).ToList();
         FeatureList.Add(new Feature(new List<Entity>()));
 
-        // starts the mapping with the first entity in EntityList list as a new list in features
+        // Starts the mapping with the first entity in EntityList list as a new list in features.
         FeatureList[0].EntityList.Add(EntityList[0]);
         listMap[0] = 0;
 
         for (int i = 0; i < EntityList.Count; i++)
         {
             int count = 0;
-            // j = i+1 so we don't see the same check for an example like when i = 1 and j=5 originally and then becomes i=5 and j=1
+            /**
+             * j = i+1 so we don't see the same check for an example like when i = 1 and
+             * j=5 originally and then becomes i=5 and j=1.
+             */
             for (int j = i + 1; j < EntityList.Count; j++)
             {
                 if (!Intersect.DoesIntersect(EntityList[i], EntityList[j])) continue;
 
-                // these entities do intersect
-                // adds each entity to their AdjList. This should not happen twice because of the j=i+1
+                // These entities do intersect.
+                // Adds each entity to their AdjList. This should not happen twice because of the j=i+1.
                 EntityList[i].AdjList.Add(EntityList[j]);
                 EntityList[j].AdjList.Add(EntityList[i]);
 
-                    // Check to flag an entity as Kisscut
-                    count++;
-                    if (count == 4)
-                    {
-                        EntityList[i].KissCut = true;
-                    }
+                // Check to flag an entity as Kisscut.
+                count++;
+                if (count == 4)
+                {
+                    EntityList[i].KissCut = true;
+                }
 
-                    bool endPointBool = true;
-                    for (int k = 0; k < EntityList[i].AdjList.Count; k++)
+                bool endPointBool = true;
+                for (int k = 0; k < EntityList[i].AdjList.Count; k++)
+                {
+                    if (Intersect.AreEndpointsTouching(EntityList[i], EntityList[i].AdjList[k]))
                     {
-                        if(Intersect.AreEndpointsTouching(EntityList[i], EntityList[i].AdjList[k]))
-                        {
-                            endPointBool = false;
-                        }
+                        endPointBool = false;
                     }
+                }
 
-                    if (endPointBool)
-                    {
-                        EntityList[i].KissCut = true;
-                    }
-                    
+                if (endPointBool)
+                {
+                    EntityList[i].KissCut = true;
+                }
 
-                // checks that either i or j still needs to be mapped
-                // say there is a third entity k that touches i and j.
-                // i and j was already checked for k and added to entityList.
-                // when i is checked against j it would attempt to add them again.
+
+                /**
+                 * Checks that either i or j still needs to be mapped, say there is a 
+                 * third entity k that touches i and j. i and j was already checked 
+                 * for k and added to entityList. When i is checked against j it would 
+                 * attempt to add them again.
+                 */
                 if (listMap[i] == -1 || listMap[j] == -1)
                 {
-                    if (listMap[i] != -1) // means entity i is mapped to a feature
+                    if (listMap[i] != -1) // Means entity i is mapped to a feature.
                     {
                         FeatureList[listMap[i]].EntityList.Add(EntityList[j]);
                         listMap[j] = listMap[i];
                     }
-                    else if (listMap[j] != -1) // means entity j is mapped to a feature
+                    else if (listMap[j] != -1) // Means entity j is mapped to a feature.
                     {
                         FeatureList[listMap[j]].EntityList.Add(EntityList[i]);
                         listMap[i] = listMap[j];
                     }
-                    else // both i and j is not mapped to a feature
+                    else // Both i and j is not mapped to a feature.
                     {
-                        // creates a new feature, adds it to FeatureList with EntityList i and j being in its EntityList
+                        /**
+                         * Creates a new feature, adds it to FeatureList with EntityList
+                         * i and j being in its EntityList.
+                         */
                         FeatureList.Add(new Feature(new List<Entity>()));
                         int index = FeatureList.Count - 1;
                         FeatureList[index].EntityList.Add(EntityList[i]);
                         FeatureList[index].EntityList.Add(EntityList[j]);
-                        // maps i and j to the index of that new feature in FeatureList
+                        // Maps i and j to the index of that new feature in FeatureList.
                         listMap[i] = index;
                         listMap[j] = index;
                     }
                 }
-                else // both i and j are already mapped
+                else // Both i and j are already mapped.
                 {
                     if (listMap[i] == listMap[j])
                     {
                         continue;
                     }
 
-                    //they should become the same feature
+                    // They should become the same feature.
                     FeatureList[listMap[i]].EntityList
-                        .AddRange(FeatureList[listMap[j]].EntityList); // combines the EntityLists
-                    FeatureList.RemoveAt(listMap[j]); // removed the feature with entity j
+                        .AddRange(FeatureList[listMap[j]].EntityList); // Combines the EntityLists.
+                    FeatureList.RemoveAt(listMap[j]); // Removed the feature with entity j.
 
-                    // this for loop corrects the mapping after a feature was removed
+                    // This for loop corrects the mapping after a feature was removed.
                     for (int k = 0; k < listMap.Count; k++)
                     {
                         if (k != j && listMap[k] == listMap[j]) listMap[k] = listMap[i];
@@ -181,11 +189,11 @@ public abstract class SupportedFile
 
             if (count == 0 && listMap[i] == -1)
             {
-                // creates a new feature, adds it to FeatureList with EntityList i being in its EntityList
+                // Creates a new feature, adds it to FeatureList with EntityList i being in its EntityList.
                 FeatureList.Add(new Feature(new List<Entity>()));
                 int index = FeatureList.Count - 1;
                 FeatureList[index].EntityList.Add(EntityList[i]);
-                // maps i and j to the index of that new feature in FeatureList
+                // Maps i and j to the index of that new feature in FeatureList.
                 listMap[i] = index;
             }
         }
@@ -197,8 +205,8 @@ public abstract class SupportedFile
     }
 
     /// <summary>
-    /// Groups features together and stores how many of each feature group are present in the file
-    /// Initializes class variable featuresList
+    /// Groups features together and stores how many of each feature group are present in the file.
+    /// Initializes class variable featuresList.
     /// </summary>
     public void SetFeatureGroups()
     {
@@ -213,12 +221,12 @@ public abstract class SupportedFile
         Point maxPoint = new(0, 0);
         Point maxDiff = new(0, 0);
 
-        //Temp variables to overwrite
+        // Temp variables to overwrite.
         Point tempDiff = new(0, 0);
 
         while (features.Count > 0)
         {
-            //Set max values to zero before run
+            // Set max values to zero before run.
             int maxDiffIndex = 0;
             maxDiff.X = 0;
             maxDiff.Y = 0;
@@ -246,7 +254,7 @@ public abstract class SupportedFile
                 }
             }
 
-            // Start the list
+            // Start the list.
             List<Feature> featureGroupList = new List<Feature>();
             Feature bigFeature = features[maxDiffIndex];
             featureGroupList.Add(bigFeature);
@@ -259,8 +267,8 @@ public abstract class SupportedFile
                 tempMaxPoint = features[i].FindMaxPoint();
                 tempMinPoint = features[i].FindMinPoint();
 
-                //Temp max should be less than maxPoint (if it's the same it also shouldn't be added)
-                //TempMin should be greater than minPoint
+                // Temp max should be less than maxPoint (if it's the same it also shouldn't be added).
+                // TempMin should be greater than minPoint.
                 if (tempMaxPoint.X < maxPoint.X && tempMaxPoint.Y < maxPoint.Y
                                                 && tempMinPoint.X > minPoint.X && tempMinPoint.Y > minPoint.Y)
                 {
@@ -270,7 +278,7 @@ public abstract class SupportedFile
                 }
             }
 
-            //featureGroupList should now contain all features that fall inside bigFeature
+            // FeatureGroupList should now contain all features that fall inside bigFeature.
             bool added = false;
             FeatureGroup newFeatureGroup = new(featureGroupList);
             if (featureGroupList.Count > 0)
@@ -285,7 +293,7 @@ public abstract class SupportedFile
                     }
                 }
 
-                //If the foreach loop was excited without adding anything add newFGroup to the featureGroup list
+                // If the foreach loop was excited without adding anything add newFGroup to the featureGroup list.
                 if (!added)
                 {
                     newFeatureGroup.Count++;
@@ -329,24 +337,24 @@ public abstract class SupportedFile
         switch (cadEntity)
         {
             case ACadSharp.Entities.Line line:
-            {
-                return new Line(line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
-            }
+                {
+                    return new Line(line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
+                }
             case ACadSharp.Entities.Arc arc:
-            {
-                return new Arc(arc.Center.X, arc.Center.Y, arc.Radius,
-                    arc.StartAngle * (180 / Math.PI), arc.EndAngle * (180 / Math.PI));
-            }
+                {
+                    return new Arc(arc.Center.X, arc.Center.Y, arc.Radius,
+                        arc.StartAngle * (180 / Math.PI), arc.EndAngle * (180 / Math.PI));
+                }
             case ACadSharp.Entities.Circle circle:
-            {
-                return new Circle(circle.Center.X, circle.Center.Y, circle.Radius);
-            }
+                {
+                    return new Circle(circle.Center.X, circle.Center.Y, circle.Radius);
+                }
             case ACadSharp.Entities.Ellipse ellipse:
-            {
-                return new Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.EndPoint.X,
-                    ellipse.EndPoint.Y,
-                    ellipse.RadiusRatio, ellipse.StartParameter, ellipse.EndParameter);
-            }
+                {
+                    return new Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.EndPoint.X,
+                        ellipse.EndPoint.Y,
+                        ellipse.RadiusRatio, ellipse.StartParameter, ellipse.EndParameter);
+                }
         }
         return null;
     }

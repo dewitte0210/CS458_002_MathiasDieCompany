@@ -99,7 +99,7 @@ public enum FileVersion
 }
 
 /// <summary>
-/// Simple attribute class for storing String Values
+/// Simple attribute class for storing String Values.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field)]
 public sealed class StringValueAttribute : Attribute
@@ -107,7 +107,7 @@ public sealed class StringValueAttribute : Attribute
     /// <summary>
     /// Creates a new <see cref="StringValueAttribute"/> instance.
     /// </summary>
-    /// <param name="value">Value.</param>
+    /// <param name="value"> Value.</param>
     public StringValueAttribute(string value)
     {
         this.Value = value;

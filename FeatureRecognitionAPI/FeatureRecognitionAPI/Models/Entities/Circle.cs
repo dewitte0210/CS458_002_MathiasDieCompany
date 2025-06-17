@@ -4,21 +4,23 @@ using Newtonsoft.Json;
 namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Class that represents a Circle object that extends Entity
-/// Inherits entityType and Length fields
+/// Class that represents a Circle object that extends Entity.
+/// Inherits entityType and Length fields.
 /// </summary>
 public class Circle : Entity
 {
-    public Point Center { get; set; }//Center point of circle
-    public double Radius { get; set; }//Radius of circle
-        
-    [JsonIgnore] public new Point Start
+    public Point Center { get; set; } // Center point of circle.
+    public double Radius { get; set; } // Radius of circle.
+
+    [JsonIgnore]
+    public new Point Start
     {
         get => throw new NotSupportedException("Circle does not have a start point.");
         set => throw new NotSupportedException("Circle does not have a start point.");
     }
 
-    [JsonIgnore] public new Point End
+    [JsonIgnore]
+    public new Point End
     {
         get => throw new NotSupportedException("Circle does not have an end point.");
         set => throw new NotSupportedException("Circle does not have an end point.");
@@ -27,11 +29,11 @@ public class Circle : Entity
     /// <summary>
     /// Constructor that takes an x, y and radius value
     /// calls calcPerimeter
-    /// makes it so Circle has no default constructor
+    /// makes it so Circle has no default constructor.
     /// </summary>
-    /// <param name="centerX"> x coordinate of central point </param>
-    /// <param name="centerY"> y coordinate of central point </param>
-    /// <param name="radius"> value of the radius of this circle </param>
+    /// <param name="centerX"> X coordinate of central point. </param>
+    /// <param name="centerY"> Y coordinate of central point. </param>
+    /// <param name="radius"> Value of the radius of this circle. </param>
     public Circle(double centerX, double centerY, double radius)
     {
         Center = new Point(centerX, centerY);
@@ -39,7 +41,7 @@ public class Circle : Entity
     }
 
     /// <summary>
-    /// Function that calculates the perimeter (circumference)
+    /// Function that calculates the perimeter (circumference).
     /// </summary>
     public override double GetLength()
     {
@@ -47,13 +49,16 @@ public class Circle : Entity
     }
 
     /// <summary>
-    /// Overrides .Equals function for the Arc object
+    /// Overrides .Equals function for the Arc object.
     /// </summary>
-    /// <param name="obj"> the object that is being compared </param>
-    /// <returns> true if equal, otherwise false </returns>
+    /// <param name="obj"> The object that is being compared. </param>
+    /// <returns> True if equal, otherwise false. </returns>
     public override bool Equals(object? obj)
     {
-        //If the object is a circle, and the circles have even Radius, within tolerance then the circles are equal
+        /**
+         * If the object is a circle, and the circles have even Radius,
+         * within tolerance then the circles are equal.
+         */
         if (obj is Circle circle)
         {
             if (Math.Abs(circle.Radius - this.Radius) < EntityTolerance)

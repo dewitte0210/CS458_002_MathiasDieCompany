@@ -5,7 +5,7 @@ namespace FeatureRecognitionAPI.Models.Entities;
 
 public class Line : Entity
 {
-    // Don't Delete. Called from ExtendedLine constructor
+    // Don't Delete. Called from ExtendedLine constructor.
     protected Line()
     {
         Start = new Point();
@@ -30,7 +30,7 @@ public class Line : Entity
         End = new Point(endPoint);
     }
 
-    //constructor with extendedLine parameter
+    // Constructor with extendedLine parameter.
     public Line(double startX, double startY, double endX, double endY, bool extendedLine)
     {
         Start = new Point(startX, startY);
@@ -56,7 +56,7 @@ public class Line : Entity
     {
         return End.X - Start.X;
     }
-    
+
     public double GetSlopeY()
     {
         return End.Y - Start.Y;
@@ -64,7 +64,7 @@ public class Line : Entity
 
     public override bool Equals(object? obj)
     {
-        if (obj is Line lineComp 
+        if (obj is Line lineComp
             && ((Start.Equals(lineComp.Start) && End.Equals(lineComp.End))
             || (Start.Equals(lineComp.End) && End.Equals(lineComp.Start))))
         {
@@ -102,11 +102,11 @@ public class Line : Entity
     {
         return new Point(End.X - Start.X, End.Y - Start.Y);
     }
-        
+
     public override Line Transform(Matrix3 transform)
     {
-        Point newStart = transform * Start; 
-        Point newEnd =  transform * End;
+        Point newStart = transform * Start;
+        Point newEnd = transform * End;
         return new Line(newStart, newEnd);
     }
 }

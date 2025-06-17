@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
-// the supportedFeatures obj holds an array of out features and some info about them
+// The supportedFeatures obj holds an array of out features and some info about them.
 import { supportedFeatures } from "../SupportedFeatures"
 interface ParentModalProps {
     showModal: boolean;
@@ -12,7 +12,7 @@ const ParentModal: React.FC<ParentModalProps> = ({
     handleCloseModal,
 }) => {
 
-    // State for child modal
+    // State for child modal.
     const [childModalVisible, setChildModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState<{
         src: string;
