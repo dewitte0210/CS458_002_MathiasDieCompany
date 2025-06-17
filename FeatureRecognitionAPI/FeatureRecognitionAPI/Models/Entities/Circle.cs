@@ -35,7 +35,13 @@ public class Circle : Entity
     public Circle(double centerX, double centerY, double radius)
     {
         Center = new Point(centerX, centerY);
-        this.Radius = radius;
+        Radius = radius;
+    }
+
+    public Circle(Circle circle)
+    {
+        Center = circle.Center;
+        Radius = circle.Radius;
     }
 
     /// <summary>

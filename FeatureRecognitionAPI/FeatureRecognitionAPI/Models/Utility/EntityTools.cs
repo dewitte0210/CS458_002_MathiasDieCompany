@@ -1,4 +1,5 @@
 using FeatureRecognitionAPI.Models.Entities;
+using FeatureRecognitionAPI.Models.Features;
 using static FeatureRecognitionAPI.Models.Utility.Angles;
 using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 
@@ -6,6 +7,7 @@ namespace FeatureRecognitionAPI.Models.Utility;
 
 public static class EntityTools
 {
+    
     /// <summary>
     /// Determine if two lines are collinear. Two lines are collinear if they are parallel
     /// and lie on the same infinite line. (isSameInfiniteLine) NOT TESTED YET

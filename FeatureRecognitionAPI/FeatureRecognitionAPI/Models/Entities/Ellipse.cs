@@ -19,7 +19,21 @@ public class Ellipse : Entity
     public double EndParameter { get; set; }
     public double Rotation { get; set; }
     public bool IsFullEllipse { get; set; }
-        
+
+    public Ellipse(Ellipse ellipse)
+    {
+        Center = ellipse.Center;
+        MajorAxisEndPoint = ellipse.MajorAxisEndPoint;
+        MajorAxisVectorFromCenter = ellipse.MajorAxisVectorFromCenter;
+        MajorAxis = ellipse.MajorAxis;
+        MinorAxis = ellipse.MinorAxis;
+        MinorToMajorAxisRatio = ellipse.MinorToMajorAxisRatio;
+        StartParameter = ellipse.StartParameter;
+        EndParameter = ellipse.EndParameter;
+        Rotation = ellipse.Rotation;
+        IsFullEllipse = ellipse.IsFullEllipse;
+    }
+    
     public Ellipse(double centerX, double centerY, double majorAxisXValue,
         double majorAxisYValue, double minorToMajorAxisRatio,
         double startParameter, double endParameter)

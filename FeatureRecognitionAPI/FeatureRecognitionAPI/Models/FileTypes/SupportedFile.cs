@@ -1,6 +1,7 @@
 ﻿using ACadSharp;
 using ACadSharp.Blocks;
 using ACadSharp.Entities;
+using FeatureRecognitionAPI.Models.Entities;
 using FeatureRecognitionAPI.Models.Enums;
 using FeatureRecognitionAPI.Models.Features;
 using FeatureRecognitionAPI.Models.Utility;
@@ -59,7 +60,7 @@ public abstract class SupportedFile
         GroupFeatureEntities();
         foreach (Feature feature in FeatureList)
         {
-            feature.OrgList = new(feature.EntityList);
+            feature.OrgList = DeepCopyEntities(feature.EntityList);
             FindCornerNotchPattern(feature);
         }
         SetFeatureGroups();
@@ -80,11 +81,6 @@ public abstract class SupportedFile
                 feature.SeparatePerimeterEntities();
                 feature.DetectFeatures();
             }
-        }
-
-        foreach (Feature feature in FeatureList)
-        {
-            feature.EntityList = new(feature.OrgList);
         }
     }
 
@@ -446,7 +442,6 @@ public abstract class SupportedFile
                 };
                 feature.PerimeterFeatureList.Add(notch);
 
-                feature.OrgList = new(feature.EntityList);
                 EntityTools.ExtendTwoLines(posNotch[0] as Line, posNotch[^1] as Line);
 
                 // remove 0 to ^2 from entity List
@@ -529,6 +524,7 @@ public abstract class SupportedFile
     private static bool CornerNotchReqCheck(List<Entity> entities, bool isRadius)
     {
         if (entities.Count != 4 && entities.Count != 6) {return false;}
+        if (entities.Any(e => e.AdjList.Count > 2)) {return false;}
         Angles.Angle innerAngle;
         Angles.Angle outerAngleClose;
         Angles.Angle outerAngleFar;
@@ -577,5 +573,33 @@ public abstract class SupportedFile
     public void SetEntities(List<Entity> entities)
     {
         EntityList = entities;
+    }
+    
+    public static List<Entity> DeepCopyEntities(List<Entity> list)
+    {
+        List<Entity> result = new List<Entity>();
+        foreach (Entity element in list)
+        {
+            switch (element)
+            {
+                case ExtendedLine extendedLine:
+                    result.Add(new ExtendedLine(extendedLine));
+                    break;
+                case Line line:
+                    result.Add(new Line(line));
+                    break;
+                case Arc arc:
+                    result.Add(new Arc(arc));
+                    break;
+                case Circle circle:
+                    result.Add(new Circle(circle));
+                    break;
+                case Ellipse ellipse:
+                    result.Add(new Ellipse(ellipse));
+                    break;
+                
+            }
+        }
+        return result.ToList();
     }
 }

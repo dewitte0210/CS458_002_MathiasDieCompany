@@ -47,7 +47,7 @@ namespace FeatureRecognitionAPI.Services
             List<Entity> touchingEntityList = new List<Entity>();
             foreach (Feature feature in supportedFile.FeatureList)
             {
-                touchingEntityList.AddRange(feature.EntityList);
+                touchingEntityList.AddRange(feature.OrgList);
             }
 
             // Create JSON that will be sent to the frontend

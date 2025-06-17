@@ -36,6 +36,15 @@ public class Arc : Entity
         CentralAngle = CalcCentralAngle(startAngle, endAngle);
     }
 
+    public Arc(Arc arc)
+    {
+        Center = arc.Center;
+        Radius = arc.Radius;
+        StartAngle = arc.StartAngle;
+        EndAngle = arc.EndAngle;
+        CentralAngle = arc.CentralAngle;
+    }
+
     /// <summary>
     /// Function to calculate the length of the arc for perimeter length checks 
     /// </summary>

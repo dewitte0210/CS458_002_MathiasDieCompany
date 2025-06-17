@@ -8,6 +8,12 @@ public class ExtendedLine : Line
     public ExtendedLine()
     {
     }
+
+    public ExtendedLine(ExtendedLine extendedLine)
+    {
+        Parent1 = extendedLine.Parent1;
+        Parent2 = extendedLine.Parent2;
+    }
         
     //runs into issues if more than one perimeter feature is on a line
     //would show up as an ExtendedLine being a parent

@@ -30,6 +30,7 @@ public class Feature
             bool isRecognized = FeatureType != PossibleFeatureTypes.Unknown;
 
             if (EntityList.Count != 0) EntityList.ForEach(e => e.IsRecognized = isRecognized);
+            if (OrgList?.Count != 0) OrgList?.ForEach(e => e.IsRecognized = isRecognized);
             if (BaseEntityList.Count != 0) BaseEntityList.ForEach(e => e.IsRecognized = isRecognized);
             if (ExtendedEntityList.Count != 0) ExtendedEntityList.ForEach(e => e.IsRecognized = isRecognized);
             if (PerimeterFeatureList.Count != 0) PerimeterFeatureList.ForEach(eList => { eList.EntityList.ForEach(e => e.IsRecognized = isRecognized); });
