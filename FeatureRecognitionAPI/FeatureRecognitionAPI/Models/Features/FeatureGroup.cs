@@ -13,7 +13,7 @@ public class FeatureGroup
     private readonly int _totalArcs;
     private readonly int _totalLines;
     private readonly int _totalCircles;
-    
+
     // Don't rename unless you change the front end as well.
     [JsonProperty] protected internal List<Feature> features { get; set; }
 
@@ -28,7 +28,7 @@ public class FeatureGroup
             _totalCircles += feature.GetNumCircles();
         }
     }
-    
+
     /// <summary>
     /// After feature detection, chamfered lines are only flagged and should be their own feature.
     /// This function breaks those flagged chamfers into their own feature.
@@ -47,14 +47,14 @@ public class FeatureGroup
              * want to use this, that will need to be corrected.
              */
             bool removeChamfers = false;
-            
+
             List<Line> chamfersToRemove = new();
             List<Entity> newEntityList = feature.EntityList.ToList();
             foreach (ChamferGroup cg in feature.ChamferList)
             {
                 // Make new chamfer feature.
                 featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [new Line(cg.Chamfer)]));
-                
+
                 // Add to a new list so that the indexes in entity list stay the same.
                 chamfersToRemove.Add(cg.Chamfer);
 
@@ -71,9 +71,9 @@ public class FeatureGroup
                 foreach (Line chamfer in chamfersToRemove)
                 {
                     newEntityList.Remove(chamfer);
-                }                
+                }
             }
-            
+
             feature.ChamferList.Clear();
             chamfersToRemove.Clear();
             feature.EntityList = newEntityList;
@@ -92,14 +92,14 @@ public class FeatureGroup
             feature.SeparateBaseEntities();
             feature.SeparatePerimeterEntities();
             feature.DetectFeatures();
-            
+
             foreach (Feature perimeterFeature in feature.PerimeterFeatureList)
             {
                 featToAdd.Add(perimeterFeature);
             }
         }
         features.AddRange(featToAdd);
-        
+
         // Break out chamfers.
         BreakOutChamfers();
 
@@ -111,7 +111,7 @@ public class FeatureGroup
             {
                 continue;
             }
-            
+
             for (int j = i + 1; j < features.Count; j++)
             {
                 if (features[i].Equals(features[j]))
@@ -148,7 +148,7 @@ public class FeatureGroup
             // While this features @ i has same perimeter as obj.features[j] check if any j = features[i].
             int j = i;
             bool checkPoint = false;
-            while (j < features.Count && 
+            while (j < features.Count &&
                    Math.Abs(features[i].perimeter - fg.features[j].perimeter) < Entity.EntityTolerance)
             {
                 if (features[i].Equals(features[j]))
@@ -167,7 +167,7 @@ public class FeatureGroup
         // If we got here, checkPoint was never false, so return true.
         return true;
     }
-        
+
     /* TODO: complete this function to replace the one above. It will fix a few cases that the above doesnt catch
      * //Check of all features in the group have a corresponding feature in other group, return true if they do
     public override bool Equals(object? obj)

@@ -49,7 +49,7 @@ public static class Intersect
         if (entity1 is Circle || entity2 is Circle) return null;
 
         // TODO: implement arc-ellipse and ellipse-ellipse intersect.
-        
+
         // If the endpoints are touching we can avoid the intersect math.
         if (Equals(entity1.Start, entity2.Start)) return entity1.Start;
         if (Equals(entity1.Start, entity2.End)) return entity1.Start;
@@ -115,7 +115,7 @@ public static class Intersect
 
         return new Point(x, y);
     }
-    
+
     // Line with line.
     private static Point? FindIntersectPointHelper(Line line1, Line line2)
     {
@@ -134,7 +134,7 @@ public static class Intersect
         Point d = new(CrossProduct(line1.Start, line1.End), CrossProduct(line2.Start, line2.End));
         double x = CrossProduct(d, xDiff) / diffCross;
         double y = CrossProduct(d, yDiff) / diffCross;
-        
+
         // If point lies on both lines it must be within both bounds.
         bool within1 = IsBetween(x, line1.Start.X, line1.End.X) && IsBetween(y, line1.Start.Y, line1.End.Y);
         bool within2 = IsBetween(x, line2.Start.X, line2.End.X) && IsBetween(y, line2.Start.Y, line2.End.Y);
@@ -172,7 +172,7 @@ public static class Intersect
         else
         {
             double xDif = line.End.X - line.Start.X;
-            
+
             if (DEQ(xDif, 0)) slope = 0;
             else slope = (line.End.Y - line.Start.Y) / xDif;
 
@@ -231,15 +231,15 @@ public static class Intersect
             {
                 // Decimal is a 16 byte float.
                 decimal decA = (decimal)(Math.Pow(slope, 2) + 1);
-                decimal decB = (decimal)(-2.0 * arc.Center.X) 
-                               + (decimal)(2 * (intercept * slope)) 
+                decimal decB = (decimal)(-2.0 * arc.Center.X)
+                               + (decimal)(2 * (intercept * slope))
                                - (decimal)(2 * (arc.Center.Y * slope));
-                decimal decC = (decimal)Math.Pow(arc.Center.X, 2) 
-                               + (decimal)Math.Pow(intercept, 2) 
-                               - (decimal)(2 * (intercept * arc.Center.Y)) 
-                               + (decimal)Math.Pow(arc.Center.Y, 2) 
+                decimal decC = (decimal)Math.Pow(arc.Center.X, 2)
+                               + (decimal)Math.Pow(intercept, 2)
+                               - (decimal)(2 * (intercept * arc.Center.Y))
+                               + (decimal)Math.Pow(arc.Center.Y, 2)
                                - (decimal)Math.Pow(arc.Radius, 2);
-                
+
                 decimal[] tempSolutions = DecimalEx.SolveQuadratic(decA, decB, decC);
                 foreach (decimal number in tempSolutions)
                 {
@@ -255,7 +255,7 @@ public static class Intersect
                     double y = slope * solution + intercept;
 
                     Point returnPoint = new(x, y);
-                    
+
                     if (arc.IsInArcRange(returnPoint) &&
                         Math.Round(Math.Min(line.Start.X, line.End.X), IntersectTolerance) <= x &&
                         Math.Round(Math.Min(line.Start.Y, line.End.Y), IntersectTolerance) <= y &&
@@ -401,7 +401,7 @@ public static class Intersect
                 double roundedEndX = Math.Round(line.End.X, IntersectTolerance);
                 double roundedStartY = Math.Round(line.Start.Y, IntersectTolerance);
                 double roundedEndY = Math.Round(line.End.Y, IntersectTolerance);
-                
+
                 if (ellipse.IsInEllipseRange(new Point(compX, compY))
                     && Math.Min(roundedStartX, roundedEndX) <= compX
                     && Math.Max(roundedStartX, roundedEndX) >= compX
@@ -424,8 +424,8 @@ public static class Intersect
 
         // First case, the circles do not intersect as they are too far apart.
         // Second case, one circle is entirely inside the other but not intersecting.
-        if (between.GetLength() > (arc1.Radius + arc2.Radius) 
-            || between.GetLength() < (Math.Abs(arc1.Radius - arc2.Radius)) 
+        if (between.GetLength() > (arc1.Radius + arc2.Radius)
+            || between.GetLength() < (Math.Abs(arc1.Radius - arc2.Radius))
             || DEQ(between.GetLength(), 0))
         {
             return null;

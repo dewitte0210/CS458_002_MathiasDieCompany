@@ -15,9 +15,9 @@ public class PunchPrice
         RunCost = installCharge;
     }
 
-    public double CutSize {get; set;} 
-    public double BaseSize { get; set; } 
+    public double CutSize { get; set; }
+    public double BaseSize { get; set; }
     public double SetupCost { get; set; }
-    public double RunCost{ get; set; }
+    public double RunCost { get; set; }
 
 }

@@ -67,7 +67,7 @@ namespace FeatureRecognitionAPI.Controllers
         {
             return Ok(dataService.GetRates());
         }
-        
+
         [Microsoft.AspNetCore.Mvc.HttpPost("{type}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
@@ -116,9 +116,9 @@ namespace FeatureRecognitionAPI.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdateRates([FromBody] RatesPrices rates)
         {
-            if(rates is null) { return BadRequest(); }
-           bool success = await dataService.UpdateRates(rates); 
-           return success ? Ok() : StatusCode(500);
+            if (rates is null) { return BadRequest(); }
+            bool success = await dataService.UpdateRates(rates);
+            return success ? Ok() : StatusCode(500);
         }
     }
 }

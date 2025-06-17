@@ -8,14 +8,14 @@ public class ExtendedLine : Line
     public ExtendedLine()
     {
     }
-        
+
     /**
      * Runs into issues if more than one perimeter feature is on a line.
      * Would show up as an ExtendedLine being a parent. This would also 
      * throw an error when trying to find a Path because the parent would 
      * not be in EntityList.
      */
-    
+
     /// <summary>
     /// Calls line's default constructor to initialize StartPoint and EndPoint.
     /// </summary>
@@ -34,7 +34,7 @@ public class ExtendedLine : Line
     private void CalcPoints()
     {
         Point pointToExtend;
-        
+
         // This looks like a lot but all this is doing is finding the closest point on line1 to line2.
         if (Point.Distance(Parent1.Start, Parent2.Start) < Point.Distance(Parent1.End, Parent2.Start))
         {

@@ -20,14 +20,14 @@ namespace FeatureRecognitionAPI.Services
         // This only appears to be used for some sort of report calc that we are not doing.
         private double DieCuttingShopRate = 126.45;
         private double PlugRate = 95.17;
-        private double BASE = 60; 
+        private double BASE = 60;
         private double DISCOUNT = 1;
-        
+
         private readonly List<PunchPrice> _tubePunchList, _soPunchList, _hdsoPunchList,
             _ftPunchList, _swPunchList, _retractList;
         private readonly List<FeaturePrice> _featurePriceList;
         private readonly IPricingDataService _dataService;
-        
+
         /// <summary>
         /// Primary constructor for the Pricing service loads all of the pricing data from the data service.
         /// </summary>
@@ -36,7 +36,7 @@ namespace FeatureRecognitionAPI.Services
         {
             _dataService = dataService;
             _featurePriceList = _dataService.GetFeaturePrices();
-            
+
             PunchPriceReturn punches = _dataService.GetPunchPrices();
             _tubePunchList = punches.TubePunchList;
             _soPunchList = punches.SoPunchList;
@@ -44,7 +44,7 @@ namespace FeatureRecognitionAPI.Services
             _ftPunchList = punches.FtPunchList;
             _swPunchList = punches.SwPunchList;
             _retractList = punches.RetractList;
-            
+
             RatesPrices rates = _dataService.GetRates();
             BaseShopRate = rates.BaseShopRate;
             DieCuttingShopRate = rates.DieCuttingShopRate;
@@ -100,16 +100,16 @@ namespace FeatureRecognitionAPI.Services
                     // Setup Cost = hour/part to set up * ShopRate $/hour
                     // Run cost is calculated using the following factors and variables
                     // Difficulty Factor * mMain.ShopRate $/hr * hour/part * quantity of parts
-                    
+
                     FeaturePrice? featureData =
                         _featurePriceList.Find(element => element.Type == feature.FeatureType);
-                    
+
                     // If the current feature is a Punch featureData will be null, and we must use punch pricing rules.
                     if (featureData != null)
                     {
                         setupCost = featureData.SetupRate * BaseShopRate;
                         runCost = featureData.DifficultyFactor * BaseShopRate * featureData.RunRate * featureData.Quantity;
-                       
+
                         if (feature.MultipleRadius > 1)
                         {
                             if (featureData.MaxRadius != 1)
@@ -118,7 +118,7 @@ namespace FeatureRecognitionAPI.Services
                                 runCost *= 1.1;
                             }
                         }
-                          
+
                         if (feature.KissCut)
                         {
                             setupCost *= 1.15;
@@ -139,12 +139,12 @@ namespace FeatureRecognitionAPI.Services
                             if (costSub1 > minCost)
                             {
                                 featureCost += costSub1;
-                                
+
                                 /**
                                  * Efficiency slope comes from MDC business logic, will apply a progressive discount
                                  * with each subsequent duplicate feature.
                                  */
-                                var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); 
+                                var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02);
                                 costSub1 *= efficiencySlope;
                             }
                             else
@@ -152,7 +152,7 @@ namespace FeatureRecognitionAPI.Services
                                 featureCost += minCost;
                             }
                         }
-                    
+
                         featureCost *= ruleFactor;
                         var setupDiscount = SetupDiscount(quantity);
                         var featureSetup = setupCost * SetupDiscount(quantity);
@@ -162,14 +162,14 @@ namespace FeatureRecognitionAPI.Services
                         totalPerimeter += feature.Perimeter * quantity;
                     }
                     else
-                    { 
+                    {
                         /**
                          * For punch pricing we get the closest punch in our data lists by matching the diameter of the 
                          * current feature (which is a punch).
                          */
-                        PunchPrice punch; 
+                        PunchPrice punch;
                         switch (feature.FeatureType)
-                        { 
+                        {
                             case PossibleFeatureTypes.StdTubePunch:
                                 punch = _tubePunchList.OrderBy(x => (Math.Abs(x.CutSize - feature.Diameter))).First();
                                 break;
@@ -184,7 +184,7 @@ namespace FeatureRecognitionAPI.Services
                                 break;
                             case PossibleFeatureTypes.StdSWPunch:
                                 punch = _swPunchList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
-                                break; 
+                                break;
                             case PossibleFeatureTypes.StdRetractPins:
                                 punch = _retractList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
                                 break;
@@ -193,17 +193,17 @@ namespace FeatureRecognitionAPI.Services
                             default:
                                 continue;
                         }
-                            setupCost = punch.SetupCost * 1.2;
-                            runCost = punch.RunCost;
+                        setupCost = punch.SetupCost * 1.2;
+                        runCost = punch.RunCost;
 
-                            var punchCost = quantity * runCost;
-                            featureCost = punchCost + (quantity * setupCost);
-                            totalFeatureCost += featureCost;
+                        var punchCost = quantity * runCost;
+                        featureCost = punchCost + (quantity * setupCost);
+                        totalFeatureCost += featureCost;
                     }
-                  
+
                 }
 
-                double perimeterCost = totalPerimeter * 0.46;    
+                double perimeterCost = totalPerimeter * 0.46;
                 var totalEstimate = (BASE + setupCostTotal + (DISCOUNT * totalFeatureCost)) + perimeterCost;
                 totalEstimate = Math.Ceiling(totalEstimate);
                 return (OperationStatus.Ok, "Successfully estimated price", totalEstimate.ToString(CultureInfo.CurrentCulture));
@@ -213,7 +213,7 @@ namespace FeatureRecognitionAPI.Services
                 return (OperationStatus.ExternalApiFailure, ex.Message, null);
             }
         }
-        
+
         /// <summary>
         /// Sets a discount for the setup cost of a feature depending on the number of that feature, SHOULD NOT BE
         /// USED ON PUNCHES.

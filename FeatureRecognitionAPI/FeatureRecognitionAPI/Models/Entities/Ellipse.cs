@@ -19,7 +19,7 @@ public class Ellipse : Entity
     public double EndParameter { get; set; }
     public double Rotation { get; set; }
     public bool IsFullEllipse { get; set; }
-        
+
     public Ellipse(double centerX, double centerY, double majorAxisXValue,
         double majorAxisYValue, double minorToMajorAxisRatio,
         double startParameter, double endParameter)
@@ -122,7 +122,7 @@ public class Ellipse : Entity
         }
         return sum;
     }
-        
+
     /// <summary>
     /// Calculates the coordinate on an ellipse given the angle in radians.
     /// </summary>
@@ -250,7 +250,7 @@ public class Ellipse : Entity
 
     public override double GetLength()
     {
-        return (IsFullEllipse)? FullPerimeterCalc() : PartialPerimeterCalc();
+        return (IsFullEllipse) ? FullPerimeterCalc() : PartialPerimeterCalc();
     }
 
     // TODO: finish this.
@@ -338,7 +338,7 @@ public class Ellipse : Entity
         {
             if (!IsFullEllipse)
             {
-                if ((DEQ(Rotation, Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)) 
+                if ((DEQ(Rotation, Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter))
                      || (DEQ(Rotation, 3 * Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter)))
                 {
                     return Math.Min(Start.Y, End.Y);
@@ -370,7 +370,7 @@ public class Ellipse : Entity
             // If the major axis is not in the partial ellipse, the end points have to be the max.
             if (!IsFullEllipse)
             {
-                if ((DEQ(Rotation, 0) && !(0 >= StartParameter && 0 <= EndParameter)) 
+                if ((DEQ(Rotation, 0) && !(0 >= StartParameter && 0 <= EndParameter))
                      || (DEQ(Rotation, Math.PI) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                 {
                     return Math.Max(Start.X, End.X);
@@ -383,7 +383,7 @@ public class Ellipse : Entity
         {
             if (!IsFullEllipse)
             {
-                if ((DEQ(Rotation, Math.PI / 2) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)) 
+                if ((DEQ(Rotation, Math.PI / 2) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter))
                      || (DEQ(Rotation, 3 * Math.PI / 2) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)))
                 {
                     return Math.Max(Start.X, End.X);
@@ -415,7 +415,7 @@ public class Ellipse : Entity
             // If the minor axis is not in the partial ellipse, the end points have to be the max.
             if (!IsFullEllipse)
             {
-                if ((DEQ(Rotation, 0) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) 
+                if ((DEQ(Rotation, 0) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter))
                     || (DEQ(Rotation, Math.PI) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter)))
                 {
                     return Math.Max(Start.Y, End.Y);
@@ -428,7 +428,7 @@ public class Ellipse : Entity
         {
             if (!IsFullEllipse)
             {
-                if ((DEQ(Rotation, Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter)) 
+                if ((DEQ(Rotation, Math.PI / 2) && !(0 >= StartParameter && 0 <= EndParameter))
                     || (DEQ(Rotation, 3 * Math.PI / 2) && !(Math.PI >= StartParameter && Math.PI <= EndParameter)))
                 {
                     return Math.Max(Start.Y, End.Y);
@@ -497,7 +497,7 @@ public class Ellipse : Entity
     /// Calculates the constants in the general form of an ellipse 
     /// (Ax^2 + Bx + Cy^2 + Dy + Exy + alpha).
     /// </summary>
-    private void CalculateEllipseConstants(ref double A, ref double B, ref double C, ref double D, ref double E, 
+    private void CalculateEllipseConstants(ref double A, ref double B, ref double C, ref double D, ref double E,
         ref double alpha)
     {
         A = (Math.Pow(Math.Cos(Rotation), 2) / Math.Pow(MajorAxis, 2)) + (Math.Pow(Math.Sin(Rotation), 2) / Math.Pow(MinorAxis, 2));
@@ -513,7 +513,7 @@ public class Ellipse : Entity
     /// </summary>
     /// <params> The ellipse constants. </params>
     /// <returns> The x values of the bounding coords. </returns>
-    private static List<double> CalcXCoordOfBoundCoords(double a, double b, double c, double d, double e, 
+    private static List<double> CalcXCoordOfBoundCoords(double a, double b, double c, double d, double e,
         double alpha, double slope, double intercept)
     {
         double squaredCoefficient = a + (slope * ((c * slope) + e));

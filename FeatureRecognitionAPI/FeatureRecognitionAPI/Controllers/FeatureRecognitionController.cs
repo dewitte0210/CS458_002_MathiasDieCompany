@@ -29,7 +29,7 @@ namespace FeatureRecognitionAPI.Controllers
             {
                 return Ok(await _featureRecognitionService.UploadFile(file));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 // Send error message as JSON so we can access it easier in the front end using await .json().
                 return BadRequest(JsonConvert.SerializeObject($"Error uploading file. {e.Message}"));

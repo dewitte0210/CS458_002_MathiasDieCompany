@@ -11,10 +11,10 @@ namespace FeatureRecognitionAPI.Models.Entities;
 public class ChamferGroup(int lineAIndex, int chamferIndex, int lineBIndex, Line chamfer)
 {
     public bool Confirmed { get; set; } = false;
-    
+
     public Line Chamfer { get; set; } = chamfer;
     public int ChamferIndex { get; } = chamferIndex;
-    
+
     public int LineAIndex { get; set; } = lineAIndex;
     public int LineBIndex { get; set; } = lineBIndex;
 }

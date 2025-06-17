@@ -9,7 +9,7 @@ public class Point
 {
     public double X { get; set; } // X coordinate.
     public double Y { get; set; } // Y coordinate.
-        
+
 
     public Point()
     {

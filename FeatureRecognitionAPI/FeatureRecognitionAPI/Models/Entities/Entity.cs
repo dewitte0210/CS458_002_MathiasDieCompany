@@ -14,9 +14,9 @@ public abstract class Entity
     public Point Start { get; set; }
     public Point End { get; set; }
     public bool KissCut { get; set; }
-        
+
     [JsonIgnore] public List<Entity> AdjList { get; set; }
-        
+
     public const double EntityTolerance = 0.00005;
 
     public bool? IsRecognized { get; set; } // For changing how lines look on the front end if the feature is not recognized.
@@ -27,7 +27,7 @@ public abstract class Entity
         Start = new Point();
         End = new Point();
     }
-        
+
     public abstract double GetLength();
 
     public abstract override bool Equals(object? obj);

@@ -110,27 +110,27 @@ public abstract class SupportedFile
                 EntityList[i].AdjList.Add(EntityList[j]);
                 EntityList[j].AdjList.Add(EntityList[i]);
 
-                    // Check to flag an entity as Kisscut.
-                    count++;
-                    if (count == 4)
-                    {
-                        EntityList[i].KissCut = true;
-                    }
+                // Check to flag an entity as Kisscut.
+                count++;
+                if (count == 4)
+                {
+                    EntityList[i].KissCut = true;
+                }
 
-                    bool endPointBool = true;
-                    for (int k = 0; k < EntityList[i].AdjList.Count; k++)
+                bool endPointBool = true;
+                for (int k = 0; k < EntityList[i].AdjList.Count; k++)
+                {
+                    if (Intersect.AreEndpointsTouching(EntityList[i], EntityList[i].AdjList[k]))
                     {
-                        if(Intersect.AreEndpointsTouching(EntityList[i], EntityList[i].AdjList[k]))
-                        {
-                            endPointBool = false;
-                        }
+                        endPointBool = false;
                     }
+                }
 
-                    if (endPointBool)
-                    {
-                        EntityList[i].KissCut = true;
-                    }
-                    
+                if (endPointBool)
+                {
+                    EntityList[i].KissCut = true;
+                }
+
 
                 /**
                  * Checks that either i or j still needs to be mapped, say there is a 
@@ -337,24 +337,24 @@ public abstract class SupportedFile
         switch (cadEntity)
         {
             case ACadSharp.Entities.Line line:
-            {
-                return new Line(line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
-            }
+                {
+                    return new Line(line.StartPoint.X, line.StartPoint.Y, line.EndPoint.X, line.EndPoint.Y);
+                }
             case ACadSharp.Entities.Arc arc:
-            {
-                return new Arc(arc.Center.X, arc.Center.Y, arc.Radius,
-                    arc.StartAngle * (180 / Math.PI), arc.EndAngle * (180 / Math.PI));
-            }
+                {
+                    return new Arc(arc.Center.X, arc.Center.Y, arc.Radius,
+                        arc.StartAngle * (180 / Math.PI), arc.EndAngle * (180 / Math.PI));
+                }
             case ACadSharp.Entities.Circle circle:
-            {
-                return new Circle(circle.Center.X, circle.Center.Y, circle.Radius);
-            }
+                {
+                    return new Circle(circle.Center.X, circle.Center.Y, circle.Radius);
+                }
             case ACadSharp.Entities.Ellipse ellipse:
-            {
-                return new Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.EndPoint.X,
-                    ellipse.EndPoint.Y,
-                    ellipse.RadiusRatio, ellipse.StartParameter, ellipse.EndParameter);
-            }
+                {
+                    return new Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.EndPoint.X,
+                        ellipse.EndPoint.Y,
+                        ellipse.RadiusRatio, ellipse.StartParameter, ellipse.EndParameter);
+                }
         }
         return null;
     }

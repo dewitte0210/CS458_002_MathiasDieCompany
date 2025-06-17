@@ -11,14 +11,16 @@ public class Circle : Entity
 {
     public Point Center { get; set; } // Center point of circle.
     public double Radius { get; set; } // Radius of circle.
-        
-    [JsonIgnore] public new Point Start
+
+    [JsonIgnore]
+    public new Point Start
     {
         get => throw new NotSupportedException("Circle does not have a start point.");
         set => throw new NotSupportedException("Circle does not have a start point.");
     }
 
-    [JsonIgnore] public new Point End
+    [JsonIgnore]
+    public new Point End
     {
         get => throw new NotSupportedException("Circle does not have an end point.");
         set => throw new NotSupportedException("Circle does not have an end point.");

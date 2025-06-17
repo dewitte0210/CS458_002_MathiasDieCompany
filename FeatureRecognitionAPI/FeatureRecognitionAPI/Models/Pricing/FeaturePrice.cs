@@ -33,6 +33,6 @@ public class FeaturePrice
     /// Denotes the Part Quantity used to make the feature.
     /// </summary>
     public int Quantity { get; set; }
-    public int MaxRadius { get; set; } 
+    public int MaxRadius { get; set; }
     public PossibleFeatureTypes Type { get; set; }
 }

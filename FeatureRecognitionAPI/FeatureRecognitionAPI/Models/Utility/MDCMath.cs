@@ -18,7 +18,7 @@ public static class MdcMath
     {
         return a > b - tolerance && a < b + tolerance;
     }
-    
+
     /// <summary>
     /// Shorter alias for DoubleEquals.
     /// </summary>

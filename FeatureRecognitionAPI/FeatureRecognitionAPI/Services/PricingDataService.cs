@@ -18,7 +18,7 @@ public class PricingDataService : IPricingDataService
     private readonly string FT_PATH = Path.Combine(BASE_PATH, "FtPunchPrices.json");
     private readonly string SW_PATH = Path.Combine(BASE_PATH, "SwPunchPrices.json");
     private readonly string RETRACT_PATH = Path.Combine(BASE_PATH, "RetractPrices.json");
-    private readonly string RATES_PATH = Path.Combine(BASE_PATH, "BasePrices.json"); 
+    private readonly string RATES_PATH = Path.Combine(BASE_PATH, "BasePrices.json");
     public List<PunchPrice> _tubePunchList { get; set; }
     public List<PunchPrice> _soPunchList { get; set; }
     public List<PunchPrice> _hdsoPunchList { get; set; }
@@ -41,8 +41,8 @@ public class PricingDataService : IPricingDataService
         var ftPunchReader = new StreamReader(FT_PATH);
         var swPunchReader = new StreamReader(SW_PATH);
         var retractReader = new StreamReader(RETRACT_PATH);
-        var ratesReader = new StreamReader(RATES_PATH); 
-        
+        var ratesReader = new StreamReader(RATES_PATH);
+
         string featureJson = featurePriceReader.ReadToEnd();
         string tubePunchJson = tubePunchReader.ReadToEnd();
         string soPunchJson = soPunchReader.ReadToEnd();
@@ -51,16 +51,16 @@ public class PricingDataService : IPricingDataService
         string swPunchJson = swPunchReader.ReadToEnd();
         string retractJson = retractReader.ReadToEnd();
         string ratesJson = ratesReader.ReadToEnd();
-        
+
         _featurePriceList = JsonConvert.DeserializeObject<List<FeaturePrice>>(featureJson);
-        _tubePunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(tubePunchJson); 
+        _tubePunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(tubePunchJson);
         _soPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(soPunchJson);
         _hdsoPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(hdsoPunchJson);
         _ftPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(ftPunchJson);
         _swPunchList = JsonConvert.DeserializeObject<List<PunchPrice>>(swPunchJson);
         _retractList = JsonConvert.DeserializeObject<List<PunchPrice>>(retractJson);
         _ratesPrices = JsonConvert.DeserializeObject<RatesPrices>(ratesJson);
-        
+
         featurePriceReader.Close();
         tubePunchReader.Close();
         soPunchReader.Close();
@@ -70,9 +70,9 @@ public class PricingDataService : IPricingDataService
         retractReader.Close();
         ratesReader.Close();
     }
-    
-    public List<FeaturePrice> GetFeaturePrices(){ return _featurePriceList; }
-    public RatesPrices GetRates(){ return _ratesPrices; }
+
+    public List<FeaturePrice> GetFeaturePrices() { return _featurePriceList; }
+    public RatesPrices GetRates() { return _ratesPrices; }
     public PunchPriceReturn GetPunchPrices()
     {
         return new PunchPriceReturn()
@@ -85,7 +85,7 @@ public class PricingDataService : IPricingDataService
             RetractList = _retractList,
         };
     }
-    
+
     public async Task<bool> UpdatePunchPrice(PossibleFeatureTypes type, List<PunchPrice> prices)
     {
         bool success;
@@ -125,7 +125,7 @@ public class PricingDataService : IPricingDataService
     public async Task<bool> UpdateFeaturePrice(List<FeaturePrice> prices)
     {
         _featurePriceList = prices;
-        bool success = await WriteToDBFile("FeaturePrices", _featurePriceList); 
+        bool success = await WriteToDBFile("FeaturePrices", _featurePriceList);
         return success;
     }
 
@@ -159,7 +159,7 @@ public class PricingDataService : IPricingDataService
                 success = await WriteToDBFile("RetractPrices", _retractList);
                 break;
             default:
-                success = false; 
+                success = false;
                 break;
         }
         return success;
@@ -168,9 +168,9 @@ public class PricingDataService : IPricingDataService
     public async Task<bool> UpdateRates(RatesPrices newRates)
     {
         _ratesPrices = newRates;
-         return await WriteToDBFile("BasePrices", _ratesPrices);
+        return await WriteToDBFile("BasePrices", _ratesPrices);
     }
-   
+
     /// <summary>
     /// Funcion locks out a file and saves the object to a specified file. It also creates or writes the current
     /// contents to a backup file incase there is an error made while saving.
@@ -180,7 +180,7 @@ public class PricingDataService : IPricingDataService
     /// <returns> Whether the write operation was successful. </returns>
     private async Task<bool> WriteToDBFile(string fileName, Object obj)
     {
-        object writeLock = new(); 
+        object writeLock = new();
         try
         {
             lock (writeLock)
@@ -190,12 +190,12 @@ public class PricingDataService : IPricingDataService
                 var sr = new StreamReader(path);
                 string jsonCopy = sr.ReadToEnd();
                 sr.Close();
-                
+
                 // Backup current data.
                 string backupPath = Path.Combine(BASE_PATH, fileName + "backup.json");
                 var backupWriter = new StreamWriter(backupPath);
                 Task backupTask = backupWriter.WriteLineAsync(jsonCopy);
-                
+
                 // Finally write new data to file.
                 var fileWriter = new StreamWriter(path);
                 string toWrite = JsonConvert.SerializeObject(obj);
@@ -203,7 +203,7 @@ public class PricingDataService : IPricingDataService
 
                 backupTask.Wait();
                 writeTask.Wait();
-                 
+
                 fileWriter.Close();
                 backupWriter.Close();
             }
@@ -213,7 +213,7 @@ public class PricingDataService : IPricingDataService
             Console.WriteLine(e.Message);
             Console.WriteLine(e.StackTrace);
             return false;
-        } 
+        }
         return true;
     }
 }

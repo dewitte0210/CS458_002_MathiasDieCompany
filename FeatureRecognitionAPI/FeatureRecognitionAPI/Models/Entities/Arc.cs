@@ -44,7 +44,7 @@ public class Arc : Entity
     {
         return (2 * Math.PI * Radius * (CentralAngle / 360));
     }
-    
+
     /// <summary>
     /// Function to calculate the x coordinate given the center point, Radius
     /// and an angle. 
@@ -76,7 +76,7 @@ public class Arc : Entity
             return endAngle - startAngle + 360;
         return endAngle - startAngle;
     }
-    
+
     /// <summary>
     /// Overrides .Equals function for the Arc object.
     /// </summary>
@@ -181,20 +181,20 @@ public class Arc : Entity
         Rect bounds = GetBounds();
         return bounds.x;
     }
-    
+
     public override double MinY()
     {
         Rect bounds = GetBounds();
         return bounds.y;
     }
-    
+
     public override double MaxX()
     {
-    
+
         Rect bounds = GetBounds();
         return bounds.x + bounds.width;
-}
-    
+    }
+
     public override double MaxY()
     {
         Rect bounds = GetBounds();
@@ -216,7 +216,7 @@ public class Arc : Entity
         public double width { get; init; }
         public double height { get; init; }
     }
-    
+
     /// <summary>
     /// This function and its helper methods are adapted from the Java.awt library.
     /// Note: comments which appeared in the original source code will be labelled as //**
@@ -259,10 +259,10 @@ public class Arc : Entity
             y2 = Math.Max(y2, ye);
         }
 
-        double width = (x2 - x1) *  Radius;
+        double width = (x2 - x1) * Radius;
         double height = (y2 - y1) * Radius;
 
-        double x  = Center.X  + x1  * Radius;
+        double x = Center.X + x1 * Radius;
         double y = Center.Y + y1 * Radius;
         return new Rect(x, y, width, height);
     }
@@ -295,7 +295,7 @@ public class Arc : Entity
 
         return (angle >= 0.0) && (angle < angExt);
     }
-    
+
     /// <summary>
     /// ** Normalizes the specified angle into the range -180 to 180.
     /// </summary>
@@ -354,15 +354,15 @@ public class Arc : Entity
 
     public override Arc Transform(Matrix3 transform)
     {
-            Point newCenter = transform * Center;
-            Point newStart = transform * Start;
-            
-            double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
-            
-            double newRadius = Point.Distance(newStart, newCenter);
-            double newAngleStart = StartAngle - rotation;
-            double newAngleEnd = EndAngle - rotation;
+        Point newCenter = transform * Center;
+        Point newStart = transform * Start;
 
-            return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
+        double rotation = Angles.RadToDegrees(Math.Acos(transform.GetUnderlyingMatrix().m00));
+
+        double newRadius = Point.Distance(newStart, newCenter);
+        double newAngleStart = StartAngle - rotation;
+        double newAngleEnd = EndAngle - rotation;
+
+        return new Arc(newCenter.X, newCenter.Y, newRadius, newAngleStart, newAngleEnd);
     }
 }

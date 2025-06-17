@@ -35,7 +35,7 @@ public class JsonPackage
             tempMaxX = Math.Max(tempMaxX, item.MaxX());
             tempMaxY = Math.Max(tempMaxY, item.MaxY());
         }
-        
+
 
         minX = tempMinX;
         minY = tempMinY;
