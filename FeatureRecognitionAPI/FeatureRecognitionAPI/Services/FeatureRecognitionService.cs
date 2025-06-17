@@ -15,10 +15,10 @@ namespace FeatureRecognitionAPI.Services
         /// <summary>
         /// Handles an uploaded file by performing feature detection based on its extension
         /// and returning the results in JSON format for the frontend.
-        /// Supported file types: .dxf, .dwg
+        /// Supported file types: .dxf, .dwg.
         /// </summary>
         /// <param name="file"> The uploaded file as an IFormFile object. </param>
-        /// <returns> The resulting JSON string if successful </returns>
+        /// <returns> The resulting JSON string if successful. </returns>
         /// <exception cref="IOException"></exception>
         public async Task<string?> UploadFile(IFormFile file)
         {
@@ -50,7 +50,7 @@ namespace FeatureRecognitionAPI.Services
                 touchingEntityList.AddRange(feature.EntityList);
             }
 
-            // Create JSON that will be sent to the frontend
+            // Create JSON that will be sent to the frontend.
             var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
             settings.Converters.Add(new StringEnumConverter());
 

@@ -9,7 +9,7 @@ namespace FeatureRecognitionAPI.Models.Dtos
         [JsonConverter(typeof(StringEnumConverter))]
         public PossibleFeatureTypes FeatureType { get; set; }
 
-        // At least some properties will not be null, depending on the entity type
+        // At least some properties will not be null, depending on the entity type.
         public List<EntityDto>? EntityList { get; set; }
         public int Count { get; set; }
         public double Perimeter { get; set; }
@@ -24,7 +24,7 @@ namespace FeatureRecognitionAPI.Models.Dtos
         public required List<Features> Features { get; set; }
 
         [JsonProperty(PropertyName = "Count")]
-        // Number Up
+        // Number Up.
         public int NumberUp { get; set; } 
 
     }

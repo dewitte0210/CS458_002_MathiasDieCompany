@@ -32,9 +32,10 @@ builder.Services.AddCors(options =>
     {
         builder.WithOrigins("*")
                 .WithHeaders(HeaderNames.AccessControlAllowOrigin)
-               .AllowAnyMethod() // Temporarily allow any method
-               .AllowAnyHeader(); // Temporarily allow any header
-                                  //.AllowCredentials(); // Allow credentials if needed
+               .AllowAnyMethod() // Temporarily allow any method.
+               .AllowAnyHeader(); // Temporarily allow any header.
+                                  //.AllowCredentials(); 
+                                  // Allow credentials if needed
                                   //.WithMethods("POST", "GET", "PUT", "DELETE")
     });
 });

@@ -7,14 +7,14 @@ namespace FeatureRecognitionAPI.Models.Features;
 
 public class FeatureGroup
 {
-    //Track how many feature groups of this type are found
-    // Don't rename Count unless you change it in the front end too
+    // Track how many feature groups of this type are found.
+    // Don't rename Count unless you change it in the front end too.
     public int Count { get; set; }
     private readonly int _totalArcs;
     private readonly int _totalLines;
     private readonly int _totalCircles;
     
-    // don't rename unless you change the front end as well
+    // Don't rename unless you change the front end as well.
     [JsonProperty] protected internal List<Feature> features { get; set; }
 
     public FeatureGroup(List<Feature> featureList)
@@ -32,7 +32,7 @@ public class FeatureGroup
     /// <summary>
     /// After feature detection, chamfered lines are only flagged and should be their own feature.
     /// This function breaks those flagged chamfers into their own feature.
-    /// There is also an option to remove the chamfer from its original feature as well (removeChamfers bool)
+    /// There is also an option to remove the chamfer from its original feature as well (removeChamfers bool).
     /// </summary>
     private void BreakOutChamfers()
     {
@@ -41,19 +41,21 @@ public class FeatureGroup
         {
             if (feature.ChamferList.Count <= 0) continue;
 
-            // Manually set to true to remove chamfers from their base feature
-            // doing this messes with the front end display so if you do
-            // want to use this, that will need to be corrected
+            /**
+             * Manually set to true to remove chamfers from their base feature.
+             * Doing this messes with the front end display so if you do
+             * want to use this, that will need to be corrected.
+             */
             bool removeChamfers = false;
             
             List<Line> chamfersToRemove = new();
             List<Entity> newEntityList = feature.EntityList.ToList();
             foreach (ChamferGroup cg in feature.ChamferList)
             {
-                // make new chamfer feature
+                // Make new chamfer feature.
                 featuresToAdd.Add(new Feature(PossibleFeatureTypes.Group3, [new Line(cg.Chamfer)]));
                 
-                // add to a new list so that the indexes in entity list stay the same
+                // Add to a new list so that the indexes in entity list stay the same.
                 chamfersToRemove.Add(cg.Chamfer);
 
                 if (removeChamfers)
@@ -63,7 +65,7 @@ public class FeatureGroup
                 }
             }
 
-            // actually remove the chamfers
+            // Actually remove the chamfers.
             if (removeChamfers)
             {
                 foreach (Line chamfer in chamfersToRemove)
@@ -76,7 +78,7 @@ public class FeatureGroup
             chamfersToRemove.Clear();
             feature.EntityList = newEntityList;
         }
-        // add the new chamfer features to the group
+        // Add the new chamfer features to the group.
         features.AddRange(featuresToAdd);
         featuresToAdd.Clear();
     }
@@ -98,13 +100,13 @@ public class FeatureGroup
         }
         features.AddRange(featToAdd);
         
-        // break out chamfers
+        // Break out chamfers.
         BreakOutChamfers();
 
-        // Group identical features together
+        // Group identical features together.
         for (int i = 0; i < features.Count; i++)
         {
-            //ignore group 3 chamfer check because equals sees them as the same even though they are not
+            // Ignore group 3 chamfer check because equals sees them as the same even though they are not.
             if (features[i].FeatureType == PossibleFeatureTypes.Group3)
             {
                 continue;
@@ -123,7 +125,7 @@ public class FeatureGroup
     }
 
     /// <summary>
-    /// Check of all features in the group have a corresponding feature in other group, return true if they do 
+    /// Check of all features in the group have a corresponding feature in other group, return true if they do.
     /// </summary>
     public override bool Equals(object? obj)
     {
@@ -131,19 +133,19 @@ public class FeatureGroup
 
         if (fg == this) return true;
 
-        //If here, obj is a FeatureGroup
+        // If here, obj is a FeatureGroup.
         if (!(_totalArcs == fg._totalArcs && _totalLines == fg._totalLines && _totalCircles == fg._totalCircles))
         {
             return false;
         }
 
-        //Sort by perimeter
+        // Sort by perimeter.
         features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
         fg.features.Sort((x, y) => x.perimeter.CompareTo(y.perimeter));
 
         for (int i = 0; i < features.Count; i++)
         {
-            //While this features @ i has same perimeter as obj.features[j] check if any j = features[i]
+            // While this features @ i has same perimeter as obj.features[j] check if any j = features[i].
             int j = i;
             bool checkPoint = false;
             while (j < features.Count && 
@@ -155,14 +157,14 @@ public class FeatureGroup
                     break;
                 }
 
-                //If first element checked isn't equal, increment J
+                // If first element checked isn't equal, increment j.
                 j++;
             }
 
             if (!checkPoint) return false;
         }
 
-        // If we got here, checkPoint was never false, so return true
+        // If we got here, checkPoint was never false, so return true.
         return true;
     }
         

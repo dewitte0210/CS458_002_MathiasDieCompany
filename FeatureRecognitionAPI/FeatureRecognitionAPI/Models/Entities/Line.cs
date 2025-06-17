@@ -5,7 +5,7 @@ namespace FeatureRecognitionAPI.Models.Entities;
 
 public class Line : Entity
 {
-    // Don't Delete. Called from ExtendedLine constructor
+    // Don't Delete. Called from ExtendedLine constructor.
     protected Line()
     {
         Start = new Point();
@@ -30,7 +30,7 @@ public class Line : Entity
         End = new Point(endPoint);
     }
 
-    //constructor with extendedLine parameter
+    // Constructor with extendedLine parameter.
     public Line(double startX, double startY, double endX, double endY, bool extendedLine)
     {
         Start = new Point(startX, startY);

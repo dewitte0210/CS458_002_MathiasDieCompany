@@ -5,9 +5,9 @@ namespace FeatureRecognitionAPI.Models.Entities;
 /// Makes it easier to keep track of and manipulate chamfers.
 /// Does not derive from Entity.
 /// </summary>
-/// <param name="lineAIndex"> reference to first line </param>
-/// <param name="chamferIndex"> reference to chamfered line </param>
-/// <param name="lineBIndex"> reference to second line </param>
+/// <param name="lineAIndex"> Reference to first line. </param>
+/// <param name="chamferIndex"> Reference to chamfered line. </param>
+/// <param name="lineBIndex"> Reference to second line. </param>
 public class ChamferGroup(int lineAIndex, int chamferIndex, int lineBIndex, Line chamfer)
 {
     public bool Confirmed { get; set; } = false;

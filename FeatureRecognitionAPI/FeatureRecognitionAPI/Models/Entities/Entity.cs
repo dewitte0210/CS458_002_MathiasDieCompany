@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Abstract class that represents a generic entity in dxf or dwg files
+/// Abstract class that represents a generic entity in dxf or dwg files.
 /// </summary>
 public abstract class Entity
 {
@@ -19,7 +19,7 @@ public abstract class Entity
         
     public const double EntityTolerance = 0.00005;
 
-    public bool? IsRecognized { get; set; } //for changing how lines look on the front end if the feature is not recognized
+    public bool? IsRecognized { get; set; } // For changing how lines look on the front end if the feature is not recognized.
     protected Entity()
     {
         AdjList = new List<Entity>();

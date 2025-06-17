@@ -11,13 +11,13 @@ using Newtonsoft.Json;
 namespace FeatureRecognitionAPI.Services
 {
     /// <summary>
-    /// Service class to perform pricing estimates on feature data
+    /// Service class to perform pricing estimates on feature data.
     /// </summary>
     public class PricingService : IPricingService
     {
-        // Change these as necessary
+        // Change these as necessary.
         private double BaseShopRate = 139.10;
-        // This only appears to be used for some sort of report calc that we are not doing
+        // This only appears to be used for some sort of report calc that we are not doing.
         private double DieCuttingShopRate = 126.45;
         private double PlugRate = 95.17;
         private double BASE = 60; 
@@ -29,7 +29,7 @@ namespace FeatureRecognitionAPI.Services
         private readonly IPricingDataService _dataService;
         
         /// <summary>
-        /// Primary constructor for the Pricing service loads all of the pricing data from the data service
+        /// Primary constructor for the Pricing service loads all of the pricing data from the data service.
         /// </summary>
         /// <param name="dataService"></param>
         public PricingService(IPricingDataService dataService)
@@ -55,9 +55,9 @@ namespace FeatureRecognitionAPI.Services
 
         /// <summary>
         /// This function estimates the price of a files detection output we first detect if the current element is a
-        /// feature or a punch and then use different logic depending on the check
+        /// feature or a punch and then use different logic depending on the check.
         /// </summary>
-        /// <param name="param">The file feature data from the website</param>
+        /// <param name="param"> The file feature data from the website. </param>
         /// <returns></returns>
         public (OperationStatus, string, string?) EstimatePrice(QuoteSubmissionDto param)
         {
@@ -72,7 +72,7 @@ namespace FeatureRecognitionAPI.Services
                 double totalFeatureCost = 0.00;
 
 
-                //Set rule factor based on rule type
+                // Set rule factor based on rule type.
                 ruleFactor = param.RuleType switch
                 {
                     RuleType.TwoPtCB937 => 1,
@@ -104,7 +104,7 @@ namespace FeatureRecognitionAPI.Services
                     FeaturePrice? featureData =
                         _featurePriceList.Find(element => element.Type == feature.FeatureType);
                     
-                    // If the current feature is a Punch featureData will be null, and we must use punch pricing rules
+                    // If the current feature is a Punch featureData will be null, and we must use punch pricing rules.
                     if (featureData != null)
                     {
                         setupCost = featureData.SetupRate * BaseShopRate;
@@ -131,7 +131,7 @@ namespace FeatureRecognitionAPI.Services
                             runCost += (tempCost / 2);
                         }
 
-                        // Applies a progressive discount depending on the quantity of the feature 
+                        // Applies a progressive discount depending on the quantity of the feature.
                         double costSub1 = runCost;
                         double minCost = runCost * 0.25;
                         for (int i = 1; i <= quantity; i++)
@@ -140,8 +140,10 @@ namespace FeatureRecognitionAPI.Services
                             {
                                 featureCost += costSub1;
                                 
-                                // Efficiency slope comes from MDC business logic, will apply a progressive discount
-                                // with each subsequent duplicate feature
+                                /**
+                                 * Efficiency slope comes from MDC business logic, will apply a progressive discount
+                                 * with each subsequent duplicate feature.
+                                 */
                                 var efficiencySlope = (Math.Sqrt(16 - Math.Pow(0.052915 * i, 2)) - 3.02); 
                                 costSub1 *= efficiencySlope;
                             }
@@ -161,8 +163,10 @@ namespace FeatureRecognitionAPI.Services
                     }
                     else
                     { 
-                        // For punch pricing we get the closest punch in our data lists by matching the diameter of the 
-                        // current feature (which is a punch)
+                        /**
+                         * For punch pricing we get the closest punch in our data lists by matching the diameter of the 
+                         * current feature (which is a punch).
+                         */
                         PunchPrice punch; 
                         switch (feature.FeatureType)
                         { 
@@ -184,7 +188,7 @@ namespace FeatureRecognitionAPI.Services
                             case PossibleFeatureTypes.StdRetractPins:
                                 punch = _retractList.OrderBy(x => Math.Abs(x.CutSize - feature.Diameter)).First();
                                 break;
-                            // Not sure if Punch is even valid for pricing 
+                            // Not sure if Punch is even valid for pricing.
                             case PossibleFeatureTypes.Punch:
                             default:
                                 continue;
@@ -212,7 +216,7 @@ namespace FeatureRecognitionAPI.Services
         
         /// <summary>
         /// Sets a discount for the setup cost of a feature depending on the number of that feature, SHOULD NOT BE
-        /// USED ON PUNCHES
+        /// USED ON PUNCHES.
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>

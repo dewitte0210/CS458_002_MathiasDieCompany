@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace FeatureRecognitionAPI.Services;
 
 /// <summary>
-/// Service class to perform CRUD operations on Pricing data
+/// Service class to perform CRUD operations on Pricing data.
 /// </summary>
 public class PricingDataService : IPricingDataService
 {
@@ -30,7 +30,7 @@ public class PricingDataService : IPricingDataService
     private RatesPrices _ratesPrices { get; set; }
 
     /// <summary>
-    /// Default Constructor reads all of the pricing data from their respective file in the JSON "Database"
+    /// Default Constructor reads all of the pricing data from their respective file in the JSON "Database".
     /// </summary>
     public PricingDataService()
     {
@@ -173,11 +173,11 @@ public class PricingDataService : IPricingDataService
    
     /// <summary>
     /// Funcion locks out a file and saves the object to a specified file. It also creates or writes the current
-    /// contents to a backup file incase there is an error made while saving 
+    /// contents to a backup file incase there is an error made while saving.
     /// </summary>
-    /// <param name="fileName">filename without the extension</param>
-    /// <param name="obj">the object to write to file</param>
-    /// <returns> Whether the write operation was successful</returns>
+    /// <param name="fileName"> Filename without the extension. </param>
+    /// <param name="obj"> The object to write to file. </param>
+    /// <returns> Whether the write operation was successful. </returns>
     private async Task<bool> WriteToDBFile(string fileName, Object obj)
     {
         object writeLock = new(); 
@@ -185,18 +185,18 @@ public class PricingDataService : IPricingDataService
         {
             lock (writeLock)
             {
-                // Get current data and save it 
+                // Get current data and save it.
                 string path = Path.Combine(BASE_PATH, fileName + ".json");
                 var sr = new StreamReader(path);
                 string jsonCopy = sr.ReadToEnd();
                 sr.Close();
                 
-                // Backup current data
+                // Backup current data.
                 string backupPath = Path.Combine(BASE_PATH, fileName + "backup.json");
                 var backupWriter = new StreamWriter(backupPath);
                 Task backupTask = backupWriter.WriteLineAsync(jsonCopy);
                 
-                // Finally write new data to file
+                // Finally write new data to file.
                 var fileWriter = new StreamWriter(path);
                 string toWrite = JsonConvert.SerializeObject(obj);
                 Task writeTask = fileWriter.WriteLineAsync(toWrite);

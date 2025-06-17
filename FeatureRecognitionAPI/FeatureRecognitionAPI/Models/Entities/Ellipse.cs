@@ -4,8 +4,8 @@ using static FeatureRecognitionAPI.Models.Utility.MdcMath;
 namespace FeatureRecognitionAPI.Models.Entities;
 
 /// <summary>
-/// Class that represents an Ellipse object that extends Entity
-/// Inherits entityType and Length fields
+/// Class that represents an Ellipse object that extends Entity.
+/// Inherits entityType and Length fields.
 /// </summary>
 public class Ellipse : Entity
 {
@@ -42,7 +42,7 @@ public class Ellipse : Entity
             End.X -= Center.X;
             End.Y -= Center.Y;
 
-            //Rotate around the origin
+            // Rotate around the origin.
             double temp = Start.X;
             Start.X = -1 * ((Start.X * Math.Cos(Rotation)) - (Start.Y * Math.Sin(Rotation)));
             Start.Y = -1 * ((Start.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
@@ -50,7 +50,7 @@ public class Ellipse : Entity
             End.X = -1 * ((End.X * Math.Cos(Rotation)) - (End.Y * Math.Sin(Rotation)));
             End.Y = -1 * ((End.Y * Math.Cos(Rotation)) + (temp * Math.Sin(Rotation)));
 
-            //Translate back
+            // Translate back.
             Start.X += Center.X;
             Start.Y += Center.Y;
             End.X += Center.X;
@@ -68,7 +68,7 @@ public class Ellipse : Entity
 
     private double FullPerimeterCalc()
     {
-        //Major axis Radius
+        // Major axis Radius.
         double majorAxis = Point.Distance(MajorAxisEndPoint, Center);
         double a = 1;
         double g = MinorToMajorAxisRatio;
@@ -90,17 +90,17 @@ public class Ellipse : Entity
     /// </summary>
     private double PartialPerimeterCalc()
     {
-        //Major axis value
+        // Major axis value.
         double a = Point.Distance(MajorAxisEndPoint, Center);
-        //Minor axis value
+        // Minor axis value.
         double b = MinorToMajorAxisRatio * a;
-        //Return value for perimeter
+        // Return value for perimeter.
         double sum = 0;
-        //Num of lines that will trace the actual perimeter
+        // Num of lines that will trace the actual perimeter.
         int numLines = (int)Math.Ceiling(360 * (3.4064 * (a - 2) + 3.0258 * (b - 1)));
-        //Increment value between each angle
+        // Increment value between each angle.
         double angleIncrement;
-        //Adjust for rotated ellipses
+        // Adjust for rotated ellipses.
         if (EndParameter < StartParameter)
         {
             double difference = (2 * Math.PI) - StartParameter;
@@ -126,14 +126,14 @@ public class Ellipse : Entity
     /// <summary>
     /// Calculates the coordinate on an ellipse given the angle in radians.
     /// </summary>
-    /// <param name="a"> Major axis value </param>
-    /// <param name="b"> Minor axis value </param>
-    /// <param name="angle"> angle of coordinate desired in Radians </param>
+    /// <param name="a"> Major axis value. </param>
+    /// <param name="b"> Minor axis value. </param>
+    /// <param name="angle"> Angle of coordinate desired in Radians. </param>
     internal Point PointOnEllipseGivenAngleInRadians(double a, double b, double angle)
     {
         double x1;
         double y1;
-        //Special cases for pi/2 and 3pi/2
+        // Special cases for pi/2 and 3pi/2.
         switch ((angle % (2 * Math.PI)) / (2 * Math.PI))
         {
             case 0.25:
@@ -146,14 +146,14 @@ public class Ellipse : Entity
                 break;
             default:
                 x1 = (a * b) / (Math.Sqrt(Math.Pow(b, 2) + (Math.Pow(a, 2) * Math.Pow(Math.Tan(angle), 2))));
-                //Tan limitation adjusted
+                // Tan limitation adjusted.
                 if (angle % (2 * Math.PI) < 3 * (Math.PI / 2) && angle % (2 * Math.PI) > (Math.PI / 2))
                 {
                     x1 *= -1;
                 }
                 break;
         }
-        //Special cases for 0, pi/2, pi, and 3pi/2
+        // Special cases for 0, pi/2, pi, and 3pi/2.
         switch ((angle % (2 * Math.PI)) / (2 * Math.PI))
         {
             case 0:
@@ -170,7 +170,7 @@ public class Ellipse : Entity
                 break;
             default:
                 y1 = (a * b) / Math.Sqrt(Math.Pow(a, 2) + (Math.Pow(b, 2) / Math.Pow(Math.Tan(angle), 2)));
-                //Tan limitation adjusted
+                // Tan limitation adjusted.
                 if (angle % (2 * Math.PI) > Math.PI && angle % (2 * Math.PI) < (2 * Math.PI))
                 {
                     y1 *= -1;
@@ -181,10 +181,12 @@ public class Ellipse : Entity
         return sol;
     }
 
-    /**
-     * Takes an angle and creates a line representing a vector pointing out from the center in the
-     * direction of the angle.
-     */
+
+    /// <summary>
+    /// Takes an angle and creates a line representing a vector pointing out from 
+    /// the center in the direction of the angle.
+    /// </summary>
+    /// <returns> The vector pointing out from the center. </returns>
     public Line VectorFromCenter(double angle)
     {
         double a = Point.Distance(MajorAxisEndPoint, Center);
@@ -193,7 +195,7 @@ public class Ellipse : Entity
     }
 
     /// <summary>
-    /// Checks if a given point on the ellipse is in range of the parameter boundaries
+    /// Checks if a given point on the ellipse is in range of the parameter boundaries.
     /// </summary>
     internal bool IsInEllipseRange(Point point)
     {
@@ -211,12 +213,12 @@ public class Ellipse : Entity
         else
         {
             pointAngle = Math.Atan2(y, x);
-            //Q2 and Q3
+            // Q2 and Q3.
             if (x < 0)
             {
                 pointAngle += Math.PI;
             }
-            //Q4
+            // Q4.
             else if (x > 0 && y < 0)
             {
                 pointAngle += 2 * Math.PI;
@@ -237,7 +239,7 @@ public class Ellipse : Entity
         {
             ellipseRotation = Math.Atan2(ellipseY, ellipseX);
         }
-        //Adjusting for ellipse rotation
+        // Adjusting for ellipse rotation.
         pointAngle -= ellipseRotation;
         if (pointAngle < 0)
         {
@@ -251,12 +253,12 @@ public class Ellipse : Entity
         return (IsFullEllipse)? FullPerimeterCalc() : PartialPerimeterCalc();
     }
 
-    //TODO: finish this
+    // TODO: finish this.
     public override bool Equals(object? obj)
     {
         if (obj is Ellipse)
         {
-            //intentional reference comparison
+            // Intentional reference comparison.
             if (this == obj)
             {
                 return true;
@@ -272,10 +274,10 @@ public class Ellipse : Entity
 
     public override double MinX()
     {
-        //Base cases
+        // Base cases:
         if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
-            //If the major axis is not in the partial ellipse, the end points have to be the min
+            // If the major axis is not in the partial ellipse, the end points have to be the min.
             if (!IsFullEllipse)
             {
                 if ((DEQ(Rotation, 0) && !(Math.PI >= StartParameter && Math.PI <= EndParameter))
@@ -288,7 +290,7 @@ public class Ellipse : Entity
         }
         else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
-            //If the minor axis is not in the partial ellipse, the end points have to be the min
+            // If the minor axis is not in the partial ellipse, the end points have to be the min.
             if (!IsFullEllipse)
             {
                 if ((DEQ(Rotation, Math.PI / 2) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter))
@@ -300,9 +302,9 @@ public class Ellipse : Entity
             return Center.X - MinorAxis;
         }
         List<Point> values = MaxAndMinX();
-        //Min value
+        // Min value.
         double min = 0;
-        //Index tracker
+        // Index tracker.
         int index = 0;
         for (int i = 0; i < values.Count; i++)
         {
@@ -310,17 +312,17 @@ public class Ellipse : Entity
             if (i == 0) min = values[i].X;
             else if (values[i].X < min) min = values[i].X;
         }
-        //Checks if the calculated min is in range of the parameters
+        // Checks if the calculated min is in range of the parameters.
         if (!IsInEllipseRange(values[index])) { return Math.Min(Start.X, End.X); }
         return min;
     }
 
     public override double MinY()
     {
-        //Base cases
+        // Base cases:
         if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
-            //If the minor axis is not in the partial ellipse, the end points have to be the min
+            // If the minor axis is not in the partial ellipse, the end points have to be the min.
             if (!IsFullEllipse)
             {
                 if ((DEQ(Rotation, 0) && !(3 * Math.PI / 2 >= StartParameter && 3 * Math.PI / 2 <= EndParameter))
@@ -331,7 +333,7 @@ public class Ellipse : Entity
             }
             return Center.Y - MinorAxis;
         }
-        //If the major axis is not in the partial ellipse, the end points have to be the min
+        // If the major axis is not in the partial ellipse, the end points have to be the min.
         else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             if (!IsFullEllipse)
@@ -345,9 +347,9 @@ public class Ellipse : Entity
             return Center.Y - MajorAxis;
         }
         List<Point> values = MaxAndMinY();
-        //Min value
+        // Min value.
         double min = 0;
-        //Index tracker
+        // Index tracker.
         int index = 0;
         for (int i = 0; i < values.Count; i++)
         {
@@ -355,17 +357,17 @@ public class Ellipse : Entity
             if (i == 0) min = values[i].Y;
             else if (values[i].Y < min) min = values[i].Y;
         }
-        //Checks if the calculated min is in range of the parameters
+        // Checks if the calculated min is in range of the parameters.
         if (!IsInEllipseRange(values[index])) { return Math.Min(Start.Y, End.Y); }
         return min;
     }
 
     public override double MaxX()
     {
-        //Base cases
+        // Base cases:
         if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
-            //If the major axis is not in the partial ellipse, the end points have to be the max
+            // If the major axis is not in the partial ellipse, the end points have to be the max.
             if (!IsFullEllipse)
             {
                 if ((DEQ(Rotation, 0) && !(0 >= StartParameter && 0 <= EndParameter)) 
@@ -376,7 +378,7 @@ public class Ellipse : Entity
             }
             return Center.X + MajorAxis;
         }
-        //If the minor axis is not in the partial ellipse, the end points have to be the max
+        // If the minor axis is not in the partial ellipse, the end points have to be the max.
         else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             if (!IsFullEllipse)
@@ -390,9 +392,9 @@ public class Ellipse : Entity
             return Center.X + MinorAxis;
         }
         List<Point> values = MaxAndMinX();
-        //Max value
+        // Max value.
         double max = 0;
-        //Index tracker
+        // Index tracker.
         int index = 0;
         for (int i = 0; i < values.Count; i++)
         {
@@ -400,17 +402,17 @@ public class Ellipse : Entity
             if (i == 0) max = values[i].X;
             else if (values[i].X > max) max = values[i].X;
         }
-        //Checks if the calculated max is in range of the parameters
+        // Checks if the calculated max is in range of the parameters.
         if (!IsInEllipseRange(values[index])) { return Math.Max(Start.X, End.X); }
         return max;
     }
 
     public override double MaxY()
     {
-        //Base cases
+        // Base cases:
         if (DEQ(Rotation, 0) || DEQ(Rotation, Math.PI))
         {
-            //If the minor axis is not in the partial ellipse, the end points have to be the max
+            // If the minor axis is not in the partial ellipse, the end points have to be the max.
             if (!IsFullEllipse)
             {
                 if ((DEQ(Rotation, 0) && !(Math.PI / 2 >= StartParameter && Math.PI / 2 <= EndParameter)) 
@@ -421,7 +423,7 @@ public class Ellipse : Entity
             }
             return Center.Y + MinorAxis;
         }
-        //If the major axis is not in the partial ellipse, the end points have to be the max
+        // If the major axis is not in the partial ellipse, the end points have to be the max.
         else if (DEQ(Rotation, Math.PI / 2) || DEQ(Rotation, 3 * Math.PI / 2))
         {
             if (!IsFullEllipse)
@@ -435,9 +437,9 @@ public class Ellipse : Entity
             return Center.Y + MajorAxis;
         }
         List<Point> values = MaxAndMinY();
-        //Max value
+        // Max value.
         double max = 0;
-        //Index tracker
+        // Index tracker.
         int index = 0;
         for (int i = 0; i < values.Count; i++)
         {
@@ -445,16 +447,16 @@ public class Ellipse : Entity
             if (i == 0) max = values[i].Y;
             else if (values[i].Y > max) max = values[i].Y;
         }
-        //Checks if the calculated max is in range of the parameters
+        // Checks if the calculated max is in range of the parameters.
         if (!IsInEllipseRange(values[index])) { return Math.Max(Start.Y, End.Y); }
         return max;
     }
 
     #region Bounds
-    /**
-     * Calculates the y-axis bounds of the ellipse
-     * @Return - The 2 points on the ellipse corresponding to the bounds
-     */
+    /// <summary>
+    /// Calculates the y-axis bounds of the ellipse.
+    /// </summary>
+    /// <returns>  The 2 points on the ellipse corresponding to the bounds. </returns>
     private List<Point> MaxAndMinY()
     {
         double a = 0, b = 0, c = 0, d = 0, e = 0, alpha = 0;
@@ -471,10 +473,10 @@ public class Ellipse : Entity
         return yValues;
     }
 
-    /**
-     * Calculates the x-axis bounds of the ellipse
-     * @Return - The 2 points on the ellipse corresponding to the bounds
-     */
+    /// <summary>
+    /// Calculates the x-axis bounds of the ellipse.
+    /// </summary>
+    /// <returns>  The 2 points on the ellipse corresponding to the bounds. </returns>
     private List<Point> MaxAndMinX()
     {
         double a = 0, b = 0, c = 0, d = 0, e = 0, alpha = 0;
@@ -491,9 +493,10 @@ public class Ellipse : Entity
         return yValues;
     }
 
-    /**
-     * Calculates the constants in the general form of an ellipse (Ax^2 + Bx + Cy^2 + Dy + Exy + alpha)
-     */
+    /// <summary>
+    /// Calculates the constants in the general form of an ellipse 
+    /// (Ax^2 + Bx + Cy^2 + Dy + Exy + alpha).
+    /// </summary>
     private void CalculateEllipseConstants(ref double A, ref double B, ref double C, ref double D, ref double E, 
         ref double alpha)
     {
@@ -505,10 +508,11 @@ public class Ellipse : Entity
         alpha = (Math.Pow(Center.X, 2) * ((Math.Pow(Math.Cos(Rotation), 2) / Math.Pow(MajorAxis, 2)) + (Math.Pow(Math.Sin(Rotation), 2) / Math.Pow(MinorAxis, 2)))) + (Center.X * Center.Y * Math.Sin(2 * Rotation) * (Math.Pow(MajorAxis, -2) - Math.Pow(MinorAxis, -2))) + (Math.Pow(Center.Y, 2) * ((Math.Pow(Math.Sin(Rotation), 2) / Math.Pow(MajorAxis, 2)) + (Math.Pow(Math.Cos(Rotation), 2) / Math.Pow(MinorAxis, 2)))) - 1;
     }
 
-    /**
-     * Takes the bounding lines and plugs them into the ellipse equation for the quadratic formula
-     * @Return - The x values of the bounding coords
-     */
+    /// <summary>
+    /// Takes the bounding lines and plugs them into the ellipse equation for the quadratic formula.
+    /// </summary>
+    /// <params> The ellipse constants. </params>
+    /// <returns> The x values of the bounding coords. </returns>
     private static List<double> CalcXCoordOfBoundCoords(double a, double b, double c, double d, double e, 
         double alpha, double slope, double intercept)
     {
