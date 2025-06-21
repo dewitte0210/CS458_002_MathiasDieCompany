@@ -23,9 +23,9 @@ enter the Commands <br/>
 ```
 cd /home/capstone/website
 ```
-'''
+```
 npm i
-'''
+```
 ```
 npm run build
 ```
