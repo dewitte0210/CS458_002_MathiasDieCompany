@@ -10,11 +10,22 @@ You will need some sort of SFTP client, Bitvise has worked well for this so far.
 ## 3: Use SSH to connect to the droplet console
 This can be done from the Access tab within the DigitalOcean menu or through your own SSH console. if through your own console you will need sign in credentials
 
-## 4: Build and start the website
+## 4: Stop the API and Website if they are currently run
+enter the "htop" command to view currently running processes
+find the website and api processes.
+The website process should say node (and then a bunch of other stuff) and then text should be white
+The api process should say dotnet (in red) and then other text in white
+for both of these, highlight them and then press F9 to kill the process and select the SIGKILL option
+
+## 5: Build and start the website
+
 enter the Commands <br/>
 ```
-cd /home/capstone/webiste
+cd /home/capstone/website
 ```
+'''
+npm i
+'''
 ```
 npm run build
 ```
